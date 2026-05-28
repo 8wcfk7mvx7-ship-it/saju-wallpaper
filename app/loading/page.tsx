@@ -2,6 +2,34 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+function AdSenseBlock() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const timer = setTimeout(() => {
+      try {
+        // @ts-expect-error adsbygoogle
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch {}
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+  if (!mounted) return <div className="w-full h-[120px]" />;
+  return (
+    <div className="w-full max-w-sm mx-auto">
+      {/* ▼ AdSense 승인 후 data-ad-client, data-ad-slot 값을 실제 값으로 교체 */}
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client="ca-pub-여기에입력"
+        data-ad-slot="여기에입력"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
+  );
+}
+
 const LOADING_MESSAGES_KO = [
   "사주팔자를 계산하고 있어요...",
   "천간과 지지를 분석하고 있어요...",
@@ -150,28 +178,7 @@ export default function LoadingPage() {
           />
         </div>
 
-        {/*
-          ───────────────────────────────────────────────────
-          구글 애드센스 삽입 방법:
-          1. Google AdSense (https://adsense.google.com) 가입 후 사이트 승인 대기
-          2. 승인 완료 → [광고] → [광고 단위] → "디스플레이 광고" 생성
-          3. 코드 중 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" 와
-             data-ad-slot="XXXXXXXXXX" 두 값을 복사해 아래 ins 태그에 붙여넣기
-          4. layout.tsx <head>에 아래 스크립트 추가:
-             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossOrigin="anonymous"></script>
-          ───────────────────────────────────────────────────
-        */}
-        <div className="w-full rounded-2xl overflow-hidden min-h-[120px] flex items-center justify-center bg-white/5 border border-white/10">
-          {/* 아래 ins 태그를 애드센스 코드로 교체하세요 */}
-          {/* <ins className="adsbygoogle"
-               style={{display:"block"}}
-               data-ad-client="ca-pub-여기에입력"
-               data-ad-slot="여기에입력"
-               data-ad-format="auto"
-               data-full-width-responsive="true" />
-          */}
-          <p className="text-gray-700 text-xs">📢 광고 영역</p>
-        </div>
+        <AdSenseBlock />
 
         {/* 사주 팁 */}
         <div className="bg-indigo-900/30 border border-indigo-500/20 rounded-2xl p-5">

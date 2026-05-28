@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type CSSProperties, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
@@ -236,36 +236,29 @@ interface PI{name:string;gender:'male'|'female';year:string;month:string;day:str
 const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',birthTime:{hour:null,minute:null,unknown:false,useJajasi:false},birthPlace:'서울'});
 
 
-/* ─── 엔트리 랜딩 애니메이션 ─── */
-const ENTRY_LINES=[
-  {text:"원진살 커플은",delay:200,big:false},
-  {text:"노력해도 결국 깨집니다.",delay:750,big:true},
-  {text:"지금 사귀는 사람,",delay:1500,big:false},
-  {text:"내 에너지를 갉아먹는 사주인가요?",delay:2200,big:true},
-];
-
-function EntryLine({text,delay,big}:{text:string;delay:number;big:boolean}){
+/* ─── 페이드인 유틸 ─── */
+function FadeSlide({children,delay=0,style}:{children:ReactNode;delay?:number;style?:CSSProperties}){
   const [v,setV]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setV(true),delay);return()=>clearTimeout(t);},[delay]);
   return(
-    <p style={{
-      margin:'0 0 16px',
+    <div style={{
       opacity:v?1:0,
-      transform:v?'translateY(0)':'translateY(22px)',
-      transition:`opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-      fontSize:big?28:20,
-      fontWeight:big?900:500,
-      letterSpacing:'-0.02em',
-      lineHeight:1.2,
-      background:big?'linear-gradient(135deg,#c4b5fd,#818cf8,#f9a8d4)':'none',
-      WebkitBackgroundClip:big?'text':'unset',
-      WebkitTextFillColor:big?'transparent':'rgba(255,255,255,0.6)',
-      color:big?'transparent':'rgba(255,255,255,0.6)',
-    }}>{text}</p>
+      transform:v?'translateY(0)':'translateY(24px)',
+      transition:`opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+      ...style,
+    }}>{children}</div>
   );
 }
 
+const FEATURES=[
+  {icon:"🌡️",title:"조후(調候) 궁합",desc:"두 사람의 사주 온도가 맞지 않으면 함께할수록 소모됩니다"},
+  {icon:"✴️",title:"삼합 에너지",desc:"인오술·해묘미… 이 조합이 두 사람을 하나로 묶거나 끊어냅니다"},
+  {icon:"🌸",title:"바람기 살 분석",desc:"도화살·홍염살 — 상대방에게 있는지 지금 확인하세요"},
+  {icon:"💀",title:"원진·충 경고",desc:"모르면 반복되는 갈등의 진짜 원인이 여기에 있습니다"},
+];
+
 export default function GunghapPage(){
+  const router=useRouter();
   const [p1,setP1]=useState<PI>(empty());
   const [p2,setP2]=useState<PI>(empty());
   const [result,setResult]=useState<null|{
@@ -353,12 +346,12 @@ export default function GunghapPage(){
     setStep('result');
   };
 
-  const inp=(s?:React.CSSProperties):React.CSSProperties=>({
+  const inp=(s?:CSSProperties):CSSProperties=>({
     width:'100%',padding:'11px 13px',border:'1.5px solid rgba(255,255,255,0.1)',
     borderRadius:10,fontSize:13,background:'rgba(255,255,255,0.05)',
     color:'#fff',outline:'none',boxSizing:'border-box',fontFamily:'inherit',...s,
   });
-  const selStyle=(s?:React.CSSProperties):React.CSSProperties=>({...inp(),appearance:'none' as const,...s});
+  const selStyle=(s?:CSSProperties):CSSProperties=>({...inp(),appearance:'none' as const,...s});
 
   const gradeColors:{[k:string]:string}={합:'#10ac84',삼합:'#10ac84',암합:'#4ecdc4',충:'#ee5a24',원진:'#c0392b',해:'#e67e22',파:'#e67e22',형:'#e74c3c',암충:'#e74c3c'};
 
@@ -415,51 +408,111 @@ export default function GunghapPage(){
     <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0d0d1a 0%,#1a1a2e 45%,#16213e 100%)',
       fontFamily:"'Apple SD Gothic Neo','Malgun Gothic',sans-serif",color:'#fff'}}>
 
-      {/* ══ ENTRY — 애니메이션 엔트리 ══ */}
+      {/* ══ ENTRY ══ */}
       {step==='entry'&&(
-        <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',
-          alignItems:'center',justifyContent:'center',
-          maxWidth:420,margin:'0 auto',padding:'0 28px 80px',textAlign:'center',position:'relative'}}>
-
+        <div style={{minHeight:'100vh',position:'relative',overflowX:'hidden'}}>
           {/* 배경 글로우 */}
           <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}}>
             <div style={{position:'absolute',top:'-15%',left:'-10%',width:520,height:520,
-              borderRadius:'50%',background:'rgba(99,102,241,0.13)',filter:'blur(140px)'}}/>
+              borderRadius:'50%',background:'rgba(99,102,241,0.15)',filter:'blur(150px)'}}/>
             <div style={{position:'absolute',bottom:'-20%',right:'-10%',width:440,height:440,
-              borderRadius:'50%',background:'rgba(244,114,182,0.10)',filter:'blur(120px)'}}/>
+              borderRadius:'50%',background:'rgba(244,114,182,0.12)',filter:'blur(130px)'}}/>
+            <div style={{position:'absolute',top:'40%',left:'50%',transform:'translate(-50%,-50%)',
+              width:260,height:260,borderRadius:'50%',background:'rgba(139,92,246,0.07)',filter:'blur(90px)'}}/>
           </div>
 
-          <div style={{position:'relative',zIndex:1,width:'100%'}}>
-            <div style={{fontSize:54,marginBottom:48,
-              filter:'drop-shadow(0 0 36px rgba(196,181,253,0.55))'}}>💑</div>
+          {/* 홈 버튼 */}
+          <FadeSlide delay={0} style={{position:'absolute',top:20,left:20,zIndex:10}}>
+            <button onClick={()=>router.push('/')} style={{background:'rgba(255,255,255,0.05)',
+              border:'1px solid rgba(255,255,255,0.1)',borderRadius:100,padding:'6px 14px',
+              color:'rgba(255,255,255,0.4)',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>
+              ← 여름궁전
+            </button>
+          </FadeSlide>
 
-            <div style={{marginBottom:52}}>
-              {ENTRY_LINES.map((l,i)=>(
-                <EntryLine key={i} text={l.text} delay={l.delay} big={l.big}/>
-              ))}
-            </div>
+          <div style={{position:'relative',zIndex:1,maxWidth:420,margin:'0 auto',
+            padding:'72px 24px 80px',textAlign:'center'}}>
 
-            <div style={{fontSize:12,color:'rgba(255,255,255,0.22)',marginBottom:40,
-              opacity:showEntryBtn?1:0,transition:'opacity 0.8s ease 200ms'}}>
-              사주팔자 기반 궁합 분석 · 무료 · 3분
-            </div>
+            {/* 카운터 뱃지 */}
+            <FadeSlide delay={100}>
+              <div style={{display:'inline-flex',alignItems:'center',gap:8,
+                background:'rgba(255,107,107,0.12)',border:'1px solid rgba(255,107,107,0.28)',
+                borderRadius:100,padding:'7px 18px',marginBottom:28}}>
+                <span style={{width:7,height:7,borderRadius:'50%',background:'#ff6b6b',
+                  display:'inline-block',animation:'pulse 1.5s infinite'}}/>
+                <span style={{color:'#ffb3b3',fontSize:13,fontWeight:600}}>
+                  지금 이 순간 <strong style={{color:'#fff'}}>{counter.toLocaleString()}명</strong>이 확인 중
+                </span>
+              </div>
+            </FadeSlide>
 
-            <div style={{
-              opacity:showEntryBtn?1:0,
-              transform:showEntryBtn?'translateY(0) scale(1)':'translateY(24px) scale(0.95)',
-              transition:'opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)',
-            }}>
+            {/* 헤드라인 */}
+            <FadeSlide delay={250}>
+              <h1 style={{fontSize:32,fontWeight:900,lineHeight:1.25,marginBottom:16,
+                letterSpacing:'-0.03em',color:'#fff'}}>
+                그 사람과 나,<br/>
+                <span style={{background:'linear-gradient(135deg,#c4b5fd,#818cf8,#f9a8d4)',
+                  WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                  진짜 맞는 사이인가요?
+                </span>
+              </h1>
+            </FadeSlide>
+
+            {/* 서브타이틀 */}
+            <FadeSlide delay={400}>
+              <p style={{color:'rgba(255,255,255,0.45)',fontSize:14,lineHeight:1.75,marginBottom:32}}>
+                느낌만으로 관계를 판단하는 시대는 끝났습니다.<br/>
+                당신 주변의 누군가는 이미 사주로 확인했습니다.
+              </p>
+            </FadeSlide>
+
+            {/* 피처 카드 */}
+            <FadeSlide delay={560}>
+              <div style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',
+                borderRadius:20,padding:'6px 0',marginBottom:28,textAlign:'left'}}>
+                {FEATURES.map((f,i)=>(
+                  <div key={i} style={{display:'flex',alignItems:'flex-start',gap:14,
+                    padding:'13px 20px',borderBottom:i<FEATURES.length-1?'1px solid rgba(255,255,255,0.05)':'none'}}>
+                    <span style={{fontSize:22,flexShrink:0,marginTop:1}}>{f.icon}</span>
+                    <div>
+                      <p style={{fontSize:14,fontWeight:800,color:'#fff',margin:'0 0 3px'}}>{f.title}</p>
+                      <p style={{fontSize:12,color:'rgba(255,255,255,0.4)',margin:0,lineHeight:1.5}}>{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </FadeSlide>
+
+            {/* 통계 */}
+            <FadeSlide delay={720}>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:28}}>
+                {[
+                  {val:'98%',label:'분석 정확도'},
+                  {val:'3분',label:'소요 시간'},
+                  {val:'무료',label:'완전 무료'},
+                ].map((s,i)=>(
+                  <div key={i} style={{textAlign:'center'}}>
+                    <p style={{fontSize:22,fontWeight:900,color:'#fff',margin:'0 0 3px'}}>{s.val}</p>
+                    <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:0}}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeSlide>
+
+            {/* CTA */}
+            <FadeSlide delay={900}>
               <button onClick={()=>setStep('form')} style={{
-                width:'100%',maxWidth:320,padding:'20px 0',borderRadius:18,border:'none',cursor:'pointer',
-                background:'linear-gradient(135deg,#7c3aed,#6366f1)',
+                width:'100%',padding:'20px 0',borderRadius:18,border:'none',cursor:'pointer',
+                background:'linear-gradient(135deg,#7c3aed,#6366f1,#a855f7)',
                 color:'#fff',fontSize:18,fontWeight:900,letterSpacing:'0.01em',
                 boxShadow:'0 8px 40px rgba(124,58,237,0.55)',
-                display:'block',margin:'0 auto 16px',
               }}>
-                시작하기 →
+                💑 지금 궁합 확인하기
               </button>
-              <p style={{fontSize:11,color:'rgba(255,255,255,0.18)'}}>가입 없음 · 광고 없음 · 완전 무료</p>
-            </div>
+              <p style={{fontSize:12,color:'rgba(255,255,255,0.2)',marginTop:12}}>
+                가입 없음 · 광고 없음 · 완전 무료
+              </p>
+            </FadeSlide>
           </div>
         </div>
       )}
