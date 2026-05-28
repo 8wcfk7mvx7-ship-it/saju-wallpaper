@@ -44,6 +44,8 @@ const VIRAL_LINES = [
 export default function LandingPage() {
   const router = useRouter();
   const [showButton, setShowButton] = useState(false);
+  const [counter] = useState(() => Math.floor(Math.random() * 200) + 160);
+  const [totalCount] = useState(() => Math.floor(Math.random() * 20000) + 43000);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowButton(true), 3200);
@@ -68,8 +70,23 @@ export default function LandingPage() {
 
       <div className="relative z-10 max-w-md w-full text-center space-y-0">
         {/* 상단 아이콘 */}
-        <FadeInLine delay={0} className="mb-12">
+        <FadeInLine delay={0} className="mb-8">
           <div className="text-5xl drop-shadow-[0_0_40px_rgba(99,102,241,0.5)]">🔮</div>
+        </FadeInLine>
+
+        {/* 카운터 뱃지 */}
+        <FadeInLine delay={100} className="mb-10">
+          <div className="flex flex-col items-center gap-2">
+            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-indigo-200 text-sm font-semibold">
+                지금 이 순간 <strong className="text-white">{counter.toLocaleString()}명</strong>이 확인 중
+              </span>
+            </div>
+            <span className="text-xs text-gray-700">
+              누적 <strong className="text-gray-500">{totalCount.toLocaleString()}명</strong> 분석 완료
+            </span>
+          </div>
         </FadeInLine>
 
         {/* 바이럴 문구 — 한 줄씩 */}

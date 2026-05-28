@@ -243,6 +243,8 @@ export default function StockPage() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "result">("entry");
   const [showBtn, setShowBtn] = useState(false);
+  const [counter] = useState(() => Math.floor(Math.random() * 250) + 130);
+  const [totalCount] = useState(() => Math.floor(Math.random() * 12000) + 24000);
   const [hasSaved, setHasSaved] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
@@ -312,7 +314,20 @@ export default function StockPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-900/20 blur-[130px]" />
         </div>
         <div className="relative z-10 max-w-md w-full text-center">
-          <FadeIn delay={0}><div className="text-5xl mb-14 drop-shadow-[0_0_40px_rgba(16,185,129,0.5)]">📈</div></FadeIn>
+          <FadeIn delay={0}><div className="text-5xl mb-10 drop-shadow-[0_0_40px_rgba(16,185,129,0.5)]">📈</div></FadeIn>
+          <FadeIn delay={100}>
+            <div className="flex flex-col items-center gap-2 mb-10">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-4 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-emerald-200 text-sm font-semibold">
+                  지금 이 순간 <strong className="text-white">{counter.toLocaleString()}명</strong>이 확인 중
+                </span>
+              </div>
+              <span className="text-xs text-gray-700">
+                누적 <strong className="text-gray-500">{totalCount.toLocaleString()}명</strong> 분석 완료
+              </span>
+            </div>
+          </FadeIn>
           <div className="space-y-4 mb-16">
             {[
               { t: "내 친구는 왜 나보다", big: false, delay: 200 },

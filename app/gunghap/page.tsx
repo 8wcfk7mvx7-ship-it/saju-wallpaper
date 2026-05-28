@@ -268,7 +268,8 @@ export default function GunghapPage(){
     gradeTitle:string; gradeDesc:string;
     r1:ReturnType<typeof analyzeSaju>; r2:ReturnType<typeof analyzeSaju>;
   }>(null);
-  const [counter]=useState(()=>Math.floor(Math.random()*1200)+1800);
+  const [counter]=useState(()=>Math.floor(Math.random()*200)+120);
+  const [totalCount]=useState(()=>Math.floor(Math.random()*12000)+32000);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
   const [step,setStep]=useState<'entry'|'form'|'result'>('entry');
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
@@ -435,13 +436,18 @@ export default function GunghapPage(){
 
             {/* 카운터 뱃지 */}
             <FadeSlide delay={100}>
-              <div style={{display:'inline-flex',alignItems:'center',gap:8,
-                background:'rgba(255,107,107,0.12)',border:'1px solid rgba(255,107,107,0.28)',
-                borderRadius:100,padding:'7px 18px',marginBottom:28}}>
-                <span style={{width:7,height:7,borderRadius:'50%',background:'#ff6b6b',
-                  display:'inline-block',animation:'pulse 1.5s infinite'}}/>
-                <span style={{color:'#ffb3b3',fontSize:13,fontWeight:600}}>
-                  지금 이 순간 <strong style={{color:'#fff'}}>{counter.toLocaleString()}명</strong>이 확인 중
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,marginBottom:28}}>
+                <div style={{display:'inline-flex',alignItems:'center',gap:8,
+                  background:'rgba(255,107,107,0.12)',border:'1px solid rgba(255,107,107,0.28)',
+                  borderRadius:100,padding:'7px 18px'}}>
+                  <span style={{width:7,height:7,borderRadius:'50%',background:'#ff6b6b',
+                    display:'inline-block',animation:'pulse 1.5s infinite'}}/>
+                  <span style={{color:'#ffb3b3',fontSize:13,fontWeight:600}}>
+                    지금 이 순간 <strong style={{color:'#fff'}}>{counter.toLocaleString()}명</strong>이 확인 중
+                  </span>
+                </div>
+                <span style={{fontSize:11,color:'rgba(255,255,255,0.25)'}}>
+                  누적 <strong style={{color:'rgba(255,255,255,0.45)'}}>{totalCount.toLocaleString()}명</strong> 분석 완료
                 </span>
               </div>
             </FadeSlide>
