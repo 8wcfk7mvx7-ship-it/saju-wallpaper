@@ -1,6 +1,9 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
+import { loadSajuData } from "@/lib/savedSaju";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 /* ═══════════════════════════════════════════════════════════════
    관계 테이블
@@ -229,16 +232,16 @@ function ohaengRel(a:string,b:string):'상생'|'상극'|'중립'{
 /* ═══════════════════════════════════════════════════════════════
    입력/상태
 ═══════════════════════════════════════════════════════════════ */
-interface PI{name:string;gender:'male'|'female';year:string;month:string;day:string;hour:string;minute:string;birthPlace:string;}
-const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',hour:'',minute:'',birthPlace:'서울'});
+interface PI{name:string;gender:'male'|'female';year:string;month:string;day:string;birthTime:BirthTimeValue;birthPlace:string;}
+const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',birthTime:{hour:null,minute:null,unknown:false,useJajasi:false},birthPlace:'서울'});
 
 
 /* ─── 엔트리 랜딩 애니메이션 ─── */
 const ENTRY_LINES=[
-  {text:"그 사람과 나,",delay:200,big:false},
-  {text:"진짜 맞는 사이인가요?",delay:750,big:true},
-  {text:"느낌은 거짓말을 합니다.",delay:1500,big:false},
-  {text:"사주는 정직합니다.",delay:2200,big:true},
+  {text:"원진살 커플은",delay:200,big:false},
+  {text:"노력해도 결국 깨집니다.",delay:750,big:true},
+  {text:"지금 사귀는 사람,",delay:1500,big:false},
+  {text:"내 에너지를 갉아먹는 사주인가요?",delay:2200,big:true},
 ];
 
 function EntryLine({text,delay,big}:{text:string;delay:number;big:boolean}){
@@ -277,14 +280,32 @@ export default function GunghapPage(){
   const [step,setStep]=useState<'entry'|'form'|'result'>('entry');
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
 
+  const fillP1=useCallback(()=>{
+    const saved=loadSajuData();
+    if(!saved) return;
+    setP1({
+      name:saved.name||'',gender:saved.gender||'male',
+      year:String(saved.birthYear),month:String(saved.birthMonth),day:String(saved.birthDay),
+      birthTime:{
+        hour:saved.birthHourUnknown?null:saved.birthHour,
+        minute:saved.birthHourUnknown?null:saved.birthMinute,
+        unknown:saved.birthHourUnknown||false,
+        useJajasi:saved.useJajasi||false,
+      },
+      birthPlace:saved.birthPlace||'서울',
+    });
+  },[]);
+
   const calc=()=>{
     const y1=+p1.year,m1=+p1.month,d1=+p1.day;
     const y2=+p2.year,m2=+p2.month,d2=+p2.day;
     if(!p1.name||!p2.name||!y1||!m1||!d1||!y2||!m2||!d2) return;
-    const h1=p1.hour!==''?+p1.hour:null;
-    const h2=p2.hour!==''?+p2.hour:null;
-    const r1=analyzeSaju({birthYear:y1,birthMonth:m1,birthDay:d1,birthHour:h1,birthMinute:h1!=null?+p1.minute||0:null,name:p1.name,gender:p1.gender,birthPlace:p1.birthPlace||'서울',style:'auto',productType:'report',useJajasi:false});
-    const r2=analyzeSaju({birthYear:y2,birthMonth:m2,birthDay:d2,birthHour:h2,birthMinute:h2!=null?+p2.minute||0:null,name:p2.name,gender:p2.gender,birthPlace:p2.birthPlace||'서울',style:'auto',productType:'report',useJajasi:false});
+    const h1=p1.birthTime.unknown?null:p1.birthTime.hour;
+    const min1=p1.birthTime.unknown?null:(p1.birthTime.minute??0);
+    const h2=p2.birthTime.unknown?null:p2.birthTime.hour;
+    const min2=p2.birthTime.unknown?null:(p2.birthTime.minute??0);
+    const r1=analyzeSaju({birthYear:y1,birthMonth:m1,birthDay:d1,birthHour:h1,birthMinute:h1!=null?min1:null,name:p1.name,gender:p1.gender,birthPlace:p1.birthPlace||'서울',style:'auto',productType:'report',useJajasi:p1.birthTime.useJajasi});
+    const r2=analyzeSaju({birthYear:y2,birthMonth:m2,birthDay:d2,birthHour:h2,birthMinute:h2!=null?min2:null,name:p2.name,gender:p2.gender,birthPlace:p2.birthPlace||'서울',style:'auto',productType:'report',useJajasi:p2.birthTime.useJajasi});
     const pd1=r1.pillarsDetail, pd2=r2.pillarsDetail;
     const jjs1=[pd1.year.jj,pd1.month.jj,pd1.day.jj,...(pd1.hour?[pd1.hour.jj]:[])];
     const jjs2=[pd2.year.jj,pd2.month.jj,pd2.day.jj,...(pd2.hour?[pd2.hour.jj]:[])];
@@ -344,9 +365,17 @@ export default function GunghapPage(){
   const Form=({p,setP,idx}:{p:PI;setP:(v:PI)=>void;idx:1|2})=>(
     <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',
       border:'1px solid rgba(255,255,255,0.07)',marginBottom:idx===1?12:0}}>
-      <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',marginBottom:12}}>
-        {idx===1?'첫 번째 사람':'두 번째 사람'}
-      </p>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+        <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>
+          {idx===1?'첫 번째 사람':'두 번째 사람'}
+        </p>
+        {idx===1&&(
+          <button type="button" onClick={fillP1} style={{
+            fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',
+            background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px',
+          }}>내 사주로 채우기</button>
+        )}
+      </div>
       <div style={{display:'flex',gap:8,marginBottom:10}}>
         {(['male','female'] as const).map(g=>(
           <button key={g} onClick={()=>setP({...p,gender:g})} style={{
@@ -359,7 +388,7 @@ export default function GunghapPage(){
         ))}
       </div>
       <input style={{...inp(),marginBottom:8}} placeholder="이름 또는 별명" value={p.name} onChange={e=>setP({...p,name:e.target.value})}/>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:7,marginBottom:8}}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:7,marginBottom:10}}>
         <input style={inp()} placeholder="출생연도" type="number" value={p.year} onChange={e=>setP({...p,year:e.target.value})}/>
         <select style={selStyle()} value={p.month} onChange={e=>setP({...p,month:e.target.value})}>
           <option value="">월</option>
@@ -370,17 +399,15 @@ export default function GunghapPage(){
           {Array.from({length:31},(_,i)=><option key={i+1} value={i+1}>{i+1}일</option>)}
         </select>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:7}}>
-        <select style={selStyle()} value={p.hour} onChange={e=>setP({...p,hour:e.target.value})}>
-          <option value="">시(선택)</option>
-          {Array.from({length:24},(_,i)=><option key={i} value={i}>{i}시</option>)}
-        </select>
-        <select style={selStyle()} value={p.minute} onChange={e=>setP({...p,minute:e.target.value})}>
-          <option value="">분(선택)</option>
-          {[0,10,20,30,40,50].map(m=><option key={m} value={m}>{m}분</option>)}
-        </select>
-        <input style={inp()} placeholder="출생지" value={p.birthPlace} onChange={e=>setP({...p,birthPlace:e.target.value})}/>
+      <div style={{marginBottom:10}}>
+        <p style={{color:'rgba(255,255,255,0.35)',fontSize:11,fontWeight:700,marginBottom:8}}>태어난 시간</p>
+        <BirthTimePicker
+          value={p.birthTime}
+          onChange={bt=>setP({...p,birthTime:bt})}
+          accent="violet"
+        />
       </div>
+      <input style={inp()} placeholder="출생 도시 (서울 / 부산 등)" value={p.birthPlace} onChange={e=>setP({...p,birthPlace:e.target.value})}/>
     </div>
   );
 
@@ -462,17 +489,17 @@ export default function GunghapPage(){
               <>
                 <div style={{textAlign:'center',marginBottom:22}}>
                   <h1 style={{fontSize:24,fontWeight:900,lineHeight:1.35,marginBottom:10}}>
-                    그 사람, 나와 진짜<br/><span style={{color:'#a78bfa'}}>맞는 사람인가요?</span>
+                    지금 사귀는 사람,<br/><span style={{color:'#a78bfa'}}>진짜 내 편인가요?</span>
                   </h1>
                   <p style={{color:'rgba(255,255,255,0.45)',fontSize:13,lineHeight:1.6}}>
-                    사주팔자 기반 정밀 궁합 — <strong style={{color:'rgba(255,255,255,0.7)'}}>조후·삼합·합충해파형·지장간·바람기</strong>
+                    조후·삼합·합충·원진살·바람기 — <strong style={{color:'rgba(255,255,255,0.7)'}}>사주가 처음부터 알고 있었습니다</strong>
                   </p>
                 </div>
                 <div style={{background:'rgba(167,139,250,0.07)',border:'1px solid rgba(167,139,250,0.18)',
                   borderRadius:12,padding:'11px 16px',marginBottom:18,textAlign:'center'}}>
                   <p style={{color:'#c4b5fd',fontSize:13,margin:0,lineHeight:1.6}}>
-                    ⚠️ 조후 불일치 + 원진살 조합은<br/>
-                    아무리 노력해도 <strong>서로를 갉아먹습니다</strong>
+                    ⚠️ 원진살 커플 + 조후 불일치 조합은<br/>
+                    3년이 지나도 결국 <strong>서로를 갉아먹습니다</strong>
                   </p>
                 </div>
                 <Form p={p1} setP={setP1} idx={1}/>

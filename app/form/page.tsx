@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 type Lang = "ko" | "en" | "id";
 type CalendarType = "solar" | "lunar";
@@ -108,11 +109,9 @@ const CARD_STEP = CARD_W + CARD_GAP; // 슬라이드 1칸 이동 거리
 const PEEK = 28;      // 양쪽 피킹 너비
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
+const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-const HOURS   = Array.from({ length: 24 }, (_, i) => i);
-const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 // ─── 드롭다운 피커 ────────────────────────────────────────────────────────────
 function DropdownPicker({
@@ -205,10 +204,11 @@ export default function FormPage() {
 
   const [form, setForm] = useState({
     birthYear: "", birthMonth: "", birthDay: "",
-    birthHour: "12", birthMinute: "0",
-    birthHourUnknown: false,
     name: "", gender: "female", birthPlace: "",
-    style: "pixel", useJajasi: false,
+    style: "pixel",
+  });
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({
+    hour: 12, minute: 30, unknown: false, useJajasi: false,
   });
 
   // 슬라이드쇼 자동 전환 (1.5초 — 속도감 + 감상 균형)
@@ -309,8 +309,10 @@ export default function FormPage() {
         birthYear: finalYear,
         birthMonth: finalMonth,
         birthDay: finalDay,
-        birthHour:   form.birthHourUnknown ? null : parseInt(form.birthHour),
-        birthMinute: form.birthHourUnknown ? null : parseInt(form.birthMinute),
+        birthHour: birthTime.unknown ? null : birthTime.hour,
+        birthMinute: birthTime.unknown ? null : birthTime.minute,
+        birthHourUnknown: birthTime.unknown,
+        useJajasi: birthTime.useJajasi,
         lang,
       }));
       router.push("/loading");
@@ -322,11 +324,9 @@ export default function FormPage() {
   };
 
   // 옵션 데이터
-  const yearOptions   = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOptions  = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOptions    = DAYS.map(d => ({ v: String(d), label: String(d) }));
-  const hourOptions   = HOURS.map(h => ({ v: String(h), label: String(h).padStart(2, "0") }));
-  const minuteOptions = MINUTES.map(m => ({ v: String(m), label: String(m).padStart(2, "0") }));
+  const yearOptions  = YEARS.map(y => ({ v: String(y), label: String(y) }));
+  const monthOptions = MONTHS.map(m => ({ v: String(m), label: String(m) }));
+  const dayOptions   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   return (
     <main className="min-h-screen bg-[#080810] text-white">
@@ -360,6 +360,11 @@ export default function FormPage() {
             {t.title}
           </h1>
           <p className="text-gray-400 text-base leading-relaxed whitespace-pre-line max-w-sm mx-auto">{t.subtitle}</p>
+          {lang === "ko" && (
+            <div className="mt-4 inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-1.5">
+              <span className="text-xs text-indigo-300">내 오행 에너지가 불균형하면 매일 손해 보고 있습니다</span>
+            </div>
+          )}
         </div>
 
         {/* 샘플 슬라이드쇼 — 2장 동시 + peek */}
@@ -520,42 +525,14 @@ export default function FormPage() {
             )}
           </div>
 
-          {/* 시간 + 분 */}
+          {/* 태어난 시간 — 십이시진 */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">{t.birthTime}</label>
-            <div className="grid grid-cols-[1fr_1fr_auto] gap-3">
-              <DropdownPicker
-                value={form.birthHour}
-                options={hourOptions}
-                onChange={v => setForm({ ...form, birthHour: v })}
-                placeholder={t.selectHour}
-                suffix={lang === "ko" ? "시" : ""}
-                disabled={form.birthHourUnknown}
-              />
-              <DropdownPicker
-                value={form.birthMinute}
-                options={minuteOptions}
-                onChange={v => setForm({ ...form, birthMinute: v })}
-                placeholder={t.selectMinute}
-                suffix={lang === "ko" ? "분" : ""}
-                disabled={form.birthHourUnknown}
-              />
-              <button type="button"
-                onClick={() => setForm({ ...form, birthHourUnknown: !form.birthHourUnknown })}
-                className={`px-4 py-3 rounded-xl border transition text-sm font-medium whitespace-nowrap ${
-                  form.birthHourUnknown ? "bg-indigo-600 border-indigo-500" : "bg-white/5 border-white/10 text-gray-400"
-                }`}>
-                {t.unknown}
-              </button>
-            </div>
-            {!form.birthHourUnknown && (
-              <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                <input type="checkbox" checked={form.useJajasi}
-                  onChange={e => setForm({ ...form, useJajasi: e.target.checked })}
-                  className="w-4 h-4 rounded accent-indigo-500" />
-                <span className="text-xs text-gray-400">{t.jajaTime}</span>
-              </label>
-            )}
+            <label className="block text-sm font-medium text-gray-300 mb-3">{t.birthTime}</label>
+            <BirthTimePicker
+              value={birthTime}
+              onChange={setBirthTime}
+              accent="indigo"
+            />
           </div>
 
           {/* 태어난 도시 */}

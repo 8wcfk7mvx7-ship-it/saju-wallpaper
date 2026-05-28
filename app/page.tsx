@@ -18,8 +18,8 @@ const SERVICES = [
     id: "saju",
     emoji: "🔮",
     title: "사주 오행 배경화면",
-    desc: "AI가 내 사주팔자를 분석해\n부족한 오행 에너지를 채워주는\n세상에 하나뿐인 배경화면",
-    tags: ["배경화면", "보고서", "AI 생성"],
+    desc: "내 사주에 부족한 오행이 있습니다\n그걸 채워주는 배경화면이 따로 있어요\n지금 확인 안 하면 계속 에너지가 새고 있는 겁니다",
+    tags: ["배경화면", "오행 보정", "AI 생성"],
     href: "/saju",
     color: "from-indigo-600/20 to-purple-600/20",
     border: "border-indigo-500/30",
@@ -31,14 +31,40 @@ const SERVICES = [
     id: "gunghap",
     emoji: "💑",
     title: "사주 궁합 분석",
-    desc: "조후·삼합·합충해파형·바람기 살\n두 사람의 사주로 보는\n진짜 궁합 무료 분석",
-    tags: ["궁합", "무료", "사주"],
+    desc: "원진살 커플은 노력해도 결국 깨집니다\n지금 사귀는 사람, 내 에너지를 갉아먹는 사주인지\n3분 안에 확인하세요",
+    tags: ["궁합", "바람기 분석", "원진살"],
     href: "/gunghap",
     color: "from-violet-600/20 to-pink-600/20",
     border: "border-violet-500/30",
     glow: "rgba(139,92,246,0.18)",
     badge: "LIVE",
     badgeColor: "bg-violet-500",
+  },
+  {
+    id: "stock",
+    emoji: "📈",
+    title: "사주 주식 투자 분석",
+    desc: "말아먹는 사주가 따로 있습니다\n내 친구는 왜 나보다 주식으로 잘 버는 걸까요?\nETF·레버리지·코인 적합도 지금 확인",
+    tags: ["주식", "코인", "ETF·레버리지"],
+    href: "/stock",
+    color: "from-emerald-600/20 to-teal-600/20",
+    border: "border-emerald-500/30",
+    glow: "rgba(16,185,129,0.18)",
+    badge: "LIVE",
+    badgeColor: "bg-emerald-600",
+  },
+  {
+    id: "charm",
+    emoji: "✨",
+    title: "사주 매력 분석",
+    desc: "저 사람은 왜 저렇게 이성에게 잘 보이는 걸까\n도화살·홍염살·내 일간의 숨은 매력\n본인만 모르고 있었던 비밀",
+    tags: ["매력", "이성운", "도화살"],
+    href: "/charm",
+    color: "from-pink-600/20 to-violet-600/20",
+    border: "border-pink-500/30",
+    glow: "rgba(236,72,153,0.18)",
+    badge: "LIVE",
+    badgeColor: "bg-pink-600",
   },
 ];
 
@@ -89,7 +115,11 @@ function ServiceCard({ svc, index }: { svc: typeof SERVICES[0]; index: number })
 
       {/* 시작하기 (LIVE만) */}
       {isLive && (
-        <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-indigo-300">
+        <div className={`mt-5 flex items-center gap-1.5 text-sm font-semibold ${
+          svc.id === "charm" ? "text-pink-300" :
+          svc.id === "stock" ? "text-emerald-300" :
+          svc.id === "gunghap" ? "text-violet-300" : "text-indigo-300"
+        }`}>
           <span>시작하기</span>
           <span
             style={{
@@ -132,11 +162,11 @@ export default function MainPage() {
           >
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-              <span className="text-xs text-gray-400 tracking-widest uppercase font-medium">AI Studio</span>
+              <span className="text-xs text-gray-400 tracking-widest uppercase font-medium">Summer Palace · AI 사주</span>
             </div>
 
             <h1 className="text-4xl font-black mb-3 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent leading-tight pb-1">
-              운명을 바꾸는<br />AI 도구들
+              당신의 사주,<br />지금 이 순간도<br />말하고 있습니다
             </h1>
           </div>
 
@@ -147,7 +177,7 @@ export default function MainPage() {
             }}
           >
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-              동양 철학과 AI가 만나<br />당신만을 위한 콘텐츠를 만들어 드립니다
+              남들은 이미 확인했습니다<br />당신만 아직 모르고 있었어요
             </p>
           </div>
         </div>
