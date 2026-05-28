@@ -54,6 +54,34 @@ export async function POST(req: NextRequest) {
       .map((s: { name: string; category: string }) => `${s.name}(${s.category === "lucky" ? "길신" : s.category === "unlucky" ? "흉신" : "중성"})`)
       .join(", ") || "없음";
 
+    // 12운성 목록
+    const uunseongSummary = pillarsDetail
+      ? Object.entries(pillarsDetail)
+          .map(([k, v]: [string, unknown]) => {
+            const d = v as { uunseong?: string; cg?: string; jj?: string };
+            return `${k}주(${d.cg || ""}${d.jj || ""}): ${d.uunseong || ""}`;
+          })
+          .join(", ")
+      : "";
+
+    // 사묘절 기둥
+    const smjPillars = pillarsDetail
+      ? Object.entries(pillarsDetail)
+          .filter(([, v]) => { const d = v as { uunseong?: string }; return ["사","묘","절"].includes(d.uunseong || ""); })
+          .map(([k, v]) => { const d = v as { uunseong?: string }; return `${k}주(${d.uunseong})`; })
+          .join(", ")
+      : "";
+
+    // 지장간 요약
+    const jijangangSummary = pillarsDetail
+      ? Object.entries(pillarsDetail)
+          .map(([k, v]: [string, unknown]) => {
+            const d = v as { jijangan?: string };
+            return `${k}주: ${d.jijangan || ""}`;
+          })
+          .join(", ")
+      : "";
+
     // DB에서 커스텀 프롬프트 로드 (없으면 기본값 사용)
     const [systemPrefix, systemSuffix, tone, specialMsg] = await Promise.all([
       getPrompt("report_system_prefix"),
@@ -94,7 +122,14 @@ export async function POST(req: NextRequest) {
 ## 십성 분포
 ${sipseongList}
 
-## 신살
+## 12운성 (일간 기준)
+${uunseongSummary || "정보 없음"}
+${smjPillars ? `⚠️ 사묘절 기둥: ${smjPillars} — 해당 기둥에서 일간 기력이 취약합니다` : ""}
+
+## 지장간 (지지 내 숨은 천간)
+${jijangangSummary || "정보 없음"}
+
+## 신살 (길신·흉신·중성)
 ${sinsalSummary}
 
 ---
