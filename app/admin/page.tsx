@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 interface PromptItem {
   key: string;
@@ -15,6 +16,7 @@ interface PromptItem {
 const CATEGORY_LABELS = {
   wallpaper: "🖼 배경화면 (DALL-E)",
   report: "📄 보고서 (Claude)",
+  preview: "👁 결과 미리보기",
 };
 
 export default function AdminPage() {
@@ -28,7 +30,14 @@ export default function AdminPage() {
   const [saving, setSaving] = useState<string | null>(null); // key being saved
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"wallpaper" | "report">("wallpaper");
+  const [activeTab, setActiveTab] = useState<"wallpaper" | "report" | "preview">("wallpaper");
+  const [previewYear, setPreviewYear] = useState("1990");
+  const [previewMonth, setPreviewMonth] = useState("5");
+  const [previewDay, setPreviewDay] = useState("15");
+  const [previewHour, setPreviewHour] = useState("10");
+  const [previewName, setPreviewName] = useState("테스트");
+  const [previewGender, setPreviewGender] = useState("female");
+  const router = useRouter();
 
   const storedPw = typeof window !== "undefined" ? sessionStorage.getItem("adminPw") : null;
 
@@ -138,6 +147,38 @@ export default function AdminPage() {
 
   const filteredPrompts = prompts.filter(p => p.category === activeTab);
 
+  function activatePreview(target: "result" | "report" | "stock" | "charm" | "generating") {
+    sessionStorage.setItem("paymentDone", "true");
+    const form = {
+      name: previewName,
+      gender: previewGender,
+      birthYear: parseInt(previewYear),
+      birthMonth: parseInt(previewMonth),
+      birthDay: parseInt(previewDay),
+      birthHour: parseInt(previewHour),
+      birthMinute: 0,
+      birthHourUnknown: false,
+      birthPlace: "서울",
+      style: "auto",
+      productType: "report",
+      useJajasi: false,
+      lang: "ko",
+    };
+    sessionStorage.setItem("sajuForm", JSON.stringify(form));
+
+    if (target === "generating") {
+      router.push("/generating?type=report");
+    } else if (target === "stock") {
+      router.push("/stock");
+    } else if (target === "charm") {
+      router.push("/charm");
+    } else if (target === "result") {
+      router.push("/result");
+    } else if (target === "report") {
+      router.push("/report");
+    }
+  }
+
   // ── 로그인 화면 ──────────────────────────────
   if (!authed) {
     return (
@@ -212,14 +253,14 @@ export default function AdminPage() {
         </div>
 
         {/* 탭 */}
-        <div className="flex gap-2 mb-6">
-          {(["wallpaper", "report"] as const).map(tab => (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {(["wallpaper", "report", "preview"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 activeTab === tab
-                  ? "bg-indigo-600 text-white"
+                  ? tab === "preview" ? "bg-emerald-600 text-white" : "bg-indigo-600 text-white"
                   : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
               }`}
             >
@@ -228,8 +269,90 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* 프롬프트 목록 */}
-        <div className="space-y-4">
+        {/* 결과 미리보기 탭 */}
+        {activeTab === "preview" && (
+          <div className="space-y-5">
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+              <p className="text-sm text-emerald-300 leading-relaxed">
+                <strong>👁 결과 미리보기</strong><br />
+                테스트용 사주 정보를 입력하고 결제 없이 모든 최종 결과 화면을 확인합니다.<br />
+                <span className="text-emerald-400/70 text-xs">sessionStorage에 paymentDone=true가 설정되어 블러가 자동 해제됩니다.</span>
+              </p>
+            </div>
+
+            {/* 테스트 사주 입력 */}
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 space-y-4">
+              <p className="text-sm font-semibold text-gray-300">테스트 사주 정보</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">이름</label>
+                  <input value={previewName} onChange={e => setPreviewName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">성별</label>
+                  <select value={previewGender} onChange={e => setPreviewGender(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <option value="female">여성</option>
+                    <option value="male">남성</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">출생연도</label>
+                  <input value={previewYear} onChange={e => setPreviewYear(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">월</label>
+                  <input value={previewMonth} onChange={e => setPreviewMonth(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">일</label>
+                  <input value={previewDay} onChange={e => setPreviewDay(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">시 (0~23)</label>
+                  <input value={previewHour} onChange={e => setPreviewHour(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+              </div>
+            </div>
+
+            {/* 바로가기 버튼들 */}
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { label: "🖼 배경화면 결과 (/result)", target: "result" as const, color: "bg-indigo-600 hover:bg-indigo-500", desc: "오행 배경화면 결과 페이지 (blur 해제)" },
+                { label: "📄 전체 보고서 (/report)", target: "report" as const, color: "bg-violet-600 hover:bg-violet-500", desc: "유료 전체 보고서 페이지" },
+                { label: "⚙️ AI 생성 중 (/generating)", target: "generating" as const, color: "bg-amber-600 hover:bg-amber-500", desc: "보고서 AI 생성 로딩 → /report 이동" },
+                { label: "📈 주식 결과 (/stock)", target: "stock" as const, color: "bg-emerald-600 hover:bg-emerald-500", desc: "주식 투자 분석 결과 (blur 해제)" },
+                { label: "✨ 매력 결과 (/charm)", target: "charm" as const, color: "bg-pink-600 hover:bg-pink-500", desc: "매력 분석 결과 (blur 해제)" },
+              ].map(({ label, target, color, desc }) => (
+                <div key={target} className="flex items-center gap-3">
+                  <button
+                    onClick={() => activatePreview(target)}
+                    className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-white transition-all ${color} shadow-lg`}
+                  >
+                    {label}
+                  </button>
+                  <span className="text-xs text-gray-600 w-36 leading-snug">{desc}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+              <p className="text-xs text-amber-300/80 leading-relaxed">
+                ⚠️ /result 와 /report 는 실제 saju 계산 데이터가 sessionStorage에 있어야 합니다.<br />
+                <strong>배경화면(/result)</strong> → 먼저 /form에서 분석을 실행하거나 /loading을 통해 데이터를 생성하세요.<br />
+                <strong>보고서(/report)</strong> → /generating을 통해 AI 생성 후 자동 이동됩니다.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 프롬프트 목록 (preview 탭 아닐 때만) */}
+        {activeTab !== "preview" && <div className="space-y-4">
           {filteredPrompts.map(p => {
             const isEditing = editingKey === p.key;
             const isSaving = saving === p.key;
@@ -357,7 +480,7 @@ export default function AdminPage() {
               </div>
             );
           })}
-        </div>
+        </div>}
 
         {/* 수채화+유화 조합 팁 */}
         {activeTab === "wallpaper" && (
