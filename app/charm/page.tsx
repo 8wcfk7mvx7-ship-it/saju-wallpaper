@@ -491,6 +491,40 @@ export default function CharmPage() {
               </div>
             </div>
 
+            {/* 12운성 매력 지수 */}
+            {(() => {
+              const dayUU = result.pillarsDetail.day.uunseong;
+              const UUNSEONG_CHARM: Record<string, { title: string; desc: string; score: number; color: string }> = {
+                장생: { title:"장생(長生) — 생기 있는 매력", desc:"자라나는 생명력처럼 신선하고 활기찬 매력. 이성에게 건강미와 긍정 에너지로 어필. 만나면 기분이 좋아지는 타입.", score:85, color:"#4ade80" },
+                목욕: { title:"목욕(沐浴) — 이성 최강 매력", desc:"전통적으로 가장 강한 이성 매력의 12운성. 타고난 에로틱한 분위기와 매혹적 외모. 이성이 본능적으로 끌리는 에너지.", score:98, color:"#c4b5fd" },
+                관대: { title:"관대(冠帶) — 당당한 매력", desc:"자신감 넘치는 자태. 사회적 지위와 능력에서 오는 매력. 존재 자체가 당당하고 믿음직스럽습니다.", score:80, color:"#86efac" },
+                건록: { title:"건록(建祿) — 독립적 매력", desc:"스스로 서는 자립적 매력. 의지가 강하고 자기 영역이 뚜렷한 타입. 의존하지 않는 모습이 이성에게 매력적.", score:75, color:"#fbbf24" },
+                제왕: { title:"제왕(帝旺) — 카리스마 최강", desc:"최고조의 에너지와 압도적 존재감. 모든 공간을 장악하는 리더십 매력. 이성이 본능적으로 따르게 됩니다.", score:90, color:"#f59e0b" },
+                쇠:   { title:"쇠(衰) — 성숙한 매력", desc:"완숙하고 안정된 매력. 젊은 열기보다 깊이 있는 성숙함이 이성에게 신뢰감을 줍니다.", score:65, color:"#94a3b8" },
+                병:   { title:"병(病) — 여린 예술적 매력", desc:"섬세하고 예술적인 분위기. 여리지만 독특한 아우라. 지적이고 감성적인 이성에게 깊이 어필합니다.", score:60, color:"#64748b" },
+                사:   { title:"사(死) — 깊고 어두운 매력", desc:"정적이고 깊은 강렬함. 표면은 조용하지만 내면의 에너지가 미스터리한 매력을 형성합니다.", score:65, color:"#f87171" },
+                묘:   { title:"묘(墓) — 신비로운 매력", desc:"감추어진 신비. 쉽게 파악되지 않는 미스터리함이 이성을 호기심으로 끌어당깁니다.", score:60, color:"#ef4444" },
+                절:   { title:"절(絶) — 순간적 강렬한 매력", desc:"순간적으로 불타오르는 매력. 이별과 새 만남을 반복하지만, 그 순간의 강렬함이 인상적입니다.", score:70, color:"#dc2626" },
+                태:   { title:"태(胎) — 순수한 천진난만 매력", desc:"아이처럼 순수하고 꾸밈없는 매력. 보호본능을 자극하는 천진난만함이 이성의 마음을 열게 합니다.", score:72, color:"#818cf8" },
+                양:   { title:"양(養) — 따뜻한 성장 매력", desc:"자라나는 생명처럼 따뜻하고 포근한 매력. 함께 성장하고 싶다는 느낌을 주는 nurturing한 에너지.", score:70, color:"#a78bfa" },
+              };
+              const uu = UUNSEONG_CHARM[dayUU];
+              if (!uu) return null;
+              return (
+                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-3">
+                  <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">☯ 일주 12운성 매력 지수</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-bold" style={{ color: uu.color }}>{uu.title}</span>
+                    <span className="text-xl font-black text-white">{uu.score}<span className="text-xs text-gray-500">/100</span></span>
+                  </div>
+                  <div className="w-full bg-white/5 rounded-full h-2 mb-3">
+                    <div className="h-full rounded-full" style={{ width: `${uu.score}%`, backgroundColor: uu.color }} />
+                  </div>
+                  <p className="text-xs text-gray-400 leading-relaxed">{uu.desc}</p>
+                </div>
+              );
+            })()}
+
             {/* 찐친이 보게 되는 실체 */}
             <div className="bg-red-500/[0.06] border border-red-500/20 rounded-2xl p-5 mb-3">
               <p className="text-xs font-bold tracking-widest text-red-400 uppercase mb-3">⚠️ 찐친이 보게 되는 실체</p>
