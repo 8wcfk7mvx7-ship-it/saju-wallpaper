@@ -199,6 +199,38 @@ const VIRAL_CONTENT_EN = [
     content: "If you've been inexplicably tired, things keep not working out, or you notice repeating patterns in relationships — suspect elemental imbalance. Supplementing lacking elements is like using navigation to find the right direction." },
 ];
 
+const UUNSEONG_LIFE: Record<string, {
+  energy: string; life: string; career: string; health: string; love: string; color: string; tier: "strong"|"weak"|"mid";
+}> = {
+  장생: { energy:"왕성한 성장기", life:"새로운 시작과 성장의 기운. 발전과 향상이 두드러집니다.", career:"사업 시작·신규 프로젝트에 유리. 개척 정신이 강합니다.", health:"건강하고 생명력이 강함. 회복력이 뛰어납니다.", love:"새 인연·만남의 기운이 강합니다.", color:"#4ade80", tier:"strong" },
+  목욕: { energy:"활발하지만 불안정", life:"다재다능하나 집중력이 분산. 풍류 기질이 있습니다.", career:"예술·서비스·대인 분야에 유리. 화려한 환경을 선호합니다.", health:"피부·신장 건강 주의. 과음·과식 조심.", love:"이성 인기 높지만 감정 기복이 심합니다.", color:"#c4b5fd", tier:"mid" },
+  관대: { energy:"기운이 점점 강해짐", life:"자신감이 넘치고 명예를 중시. 성장 가속 시기.", career:"관직·공직·교육 분야에 길합니다.", health:"건강 양호. 과로·스트레스 주의.", love:"자기 중심적 성향으로 갈등 가능.", color:"#86efac", tier:"strong" },
+  건록: { energy:"독립적 왕성함", life:"독립과 자수성가의 기운. 의지와 책임감이 강합니다.", career:"자영업·독립창업·전문직에 유리. 스스로 개척합니다.", health:"건강 왕성. 다만 독불장군 스트레스 주의.", love:"독립적 성향. 혼자 있는 것을 즐깁니다.", color:"#fbbf24", tier:"strong" },
+  제왕: { energy:"최강의 기운", life:"최고조의 기세. 리더십과 통솔력이 최고조.", career:"리더·경영자·최고 성과 달성에 적합.", health:"건강 최고지만 지나치면 역효과.", love:"강한 존재감. 주도적 관계를 선호합니다.", color:"#f59e0b", tier:"strong" },
+  쇠: { energy:"서서히 쇠퇴", life:"안정을 추구하며 현상 유지 경향. 보수적.", career:"유지·관리·지원 역할이 적합합니다.", health:"체력 저하 시작. 관절·혈액순환 주의.", love:"안정적이나 새로움이 부족합니다.", color:"#94a3b8", tier:"mid" },
+  병: { energy:"기운이 약해짐", life:"고독함과 내성적 기질. 신중하고 철학적.", career:"정신세계·종교·연구 분야에 인연이 있습니다.", health:"만성 피로·면역 저하 주의.", love:"소수의 깊은 관계를 선호합니다.", color:"#64748b", tier:"weak" },
+  사: { energy:"기운 소진",  life:"에너지가 소진되는 기운. 의욕 저하·정적인 삶.", career:"결과보다 과정에 집중. 장기 계획이 필요합니다.", health:"심장·혈관·소화기 건강 주의.", love:"감성적이고 이별에 민감합니다.", color:"#f87171", tier:"weak" },
+  묘: { energy:"기운이 갇힘",  life:"인내와 저축의 기운. 축적하지만 답답함이 있습니다.", career:"보관·관리·저장 업무. 장기 투자에 적합.", health:"울체·소화기 문제 주의.", love:"마음을 잘 드러내지 않습니다.", color:"#ef4444", tier:"weak" },
+  절: { energy:"기운 단절·새 출발", life:"단절과 새 시작의 반복. 변화와 이별이 잦습니다.", career:"이직·변화·새 출발이 많습니다.", health:"신경·호흡기 계통 주의.", love:"인연의 단절과 새 만남이 반복됩니다.", color:"#dc2626", tier:"weak" },
+  태: { energy:"새 생명의 씨앗", life:"잠재력은 크지만 아직 미성숙. 준비 단계.", career:"준비·기획·아이디어 단계. 기반 구축이 필요합니다.", health:"면역 예민. 건강 관리에 신경 써야 합니다.", love:"순수하고 이상적인 연애관을 가집니다.", color:"#818cf8", tier:"mid" },
+  양: { energy:"기운이 자라남", life:"서서히 성장하는 기운. 인내심이 필요한 시기.", career:"수련·학습·성장 중인 단계. 꾸준함이 열쇠.", health:"성장통 주의. 체력 보충이 필요합니다.", love:"관계가 서서히 천천히 발전합니다.", color:"#a78bfa", tier:"mid" },
+};
+
+const JIJANGAN_LIFE: Record<string, string> = {
+  자:"겨울 물의 기운(壬癸). 지혜와 직관, 감수성이 숨어 있습니다.",
+  축:"토 속에 수·금이 숨어 있습니다(癸辛己). 인내 속에 재물과 지혜가 잠재됩니다.",
+  인:"봄 나무의 핵심(戊丙甲). 생명력과 열정, 리더십이 내면에 가득합니다.",
+  묘:"순수한 목 기운(甲乙). 창의성과 성장력이 집중되어 있습니다.",
+  진:"토 속에 목·수가 숨어 있습니다(乙癸戊). 변화와 재생의 힘이 내재됩니다.",
+  사:"화 속에 금·토가 숨어 있습니다(戊庚丙). 강한 의지와 실행력, 재물운이 있습니다.",
+  오:"여름 불의 정수(丙己丁). 열정과 표현력, 명예욕이 강렬합니다.",
+  미:"토 속에 화·목이 숨어 있습니다(丁乙己). 따뜻함과 포용력, 예술성이 있습니다.",
+  신:"가을 금의 핵심(戊壬庚). 결단력과 지혜, 강인함이 내재됩니다.",
+  유:"순수한 금 기운(庚辛). 정밀함과 완벽주의, 결단력이 집중됩니다.",
+  술:"토 속에 금·화가 숨어 있습니다(辛丁戊). 카리스마와 지도력, 충성심이 있습니다.",
+  해:"겨울 물의 생명(戊甲壬). 지혜와 생명력, 새로운 시작의 씨앗이 있습니다.",
+};
+
 export default function ResultPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
@@ -692,6 +724,140 @@ export default function ResultPage() {
           );
         })()}
 
+        {/* ─── 12운성 인생 분석 ─── */}
+        {sajuResult.pillarsDetail && (() => {
+          const det = sajuResult.pillarsDetail;
+          const pillarEntries = [
+            { key: "연", d: det.year },
+            { key: "월", d: det.month },
+            { key: "일", d: det.day },
+            ...(det.hour ? [{ key: "시", d: det.hour }] : []),
+          ].filter(p => p.d && p.d.uunseong);
+
+          if (pillarEntries.length === 0) return null;
+
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="font-bold text-lg">☯ 12운성 인생 분석</h2>
+                <span className="text-xs text-gray-500">각 기둥이 인생에 미치는 영향</span>
+              </div>
+
+              <div className="space-y-3">
+                {pillarEntries.map(({ key, d }) => {
+                  const uu = d.uunseong;
+                  const info = UUNSEONG_LIFE[uu];
+                  if (!info) return null;
+                  const tierBg = info.tier === "strong"
+                    ? "bg-amber-950/30 border-amber-500/20"
+                    : info.tier === "weak"
+                    ? "bg-red-950/30 border-red-500/20"
+                    : "bg-white/[0.04] border-white/10";
+                  return (
+                    <div key={key} className={`rounded-xl border p-4 ${tierBg}`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-xs bg-white/10 text-gray-400 px-2 py-0.5 rounded-full font-medium">{key}주</span>
+                        <span className="text-sm font-bold" style={{ color: info.color }}>{uu}</span>
+                        <span className="text-xs text-gray-500">{info.energy}</span>
+                        {info.tier === "strong" && <span className="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full ml-auto">길(吉)</span>}
+                        {info.tier === "weak" && <span className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full ml-auto">취약(弱)</span>}
+                      </div>
+                      <p className="text-xs text-gray-300 mb-3 leading-relaxed">{info.life}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="bg-black/20 rounded-lg p-2">
+                          <p className="text-[10px] text-gray-600 mb-1">💼 직업·재물</p>
+                          <p className="text-[11px] text-gray-400 leading-relaxed">{info.career}</p>
+                        </div>
+                        <div className="bg-black/20 rounded-lg p-2">
+                          <p className="text-[10px] text-gray-600 mb-1">🏃 건강</p>
+                          <p className="text-[11px] text-gray-400 leading-relaxed">{info.health}</p>
+                        </div>
+                        <div className="bg-black/20 rounded-lg p-2">
+                          <p className="text-[10px] text-gray-600 mb-1">❤️ 관계·사랑</p>
+                          <p className="text-[11px] text-gray-400 leading-relaxed">{info.love}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <p className="text-[11px] text-gray-600">
+                  ☯ 일주(日柱)의 12운성이 삶의 핵심 에너지를 결정합니다. 사·묘·절은 취약지로, 용신 오행으로 보완하면 운의 흐름이 개선됩니다.
+                </p>
+              </div>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
+        {/* ─── 지장간 숨겨진 기운 ─── */}
+        {sajuResult.pillarsDetail && (() => {
+          const det = sajuResult.pillarsDetail;
+          const pillarEntries = [
+            { key: "연주", jj: det.year.jj },
+            { key: "월주", jj: det.month.jj },
+            { key: "일주", jj: det.day.jj },
+            ...(det.hour ? [{ key: "시주", jj: det.hour.jj }] : []),
+          ];
+          const EL_COLOR: Record<string, string> = { 목:"#4ade80", 화:"#f87171", 토:"#d4a373", 금:"#dde6f0", 수:"#7dd3fc" };
+          const CG_EL: Record<string, string> = { 갑:"목", 을:"목", 병:"화", 정:"화", 무:"토", 기:"토", 경:"금", 신:"금", 임:"수", 계:"수" };
+          const JIJANGAN_DISPLAY2: Record<string, Array<{stem:string;role:"정기"|"중기"|"여기"}>> = {
+            자:[{stem:"임",role:"여기"},{stem:"계",role:"정기"}],
+            축:[{stem:"계",role:"여기"},{stem:"신",role:"중기"},{stem:"기",role:"정기"}],
+            인:[{stem:"무",role:"여기"},{stem:"병",role:"중기"},{stem:"갑",role:"정기"}],
+            묘:[{stem:"갑",role:"여기"},{stem:"을",role:"정기"}],
+            진:[{stem:"을",role:"여기"},{stem:"계",role:"중기"},{stem:"무",role:"정기"}],
+            사:[{stem:"무",role:"여기"},{stem:"경",role:"중기"},{stem:"병",role:"정기"}],
+            오:[{stem:"병",role:"여기"},{stem:"기",role:"중기"},{stem:"정",role:"정기"}],
+            미:[{stem:"정",role:"여기"},{stem:"을",role:"중기"},{stem:"기",role:"정기"}],
+            신:[{stem:"무",role:"여기"},{stem:"임",role:"중기"},{stem:"경",role:"정기"}],
+            유:[{stem:"경",role:"여기"},{stem:"신",role:"정기"}],
+            술:[{stem:"신",role:"여기"},{stem:"정",role:"중기"},{stem:"무",role:"정기"}],
+            해:[{stem:"무",role:"여기"},{stem:"갑",role:"중기"},{stem:"임",role:"정기"}],
+          };
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="font-bold text-lg">🌀 지장간 — 숨겨진 기운</h2>
+                <span className="text-xs text-gray-500">지지 안에 감춰진 천간의 에너지</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {pillarEntries.map(({ key, jj }) => {
+                  const stems = JIJANGAN_DISPLAY2[jj] || [];
+                  const lifeDesc = JIJANGAN_LIFE[jj];
+                  return (
+                    <div key={key} className="bg-black/20 border border-white/8 rounded-xl p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-500">{key}</span>
+                        <div className="flex gap-1">
+                          {stems.map((s, si) => {
+                            const el = CG_EL[s.stem];
+                            return (
+                              <span key={si} className="text-sm font-bold"
+                                style={{ color: el ? EL_COLOR[el] : "#6b7280", opacity: s.role === "정기" ? 1 : s.role === "중기" ? 0.7 : 0.45 }}>
+                                {s.stem}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-gray-500 leading-relaxed">{lifeDesc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-gray-600 mt-3 pt-3 border-t border-white/10">
+                지장간의 정기(본기)가 가장 강한 영향을 미치며, 대운·세운과 만날 때 그 기운이 활성화됩니다.
+              </p>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
         {/* 부족한 오행 상세 */}
         {lacking.slice(0, 2).map((el, idx) => (
           <FadeIn key={el} delay={idx * 80}>
@@ -869,72 +1035,116 @@ export default function ResultPage() {
         </div>
         </FadeIn>
 
-        {/* 신살 분석 */}
+        {/* 신살·귀인 분석 */}
         {sajuResult.sinsalList && sajuResult.sinsalList.length > 0 && (
           <FadeIn delay={60}>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h2 className="font-bold text-lg mb-4">🔯 신살 분석</h2>
-            <div className="space-y-2">
+          <div className="rounded-2xl overflow-hidden border border-white/10">
+            <div className="bg-gradient-to-br from-indigo-950/70 to-purple-950/50 px-6 pt-6 pb-4">
+              <div className="flex items-center gap-3">
+                <h2 className="font-bold text-lg">✦ 신살·귀인 분석</h2>
+                <span className="text-xs text-gray-500">사주에 새겨진 특수 기운들</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">길신은 타고난 축복, 흉신은 인생의 과제입니다</p>
+            </div>
+
+            <div className="bg-black/20 px-6 py-5 space-y-5">
               {/* 길신 */}
               {sajuResult.sinsalList.filter((s: any) => s.category === 'lucky').length > 0 && (
                 <div>
-                  <p className="text-xs text-emerald-400 font-medium mb-2">✨ 길신 (吉神)</p>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-1 h-4 bg-gradient-to-b from-amber-400 to-emerald-400 rounded-full" />
+                    <p className="text-sm font-bold text-emerald-300">길신 (吉神) — 타고난 복</p>
+                  </div>
                   <div className="space-y-2">
                     {sajuResult.sinsalList.filter((s: any) => s.category === 'lucky').map((s: any, i: number) => (
-                      <div key={i} className="bg-emerald-900/20 border border-emerald-500/20 rounded-xl p-3">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-bold text-emerald-300">{s.name}</span>
-                          <span className="text-xs text-gray-500">{s.hanja}</span>
-                          {s.pillars.map((p: string, pi: number) => (
-                            <span key={pi} className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">{p}주</span>
-                          ))}
+                      <div key={i} className="bg-emerald-950/40 border border-emerald-500/25 rounded-xl p-4">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-emerald-300">{s.name}</span>
+                              <span className="text-xs text-gray-600">{s.hanja}</span>
+                            </div>
+                            <div className="flex gap-1 mt-1">
+                              {s.pillars.map((p: string, pi: number) => (
+                                <span key={pi} className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">{p}주</span>
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-lg flex-shrink-0">✨</span>
                         </div>
-                        <p className="text-xs text-gray-400">{s.desc}</p>
+                        <p className="text-xs text-gray-300 leading-relaxed">{s.desc}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+
               {/* 흉신 */}
               {sajuResult.sinsalList.filter((s: any) => s.category === 'unlucky').length > 0 && (
-                <div className="mt-3">
-                  <p className="text-xs text-red-400 font-medium mb-2">⚠️ 흉신 (凶神)</p>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-1 h-4 bg-gradient-to-b from-red-500 to-orange-500 rounded-full" />
+                    <p className="text-sm font-bold text-red-300">흉신 (凶神) — 인생의 과제</p>
+                  </div>
                   <div className="space-y-2">
                     {sajuResult.sinsalList.filter((s: any) => s.category === 'unlucky').map((s: any, i: number) => (
-                      <div key={i} className="bg-red-900/20 border border-red-500/20 rounded-xl p-3">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-bold text-red-300">{s.name}</span>
-                          <span className="text-xs text-gray-500">{s.hanja}</span>
-                          {s.pillars.map((p: string, pi: number) => (
-                            <span key={pi} className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">{p}주</span>
-                          ))}
+                      <div key={i} className="bg-red-950/30 border border-red-500/20 rounded-xl p-4">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-red-300">{s.name}</span>
+                              <span className="text-xs text-gray-600">{s.hanja}</span>
+                            </div>
+                            <div className="flex gap-1 mt-1">
+                              {s.pillars.map((p: string, pi: number) => (
+                                <span key={pi} className="text-[10px] bg-red-500/15 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded-full">{p}주</span>
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-lg flex-shrink-0">⚠️</span>
                         </div>
-                        <p className="text-xs text-gray-400">{s.desc}</p>
+                        <p className="text-xs text-gray-300 leading-relaxed">{s.desc}</p>
+                        <p className="text-[11px] text-gray-500 mt-1.5">💡 용신 오행의 환경을 가까이하면 흉신의 영향이 완화됩니다.</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+
               {/* 중성 */}
               {sajuResult.sinsalList.filter((s: any) => s.category === 'neutral').length > 0 && (
-                <div className="mt-3">
-                  <p className="text-xs text-blue-400 font-medium mb-2">🔵 중성 신살</p>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-1 h-4 bg-gradient-to-b from-indigo-400 to-blue-400 rounded-full" />
+                    <p className="text-sm font-bold text-indigo-300">중성 신살 — 특성</p>
+                  </div>
                   <div className="space-y-2">
                     {sajuResult.sinsalList.filter((s: any) => s.category === 'neutral').map((s: any, i: number) => (
-                      <div key={i} className="bg-blue-900/20 border border-blue-500/20 rounded-xl p-3">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-bold text-blue-300">{s.name}</span>
-                          <span className="text-xs text-gray-500">{s.hanja}</span>
-                          {s.pillars.map((p: string, pi: number) => (
-                            <span key={pi} className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">{p}주</span>
-                          ))}
+                      <div key={i} className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-indigo-300">{s.name}</span>
+                              <span className="text-xs text-gray-600">{s.hanja}</span>
+                            </div>
+                            <div className="flex gap-1 mt-1">
+                              {s.pillars.map((p: string, pi: number) => (
+                                <span key={pi} className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded-full">{p}주</span>
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-lg flex-shrink-0">🔵</span>
                         </div>
-                        <p className="text-xs text-gray-400">{s.desc}</p>
+                        <p className="text-xs text-gray-300 leading-relaxed">{s.desc}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+            </div>
+
+            <div className="bg-white/[0.02] border-t border-white/5 px-6 py-3">
+              <p className="text-[11px] text-gray-600">※ 신살은 선천적 기질과 경향성입니다. 길신은 더욱 활용하고, 흉신은 용신 보강으로 완화할 수 있습니다.</p>
             </div>
           </div>
           </FadeIn>
