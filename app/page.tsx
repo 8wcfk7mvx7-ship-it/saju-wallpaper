@@ -96,6 +96,17 @@ const SERVICES_KO = [
     accent: "#fda4af", badgeBg: "rgba(225,29,72,0.9)",
     hanja: "桃花紅艶",
   },
+  {
+    id: "taste", emoji: "🎬",
+    title: "사주로 보는\n내 영화·책 취향",
+    desc: "목오행은 성장 드라마에 빠집니다\n수오행은 감성 영화에 눈물 흘립니다\n내 오행이 좋아할 콘텐츠 지금 확인",
+    tags: ["영화", "책", "취향 분석"],
+    href: "/taste", badge: "FREE",
+    gradient: "from-amber-950/80 to-orange-950/80",
+    border: "rgba(245,158,11,0.22)", glow: "rgba(234,88,12,0.18)",
+    accent: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
+    hanja: "木火土金水",
+  },
 ];
 
 const SERVICES_EN = [
@@ -399,6 +410,14 @@ export default function MainPage() {
             <span style={{ color: "rgba(201,168,76,0.3)" }}>·</span>
             <button onClick={() => router.push("/terms")} className="hover:text-amber-400/70 transition-colors" style={{ color: "rgba(255,255,255,0.2)" }}>
               {t.terms}
+            </button>
+            <span style={{ color: "rgba(201,168,76,0.3)" }}>·</span>
+            <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors" style={{ color: "rgba(255,255,255,0.2)" }}>
+              💬 문의
+            </a>
+            <span style={{ color: "rgba(201,168,76,0.3)" }}>·</span>
+            <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors" style={{ color: "rgba(255,255,255,0.2)" }}>
+              환불규정
             </button>
           </div>
         </div>

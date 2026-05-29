@@ -1359,7 +1359,15 @@ export default function ResultPage() {
         </FadeIn>
 
         {/* 하단 여백 + 홈으로 */}
-        <div className="text-center pt-4 pb-4">
+        <div className="text-center pt-4 pb-4 flex flex-col items-center gap-3">
+          <a
+            href="http://pf.kakao.com/_cuksX"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-yellow-600/70 hover:text-yellow-400/80 transition flex items-center gap-1"
+          >
+            💬 카카오 채널 문의
+          </a>
           <button onClick={() => router.push("/")}
             className="text-xs text-gray-700 hover:text-gray-500 transition">
             {displayLang === "ko" ? "← AI Studio 홈으로" : "← Back to AI Studio"}

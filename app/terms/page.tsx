@@ -78,7 +78,7 @@ export default function TermsPage() {
                   <li>서비스 오류로 인한 미생성: 전액 환불</li>
                 </ul>
               </div>
-              <p>환불 문의: support@summerpalace.ai.kr</p>
+              <p>환불 문의: <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="text-yellow-500 underline">카카오 채널 문의</a> 또는 support@summerpalace.ai.kr</p>
             </div>
           </section>
 
