@@ -156,6 +156,22 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   사지:     {hanja:"死地",   category:"unlucky",  desc:"일간의 기운이 사지(死地)에 들어 에너지가 소진되고 의욕이 저하되기 쉽습니다"},
   묘지:     {hanja:"墓地",   category:"unlucky",  desc:"일간의 기운이 묘지(墓地)에 갇혀 답답함과 정체감이 따르기 쉽습니다"},
   절지:     {hanja:"絶地",   category:"unlucky",  desc:"일간의 기운이 절지(絶地)에 들어 단절·이별·시작과 끝이 반복되기 쉽습니다"},
+  // 지지충(六沖) — 사주 내 충 관계
+  자오충:   {hanja:"子午沖", category:"unlucky",  desc:"감정 기복이 심하고 직업 변동이 잦습니다. 심장·신장 건강을 주의하세요"},
+  축미충:   {hanja:"丑未沖", category:"unlucky",  desc:"재산 손실과 부부 갈등이 생기기 쉽습니다. 토지·부동산 분쟁을 주의하세요"},
+  인신충:   {hanja:"寅申沖", category:"unlucky",  desc:"사고수와 급격한 이동·변화가 강합니다. 교통사고·충돌을 각별히 조심하세요"},
+  묘유충:   {hanja:"卯酉沖", category:"unlucky",  desc:"부부·형제 갈등이 따르기 쉽습니다. 간·폐 건강에 유의하세요"},
+  진술충:   {hanja:"辰戌沖", category:"unlucky",  desc:"관재·구설과 재산 다툼이 따르기 쉽습니다. 소화기 건강을 주의하세요"},
+  사해충:   {hanja:"巳亥沖", category:"unlucky",  desc:"예기치 못한 사고와 변동이 따릅니다. 심장·신장 건강에 유의하세요"},
+  // 삼형살(三刑殺) 및 형(刑)
+  인사신삼형:{hanja:"寅巳申三刑",category:"unlucky", desc:"지세지형(持勢之刑). 권력욕이 강하나 자기파괴적 성향이 있습니다. 관재·수술·사고를 주의하세요"},
+  축술미삼형:{hanja:"丑戌未三刑",category:"unlucky", desc:"무은지형(無恩之刑). 배신당하거나 배신하기 쉽습니다. 다리·위장 건강 주의"},
+  자묘형:   {hanja:"子卯刑",   category:"unlucky",  desc:"무례지형(無禮之刑). 예의 없는 행동으로 구설수에 오르기 쉽습니다. 관계 갈등 주의"},
+  자형살:   {hanja:"自刑殺",   category:"unlucky",  desc:"같은 지지가 겹쳐 스스로 화를 자초합니다. 자기파괴적 행동과 자해적 결정을 주의하세요"},
+  // 지지파(地支破) — 이별·손재의 기운
+  지지파:   {hanja:"地支破",   category:"unlucky",  desc:"이별·손재·인연 파탄의 기운입니다. 재물 손실과 관계의 이별을 주의하세요"},
+  // 지지해(地支害/穿) — 방해·배신의 기운
+  지지해:   {hanja:"地支害",   category:"unlucky",  desc:"육해(六害). 방해와 장애가 따르며 가까운 사람의 배신을 조심하세요"},
 };
 
 // 양인살: 일간 기준 양인 지지
@@ -1341,6 +1357,74 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     else if (d.uunseong === '묘') addSinsal('묘지', [label]);
     else if (d.uunseong === '절') addSinsal('절지', [label]);
   }
+
+  // === 지지충(六沖) 신살 등록 ===
+  const JIJI_CHUNG_SINSAL = [
+    {a:"자", b:"오", name:"자오충"},
+    {a:"축", b:"미", name:"축미충"},
+    {a:"인", b:"신", name:"인신충"},
+    {a:"묘", b:"유", name:"묘유충"},
+    {a:"진", b:"술", name:"진술충"},
+    {a:"사", b:"해", name:"사해충"},
+  ] as const;
+  for (const cs of JIJI_CHUNG_SINSAL) {
+    if (jjSet.has(cs.a) && jjSet.has(cs.b)) {
+      addSinsal(cs.name, detailArr.filter(p => p.d.jj === cs.a || p.d.jj === cs.b).map(p => p.label));
+    }
+  }
+
+  // === 삼형살(三刑殺) 및 형(刑) 신살 등록 ===
+  // 인사신 삼형(지세지형): 2개 이상이면 형살 성립
+  const inSaSinF = detailArr.filter(p => ["인","사","신"].includes(p.d.jj));
+  if (inSaSinF.length >= 2) {
+    addSinsal('인사신삼형', inSaSinF.map(p => p.label));
+  }
+  // 축술미 삼형(무은지형): 2개 이상이면 형살 성립
+  const chukSulMiF = detailArr.filter(p => ["축","술","미"].includes(p.d.jj));
+  if (chukSulMiF.length >= 2) {
+    addSinsal('축술미삼형', chukSulMiF.map(p => p.label));
+  }
+  // 자묘형(무례지형)
+  if (jjSet.has("자") && jjSet.has("묘")) {
+    addSinsal('자묘형', detailArr.filter(p => p.d.jj === "자" || p.d.jj === "묘").map(p => p.label));
+  }
+  // 자형살(自刑殺): 진진·오오·유유·해해 — 같은 지지가 2기둥 이상
+  const selfFormCnt: Record<string, string[]> = {};
+  for (const {label, d} of detailArr) {
+    selfFormCnt[d.jj] = selfFormCnt[d.jj] || [];
+    selfFormCnt[d.jj].push(label);
+  }
+  const selfFormAffected: string[] = [];
+  for (const b of ["진","오","유","해"]) {
+    if ((selfFormCnt[b] || []).length >= 2) selfFormAffected.push(...(selfFormCnt[b] || []));
+  }
+  if (selfFormAffected.length > 0) addSinsal('자형살', [...new Set(selfFormAffected)]);
+
+  // === 지지파(地支破) 신살 등록 ===
+  const JIJI_PA_SINSAL_PAIRS = [
+    {a:"자", b:"유"}, {a:"오", b:"묘"}, {a:"인", b:"해"},
+    {a:"사", b:"신"}, {a:"진", b:"축"}, {a:"술", b:"미"},
+  ];
+  const paAffected: string[] = [];
+  for (const pa of JIJI_PA_SINSAL_PAIRS) {
+    if (jjSet.has(pa.a) && jjSet.has(pa.b)) {
+      detailArr.filter(p => p.d.jj === pa.a || p.d.jj === pa.b).forEach(p => paAffected.push(p.label));
+    }
+  }
+  if (paAffected.length > 0) addSinsal('지지파', [...new Set(paAffected)]);
+
+  // === 지지해(地支害/穿) 신살 등록 ===
+  const JIJI_HAE_SINSAL_PAIRS = [
+    {a:"자", b:"미"}, {a:"축", b:"오"}, {a:"인", b:"사"},
+    {a:"묘", b:"진"}, {a:"신", b:"해"}, {a:"유", b:"술"},
+  ];
+  const haeAffected: string[] = [];
+  for (const hae of JIJI_HAE_SINSAL_PAIRS) {
+    if (jjSet.has(hae.a) && jjSet.has(hae.b)) {
+      detailArr.filter(p => p.d.jj === hae.a || p.d.jj === hae.b).forEach(p => haeAffected.push(p.label));
+    }
+  }
+  if (haeAffected.length > 0) addSinsal('지지해', [...new Set(haeAffected)]);
 
   const elements: Element[] = ["목","화","토","금","수"];
   const sorted = [...elements].sort((a,b) => scores[b]-scores[a]);
