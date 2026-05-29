@@ -140,6 +140,17 @@ const SERVICES_KO = [
     accent: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     hanja: "大運歲運",
   },
+  {
+    id: "place", emoji: "🌍",
+    title: "내 사주에 맞는\n도시·나라",
+    desc: "한국 어느 도시가 내 기운에 맞는지\n해외 이민·유학에 유리한 나라는 어디\n용신 오행으로 찾는 최적의 장소",
+    tags: ["거주지", "해외", "용신 방위"],
+    href: "/place", badge: "₩990",
+    gradient: "from-violet-950/80 to-indigo-950/80",
+    border: "rgba(139,92,246,0.22)", glow: "rgba(99,102,241,0.18)",
+    accent: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
+    hanja: "居住方位",
+  },
 ];
 
 const SERVICES_EN = [
