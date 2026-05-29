@@ -107,6 +107,17 @@ const SERVICES_KO = [
     accent: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
     hanja: "木火土金水",
   },
+  {
+    id: "overcome", emoji: "⚡",
+    title: "쓰레기 사주\n극복법",
+    desc: "역마살·귀문관살·홍염살이 있어도\n방향만 맞으면 최강 무기가 됩니다\n내 신살 · 오행 불균형 극복 완벽 가이드",
+    tags: ["신살 극복", "오행 보완", "개운"],
+    href: "/overcome", badge: "FREE",
+    gradient: "from-red-950/80 to-rose-950/80",
+    border: "rgba(239,68,68,0.22)", glow: "rgba(220,38,38,0.18)",
+    accent: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
+    hanja: "克化用變",
+  },
 ];
 
 const SERVICES_EN = [
