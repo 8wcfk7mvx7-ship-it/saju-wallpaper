@@ -386,9 +386,8 @@ export default function MainPage() {
 
       {/* ── 푸터 ── */}
       <footer
-        style={{ opacity: footerVisible ? 1 : 0, transition: "opacity 1.2s ease 1100ms" }}
+        style={{ opacity: footerVisible ? 1 : 0, transition: "opacity 1.2s ease 1100ms", background: "linear-gradient(to top, rgba(6,6,14,0.95) 60%, transparent)" }}
         className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4"
-        style2={{ background: "linear-gradient(to top, rgba(6,6,14,0.95) 60%, transparent)" }}
       >
         <div className="w-full text-center" style={{ background: "linear-gradient(to top, rgba(6,6,14,0.97), transparent)", paddingTop: 16 }}>
           <div className="flex items-center justify-center gap-3 text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>

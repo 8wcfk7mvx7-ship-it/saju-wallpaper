@@ -14,6 +14,7 @@
     "@hoshin/saju-mcp-server": "github:hjsh200219/fortuneteller",
     "@supabase/supabase-js": "^2.105.4",
     "@tosspayments/tosspayments-sdk": "^2.7.0",
+    "jspdf": "^4.2.1",
     "korean-lunar-calendar": "^0.3.6",
     "lunar-typescript": "^1.8.6",
     "next": "16.2.6",

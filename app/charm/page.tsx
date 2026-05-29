@@ -5,6 +5,8 @@ import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
 
+export const dynamic = "force-dynamic";
+
 // ─── 일간별 매력 데이터 ──────────────────────────────────────────────────────
 const ILGAN_DATA: Record<string, {
   type: "남들이 먼저 알아보는 매력" | "조용히 중독시키는 매력" | "은근히 오래 남는 매력";
@@ -203,17 +205,15 @@ function DropdownPicker({ value, options, onChange, placeholder, suffix }: {
 // ─── 매인 컴포넌트 ────────────────────────────────────────────────────────────
 export default function CharmPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"entry" | "form" | "result">("entry");
+  const [step, setStep] = useState<"entry" | "form">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  const [blurRemoved, setBlurRemoved] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
     birthYear: "", birthMonth: "", birthDay: "",
     birthTime: { hour: 12, minute: 30, unknown: false, useJajasi: false },
     birthPlace: "서울",
   });
-  const [result, setResult] = useState<ReturnType<typeof analyzeSaju> | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setShowBtn(true), 2500);
@@ -255,10 +255,11 @@ export default function CharmPage() {
     const h = form.birthTime.unknown ? null : form.birthTime.hour;
     const min = form.birthTime.unknown ? null : form.birthTime.minute;
     saveSajuData({ name: form.name, gender: form.gender, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: min, birthHourUnknown: form.birthTime.unknown, birthPlace: form.birthPlace, style: "auto", useJajasi: form.birthTime.useJajasi });
+    // 사주 분석 후 결과 저장하고 결과 페이지로 이동
     const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: min, name: form.name, gender: form.gender, birthPlace: form.birthPlace, style: "auto", productType: "report", useJajasi: form.birthTime.useJajasi });
-    setResult(r);
-    setBlurRemoved(false);
-    setStep("result");
+    const charmData = { form: { ...form, birthHour: h, birthMinute: min }, result: r };
+    try { sessionStorage.setItem("charmData", JSON.stringify(charmData)); } catch {}
+    router.push("/charm/result");
   };
 
   // ── 엔트리 ───────────────────────────────────────────────────────────────
@@ -355,200 +356,6 @@ export default function CharmPage() {
             ✨ 내 숨은 매력 분석하기
           </button>
         </div>
-      </div>
-    </main>
-  );
-
-  // ── 결과 ──────────────────────────────────────────────────────────────────
-  if (!result) return null;
-
-  const ilgan = result.pillarsDetail.day.cg;
-  const idata = ILGAN_DATA[ilgan];
-  const dominantEl = result.dominant[0] || "토";
-  const olook = OHAENG_LOOK[dominantEl];
-
-  const hasDohwa = result.sinsalList.some(s => s.name.includes("도화"));
-  const hasHongyeom = result.sinsalList.some(s => s.name.includes("홍염"));
-  const hasHamji = result.sinsalList.some(s => s.name.includes("함지") || s.name.includes("咸池"));
-  const hasHwagae = result.sinsalList.some(s => s.name.includes("화개"));
-
-  const charmScore = Math.min(99,
-    65 +
-    (hasDohwa ? 15 : 0) +
-    (hasHongyeom ? 12 : 0) +
-    (hasHamji ? 8 : 0) +
-    (hasHwagae ? 5 : 0)
-  );
-
-  return (
-    <main className="min-h-screen bg-[#080810] text-white">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-pink-900/20 blur-[140px]" />
-        <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
-      </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-        </div>
-
-        {/* 헤더 */}
-        <div className="text-center mb-6">
-          <div className="text-4xl mb-2">✨</div>
-          <h2 className="text-2xl font-black mb-1">{form.name}님의 숨은 매력</h2>
-          <p className="text-gray-500 text-sm">{result.fourPillars}</p>
-          <div className="inline-flex items-center gap-2 mt-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
-            <span className="text-sm font-bold text-white">{ilgan}일간</span>
-            <span className="text-gray-500 text-xs">·</span>
-            <span className="text-sm font-bold" style={{ color: idata?.typeColor || "#fff" }}>{idata?.type || ""}</span>
-          </div>
-        </div>
-
-        {/* ① 일간 핵심 매력 — 공개 */}
-        <div className="bg-gradient-to-br from-pink-600/10 to-violet-600/10 border border-pink-500/25 rounded-2xl p-5 mb-4">
-          <p className="text-xs font-bold tracking-widest text-pink-300 uppercase mb-3">일간 · 핵심 매력</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-3">{idata?.coreMagic}</p>
-          <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5">
-            <p className="text-xs text-gray-500 mb-1">처음 만난 사람 눈에 보이는 것</p>
-            <p className="text-sm text-gray-200 leading-relaxed">{idata?.firstImpression}</p>
-          </div>
-        </div>
-
-        {/* ② 오행 외모 — 공개 */}
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}</p>
-          <p className="text-xs text-gray-600">📺 비슷한 스타일: {olook?.celebs}</p>
-        </div>
-
-        {/* ③ 숨은 매력 — 공개 */}
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">남들이 천천히 알게 되는 매력</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{idata?.hiddenMagic}</p>
-        </div>
-
-        {/* ④ 블러 섹션 */}
-        <div className="relative mb-4">
-          {!blurRemoved && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl backdrop-blur-md bg-black/30">
-              <div className="text-center px-6 py-8">
-                <p className="text-3xl mb-3">🔒</p>
-                <p className="text-white font-black text-lg mb-2">숨겨진 매력 분석</p>
-                <p className="text-gray-300 text-sm mb-1 font-semibold">"찐친이 보게 되는 {form.name}의 실체"</p>
-                <p className="text-gray-500 text-sm mb-1">신살 매력 서열 (도화살·홍염살·함지살)</p>
-                <p className="text-gray-500 text-sm mb-1">매력 점수 <span className="text-white font-bold">{charmScore}/100</span></p>
-                <p className="text-gray-500 text-sm mb-1">나한테 끌리는 이성 타입</p>
-                <p className="text-gray-500 text-sm mb-5">치명적 약점 (연애할 때 드러나는 것)</p>
-                <button onClick={() => setBlurRemoved(true)}
-                  className="bg-gradient-to-r from-pink-600 to-violet-600 text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg hover:from-pink-500 hover:to-violet-500 transition active:scale-[0.97]">
-                  전체 결과 무료 공개 →
-                </button>
-                <p className="text-xs text-gray-600 mt-2">로그인 없음 · 완전 무료</p>
-              </div>
-            </div>
-          )}
-
-          <div className={blurRemoved ? "" : "blur-md pointer-events-none select-none"}>
-            {/* 매력 점수 */}
-            <div className="bg-gradient-to-br from-pink-600/10 to-violet-600/10 border border-pink-500/25 rounded-2xl p-5 mb-3">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold tracking-widest text-pink-300 uppercase">종합 매력 점수</p>
-                <span className="text-2xl font-black text-white">{charmScore}<span className="text-sm text-gray-500">/100</span></span>
-              </div>
-              <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden mb-3">
-                <div className="h-full rounded-full" style={{ width: `${charmScore}%`, background: "linear-gradient(90deg, #ec4899, #8b5cf6)" }} />
-              </div>
-              <p className="text-xs text-gray-500">
-                {charmScore >= 85 ? "상위 5% 매력 — 만나는 사람마다 인상에 남는 타입" :
-                 charmScore >= 75 ? "상위 20% — 알면 알수록 빠져드는 타입" :
-                 "평균 이상 — 진가를 알아보는 사람에게 깊이 사랑받는 타입"}
-              </p>
-            </div>
-
-            {/* 신살 매력 서열 */}
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-3">
-              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-4">신살 매력 서열</p>
-              <div className="space-y-2.5">
-                {[
-                  { name: "진도화 (만인의 사랑)", has: hasDohwa, desc: "모든 연령층에게 자연스럽게 호감을 얻는 타고난 대중적 매력", emoji: "🌸" },
-                  { name: "홍염살 (치명적 매력)", has: hasHongyeom, desc: "이성을 강하게 끌어당기는 위험한 매력. 홀리는 에너지.", emoji: "🔥" },
-                  { name: "함지살 (본능적 끌림)", has: hasHamji, desc: "이유 없이 끌리게 만드는 원초적 매력. 설명이 안 되는 끌림.", emoji: "💫" },
-                  { name: "화개살 (은은한 아우라)", has: hasHwagae, desc: "예술적 감각과 신비로운 분위기. 범접하기 어려운 아우라.", emoji: "🌙" },
-                ].map((s, i) => (
-                  <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${s.has ? "bg-pink-500/8 border-pink-500/25" : "bg-white/[0.02] border-white/5"}`}>
-                    <span className="text-lg shrink-0">{s.emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-sm font-bold ${s.has ? "text-pink-200" : "text-gray-500"}`}>{s.name}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${s.has ? "bg-pink-500/20 text-pink-300" : "bg-white/5 text-gray-600"}`}>
-                          {s.has ? "있음" : "없음"}
-                        </span>
-                      </div>
-                      {s.has && <p className="text-xs text-gray-400 leading-relaxed">{s.desc}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 12운성 매력 지수 */}
-            {(() => {
-              const dayUU = result.pillarsDetail.day.uunseong;
-              const UUNSEONG_CHARM: Record<string, { title: string; desc: string; score: number; color: string }> = {
-                장생: { title:"장생(長生) — 생기 있는 매력", desc:"자라나는 생명력처럼 신선하고 활기찬 매력. 이성에게 건강미와 긍정 에너지로 어필. 만나면 기분이 좋아지는 타입.", score:85, color:"#4ade80" },
-                목욕: { title:"목욕(沐浴) — 이성 최강 매력", desc:"전통적으로 가장 강한 이성 매력의 12운성. 타고난 에로틱한 분위기와 매혹적 외모. 이성이 본능적으로 끌리는 에너지.", score:98, color:"#c4b5fd" },
-                관대: { title:"관대(冠帶) — 당당한 매력", desc:"자신감 넘치는 자태. 사회적 지위와 능력에서 오는 매력. 존재 자체가 당당하고 믿음직스럽습니다.", score:80, color:"#86efac" },
-                건록: { title:"건록(建祿) — 독립적 매력", desc:"스스로 서는 자립적 매력. 의지가 강하고 자기 영역이 뚜렷한 타입. 의존하지 않는 모습이 이성에게 매력적.", score:75, color:"#fbbf24" },
-                제왕: { title:"제왕(帝旺) — 카리스마 최강", desc:"최고조의 에너지와 압도적 존재감. 모든 공간을 장악하는 리더십 매력. 이성이 본능적으로 따르게 됩니다.", score:90, color:"#f59e0b" },
-                쇠:   { title:"쇠(衰) — 성숙한 매력", desc:"완숙하고 안정된 매력. 젊은 열기보다 깊이 있는 성숙함이 이성에게 신뢰감을 줍니다.", score:65, color:"#94a3b8" },
-                병:   { title:"병(病) — 여린 예술적 매력", desc:"섬세하고 예술적인 분위기. 여리지만 독특한 아우라. 지적이고 감성적인 이성에게 깊이 어필합니다.", score:60, color:"#64748b" },
-                사:   { title:"사(死) — 깊고 어두운 매력", desc:"정적이고 깊은 강렬함. 표면은 조용하지만 내면의 에너지가 미스터리한 매력을 형성합니다.", score:65, color:"#f87171" },
-                묘:   { title:"묘(墓) — 신비로운 매력", desc:"감추어진 신비. 쉽게 파악되지 않는 미스터리함이 이성을 호기심으로 끌어당깁니다.", score:60, color:"#ef4444" },
-                절:   { title:"절(絶) — 순간적 강렬한 매력", desc:"순간적으로 불타오르는 매력. 이별과 새 만남을 반복하지만, 그 순간의 강렬함이 인상적입니다.", score:70, color:"#dc2626" },
-                태:   { title:"태(胎) — 순수한 천진난만 매력", desc:"아이처럼 순수하고 꾸밈없는 매력. 보호본능을 자극하는 천진난만함이 이성의 마음을 열게 합니다.", score:72, color:"#818cf8" },
-                양:   { title:"양(養) — 따뜻한 성장 매력", desc:"자라나는 생명처럼 따뜻하고 포근한 매력. 함께 성장하고 싶다는 느낌을 주는 nurturing한 에너지.", score:70, color:"#a78bfa" },
-              };
-              const uu = UUNSEONG_CHARM[dayUU];
-              if (!uu) return null;
-              return (
-                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-3">
-                  <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">☯ 일주 12운성 매력 지수</p>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-bold" style={{ color: uu.color }}>{uu.title}</span>
-                    <span className="text-xl font-black text-white">{uu.score}<span className="text-xs text-gray-500">/100</span></span>
-                  </div>
-                  <div className="w-full bg-white/5 rounded-full h-2 mb-3">
-                    <div className="h-full rounded-full" style={{ width: `${uu.score}%`, backgroundColor: uu.color }} />
-                  </div>
-                  <p className="text-xs text-gray-400 leading-relaxed">{uu.desc}</p>
-                </div>
-              );
-            })()}
-
-            {/* 찐친이 보게 되는 실체 */}
-            <div className="bg-red-500/[0.06] border border-red-500/20 rounded-2xl p-5 mb-3">
-              <p className="text-xs font-bold tracking-widest text-red-400 uppercase mb-3">⚠️ 찐친이 보게 되는 실체</p>
-              <p className="text-sm text-red-200/80 leading-relaxed">{idata?.realSelf}</p>
-            </div>
-
-            {/* 치명적 약점 */}
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-3">
-              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">연애할 때 드러나는 치명적 약점</p>
-              <p className="text-sm text-gray-300 leading-relaxed">{idata?.fatalFlaw}</p>
-            </div>
-
-            {/* 이성 타입 */}
-            <div className="bg-gradient-to-br from-pink-600/8 to-violet-600/8 border border-violet-500/20 rounded-2xl p-5 mb-3">
-              <p className="text-xs font-bold tracking-widest text-violet-300 uppercase mb-3">나한테 먼저 끌리는 이성 타입</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{idata?.attractedType}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center mt-4">
-          <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 이론 기반 순수 오락용 콘텐츠입니다.</p>
-        </div>
-        <button onClick={() => setStep("form")} className="w-full mt-6 py-3 rounded-xl border border-white/10 text-gray-500 hover:text-gray-300 text-sm transition">다시 분석하기</button>
       </div>
     </main>
   );
