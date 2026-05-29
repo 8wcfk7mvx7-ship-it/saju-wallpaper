@@ -308,8 +308,8 @@ export default function ResultPage() {
     ? ["시주", "일주", "월주", "연주"]
     : ["Hour", "Day", "Month", "Year"];
 
-  const PRICES: Record<string, string> = { mobile: "₩2,900", report: "₩8,900", bundle: "₩9,900" };
-  const PRICE_AMOUNTS: Record<string, number> = { mobile: 2900, report: 8900, bundle: 9900 };
+  const PRICES: Record<string, string> = { mobile: "₩2,000", report: "₩8,900", bundle: "₩9,900" };
+  const PRICE_AMOUNTS: Record<string, number> = { mobile: 2000, report: 8900, bundle: 9900 };
 
   // 쟁재(爭財) 감지: 비겁이 재성보다 훨씬 많은 경우
   const det2 = sajuResult.pillarsDetail;
@@ -1316,7 +1316,7 @@ export default function ResultPage() {
                 <span className="text-2xl">③</span>
                 <div className="text-left">
                   <p className="font-bold text-sm text-amber-200">{displayLang === "ko" ? "🎁 배경화면 + 상세 보고서" : "🎁 Wallpaper + Full Report"}</p>
-                  <p className="text-xs text-gray-400">{displayLang === "ko" ? "①+② 묶음 · ₩900 할인" : "①+② Bundle · ₩900 off"}</p>
+                  <p className="text-xs text-gray-400">{displayLang === "ko" ? "①+② 묶음 · ₩1,900 할인" : "①+② Bundle · ₩1,900 off"}</p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">

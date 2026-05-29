@@ -76,7 +76,7 @@ const SERVICES_KO = [
   },
   {
     id: "stock", emoji: "📈",
-    title: "사주 주식 투자 분석",
+    title: "사주로 보는\n내 주식투자 스타일",
     desc: "말아먹는 사주가 따로 있습니다\n내 친구는 왜 나보다 주식으로 잘 버는 걸까요?\nETF·레버리지·코인 적합도 지금 확인",
     tags: ["주식", "코인", "ETF·레버리지"],
     href: "/stock", badge: "LIVE",
@@ -101,14 +101,14 @@ const SERVICES_KO = [
 const SERVICES_EN = [
   { id:"saju", emoji:"🔮", title:"Five Elements Wallpaper", desc:"Your Saju lacks a certain element.\nThere's a specific wallpaper that fills it.\nNot checking means your energy keeps leaking.", tags:["Wallpaper","Element Fix","AI Generated"], href:"/saju", badge:"LIVE", gradient:"from-indigo-950/80 to-violet-950/80", border:"rgba(139,92,246,0.25)", glow:"rgba(99,102,241,0.22)", accent:"#a78bfa", badgeBg:"rgba(99,102,241,0.9)", hanja:"木火土金水" },
   { id:"gunghap", emoji:"💑", title:"Compatibility Analysis", desc:"Wonjin couples always break up no matter what.\nIs the person you're dating draining your energy?\nFind out in 3 minutes.", tags:["Compatibility","Attraction","Wonjin"], href:"/gunghap", badge:"LIVE", gradient:"from-violet-950/80 to-pink-950/80", border:"rgba(236,72,153,0.22)", glow:"rgba(139,92,246,0.22)", accent:"#f9a8d4", badgeBg:"rgba(139,92,246,0.9)", hanja:"合沖害破" },
-  { id:"stock", emoji:"📈", title:"Investment Analysis", desc:"Some people are born to lose money in stocks.\nWhy does your friend earn more than you?\nCheck ETF · Leverage · Crypto compatibility.", tags:["Stocks","Crypto","ETF·Leverage"], href:"/stock", badge:"LIVE", gradient:"from-emerald-950/80 to-teal-950/80", border:"rgba(16,185,129,0.22)", glow:"rgba(16,185,129,0.18)", accent:"#6ee7b7", badgeBg:"rgba(5,150,105,0.9)", hanja:"財官印食" },
+  { id:"stock", emoji:"📈", title:"Saju Investment\nStyle", desc:"Some people are born to lose money in stocks.\nWhy does your friend earn more than you?\nCheck ETF · Leverage · Crypto compatibility.", tags:["Stocks","Crypto","ETF·Leverage"], href:"/stock", badge:"LIVE", gradient:"from-emerald-950/80 to-teal-950/80", border:"rgba(16,185,129,0.22)", glow:"rgba(16,185,129,0.18)", accent:"#6ee7b7", badgeBg:"rgba(5,150,105,0.9)", hanja:"財官印食" },
   { id:"charm", emoji:"✨", title:"Charm Analysis", desc:"Why does that person attract others so easily?\nDohwa · Hongyeom · hidden charm of your day pillar.\nA secret only you didn't know.", tags:["Charm","Attraction","Dohwa"], href:"/charm", badge:"LIVE", gradient:"from-rose-950/80 to-pink-950/80", border:"rgba(244,63,94,0.22)", glow:"rgba(236,72,153,0.22)", accent:"#fda4af", badgeBg:"rgba(225,29,72,0.9)", hanja:"桃花紅艶" },
 ];
 
 const SERVICES_ID = [
   { id:"saju", emoji:"🔮", title:"Wallpaper Lima Elemen", desc:"Saju-mu kekurangan elemen tertentu.\nAda wallpaper khusus yang mengisinya.\nTidak memeriksa berarti energimu terus bocor.", tags:["Wallpaper","Koreksi Elemen","AI"], href:"/saju", badge:"LIVE", gradient:"from-indigo-950/80 to-violet-950/80", border:"rgba(139,92,246,0.25)", glow:"rgba(99,102,241,0.22)", accent:"#a78bfa", badgeBg:"rgba(99,102,241,0.9)", hanja:"木火土金水" },
   { id:"gunghap", emoji:"💑", title:"Analisis Kecocokan", desc:"Pasangan Wonjin selalu berpisah meski berusaha.\nApakah orang yang kamu pacari menguras energimu?\nCek dalam 3 menit.", tags:["Kecocokan","Daya Tarik","Wonjin"], href:"/gunghap", badge:"LIVE", gradient:"from-violet-950/80 to-pink-950/80", border:"rgba(236,72,153,0.22)", glow:"rgba(139,92,246,0.22)", accent:"#f9a8d4", badgeBg:"rgba(139,92,246,0.9)", hanja:"合沖害破" },
-  { id:"stock", emoji:"📈", title:"Analisis Investasi", desc:"Ada orang yang saju-nya rugi di saham.\nKenapa temanmu lebih sukses investasi?\nCek ETF · Leverage · Kripto sekarang.", tags:["Saham","Kripto","ETF·Leverage"], href:"/stock", badge:"LIVE", gradient:"from-emerald-950/80 to-teal-950/80", border:"rgba(16,185,129,0.22)", glow:"rgba(16,185,129,0.18)", accent:"#6ee7b7", badgeBg:"rgba(5,150,105,0.9)", hanja:"財官印食" },
+  { id:"stock", emoji:"📈", title:"Gaya Investasi\nMenurut Saju", desc:"Ada orang yang saju-nya rugi di saham.\nKenapa temanmu lebih sukses investasi?\nCek ETF · Leverage · Kripto sekarang.", tags:["Saham","Kripto","ETF·Leverage"], href:"/stock", badge:"LIVE", gradient:"from-emerald-950/80 to-teal-950/80", border:"rgba(16,185,129,0.22)", glow:"rgba(16,185,129,0.18)", accent:"#6ee7b7", badgeBg:"rgba(5,150,105,0.9)", hanja:"財官印食" },
   { id:"charm", emoji:"✨", title:"Analisis Daya Pikat", desc:"Kenapa orang itu begitu menarik?\nDohwa · Hongyeom · daya pikat tersembunyi.\nRahasia yang hanya kamu tidak tahu.", tags:["Daya Pikat","Asmara","Dohwa"], href:"/charm", badge:"LIVE", gradient:"from-rose-950/80 to-pink-950/80", border:"rgba(244,63,94,0.22)", glow:"rgba(236,72,153,0.22)", accent:"#fda4af", badgeBg:"rgba(225,29,72,0.9)", hanja:"桃花紅艶" },
 ];
 
@@ -132,7 +132,7 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES_KO[0]; i
         borderColor: hovered ? svc.border : "rgba(255,255,255,0.07)",
         boxShadow: hovered ? `0 12px 60px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
-      className={`relative bg-gradient-to-br ${svc.gradient} border rounded-3xl p-6 cursor-pointer transition-all duration-500 flex flex-col min-h-[230px] overflow-hidden`}
+      className={`relative bg-gradient-to-br ${svc.gradient} border rounded-3xl p-6 cursor-pointer transition-all duration-500 flex flex-col min-h-[260px] overflow-hidden`}
     >
       {/* 배경 한자 장식 */}
       <span
@@ -167,7 +167,7 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES_KO[0]; i
       </div>
 
       {/* 제목 */}
-      <h3 className="text-lg font-black text-white mb-2 leading-tight">{svc.title}</h3>
+      <h3 className="text-lg font-black text-white mb-2 leading-tight whitespace-pre-line">{svc.title}</h3>
 
       {/* 설명 */}
       <p className="text-sm leading-relaxed whitespace-pre-line mb-4 flex-1" style={{ color: "rgba(255,255,255,0.45)" }}>

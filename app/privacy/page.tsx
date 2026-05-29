@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
           </div>
           <h1 className="text-2xl font-black text-white mb-2">개인정보처리방침</h1>
-          <p className="text-sm text-gray-600">최종 수정일: 2026년 5월 28일 · 시행일: 2025년 1월 1일</p>
+          <p className="text-sm text-gray-600">최종 수정일: 2026년 5월 29일 · 시행일: 2025년 1월 1일</p>
         </div>
 
         <div className="space-y-8 text-sm leading-relaxed">
