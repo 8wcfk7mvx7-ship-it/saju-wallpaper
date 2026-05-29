@@ -50,12 +50,20 @@ function DaewoonSuccessContent() {
       // 결제 확인
       try {
         const paymentKey = params.get("paymentKey") || "";
+        const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
         setProgress(20);
         if (paymentKey) {
+          const raw2 = sessionStorage.getItem("daewoonData");
+          const parsedName = raw2 ? (JSON.parse(raw2).name || "고객") : "고객";
           const res = await fetch("/api/payment/confirm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentKey, orderId, amount }),
+            body: JSON.stringify({
+              paymentKey, orderId, amount,
+              customerEmail: receiptEmail,
+              customerName: parsedName,
+              productName: "대운·세운 프리미엄 보고서",
+            }),
           });
           if (!res.ok) throw new Error("결제 확인 실패");
         }

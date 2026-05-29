@@ -151,6 +151,17 @@ const SERVICES_KO = [
     accent: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     hanja: "居住方位",
   },
+  {
+    id: "mbti", emoji: "🧬",
+    title: "사주 × MBTI\n조합 분석",
+    desc: "내 사주 오행과 MBTI 성격 유형의 시너지\n일간별 MBTI 궁합·추천 직업·에너지 분석\n타고난 나를 두 가지 렌즈로 완전 해석",
+    tags: ["MBTI", "성격 분석", "직업 추천"],
+    href: "/mbti", badge: "FREE",
+    gradient: "from-fuchsia-950/80 to-violet-950/80",
+    border: "rgba(217,70,239,0.22)", glow: "rgba(168,85,247,0.18)",
+    accent: "#e879f9", badgeBg: "rgba(162,28,175,0.9)",
+    hanja: "性格五行",
+  },
 ];
 
 const SERVICES_EN = [

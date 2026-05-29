@@ -76,13 +76,20 @@ function CharmSuccessContent() {
     } catch {}
 
     async function run() {
+      const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
+
       // 1. 결제 승인
       try {
         setProgress(10);
         const res = await fetch("/api/payment/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentKey, orderId, amount }),
+          body: JSON.stringify({
+            paymentKey, orderId, amount,
+            customerEmail: receiptEmail,
+            customerName: charmName || "고객",
+            productName: "사주 매력 분석 프리미엄 보고서",
+          }),
         });
         if (!res.ok) {
           const data = await res.json();

@@ -22,10 +22,18 @@ function SuccessContent() {
 
     async function confirm() {
       try {
+        const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
+        const sajuRaw = sessionStorage.getItem("sajuForm");
+        const sajuName = sajuRaw ? (JSON.parse(sajuRaw).name || "고객") : "고객";
         const res = await fetch("/api/payment/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentKey, orderId, amount }),
+          body: JSON.stringify({
+            paymentKey, orderId, amount,
+            customerEmail: receiptEmail,
+            customerName: sajuName,
+            productName: "사주 운세 분석",
+          }),
         });
         if (!res.ok) {
           const data = await res.json();

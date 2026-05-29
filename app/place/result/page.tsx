@@ -120,10 +120,18 @@ function PlaceResultContent() {
       try {
         const paymentKey = params.get("paymentKey") || "";
         if (paymentKey) {
+          const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
+          const sajuRaw = sessionStorage.getItem("sajuForm");
+          const sajuName = sajuRaw ? (JSON.parse(sajuRaw).name || "고객") : "고객";
           const res = await fetch("/api/payment/confirm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentKey, orderId, amount }),
+            body: JSON.stringify({
+              paymentKey, orderId, amount,
+              customerEmail: receiptEmail,
+              customerName: sajuName,
+              productName: "사주 도시 추천 완전판",
+            }),
           });
           if (!res.ok) throw new Error("결제 확인 실패");
         }

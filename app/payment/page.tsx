@@ -41,6 +41,7 @@ function PaymentContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   const info = PRODUCT_INFO[productType] || PRODUCT_INFO.mobile;
 
@@ -62,6 +63,7 @@ function PaymentContent() {
     setLoading(true);
     setError("");
     try {
+      if (email) sessionStorage.setItem("receiptEmail", email);
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
       const tossPayments = await loadTossPayments(clientKey);
       const payment = tossPayments.payment({ customerKey: ANONYMOUS });
@@ -132,6 +134,18 @@ function PaymentContent() {
           <span className="text-gray-400 text-sm">결제 금액</span>
           <span className="text-2xl font-black text-indigo-300">{PRICE_LABELS[productType]}</span>
         </div>
+      </div>
+
+      {/* 이메일 (선택) */}
+      <div className="w-full max-w-sm mb-4">
+        <label className="block text-xs text-gray-500 mb-1.5">영수증 받을 이메일 (선택)</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="example@email.com"
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50"
+        />
       </div>
 
       {/* 에러 */}
