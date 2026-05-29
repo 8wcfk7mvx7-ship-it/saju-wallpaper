@@ -118,6 +118,17 @@ const SERVICES_KO = [
     accent: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
     hanja: "克化用變",
   },
+  {
+    id: "calendar", emoji: "📅",
+    title: "일진 달력\n1975~2030",
+    desc: "오늘이 내 사주와 맞는 날인지\n매일의 일주·오행·12운성을 한눈에\n중요한 결정의 날을 고를 수 있어요",
+    tags: ["일진", "12운성", "일주"],
+    href: "/calendar", badge: "FREE",
+    gradient: "from-sky-950/80 to-blue-950/80",
+    border: "rgba(14,165,233,0.22)", glow: "rgba(59,130,246,0.18)",
+    accent: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
+    hanja: "日辰曆法",
+  },
 ];
 
 const SERVICES_EN = [

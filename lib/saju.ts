@@ -58,7 +58,7 @@ export interface SajuResult {
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"];
 const JIJI = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
-const CHEONGAN_ELEMENT: Record<string, Element> = {
+export const CHEONGAN_ELEMENT: Record<string, Element> = {
   갑:"목", 을:"목", 병:"화", 정:"화", 무:"토",
   기:"토", 경:"금", 신:"금", 임:"수", 계:"수",
 };
@@ -87,7 +87,7 @@ const JIJANGAN: Record<string, Array<{element: Element; weight: number}>> = {
 const PILLAR_WEIGHTS = {year: 0.9, month: 1.8, day: 1.1, hour: 0.9};
 
 // 지지 본기(정기)
-const JIJI_BONGI: Record<string, string> = {
+export const JIJI_BONGI: Record<string, string> = {
   자:"계", 축:"기", 인:"갑", 묘:"을", 진:"무", 사:"병",
   오:"정", 미:"기", 신:"경", 유:"신", 술:"무", 해:"임",
 };
@@ -270,7 +270,7 @@ const OHAENG_CONTROLS: Record<string, Element> = {목:"토",토:"수",수:"화",
 // 절기 시작일 근사값 (인덱스 = 양력 월)
 // 1=소한(6일), 2=입춘(4일), 3=경칩(6일), 4=청명(5일), 5=입하(6일), 6=망종(6일)
 // 7=소서(7일), 8=입추(8일), 9=백로(8일), 10=한로(8일), 11=입동(7일), 12=대설(7일)
-const SOLAR_TERM_DAYS = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7];
+export const SOLAR_TERM_DAYS = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7];
 
 // 도시별 경도 — 경도 기준 진태양시 보정: (경도 - 135) × 4분
 
@@ -599,7 +599,7 @@ function getSummerTimeCorrection(year: number, month: number): number {
   return 0;
 }
 
-function toJDN(y: number, m: number, d: number): number {
+export function toJDN(y: number, m: number, d: number): number {
   const a = Math.floor((14 - m) / 12);
   const yr = y + 4800 - a;
   const mo = m + 12 * a - 3;
@@ -626,7 +626,7 @@ function getGwasukJj(yeonji: string): string {
 }
 
 // 십성 계산 (일간 기준)
-function getSipseong(ilgan: string, target: string): string {
+export function getSipseong(ilgan: string, target: string): string {
   const ilEl = CHEONGAN_ELEMENT[ilgan];
   const tgEl = CHEONGAN_ELEMENT[target];
   if (!ilEl || !tgEl) return "";
@@ -640,7 +640,7 @@ function getSipseong(ilgan: string, target: string): string {
 }
 
 // 12운성 (일간 기준, 모든 기둥 지지에 적용)
-function getUunseong(ilgan: string, jj: string): string {
+export function getUunseong(ilgan: string, jj: string): string {
   const jjIdx = JIJI.indexOf(jj);
   const data = JANGSEAENG_DATA[ilgan];
   if (!data || jjIdx < 0) return "";
@@ -673,7 +673,7 @@ function getGongmang(dayCg: string, dayJj: string): string[] {
 }
 
 // 연주
-function getYearPillar(year: number): {cg: string; jj: string} {
+export function getYearPillar(year: number): {cg: string; jj: string} {
   return { cg: CHEONGAN[(year-4)%10], jj: JIJI[(year-4)%12] };
 }
 
@@ -683,7 +683,7 @@ function getYearPillar(year: number): {cg: string; jj: string} {
 // 실제: 을경년 기두 무인월 → 6월은 신사월
 // 연간 인덱스별 1월(인월) 천간:
 // 갑기년=병인, 을경년=무인, 병신년=경인, 정임년=임인, 무계년=갑인
-function getMonthPillar(year: number, month: number, day: number): {cg: string; jj: string} {
+export function getMonthPillar(year: number, month: number, day: number): {cg: string; jj: string} {
   // 절기 기준으로 전통 월(月) 결정
   // 해당 월의 절기 시작일 이전이면 전월로 처리
   let calcMonth = month;
@@ -720,7 +720,7 @@ function getMonthPillar(year: number, month: number, day: number): {cg: string; 
 }
 
 // 일주 — 기준: 1995.06.02 = 갑자일 (갑=0, 자=0)
-function getDayPillar(year: number, month: number, day: number): {cg: string; jj: string} {
+export function getDayPillar(year: number, month: number, day: number): {cg: string; jj: string} {
   const jdn = toJDN(year, month, day);
   const BASE_JDN = toJDN(1995, 6, 2);
   const diff = jdn - BASE_JDN;
