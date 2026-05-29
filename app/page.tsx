@@ -129,6 +129,17 @@ const SERVICES_KO = [
     accent: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     hanja: "日辰曆法",
   },
+  {
+    id: "daewoon", emoji: "⏳",
+    title: "대운·세운\n80년 분석",
+    desc: "내 인생이 몇 살에 터지는지\n대운 8개·세운 14년 흐름·교운기까지\nAI가 대운별 전략을 직접 알려줍니다",
+    tags: ["대운", "세운", "교운기"],
+    href: "/daewoon", badge: "₩15,000",
+    gradient: "from-amber-950/80 to-yellow-950/80",
+    border: "rgba(202,138,4,0.25)", glow: "rgba(161,98,7,0.20)",
+    accent: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
+    hanja: "大運歲運",
+  },
 ];
 
 const SERVICES_EN = [

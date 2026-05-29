@@ -1,0 +1,369 @@
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
+import type { DaewoonResult, SewoonItem } from "@/lib/saju";
+import { loadSajuData } from "@/lib/savedSaju";
+
+export const dynamic = "force-dynamic";
+
+const PRICE = 15000;
+
+const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }> = {
+  목: { bg: "#052e16", text: "#4ade80", border: "#14532d" },
+  화: { bg: "#450a0a", text: "#f87171", border: "#7f1d1d" },
+  토: { bg: "#2d1a00", text: "#fbbf24", border: "#78350f" },
+  금: { bg: "#0f0e2e", text: "#a5b4fc", border: "#1e1b4b" },
+  수: { bg: "#0a1f3a", text: "#60a5fa", border: "#0c2a4a" },
+};
+
+const SIPSEONG_COLOR: Record<string, string> = {
+  비견:"#4ade80", 겁재:"#f87171", 식신:"#60a5fa", 상관:"#fb923c",
+  편재:"#fbbf24", 정재:"#f59e0b", 편관:"#c084fc", 정관:"#a78bfa",
+  편인:"#94a3b8", 정인:"#e2e8f0",
+};
+
+const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: string; desc: string }> = {
+  장생: { label:"장생★★★", score:9, color:"#4ade80", desc:"새로운 시작과 성장. 건강하고 활기찬 기운." },
+  목욕: { label:"목욕★★☆", score:6, color:"#34d399", desc:"감성적이고 풍류적인 기운. 인간관계 활발." },
+  관대: { label:"관대★★★", score:8, color:"#60a5fa", desc:"배움과 성장. 사회적 지위 향상 기운." },
+  건록: { label:"건록★★★", score:10, color:"#818cf8", desc:"가장 안정적이고 건실한 최길 기운." },
+  제왕: { label:"제왕★★★", score:10, color:"#c084fc", desc:"에너지 최고조. 성공과 지배의 기운." },
+  쇠: { label:"쇠★★☆", score:5, color:"#94a3b8", desc:"기운이 꺾이는 시기. 무리하지 말고 내실을 다지세요." },
+  병: { label:"병★☆☆", score:3, color:"#fb923c", desc:"몸과 마음이 지치는 기운. 건강 관리 필수." },
+  사: { label:"사☆☆☆", score:1, color:"#ef4444", desc:"에너지 소진. 새 일보다 마무리와 정리가 유리." },
+  묘: { label:"묘☆☆☆", score:1, color:"#dc2626", desc:"정체와 답답함. 참고 기다리는 시기." },
+  절: { label:"절☆☆☆", score:2, color:"#9333ea", desc:"단절과 전환. 끝내야 할 것을 끝내는 기운." },
+  태: { label:"태★★☆", score:6, color:"#fb923c", desc:"새 씨앗이 잉태되는 기운. 계획과 구상에 좋음." },
+  양: { label:"양★★☆", score:7, color:"#fbbf24", desc:"서서히 자라나는 기운. 꾸준한 노력이 빛나는 시기." },
+};
+
+export default function DaewoonPage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState<"male" | "female">("female");
+  const [birthYear, setBirthYear] = useState(1990);
+  const [birthMonth, setBirthMonth] = useState(6);
+  const [birthDay, setBirthDay] = useState(15);
+  const [birthHour, setBirthHour] = useState<number | null>(null);
+  const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
+  const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
+  const [ilgan, setIlgan] = useState("");
+  const [monthJj, setMonthJj] = useState("");
+  const [step, setStep] = useState<"entry" | "preview">("entry");
+  const [isPaid, setIsPaid] = useState(false);
+  const [showFull, setShowFull] = useState(false);
+
+  useEffect(() => {
+    setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");
+    const saved = loadSajuData();
+    if (saved) {
+      setName(saved.name || "");
+      setGender((saved.gender as "male" | "female") || "female");
+      setBirthYear(saved.birthYear);
+      setBirthMonth(saved.birthMonth);
+      setBirthDay(saved.birthDay);
+      if (saved.birthHour != null) setBirthHour(saved.birthHour);
+    }
+  }, []);
+
+  function analyze() {
+    try {
+      const r = analyzeSaju({
+        birthYear, birthMonth, birthDay,
+        birthHour, birthMinute: 0,
+        name: name || "분석", gender,
+        birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+      });
+      const mp = r.pillarsDetail.month;
+      const dw = calcDaewoon(birthYear, birthMonth, birthDay, gender, r.pillarsDetail.day.cg, mp);
+      const sw = calcSewoon(birthYear, r.pillarsDetail.day.cg);
+      setIlgan(r.pillarsDetail.day.cg);
+      setMonthJj(mp.jj);
+      setDaewoon(dw);
+      setSewoon(sw);
+      setStep("preview");
+    } catch {
+      alert("사주 정보를 다시 확인해주세요.");
+    }
+  }
+
+  function goPay() {
+    const orderId = `dw-${Date.now()}`;
+    sessionStorage.setItem("daewoonData", JSON.stringify({ name, gender, birthYear, birthMonth, birthDay, birthHour }));
+    router.push(`/daewoon/pay?orderId=${orderId}&amount=${PRICE}`);
+  }
+
+  // ── 입력 화면 ──
+  if (step === "entry") {
+    return (
+      <main className="min-h-screen bg-[#06060e] text-white">
+        <div className="max-w-lg mx-auto px-5 py-10 pb-24">
+          <button onClick={() => router.back()} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
+
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-3">
+              <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
+            </div>
+            <h1 className="text-2xl font-black mb-2">대운·세운 분석</h1>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              10년 단위 대운, 연도별 세운, 교운기까지<br />
+              내 인생의 큰 흐름을 한눈에 봅니다
+            </p>
+          </div>
+
+          {/* 가격 배너 */}
+          <div className="bg-gradient-to-r from-amber-950/60 to-yellow-950/60 border border-yellow-700/30 rounded-2xl p-5 mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-yellow-500 font-semibold uppercase tracking-wider">프리미엄 보고서</span>
+              <span className="text-2xl font-black text-yellow-400">₩{PRICE.toLocaleString()}</span>
+            </div>
+            <ul className="space-y-1.5 text-xs text-gray-400">
+              <li className="flex items-center gap-2"><span className="text-yellow-400">✓</span> 대운 8개 전체 (80년 흐름)</li>
+              <li className="flex items-center gap-2"><span className="text-yellow-400">✓</span> 연도별 세운 14년치</li>
+              <li className="flex items-center gap-2"><span className="text-yellow-400">✓</span> 교운기 진입 나이 정확 계산</li>
+              <li className="flex items-center gap-2"><span className="text-yellow-400">✓</span> AI 대운별 인생 조언</li>
+              <li className="flex items-center gap-2"><span className="text-yellow-400">✓</span> PDF 다운로드 포함</li>
+            </ul>
+          </div>
+
+          {/* 사주 입력 폼 */}
+          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 space-y-4">
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="이름을 입력하세요"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">성별</label>
+                <select
+                  value={gender}
+                  onChange={e => setGender(e.target.value as "male" | "female")}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+                >
+                  <option value="female">여성</option>
+                  <option value="male">남성</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">출생연도</label>
+                <input
+                  type="number" value={birthYear} min={1920} max={2010}
+                  onChange={e => setBirthYear(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">출생월</label>
+                <select
+                  value={birthMonth}
+                  onChange={e => setBirthMonth(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                    <option key={m} value={m}>{m}월</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">출생일</label>
+                <input
+                  type="number" value={birthDay} min={1} max={31}
+                  onChange={e => setBirthDay(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
+                <select
+                  value={birthHour ?? ""}
+                  onChange={e => setBirthHour(e.target.value === "" ? null : Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+                >
+                  <option value="">모름</option>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={i}>{i}시</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={analyze}
+            className="mt-6 w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-lg text-white shadow-lg hover:opacity-90 transition-opacity"
+          >
+            대운·세운 미리 보기 →
+          </button>
+          <p className="text-center text-xs text-gray-600 mt-3">미리보기는 무료 · 상세 분석은 ₩{PRICE.toLocaleString()}</p>
+        </div>
+      </main>
+    );
+  }
+
+  // ── 미리보기 / 결과 화면 ──
+  if (!daewoon) return null;
+  const nowYear = new Date().getFullYear();
+
+  return (
+    <main className="min-h-screen bg-[#06060e] text-white">
+      <div className="max-w-lg mx-auto px-5 py-8 pb-32">
+        <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
+
+        {/* 헤더 */}
+        <div className="mb-6">
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-2">
+            <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
+          </div>
+          <h1 className="text-xl font-black">
+            {name ? `${name}님의 ` : ""}대운·세운
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            일간 <strong className="text-white">{ilgan}</strong> ·
+            월지 <strong className="text-white">{monthJj}</strong> ·
+            {daewoon.direction} ({daewoon.direction === "순행" ? "양남/음녀" : "음남/양녀"})
+          </p>
+        </div>
+
+        {/* 교운기 배너 */}
+        <div className="bg-violet-500/10 border border-violet-500/25 rounded-2xl p-4 mb-6">
+          <p className="text-xs text-violet-400 font-semibold mb-1">⏰ 교운기 (첫 대운 진입)</p>
+          <p className="text-2xl font-black text-violet-300">{daewoon.startAge}세</p>
+          <p className="text-xs text-gray-500 mt-1">
+            출생 후 {daewoon.startAge}세에 첫 대운이 시작됩니다.
+            이후 10년마다 대운이 바뀌며 인생의 큰 흐름이 전환됩니다.
+          </p>
+        </div>
+
+        {/* 대운 8개 */}
+        <div className="mb-6">
+          <h2 className="text-sm font-bold text-gray-300 mb-3">대운 흐름 (80년)</h2>
+          <div className="space-y-2">
+            {daewoon.pillars.map((p, i) => {
+              const isCurrentDw = i === daewoon.currentIdx;
+              const elStyle = ELEMENT_COLOR[p.element] || ELEMENT_COLOR["토"];
+              const uunsF = UUNSEONG_FORTUNE[p.uunseong];
+              const isBlurred = !isPaid && i >= 3;
+
+              return (
+                <div
+                  key={i}
+                  className={`rounded-xl border p-4 transition-all relative ${
+                    isCurrentDw ? "border-yellow-500/50" : ""
+                  }`}
+                  style={isCurrentDw
+                    ? { background: `${elStyle.bg}cc`, borderColor: "#ca8a04" }
+                    : { background: `${elStyle.bg}66`, borderColor: elStyle.border }
+                  }
+                >
+                  {isBlurred && (
+                    <div className="absolute inset-0 bg-[#06060e]/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+                      <p className="text-xs text-gray-500">🔒 프리미엄 전용</p>
+                    </div>
+                  )}
+
+                  {isCurrentDw && (
+                    <span className="absolute top-2 right-2 text-[10px] bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-bold">현재 대운</span>
+                  )}
+
+                  <div className="flex items-start gap-4">
+                    <div className="text-center min-w-[52px]">
+                      <p className="text-2xl font-black" style={{ color: elStyle.text }}>{p.cg}{p.jj}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{p.age}세</p>
+                      <p className="text-[10px] text-gray-600">{p.yearStart}년~</p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-white">{p.sipseongCg}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-white">{p.sipseongJj}</span>
+                        {uunsF && (
+                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: `${uunsF.color}22`, color: uunsF.color }}>
+                            {uunsF.label}
+                          </span>
+                        )}
+                      </div>
+                      {uunsF && (
+                        <p className="text-xs text-gray-400 leading-relaxed">{uunsF.desc}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 세운 (현재 주변 연도) */}
+        <div className="mb-6">
+          <h2 className="text-sm font-bold text-gray-300 mb-3">세운 — 연도별 흐름</h2>
+          <div className="overflow-x-auto">
+            <div className="flex gap-2 pb-2" style={{ minWidth: "max-content" }}>
+              {sewoon.map((s, i) => {
+                const elStyle = ELEMENT_COLOR[s.element] || ELEMENT_COLOR["토"];
+                const uunsF = UUNSEONG_FORTUNE[s.uunseong];
+                const isBlurredSw = !isPaid && i >= 4;
+
+                return (
+                  <div
+                    key={s.year}
+                    className="rounded-xl border p-3 min-w-[80px] text-center relative"
+                    style={s.isCurrent
+                      ? { background: `${elStyle.bg}cc`, borderColor: "#fbbf24" }
+                      : { background: `${elStyle.bg}55`, borderColor: elStyle.border }
+                    }
+                  >
+                    {isBlurredSw && (
+                      <div className="absolute inset-0 bg-[#06060e]/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+                        <p className="text-[10px] text-gray-600">🔒</p>
+                      </div>
+                    )}
+                    {s.isCurrent && (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                        <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-full font-bold">올해</span>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-gray-500 mb-1">{s.year}</p>
+                    <p className="text-base font-black" style={{ color: elStyle.text }}>{s.cg}{s.jj}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">{s.sipseongJj}</p>
+                    {uunsF && (
+                      <p className="text-[9px] mt-1 font-semibold" style={{ color: uunsF.color }}>
+                        {s.uunseong}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* 프리미엄 CTA */}
+        {!isPaid && (
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
+            <div className="max-w-lg mx-auto">
+              <button
+                onClick={goPay}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
+              >
+                전체 보고서 + AI 해설 + PDF — ₩{PRICE.toLocaleString()}
+              </button>
+              <p className="text-center text-xs text-gray-600 mt-2">교운기·대운 8개 전체·세운 14년치 완전 공개</p>
+            </div>
+          </div>
+        )}
+
+        {isPaid && (
+          <div className="bg-green-500/10 border border-green-500/25 rounded-xl p-4 text-center">
+            <p className="text-green-400 font-semibold text-sm">✓ 프리미엄 보고서 활성화됨</p>
+            <p className="text-xs text-gray-500 mt-1">대운 8개 전체 · 세운 14년치 · AI 해설 포함</p>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}

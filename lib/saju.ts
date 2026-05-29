@@ -1488,3 +1488,133 @@ export const PRICES = {
   report: 8900,    // 사주 상세 보고서 단품 (인상: 7900→8900)
   bundle: 9900,    // 배경화면 + 상세 보고서 패키지 (최고 가성비)
 } as const;
+
+// ── 대운(大運) / 세운(歲運) 계산 ──────────────────────────────────────────────
+
+export interface DaewoonPillar {
+  age: number;        // 대운 시작 나이 (만)
+  yearStart: number;  // 대운 시작 추정 연도
+  cg: string; jj: string;
+  sipseongCg: string; // 일간 기준 십성 (천간)
+  sipseongJj: string; // 일간 기준 십성 (지지 본기)
+  uunseong: string;   // 일간 기준 12운성
+  element: Element;   // 지지 오행
+}
+
+export interface DaewoonResult {
+  startAge: number;           // 첫 대운 시작 나이 (교운기)
+  direction: "순행" | "역행";
+  pillars: DaewoonPillar[];   // 8개 대운
+  currentIdx: number;         // 현재 해당 대운 인덱스
+}
+
+export function calcDaewoon(
+  birthYear: number, birthMonth: number, birthDay: number,
+  gender: "male" | "female",
+  ilgan: string,
+  monthPillar: { cg: string; jj: string },
+): DaewoonResult {
+  // ① 순역행 결정
+  // 양년(갑·병·무·경·임) + 남성 = 순행 / 음년 + 여성 = 순행
+  // 음년(을·정·기·신·계) + 남성 = 역행 / 양년 + 여성 = 역행
+  const yearCgIdx = ((birthYear - 4) % 10 + 10) % 10;
+  const isYangYear = yearCgIdx % 2 === 0;
+  const isForward = (isYangYear && gender === "male") || (!isYangYear && gender === "female");
+
+  // ② 출생일 ↔ 절기일 사이 날 수 계산
+  const birthJDN = toJDN(birthYear, birthMonth, birthDay);
+  let termJDN: number;
+
+  if (isForward) {
+    // 다음 절기 찾기 (순행)
+    const currentTermDay = SOLAR_TERM_DAYS[birthMonth];
+    if (birthDay < currentTermDay) {
+      // 이번 달 절기 아직 안 지남 → 이번 달 절기
+      termJDN = toJDN(birthYear, birthMonth, currentTermDay);
+    } else {
+      // 이번 달 절기 지남 → 다음 달 절기
+      const nm = birthMonth === 12 ? 1 : birthMonth + 1;
+      const ny = birthMonth === 12 ? birthYear + 1 : birthYear;
+      termJDN = toJDN(ny, nm, SOLAR_TERM_DAYS[nm]);
+    }
+  } else {
+    // 이전 절기 찾기 (역행)
+    const currentTermDay = SOLAR_TERM_DAYS[birthMonth];
+    if (birthDay >= currentTermDay) {
+      // 이번 달 절기 지남 → 이번 달 절기 = 직전 절기
+      termJDN = toJDN(birthYear, birthMonth, currentTermDay);
+    } else {
+      // 아직 이번 달 절기 전 → 전달 절기
+      const pm = birthMonth === 1 ? 12 : birthMonth - 1;
+      const py = birthMonth === 1 ? birthYear - 1 : birthYear;
+      termJDN = toJDN(py, pm, SOLAR_TERM_DAYS[pm]);
+    }
+  }
+
+  const daysDiff = Math.abs(termJDN - birthJDN);
+  // 3일 = 1년, 1일 = 4개월 → 반올림하여 대운 시작 나이 결정
+  const startAge = Math.round(daysDiff / 3.0);
+
+  // ③ 대운 기둥 8개 생성
+  const monthCgIdx = CHEONGAN.indexOf(monthPillar.cg);
+  const monthJjIdx = JIJI.indexOf(monthPillar.jj);
+
+  const pillars: DaewoonPillar[] = [];
+  for (let i = 0; i < 8; i++) {
+    const step = isForward ? i + 1 : -(i + 1);
+    const cgIdx = ((monthCgIdx + step) % 10 + 10) % 10;
+    const jjIdx = ((monthJjIdx + step) % 12 + 12) % 12;
+    const cg = CHEONGAN[cgIdx];
+    const jj = JIJI[jjIdx];
+    const bongi = JIJI_BONGI[jj] || "";
+    pillars.push({
+      age: startAge + i * 10,
+      yearStart: birthYear + startAge + i * 10,
+      cg, jj,
+      sipseongCg: getSipseong(ilgan, cg),
+      sipseongJj: getSipseong(ilgan, bongi),
+      uunseong: getUunseong(ilgan, jj),
+      element: CHEONGAN_ELEMENT[bongi] || "토" as Element,
+    });
+  }
+
+  // ④ 현재 해당 대운 인덱스
+  const nowYear = new Date().getFullYear();
+  const approxAge = nowYear - birthYear;
+  let currentIdx = pillars.findIndex((p, i) => {
+    const nextAge = i + 1 < pillars.length ? pillars[i + 1].age : 999;
+    return approxAge >= p.age && approxAge < nextAge;
+  });
+  if (currentIdx < 0) currentIdx = 0;
+
+  return { startAge, direction: isForward ? "순행" : "역행", pillars, currentIdx };
+}
+
+export interface SewoonItem {
+  year: number;
+  cg: string; jj: string;
+  sipseongCg: string;
+  sipseongJj: string;
+  uunseong: string;
+  element: Element;
+  isCurrent: boolean;
+}
+
+export function calcSewoon(birthYear: number, ilgan: string, rangeYears = 12): SewoonItem[] {
+  const nowYear = new Date().getFullYear();
+  const result: SewoonItem[] = [];
+  for (let y = nowYear - 2; y <= nowYear + rangeYears; y++) {
+    const p = getYearPillar(y);
+    const bongi = JIJI_BONGI[p.jj] || "";
+    result.push({
+      year: y,
+      cg: p.cg, jj: p.jj,
+      sipseongCg: getSipseong(ilgan, p.cg),
+      sipseongJj: getSipseong(ilgan, bongi),
+      uunseong: getUunseong(ilgan, p.jj),
+      element: CHEONGAN_ELEMENT[bongi] || "토" as Element,
+      isCurrent: y === nowYear,
+    });
+  }
+  return result;
+}
