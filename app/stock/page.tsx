@@ -227,6 +227,37 @@ const EL_DATA: Record<string, ElData> = {
   },
 };
 
+// ─── 12운성 투자 에너지 ──────────────────────────────────────────────────────
+const UUNSEONG_INVEST: Record<string, { style: string; timing: string; riskLevel: string; advice: string; color: string; smj: boolean }> = {
+  장생: { style:"상승 초기 선점형", timing:"신규 섹터·IPO·초기 성장주 선점에 강함", riskLevel:"중위험", advice:"장기 보유 시 높은 수익. 진입 직후 일시 손실도 버티는 인내심 필요.", color:"#4ade80", smj:false },
+  목욕: { style:"감각적 단기 트레이더", timing:"단기 고점 매도 감각이 뛰어남", riskLevel:"고위험 ★", advice:"자동 손절 라인 설정 필수. 감각만 믿으면 손실이 반복됩니다.", color:"#c4b5fd", smj:false },
+  관대: { style:"자신감 중장기 투자자", timing:"성장주 초·중기 진입 타이밍 양호", riskLevel:"중위험", advice:"자신감 과잉으로 한 종목 집중 주의. 분산 원칙 지키면 좋은 성과.", color:"#86efac", smj:false },
+  건록: { style:"독립형 리서치 투자자", timing:"본인 분석 기반 중장기 투자", riskLevel:"중위험", advice:"시장 흐름 완전 무시는 금물. 타인 의견도 일부 참고하세요.", color:"#fbbf24", smj:false },
+  제왕: { style:"대세 추종 집중 투자형", timing:"대형 상승 랠리 구간에서 최강", riskLevel:"고위험 ★", advice:"출구 전략을 미리 정하고 반드시 지켜야 합니다.", color:"#f59e0b", smj:false },
+  쇠:   { style:"안전자산·현금 비중 중시형", timing:"하락 방어에 탁월", riskLevel:"저위험", advice:"배당주·채권 ETF 비중 유지. 지키는 전략이 이 에너지와 맞습니다.", color:"#94a3b8", smj:false },
+  병:   { style:"장기 가치 투자자", timing:"하락장 저가 매수 선호", riskLevel:"중위험", advice:"5년 이상 보유 가능 종목만 매수. 단기 노이즈 차단이 핵심.", color:"#64748b", smj:true },
+  사:   { style:"소극적 방어 투자자", timing:"현금 보유 비중 높음", riskLevel:"중위험", advice:"적립식 인덱스 ETF가 최적. 큰 결정 전 전문가 조언 구할 것.", color:"#f87171", smj:true },
+  묘:   { style:"장기 적립식 저축형", timing:"적립식 매수에 최적화", riskLevel:"저위험", advice:"월 정액 자동투자 설정하고 마켓타이밍 시도하지 마세요.", color:"#ef4444", smj:true },
+  절:   { style:"반복 진출입 투자자", timing:"전환점 포착 시 수익, 오판 시 손실", riskLevel:"고위험 ★", advice:"매매 횟수 월 2회 이하 제한. 전환점 확인 후 진입.", color:"#dc2626", smj:true },
+  태:   { style:"아이디어형 기획 투자자", timing:"트렌드 선점 가능성 있음", riskLevel:"고위험", advice:"ETF로 아이디어 섹터 분산. 단일 종목 집중 금지.", color:"#818cf8", smj:false },
+  양:   { style:"점진적 성장 투자자", timing:"꾸준한 적립식 투자에 적합", riskLevel:"중위험", advice:"인내심 있게 장기 투자하면 안정적 수익 기대 가능.", color:"#a78bfa", smj:false },
+};
+
+const JIJANGAN_FINANCE: Record<string, string> = {
+  자:"임수·계수. 지혜로운 재물 운용. 감정 개입 없이 냉정하게 판단하면 수익이 납니다.",
+  축:"계수·신금·기토. 인내 속에 재물이 쌓이는 구조. 단기 욕심보다 장기 축적이 맞습니다.",
+  인:"무토·병화·갑목. 강한 생명력과 추진력이 숨어 있습니다. 새로운 분야 개척에서 재물이 옵니다.",
+  묘:"갑목·을목. 창의성과 성장력이 핵심. 트렌드 앞서가는 분야에서 수익 가능성이 높습니다.",
+  진:"을목·계수·무토. 변화와 재생의 힘. 전환점마다 재물 기회가 숨어 있습니다.",
+  사:"무토·경금·병화. 강한 의지와 실행력, 재물 기운이 충만합니다. 다만 과열 주의.",
+  오:"병화·기토·정화. 열정과 명예욕이 투자에 작용합니다. 감정적 매수 주의, 냉정함이 수익의 열쇠.",
+  미:"정화·을목·기토. 포용력과 예술성. 느린 듯하지만 착실히 쌓이는 재물 패턴.",
+  신:"무토·임수·경금. 결단력과 지혜. 이성적 분석을 따르면 좋은 결과가 옵니다.",
+  유:"경금·신금. 정밀함과 완벽주의. 철저한 리서치 후 집중 투자하는 패턴이 잘 맞습니다.",
+  술:"신금·정화·무토. 카리스마와 강한 의지. 장기 보유 종목에서 큰 수익이 나는 패턴.",
+  해:"무토·갑목·임수. 지혜와 생명력. 새로운 시작에서 재물 기운이 활성화됩니다.",
+};
+
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS   = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
 const MONTHS  = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -530,6 +561,58 @@ export default function StockPage() {
           <p className="text-sm text-red-200/80 leading-relaxed font-medium">"{ed.lossPattern}"</p>
           <p className="text-xs text-red-400/50 mt-3">같은 사주 유형 투자자 중 이 패턴으로 3년 내 원금 30% 이상 손실한 비율을 분석한 결과입니다.</p>
         </div>
+
+        {/* ⑤-b ☯ 12운성 투자 에너지 */}
+        {(() => {
+          const dayUU = result.pillarsDetail?.day?.uunseong;
+          const uu = dayUU ? UUNSEONG_INVEST[dayUU] : null;
+          if (!uu) return null;
+          return (
+            <div className={`border rounded-2xl p-5 mb-4 ${uu.smj ? "bg-red-950/20 border-red-500/20" : "bg-white/[0.04] border-white/10"}`}>
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">☯ 일주 12운성 투자 에너지</p>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm font-black" style={{ color: uu.color }}>{dayUU}</span>
+                <span className="text-sm text-gray-300 font-bold">— {uu.style}</span>
+                {uu.smj && <span className="text-[10px] bg-red-500/20 text-red-300 border border-red-500/25 px-2 py-0.5 rounded-full ml-auto">사묘절 (死墓絶)</span>}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-black/30 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-600 mb-1.5">⏱ 투자 타이밍</p>
+                  <p className="text-[11px] text-gray-300 leading-relaxed">{uu.timing}</p>
+                </div>
+                <div className="bg-black/30 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-600 mb-1.5">⚡ 위험 수준</p>
+                  <p className="text-[11px] leading-relaxed" style={{ color: uu.riskLevel.includes("★") ? "#f87171" : "#94a3b8" }}>{uu.riskLevel}</p>
+                </div>
+                <div className="bg-black/30 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-600 mb-1.5">💡 핵심 조언</p>
+                  <p className="text-[11px] text-gray-300 leading-relaxed">{uu.advice}</p>
+                </div>
+              </div>
+              {uu.smj && (
+                <div className="mt-3 bg-red-950/40 border border-red-500/20 rounded-xl p-3">
+                  <p className="text-xs text-red-300 leading-relaxed">⚠️ 사묘절 에너지: 일간의 기력이 소진·정체·단절되는 구간입니다. <strong>큰 투자 결정 전 반드시 신중하게 검토</strong>하고, 용신 오행 환경으로 에너지를 보충하세요.</p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* ⑤-c 🌀 지장간 숨은 재물 기운 */}
+        {(() => {
+          const dayJj = result.pillarsDetail?.day?.jj;
+          const desc = dayJj ? JIJANGAN_FINANCE[dayJj] : null;
+          if (!desc) return null;
+          return (
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">🌀 지장간 — 숨은 재물 기운</p>
+              <p className="text-xs text-gray-500 mb-2">일지(日支) <strong className="text-gray-300">{dayJj}</strong> 안에 숨어 있는 천간의 재물 에너지</p>
+              <div className="bg-black/20 rounded-xl p-3">
+                <p className="text-sm text-gray-300 leading-relaxed">{desc}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ⑥ 블러 섹션들 */}
         <div className="relative mb-4">

@@ -41,6 +41,38 @@ const JIJANGAN_ALL: Record<string,string[]> = {
   진:["을","계","무"], 사:["무","경","병"], 오:["병","기","정"], 미:["정","을","기"],
   신:["무","임","경"], 유:["경","신"], 술:["신","정","무"], 해:["무","갑","임"],
 };
+/* 12운성 관계 에너지 */
+const UUNSEONG_COMPAT: Record<string,{desc:string;keyword:string;color:string;smj:boolean}> = {
+  장생:{desc:"성장과 시작의 에너지. 관계에 신선한 자극과 설렘을 불어넣습니다.",keyword:"생동감·성장형",color:"#4ade80",smj:false},
+  목욕:{desc:"감각적이고 매력적인 에너지. 상대에게 강하게 끌리지만 감정 기복이 있을 수 있습니다.",keyword:"감각·매력형",color:"#c4b5fd",smj:false},
+  관대:{desc:"자신감과 리더십이 넘칩니다. 관계에서 이끌어가려는 성향이 강합니다.",keyword:"자신감·리더형",color:"#86efac",smj:false},
+  건록:{desc:"독립심이 강하고 자기 페이스를 중시합니다. 관계에서 자유와 존중이 필요합니다.",keyword:"독립·자존형",color:"#fbbf24",smj:false},
+  제왕:{desc:"강한 카리스마와 결단력. 관계의 주도권을 잡으려 하지만 고집이 셀 수 있습니다.",keyword:"카리스마·주도형",color:"#f59e0b",smj:false},
+  쇠:  {desc:"성숙하고 안정된 에너지. 관계에서 신뢰와 안정을 추구합니다.",keyword:"성숙·안정형",color:"#94a3b8",smj:false},
+  병:  {desc:"섬세하고 배려심이 깊습니다. 상대의 감정을 잘 헤아리지만 자기 에너지 관리가 필요합니다.",keyword:"섬세·배려형",color:"#64748b",smj:true},
+  사:  {desc:"조용하고 내면 중심적인 에너지. 관계에서 깊은 유대는 있으나 표현이 부족할 수 있습니다.",keyword:"내면·침잠형",color:"#f87171",smj:true},
+  묘:  {desc:"현실적이고 안정적인 관계를 추구합니다. 서두르지 않고 관계를 오래 유지합니다.",keyword:"현실·지속형",color:"#ef4444",smj:true},
+  절:  {desc:"변화와 새 출발의 에너지. 관계에서 전환점이 잦고 예측하기 어렵습니다.",keyword:"전환·변화형",color:"#dc2626",smj:true},
+  태:  {desc:"순수하고 꿈꾸는 에너지. 관계에서 이상적인 모습을 그리며 시작합니다.",keyword:"순수·이상형",color:"#818cf8",smj:false},
+  양:  {desc:"잠재력이 자라나는 에너지. 관계가 깊어질수록 진가가 드러납니다.",keyword:"성장·잠재형",color:"#a78bfa",smj:false},
+};
+
+/* 지장간 궁합 에너지 */
+const JIJANGAN_COMPAT: Record<string,string> = {
+  자:"임수·계수의 기운. 지혜롭고 냉철하나 감정 표현이 서툴 수 있습니다. 상대의 따뜻한 이해가 필요합니다.",
+  축:"기토·신금·계수. 인내심 강하고 신뢰를 중시합니다. 느리게 쌓이는 관계에서 빛납니다.",
+  인:"무토·병화·갑목. 생명력과 추진력이 관계를 이끕니다. 새로운 경험을 함께 만들어갑니다.",
+  묘:"갑목·을목. 창의적이고 부드러운 기운. 예술적 감성과 섬세함으로 상대를 배려합니다.",
+  진:"을목·계수·무토. 변화와 재생의 힘. 관계에서 위기를 함께 극복하는 강한 유대를 만듭니다.",
+  사:"무토·경금·병화. 강한 의지와 열정. 관계를 주도하지만 때로 상대를 압박할 수 있습니다.",
+  오:"병화·기토·정화. 따뜻한 열정과 명랑함. 관계에 활기를 불어넣으나 감정 기복 주의가 필요합니다.",
+  미:"정화·을목·기토. 포용력과 예술적 감성. 상대를 부드럽게 감싸는 따뜻한 기운입니다.",
+  신:"무토·임수·경금. 결단력과 이성적 판단. 관계에서 신뢰와 논리를 중요하게 여깁니다.",
+  유:"경금·신금. 정밀하고 완벽주의적 기운. 깊은 신뢰 관계를 원하지만 까다로울 수 있습니다.",
+  술:"신금·정화·무토. 카리스마와 의지. 관계에서 강한 존재감을 발휘하며 보호자 역할을 합니다.",
+  해:"무토·갑목·임수. 지혜와 생명력. 관계에서 새로운 시작을 함께할 때 에너지가 가장 빛납니다.",
+};
+
 const CG_HAP_MAP: Record<string,{partner:string;el:string}> = {};
 CHEONGAN_HAP.forEach(([a,b,el])=>{CG_HAP_MAP[a]={partner:b,el};CG_HAP_MAP[b]={partner:a,el};});
 const CG_CHUNG_SET=new Set(CHEONGAN_CHUNG.map(([a,b])=>`${a}-${b}`).concat(CHEONGAN_CHUNG.map(([a,b])=>`${b}-${a}`)));
@@ -607,6 +639,71 @@ export default function GunghapPage(){
                 </div>
               ))}
             </div>
+
+            {/* 12운성 관계 에너지 */}
+            {(()=>{
+              const pd1=result.r1.pillarsDetail, pd2=result.r2.pillarsDetail;
+              const uu1=pd1.day.uunseong, uu2=pd2.day.uunseong;
+              const d1=uu1?UUNSEONG_COMPAT[uu1]:null, d2=uu2?UUNSEONG_COMPAT[uu2]:null;
+              if(!d1&&!d2) return null;
+              return (
+                <div style={{borderRadius:15,padding:'16px',marginBottom:12,
+                  background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}}>
+                  <p style={{fontSize:13,fontWeight:900,color:'#ffd700',marginBottom:10}}>☯ 일주 12운성 관계 에너지</p>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
+                    {[{name:p1.name,uu:uu1,d:d1},{name:p2.name,uu:uu2,d:d2}].map((x,i)=>x.d&&(
+                      <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:10,padding:'10px',
+                        border:x.d.smj?'1px solid rgba(248,113,113,0.25)':'1px solid rgba(255,255,255,0.06)'}}>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:'0 0 4px'}}>{x.name}</p>
+                        <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:5,flexWrap:'wrap'}}>
+                          <span style={{fontSize:13,fontWeight:900,color:x.d.color}}>{x.uu}</span>
+                          {x.d.smj&&<span style={{fontSize:9,background:'rgba(248,113,113,0.2)',color:'#fca5a5',
+                            border:'1px solid rgba(248,113,113,0.25)',borderRadius:4,padding:'1px 5px'}}>사묘절</span>}
+                        </div>
+                        <p style={{fontSize:10,color:x.d.color,marginBottom:4,fontWeight:700}}>{x.d.keyword}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',lineHeight:1.5,margin:0}}>{x.d.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {(d1?.smj||d2?.smj)&&(
+                    <div style={{background:'rgba(248,113,113,0.08)',border:'1px solid rgba(248,113,113,0.2)',
+                      borderRadius:8,padding:'8px 12px'}}>
+                      <p style={{fontSize:11,color:'#fca5a5',lineHeight:1.5,margin:0}}>
+                        ⚠️ 사묘절(死墓絶) 에너지: 일간의 기력이 소진·정체·단절되는 운성입니다.
+                        관계에서 에너지 소모가 크거나 표현이 위축될 수 있으니 서로 배려가 필요합니다.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* 지장간 숨은 궁합 에너지 */}
+            {(()=>{
+              const pd1=result.r1.pillarsDetail, pd2=result.r2.pillarsDetail;
+              const jj1=pd1.day.jj, jj2=pd2.day.jj;
+              const desc1=jj1?JIJANGAN_COMPAT[jj1]:null, desc2=jj2?JIJANGAN_COMPAT[jj2]:null;
+              if(!desc1&&!desc2) return null;
+              return (
+                <div style={{borderRadius:15,padding:'16px',marginBottom:12,
+                  background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}}>
+                  <p style={{fontSize:13,fontWeight:900,color:'#ffd700',marginBottom:4}}>🌀 지장간 — 숨은 궁합 에너지</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:10,lineHeight:1.5}}>
+                    일지(日支) 안에 숨어 있는 천간의 기운이 상대에게 어떻게 작용하는지 보여줍니다.
+                  </p>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                    {[{name:p1.name,jj:jj1,desc:desc1},{name:p2.name,jj:jj2,desc:desc2}].map((x,i)=>x.desc&&(
+                      <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:10,padding:'10px',
+                        border:'1px solid rgba(255,255,255,0.06)'}}>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:'0 0 3px'}}>{x.name}</p>
+                        <p style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,0.7)',margin:'0 0 5px'}}>일지 {x.jj}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',lineHeight:1.5,margin:0}}>{x.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ① 조후 궁합 */}
             <div style={{borderRadius:15,padding:'16px',marginBottom:12,
