@@ -3,6 +3,18 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import KakaoLoginButton from "@/components/KakaoLoginButton";
 
+type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special";
+
+const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
+  { key: "전체",    icon: "☯",  desc: "전체 서비스" },
+  { key: "무료",    icon: "🆓",  desc: "무료 서비스" },
+  { key: "연애·궁합", icon: "💑", desc: "연애·궁합" },
+  { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
+  { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
+  { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
+  { key: "Special", icon: "👑", desc: "프리미엄" },
+];
+
 // ── 후기 데이터 ───────────────────────────────────────────────────────────────
 const REVIEWS = [
   { name: "이○○", region: "서울", age: "32세", text: "배경화면 바꾸고 나서 진짜 기분인지 모르겠는데 취업됐어요. 믿기 싫었는데 신기합니다.", service: "오행 배경화면", stars: 5 },
@@ -34,7 +46,11 @@ const ACTIVITIES = [
 ];
 
 // ── 서비스 목록 ───────────────────────────────────────────────────────────────
-const SERVICES = [
+const SERVICES: {
+  id: string; emoji: string; title: string; viral: string; desc: string;
+  tags: string[]; href: string; badge: string; color: string; badgeBg: string;
+  border: string; glow: string; categories: Category[];
+}[] = [
   {
     id: "saju", emoji: "🔮",
     title: "사주 오행 배경화면",
@@ -43,8 +59,8 @@ const SERVICES = [
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
     href: "/saju", badge: "무료 분석",
     color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
-    border: "rgba(139,92,246,0.3)",
-    glow: "rgba(99,102,241,0.15)",
+    border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
+    categories: ["전체", "무료", "라이프"],
   },
   {
     id: "gunghap", emoji: "💑",
@@ -54,19 +70,8 @@ const SERVICES = [
     tags: ["원진살", "합충", "바람기 분석"],
     href: "/gunghap", badge: "무료 분석",
     color: "#f9a8d4", badgeBg: "rgba(236,72,153,0.85)",
-    border: "rgba(236,72,153,0.3)",
-    glow: "rgba(236,72,153,0.12)",
-  },
-  {
-    id: "daewoon", emoji: "⏳",
-    title: "대운·세운 80년 분석",
-    viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
-    desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
-    tags: ["대운", "세운", "교운기 전략"],
-    href: "/daewoon", badge: "₩15,000",
-    color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
-    border: "rgba(202,138,4,0.3)",
-    glow: "rgba(161,98,7,0.15)",
+    border: "rgba(236,72,153,0.3)", glow: "rgba(236,72,153,0.12)",
+    categories: ["전체", "무료", "연애·궁합"],
   },
   {
     id: "charm", emoji: "✨",
@@ -76,30 +81,8 @@ const SERVICES = [
     tags: ["도화살", "홍염살", "이성운"],
     href: "/charm", badge: "무료+유료",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
-    border: "rgba(244,63,94,0.3)",
-    glow: "rgba(244,63,94,0.12)",
-  },
-  {
-    id: "stock", emoji: "📈",
-    title: "사주로 보는 주식 스타일",
-    viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
-    desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
-    tags: ["주식", "코인", "ETF·레버리지"],
-    href: "/stock", badge: "무료",
-    color: "#6ee7b7", badgeBg: "rgba(5,150,105,0.9)",
-    border: "rgba(16,185,129,0.3)",
-    glow: "rgba(16,185,129,0.12)",
-  },
-  {
-    id: "place", emoji: "🌍",
-    title: "내 사주에 맞는 도시·나라",
-    viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
-    desc: "용신 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
-    tags: ["거주지", "해외 추천", "용신 방위"],
-    href: "/place", badge: "₩990",
-    color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
-    border: "rgba(139,92,246,0.3)",
-    glow: "rgba(99,102,241,0.12)",
+    border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
+    categories: ["전체", "무료", "연애·궁합"],
   },
   {
     id: "mbti", emoji: "🧬",
@@ -109,8 +92,41 @@ const SERVICES = [
     tags: ["MBTI", "성격 분석", "직업 추천"],
     href: "/mbti", badge: "무료",
     color: "#e879f9", badgeBg: "rgba(162,28,175,0.9)",
-    border: "rgba(217,70,239,0.3)",
-    glow: "rgba(217,70,239,0.12)",
+    border: "rgba(217,70,239,0.3)", glow: "rgba(217,70,239,0.12)",
+    categories: ["전체", "무료", "연애·궁합", "라이프"],
+  },
+  {
+    id: "stock", emoji: "📈",
+    title: "사주로 보는 주식 스타일",
+    viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
+    desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
+    tags: ["주식", "코인", "ETF·레버리지"],
+    href: "/stock", badge: "무료",
+    color: "#6ee7b7", badgeBg: "rgba(5,150,105,0.9)",
+    border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)",
+    categories: ["전체", "무료", "금전·투자"],
+  },
+  {
+    id: "daewoon", emoji: "⏳",
+    title: "대운·세운 80년 분석",
+    viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
+    desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
+    tags: ["대운", "세운", "교운기 전략"],
+    href: "/daewoon", badge: "₩15,000",
+    color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
+    border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
+    categories: ["전체", "금전·투자", "운명·대운", "Special"],
+  },
+  {
+    id: "place", emoji: "🌍",
+    title: "내 사주에 맞는 도시·나라",
+    viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
+    desc: "용신 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
+    tags: ["거주지", "해외 추천", "용신 방위"],
+    href: "/place", badge: "₩990",
+    color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
+    border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
+    categories: ["전체", "운명·대운", "라이프", "Special"],
   },
   {
     id: "overcome", emoji: "⚡",
@@ -120,8 +136,8 @@ const SERVICES = [
     tags: ["신살 극복", "오행 보완", "개운법"],
     href: "/overcome", badge: "무료",
     color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
-    border: "rgba(239,68,68,0.3)",
-    glow: "rgba(239,68,68,0.12)",
+    border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
+    categories: ["전체", "무료", "운명·대운"],
   },
   {
     id: "calendar", emoji: "📅",
@@ -131,8 +147,8 @@ const SERVICES = [
     tags: ["일진", "날짜 선택", "12운성"],
     href: "/calendar", badge: "무료",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
-    border: "rgba(14,165,233,0.3)",
-    glow: "rgba(14,165,233,0.12)",
+    border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
+    categories: ["전체", "무료", "운명·대운", "라이프"],
   },
   {
     id: "taste", emoji: "🎬",
@@ -142,8 +158,8 @@ const SERVICES = [
     tags: ["영화", "책", "여행 스타일"],
     href: "/taste", badge: "무료",
     color: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
-    border: "rgba(245,158,11,0.3)",
-    glow: "rgba(245,158,11,0.12)",
+    border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)",
+    categories: ["전체", "무료", "라이프"],
   },
 ];
 
@@ -233,6 +249,7 @@ export default function MainPage() {
   const [todayCounter] = useState(() => Math.floor(Math.random() * 400) + 800);
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<Category>("전체");
 
   useEffect(() => {
     fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: "/" }) }).catch(() => {});
@@ -359,6 +376,32 @@ export default function MainPage() {
             무료로 내 사주 분석하기
             <span>→</span>
           </button>
+
+          {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
+          <div className="mt-10 relative">
+            <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.25)" }}>카테고리로 찾기</p>
+            <div className="flex gap-2 justify-center flex-wrap">
+              {CATEGORIES.map(({ key, icon, desc }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveCategory(key);
+                    document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200"
+                  style={{
+                    background: activeCategory === key ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)",
+                    border: activeCategory === key ? "1px solid rgba(201,168,76,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                    color: activeCategory === key ? "#e8c97a" : "rgba(255,255,255,0.4)",
+                  }}
+                >
+                  <span>{icon}</span>
+                  <span className="hidden sm:inline">{desc}</span>
+                  <span className="sm:hidden">{key}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* ── 공지사항 ── */}
@@ -385,21 +428,91 @@ export default function MainPage() {
         </section>
 
         {/* ── 서비스 섹션 ── */}
-        <section className="mb-14">
-          <div className="flex items-end justify-between mb-5">
+        <section id="services-section" className="mb-14">
+          <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>AI SERVICES</p>
               <h2 className="text-xl sm:text-2xl font-black text-white">지금 바로 확인하세요</h2>
             </div>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>10가지 서비스</span>
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지 서비스
+            </span>
+          </div>
+
+          {/* ── 카테고리 필터 탭 ── */}
+          <div className="relative mb-5">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
+              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}>
+              {CATEGORIES.map(({ key, icon }) => {
+                const isActive = activeCategory === key;
+                const count = key === "전체" ? SERVICES.length : SERVICES.filter(s => s.categories.includes(key)).length;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setActiveCategory(key)}
+                    className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap"
+                    style={{
+                      background: isActive
+                        ? key === "Special" ? "linear-gradient(135deg, rgba(201,168,76,0.25), rgba(161,98,7,0.3))"
+                          : key === "무료" ? "rgba(16,185,129,0.2)"
+                          : key === "연애·궁합" ? "rgba(236,72,153,0.2)"
+                          : key === "금전·투자" ? "rgba(16,185,129,0.2)"
+                          : key === "운명·대운" ? "rgba(202,138,4,0.2)"
+                          : key === "라이프" ? "rgba(99,102,241,0.2)"
+                          : "rgba(255,255,255,0.1)"
+                        : "rgba(255,255,255,0.04)",
+                      border: isActive
+                        ? key === "Special" ? "1px solid rgba(201,168,76,0.4)"
+                          : key === "무료" ? "1px solid rgba(16,185,129,0.35)"
+                          : key === "연애·궁합" ? "1px solid rgba(236,72,153,0.35)"
+                          : key === "금전·투자" ? "1px solid rgba(16,185,129,0.35)"
+                          : key === "운명·대운" ? "1px solid rgba(202,138,4,0.35)"
+                          : key === "라이프" ? "1px solid rgba(99,102,241,0.35)"
+                          : "1px solid rgba(255,255,255,0.18)"
+                        : "1px solid rgba(255,255,255,0.07)",
+                      color: isActive
+                        ? key === "Special" ? "#e8c97a"
+                          : key === "무료" ? "#6ee7b7"
+                          : key === "연애·궁합" ? "#f9a8d4"
+                          : key === "금전·투자" ? "#6ee7b7"
+                          : key === "운명·대운" ? "#fbbf24"
+                          : key === "라이프" ? "#a78bfa"
+                          : "rgba(255,255,255,0.9)"
+                        : "rgba(255,255,255,0.38)",
+                    }}
+                  >
+                    <span>{icon}</span>
+                    <span>{key}</span>
+                    {isActive && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
+                        style={{ background: "rgba(255,255,255,0.12)" }}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* 오른쪽 페이드 */}
+            <div className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none"
+              style={{ background: "linear-gradient(to right, transparent, #06060e)" }} />
           </div>
 
           {/* 데스크탑: 2컬럼, 모바일: 1컬럼 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {SERVICES.map((svc, i) => (
-              <ServiceCard key={svc.id} svc={svc} index={i} />
-            ))}
+            {SERVICES
+              .filter(s => s.categories.includes(activeCategory))
+              .map((svc, i) => (
+                <ServiceCard key={svc.id} svc={svc} index={i} />
+              ))}
           </div>
+
+          {/* 빈 카테고리 처리 */}
+          {SERVICES.filter(s => s.categories.includes(activeCategory)).length === 0 && (
+            <div className="text-center py-16 text-gray-600 text-sm">
+              준비 중인 서비스입니다
+            </div>
+          )}
         </section>
 
         {/* ── 바이럴 배너 ── */}
