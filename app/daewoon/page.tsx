@@ -50,9 +50,10 @@ export default function DaewoonPage() {
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
   const [monthJj, setMonthJj] = useState("");
-  const [step, setStep] = useState<"entry" | "preview">("entry");
+  const [step, setStep] = useState<"splash" | "entry" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
-  const [showFull, setShowFull] = useState(false);
+  const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
+  const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 28000);
 
   useEffect(() => {
     setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");
@@ -94,12 +95,89 @@ export default function DaewoonPage() {
     router.push(`/daewoon/pay?orderId=${orderId}&amount=${PRICE}`);
   }
 
+  // ── 스플래시 ──
+  if (step === "splash") {
+    return (
+      <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden">
+        <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background: "rgba(251,191,36,0.12)" }} />
+          <div className="absolute bottom-[-20%] right-[-20%] w-[500px] h-[500px] rounded-full blur-[140px]" style={{ background: "rgba(192,132,252,0.1)" }} />
+        </div>
+
+        <div className="relative z-10 flex items-center px-5 py-4">
+          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+        </div>
+
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
+
+          <div className="flex items-center gap-2 mb-8">
+            <div className="w-2 h-2 rounded-full bg-yellow-400 pulse" />
+            <span className="text-xs text-gray-400">지금 <strong className="text-yellow-400">{counter.toLocaleString()}명</strong>이 대운 확인 중</span>
+          </div>
+
+          <div className="mb-8 space-y-3">
+            <p className="text-4xl font-black leading-tight">
+              대운을 모르고<br />
+              <span className="text-yellow-400">하는 결정은</span><br />
+              전부 도박입니다
+            </p>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              지금 상승기인지, 침체기인지도 모른 채<br />
+              투자·이직·결혼·창업을 결정하고 있습니다.<br />
+              결과가 안 나오는 이유가 여기 있습니다.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {[
+              { icon: "🌊", title: "대운 80년 흐름", desc: "10년 단위 8개 대운 전체" },
+              { icon: "📅", title: "세운 14년치", desc: "연도별 상세 흐름" },
+              { icon: "⏰", title: "교운기 정확 계산", desc: "첫 대운 진입 나이" },
+              { icon: "🤖", title: "AI 대운 해설", desc: "대운별 인생 조언" },
+            ].map(f => (
+              <div key={f.title} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <span className="text-2xl">{f.icon}</span>
+                <p className="text-sm font-bold text-white mt-2">{f.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-4 mb-8 py-4 border-y" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-yellow-400">{totalCount.toLocaleString()}</p>
+              <p className="text-[10px] text-gray-600 mt-0.5">누적 분석</p>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-white">★ 4.9</p>
+              <p className="text-[10px] text-gray-600 mt-0.5">평균 평점</p>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-green-400">무료</p>
+              <p className="text-[10px] text-gray-600 mt-0.5">미리보기</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setStep("entry")}
+            className="w-full py-5 rounded-2xl font-black text-lg text-black shadow-2xl transition-all active:scale-[0.97]"
+            style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}
+          >
+            내 대운 확인하기 →
+          </button>
+          <p className="text-center text-xs text-gray-600 mt-3">미리보기 무료 · 전체 보고서 ₩{PRICE.toLocaleString()}</p>
+        </div>
+      </main>
+    );
+  }
+
   // ── 입력 화면 ──
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
         <div className="max-w-lg mx-auto px-5 py-10 pb-24">
-          <button onClick={() => router.back()} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
+          <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-3">
@@ -112,7 +190,6 @@ export default function DaewoonPage() {
             </p>
           </div>
 
-          {/* 가격 배너 */}
           <div className="bg-gradient-to-r from-amber-950/60 to-yellow-950/60 border border-yellow-700/30 rounded-2xl p-5 mb-8">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-yellow-500 font-semibold uppercase tracking-wider">프리미엄 보고서</span>
@@ -127,7 +204,6 @@ export default function DaewoonPage() {
             </ul>
           </div>
 
-          {/* 사주 입력 폼 */}
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 space-y-4">
             <div>
               <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
@@ -208,14 +284,12 @@ export default function DaewoonPage() {
 
   // ── 미리보기 / 결과 화면 ──
   if (!daewoon) return null;
-  const nowYear = new Date().getFullYear();
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <div className="max-w-lg mx-auto px-5 py-8 pb-32">
         <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
-        {/* 헤더 */}
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-2">
             <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
@@ -230,7 +304,6 @@ export default function DaewoonPage() {
           </p>
         </div>
 
-        {/* 교운기 배너 */}
         <div className="bg-violet-500/10 border border-violet-500/25 rounded-2xl p-4 mb-6">
           <p className="text-xs text-violet-400 font-semibold mb-1">⏰ 교운기 (첫 대운 진입)</p>
           <p className="text-2xl font-black text-violet-300">{daewoon.startAge}세</p>
@@ -240,7 +313,6 @@ export default function DaewoonPage() {
           </p>
         </div>
 
-        {/* 대운 8개 */}
         <div className="mb-6">
           <h2 className="text-sm font-bold text-gray-300 mb-3">대운 흐름 (80년)</h2>
           <div className="space-y-2">
@@ -253,9 +325,7 @@ export default function DaewoonPage() {
               return (
                 <div
                   key={i}
-                  className={`rounded-xl border p-4 transition-all relative ${
-                    isCurrentDw ? "border-yellow-500/50" : ""
-                  }`}
+                  className={`rounded-xl border p-4 transition-all relative ${isCurrentDw ? "border-yellow-500/50" : ""}`}
                   style={isCurrentDw
                     ? { background: `${elStyle.bg}cc`, borderColor: "#ca8a04" }
                     : { background: `${elStyle.bg}66`, borderColor: elStyle.border }
@@ -266,11 +336,9 @@ export default function DaewoonPage() {
                       <p className="text-xs text-gray-500">🔒 프리미엄 전용</p>
                     </div>
                   )}
-
                   {isCurrentDw && (
                     <span className="absolute top-2 right-2 text-[10px] bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-bold">현재 대운</span>
                   )}
-
                   <div className="flex items-start gap-4">
                     <div className="text-center min-w-[52px]">
                       <p className="text-2xl font-black" style={{ color: elStyle.text }}>{p.cg}{p.jj}</p>
@@ -287,9 +355,7 @@ export default function DaewoonPage() {
                           </span>
                         )}
                       </div>
-                      {uunsF && (
-                        <p className="text-xs text-gray-400 leading-relaxed">{uunsF.desc}</p>
-                      )}
+                      {uunsF && <p className="text-xs text-gray-400 leading-relaxed">{uunsF.desc}</p>}
                     </div>
                   </div>
                 </div>
@@ -298,7 +364,6 @@ export default function DaewoonPage() {
           </div>
         </div>
 
-        {/* 세운 (현재 주변 연도) */}
         <div className="mb-6">
           <h2 className="text-sm font-bold text-gray-300 mb-3">세운 — 연도별 흐름</h2>
           <div className="overflow-x-auto">
@@ -331,9 +396,7 @@ export default function DaewoonPage() {
                     <p className="text-base font-black" style={{ color: elStyle.text }}>{s.cg}{s.jj}</p>
                     <p className="text-[10px] text-gray-500 mt-0.5">{s.sipseongJj}</p>
                     {uunsF && (
-                      <p className="text-[9px] mt-1 font-semibold" style={{ color: uunsF.color }}>
-                        {s.uunseong}
-                      </p>
+                      <p className="text-[9px] mt-1 font-semibold" style={{ color: uunsF.color }}>{s.uunseong}</p>
                     )}
                   </div>
                 );
@@ -342,7 +405,6 @@ export default function DaewoonPage() {
           </div>
         </div>
 
-        {/* 프리미엄 CTA */}
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
             <div className="max-w-lg mx-auto">
