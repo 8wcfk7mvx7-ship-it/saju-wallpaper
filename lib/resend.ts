@@ -1,7 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "Summer Palace <noreply@summerpalace.ai.kr>";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export interface ReceiptEmailParams {
   to: string;
@@ -18,7 +21,7 @@ export async function sendReceiptEmail(params: ReceiptEmailParams): Promise<bool
   const { to, customerName, orderId, amount, productName, serviceUrl } = params;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: `[Summer Palace] 결제 완료 - ${productName}`,
@@ -117,7 +120,7 @@ export async function sendAdminNotification(orderId: string, amount: number, pro
   if (!process.env.RESEND_API_KEY || !adminEmail) return;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: adminEmail,
       subject: `[Summer Palace] 새 결제 — ${productName} ₩${amount.toLocaleString()}`,

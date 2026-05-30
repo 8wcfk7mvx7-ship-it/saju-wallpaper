@@ -13,7 +13,26 @@ interface PromptItem {
   updatedAt: string | null;
 }
 
+interface Payment {
+  id: number;
+  order_id: string;
+  amount: number;
+  product_name: string;
+  customer_name: string;
+  customer_email: string | null;
+  status: string;
+  created_at: string;
+}
+
+interface Stats {
+  todayViews: number;
+  totalViews: number;
+  payments: Payment[];
+  dbConnected: boolean;
+}
+
 const CATEGORY_LABELS = {
+  dashboard: "📊 대시보드",
   wallpaper: "🖼 배경화면 (DALL-E)",
   report: "📄 보고서 (Claude)",
   preview: "👁 결과 미리보기",
@@ -30,7 +49,9 @@ export default function AdminPage() {
   const [saving, setSaving] = useState<string | null>(null); // key being saved
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"wallpaper" | "report" | "preview">("wallpaper");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "wallpaper" | "report" | "preview">("dashboard");
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [previewYear, setPreviewYear] = useState("1990");
   const [previewMonth, setPreviewMonth] = useState("5");
   const [previewDay, setPreviewDay] = useState("15");
@@ -145,7 +166,26 @@ export default function AdminPage() {
     }
   }
 
-  const filteredPrompts = prompts.filter(p => p.category === activeTab);
+  const filteredPrompts = prompts.filter(p => p.category === (activeTab === "dashboard" ? "wallpaper" : activeTab));
+
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const res = await fetch("/api/admin/stats", {
+        headers: { "x-admin-password": password },
+      });
+      const data = await res.json();
+      setStats(data);
+    } catch {
+      // ignore
+    } finally {
+      setStatsLoading(false);
+    }
+  }, [password]);
+
+  useEffect(() => {
+    if (authed && activeTab === "dashboard") fetchStats();
+  }, [authed, activeTab, fetchStats]);
 
   function activatePreview(target: "result" | "report" | "stock" | "charm" | "generating") {
     sessionStorage.setItem("paymentDone", "true");
@@ -254,13 +294,15 @@ export default function AdminPage() {
 
         {/* 탭 */}
         <div className="flex gap-2 mb-6 flex-wrap">
-          {(["wallpaper", "report", "preview"] as const).map(tab => (
+          {(["dashboard", "wallpaper", "report", "preview"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 activeTab === tab
-                  ? tab === "preview" ? "bg-emerald-600 text-white" : "bg-indigo-600 text-white"
+                  ? tab === "preview" ? "bg-emerald-600 text-white"
+                    : tab === "dashboard" ? "bg-sky-600 text-white"
+                    : "bg-indigo-600 text-white"
                   : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
               }`}
             >
@@ -268,6 +310,138 @@ export default function AdminPage() {
             </button>
           ))}
         </div>
+
+        {/* 대시보드 탭 */}
+        {activeTab === "dashboard" && (
+          <div className="space-y-6">
+            <div className="flex justify-end">
+              <button onClick={fetchStats} disabled={statsLoading}
+                className="text-xs text-sky-400 hover:text-sky-300 transition disabled:opacity-50">
+                {statsLoading ? "로딩 중..." : "↻ 새로고침"}
+              </button>
+            </div>
+
+            {/* 방문자 수 카드 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-2xl p-5">
+                <p className="text-xs text-sky-400 mb-1">오늘 방문자</p>
+                <p className="text-3xl font-black text-white">
+                  {statsLoading ? "—" : (stats?.todayViews ?? 0).toLocaleString()}
+                </p>
+                {!stats?.dbConnected && <p className="text-xs text-gray-600 mt-1">DB 미연결</p>}
+              </div>
+              <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5">
+                <p className="text-xs text-violet-400 mb-1">누적 방문자</p>
+                <p className="text-3xl font-black text-white">
+                  {statsLoading ? "—" : (stats?.totalViews ?? 0).toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* 결제 통계 */}
+            {stats?.payments && stats.payments.length > 0 && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-xs text-emerald-400 mb-1">총 결제 건</p>
+                    <p className="text-2xl font-black text-white">{stats.payments.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-emerald-400 mb-1">총 매출</p>
+                    <p className="text-2xl font-black text-white">
+                      ₩{stats.payments.reduce((s, p) => s + p.amount, 0).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-emerald-400 mb-1">오늘 매출</p>
+                    <p className="text-2xl font-black text-white">
+                      ₩{stats.payments
+                        .filter(p => new Date(p.created_at).toDateString() === new Date().toDateString())
+                        .reduce((s, p) => s + p.amount, 0).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 결제 목록 */}
+            <div>
+              <h3 className="text-sm font-bold text-gray-300 mb-3">결제 내역</h3>
+              {statsLoading ? (
+                <p className="text-gray-600 text-sm text-center py-8">로딩 중...</p>
+              ) : !stats?.dbConnected ? (
+                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 text-center">
+                  <p className="text-gray-600 text-sm">Supabase 미연결</p>
+                  <p className="text-gray-700 text-xs mt-1">SUPABASE_URL / SUPABASE_SERVICE_KEY 환경변수 설정 필요</p>
+                </div>
+              ) : stats.payments.length === 0 ? (
+                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 text-center">
+                  <p className="text-gray-600 text-sm">결제 내역 없음</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {stats.payments.map(p => (
+                    <div key={p.id} className="bg-white/[0.04] border border-white/8 rounded-xl p-4 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-sm font-semibold text-white">{p.product_name}</span>
+                          <span className="text-xs bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full">{p.status}</span>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {p.customer_name}
+                          {p.customer_email && ` · ${p.customer_email}`}
+                        </p>
+                        <p className="text-xs text-gray-700 mt-0.5 font-mono">{p.order_id}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-base font-black text-violet-300">₩{p.amount.toLocaleString()}</p>
+                        <p className="text-xs text-gray-600">
+                          {new Date(p.created_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Supabase 테이블 생성 안내 */}
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+              <p className="text-xs text-amber-300 font-bold mb-2">⚙️ Supabase 테이블 설정 필요</p>
+              <p className="text-xs text-amber-200/70 leading-relaxed mb-2">아래 SQL을 Supabase SQL Editor에서 실행하세요:</p>
+              <pre className="text-xs text-gray-400 bg-black/30 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap">{`-- 방문자 추적
+create table if not exists page_views (
+  id bigint generated always as identity primary key,
+  page text not null default '/',
+  created_at timestamptz default now()
+);
+
+-- 결제 내역
+create table if not exists payments (
+  id bigint generated always as identity primary key,
+  order_id text unique not null,
+  amount integer not null,
+  product_name text not null,
+  customer_name text,
+  customer_email text,
+  payment_key text,
+  status text default 'paid',
+  created_at timestamptz default now()
+);
+
+-- 카카오 사용자
+create table if not exists kakao_users (
+  id bigint generated always as identity primary key,
+  kakao_id text unique not null,
+  nickname text,
+  profile_image text,
+  email text,
+  last_login timestamptz default now(),
+  created_at timestamptz default now()
+);`}</pre>
+            </div>
+          </div>
+        )}
 
         {/* 결과 미리보기 탭 */}
         {activeTab === "preview" && (
@@ -351,8 +525,8 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* 프롬프트 목록 (preview 탭 아닐 때만) */}
-        {activeTab !== "preview" && <div className="space-y-4">
+        {/* 프롬프트 목록 (wallpaper/report 탭일 때만) */}
+        {(activeTab === "wallpaper" || activeTab === "report") && <div className="space-y-4">
           {filteredPrompts.map(p => {
             const isEditing = editingKey === p.key;
             const isSaving = saving === p.key;
@@ -483,7 +657,7 @@ export default function AdminPage() {
         </div>}
 
         {/* 수채화+유화 조합 팁 */}
-        {activeTab === "wallpaper" && (
+        {activeTab === "wallpaper" && prompts.length > 0 && (
           <div className="mt-6 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
             <p className="text-sm text-yellow-300 font-medium mb-1">💡 수채화 + 유화 조합 팁</p>
             <p className="text-xs text-yellow-200/70 leading-relaxed">

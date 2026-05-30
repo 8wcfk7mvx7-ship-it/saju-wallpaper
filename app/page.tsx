@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import KakaoLoginButton from "@/components/KakaoLoginButton";
 
 type Lang = "ko" | "en" | "id";
 
@@ -279,6 +280,11 @@ export default function MainPage() {
   const [lang, setLang] = useState<Lang>("ko");
   const [counter] = useState(() => Math.floor(Math.random() * 300) + 180);
 
+  // 방문자 트래킹
+  useEffect(() => {
+    fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: "/" }) }).catch(() => {});
+  }, []);
+
   const titleVisible = useFadeIn(80);
   const subVisible   = useFadeIn(240);
   const statsVisible = useFadeIn(360);
@@ -332,22 +338,25 @@ export default function MainPage() {
         ))}
       </div>
 
-      {/* ── 언어 선택 ── */}
-      <div className="fixed top-4 right-4 z-20 flex gap-1.5">
-        {(["ko", "en", "id"] as Lang[]).map(l => (
-          <button
-            key={l}
-            onClick={() => setLang(l)}
-            className="text-xs font-bold px-3 py-1.5 rounded-full border transition-all duration-300"
-            style={{
-              background: lang === l ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)",
-              borderColor: lang === l ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.1)",
-              color: lang === l ? "#e8c97a" : "rgba(255,255,255,0.35)",
-            }}
-          >
-            {l === "ko" ? "한국어" : l === "en" ? "EN" : "ID"}
-          </button>
-        ))}
+      {/* ── 상단 바 (언어 선택 + 카카오 로그인) ── */}
+      <div className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-3 pb-2">
+        <KakaoLoginButton redirectTo="/" />
+        <div className="flex gap-1.5">
+          {(["ko", "en", "id"] as Lang[]).map(l => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              className="text-xs font-bold px-3 py-1.5 rounded-full border transition-all duration-300"
+              style={{
+                background: lang === l ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)",
+                borderColor: lang === l ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.1)",
+                color: lang === l ? "#e8c97a" : "rgba(255,255,255,0.35)",
+              }}
+            >
+              {l === "ko" ? "한국어" : l === "en" ? "EN" : "ID"}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-5 pb-28">

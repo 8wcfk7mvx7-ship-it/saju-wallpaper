@@ -1,29 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { confirmTossPayment } from "@/lib/toss";
 import { sendReceiptEmail, sendAdminNotification } from "@/lib/resend";
+
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { paymentKey, orderId, amount, customerEmail, customerName, productName } = await req.json();
 
     if (!paymentKey || !orderId || !amount) {
-      return NextResponse.json(
-        { error: "결제 정보가 올바르지 않습니다." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "결제 정보가 올바르지 않습니다." }, { status: 400 });
     }
 
     const result = await confirmTossPayment(paymentKey, orderId, Number(amount));
 
+    // DB에 결제 기록 저장
+    const sb = getSupabase();
+    if (sb) {
+      await sb.from("payments").insert({
+        order_id: orderId,
+        amount: Number(amount),
+        product_name: productName || "Summer Palace 분석",
+        customer_name: customerName || "고객",
+        customer_email: customerEmail || null,
+        payment_key: paymentKey,
+        status: "paid",
+      }).then(() => {});
+    }
+
     if (customerEmail) {
-      const serviceUrl = result?.successUrl as string | undefined;
       await sendReceiptEmail({
         to: customerEmail,
         customerName: customerName || "고객",
         orderId,
         amount: Number(amount),
         productName: productName || "Summer Palace 분석",
-        serviceUrl,
       });
     }
 
