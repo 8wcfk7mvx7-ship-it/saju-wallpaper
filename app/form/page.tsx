@@ -304,7 +304,7 @@ export default function FormPage() {
         }
       }
 
-      sessionStorage.setItem("sajuForm", JSON.stringify({
+      const sajuData = {
         ...form,
         birthYear: finalYear,
         birthMonth: finalMonth,
@@ -314,7 +314,34 @@ export default function FormPage() {
         birthHourUnknown: birthTime.unknown,
         useJajasi: birthTime.useJajasi,
         lang,
-      }));
+      };
+      sessionStorage.setItem("sajuForm", JSON.stringify(sajuData));
+
+      // 보관함 자동저장
+      try {
+        const SAJU_KEY = "sp_saved_saju_list";
+        const existing = JSON.parse(localStorage.getItem(SAJU_KEY) || "[]");
+        const newEntry = {
+          name: form.name,
+          birthYear: finalYear,
+          birthMonth: finalMonth,
+          birthDay: finalDay,
+          birthHour: birthTime.unknown ? 0 : birthTime.hour,
+          birthHourUnknown: birthTime.unknown,
+          gender: form.gender,
+          savedAt: new Date().toISOString(),
+        };
+        const isDuplicate = existing.some((e: { birthYear: number; birthMonth: number; birthDay: number; name: string }) =>
+          e.birthYear === newEntry.birthYear &&
+          e.birthMonth === newEntry.birthMonth &&
+          e.birthDay === newEntry.birthDay &&
+          e.name === newEntry.name
+        );
+        if (!isDuplicate) {
+          localStorage.setItem(SAJU_KEY, JSON.stringify([newEntry, ...existing].slice(0, 20)));
+        }
+      } catch {}
+
       router.push("/loading");
     } catch {
       alert("오류가 발생했습니다");
