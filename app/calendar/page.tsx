@@ -11,7 +11,6 @@ import { analyzeSaju } from "@/lib/saju";
 
 export const dynamic = "force-dynamic";
 
-// ── 상수 ──────────────────────────────────────────────────────────────────────
 const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }> = {
   목: { bg: "#14532d", text: "#4ade80", border: "#166534" },
   화: { bg: "#7f1d1d", text: "#f87171", border: "#991b1b" },
@@ -43,16 +42,13 @@ const SOLAR_TERM_NAME: Record<number, string> = {
 
 const MONTH_NAMES = ["", "1월", "2월", "3월", "4월", "5월", "6월",
   "7월", "8월", "9월", "10월", "11월", "12월"];
-
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
-// ── 유틸 ──────────────────────────────────────────────────────────────────────
 function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
-
 function firstDayOfWeek(year: number, month: number): number {
-  return new Date(year, month - 1, 1).getDay(); // 0=일
+  return new Date(year, month - 1, 1).getDay();
 }
 
 interface DayInfo {
@@ -63,8 +59,21 @@ interface DayInfo {
   isSolarTerm: boolean;
 }
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const router = useRouter();
+  const [step, setStep] = useState<"splash" | "main">("splash");
+  const [counter] = useState(() => Math.floor(Math.random() * 300) + 1200);
+  const [showBtn, setShowBtn] = useState(false);
   const today = new Date();
 
   const [year, setYear] = useState(today.getFullYear());
@@ -72,6 +81,11 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [userIlgan, setUserIlgan] = useState<string | null>(null);
   const [userName, setUserName] = useState("나");
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowBtn(true), 2500);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     const saved = loadSajuData();
@@ -132,12 +146,108 @@ export default function CalendarPage() {
   const isWoljuChange = postTermWolju &&
     (postTermWolju.cg !== prevMonthWolju.cg || postTermWolju.jj !== prevMonthWolju.jj);
 
+  // ── 스플래시 ────────────────────────────────────────────────────────────────
+  if (step === "splash") return (
+    <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
+
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[160px]" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-900/15 blur-[130px]" />
+      </div>
+
+      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+
+      <div className="relative z-10 max-w-md w-full text-center space-y-0">
+
+        {/* 배지 + 아이콘 */}
+        <FadeIn delay={0} className="mb-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5">
+              <span className="pulse w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
+              <span className="text-xs font-bold text-violet-300 tracking-widest uppercase">Summer Palace · 일진달력</span>
+            </div>
+            <div className="text-5xl drop-shadow-[0_0_40px_rgba(139,92,246,0.5)]">📅</div>
+          </div>
+        </FadeIn>
+
+        {/* 실시간 카운터 */}
+        <FadeIn delay={100} className="mb-10">
+          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 pulse" />
+            <span className="text-indigo-200 text-sm font-semibold">
+              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 오늘 일진 확인 중
+            </span>
+          </div>
+        </FadeIn>
+
+        {/* 카피 */}
+        <div className="space-y-4 mb-12">
+          {[
+            { text: "오늘 일진이 어떤지", big: false, delay: 200 },
+            { text: "모르고 움직이면", big: false, delay: 700 },
+            { text: "손해입니다.", big: true, delay: 1200 },
+            { text: "하루의 에너지가 다 다릅니다.", big: true, delay: 1800 },
+          ].map((line, i) => (
+            <FadeIn key={i} delay={line.delay}>
+              <p className={`leading-snug ${line.big
+                ? "text-3xl font-black bg-gradient-to-r from-violet-300 via-indigo-200 to-violet-300 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+                : "text-xl text-gray-400 font-medium"
+              }`}>
+                {line.text}
+              </p>
+            </FadeIn>
+          ))}
+        </div>
+
+        {/* 피처 카드 */}
+        <FadeIn delay={2200} className="mb-10">
+          <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+            {[
+              { icon: "📅", title: "일주 오행", desc: "매일 다른 기운" },
+              { icon: "🌿", title: "절기 확인", desc: "월주 바뀌는 날" },
+              { icon: "⭐", title: "12운성", desc: "길일·흉일 판별" },
+              { icon: "🔮", title: "맞춤 분석", desc: "내 일간 기준" },
+            ].map((f, i) => (
+              <div key={i} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <span className="text-xl">{f.icon}</span>
+                <p className="text-xs font-bold text-white mt-1">{f.title}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+
+        {/* CTA */}
+        <div style={{
+          opacity: showBtn ? 1 : 0,
+          transform: showBtn ? "translateY(0) scale(1)" : "translateY(20px) scale(0.96)",
+          transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+        }}>
+          <button
+            onClick={() => setStep("main")}
+            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
+            style={{
+              background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
+              color: "#fff",
+              boxShadow: "0 8px 32px -4px rgba(124,58,237,0.4)",
+            }}
+          >
+            오늘 일진 확인하기 →
+          </button>
+          <p className="text-xs text-gray-700 mt-4">무료 · 매월 1975~2030년</p>
+        </div>
+      </div>
+    </main>
+  );
+
+  // ── 캘린더 본편 ─────────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-400 transition text-sm">← 뒤로</button>
+          <button onClick={() => setStep("splash")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 뒤로</button>
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-1">
               <span className="text-[10px] text-gray-500 uppercase tracking-widest">Summer Palace</span>
@@ -147,28 +257,21 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        {/* 연도 선택 + 월 네비게이션 */}
+        {/* 월 네비게이션 */}
         <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={prevMonth}
-            disabled={year === 1975 && month === 1}
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition"
-          >‹</button>
+          <button onClick={prevMonth} disabled={year === 1975 && month === 1}
+            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition">‹</button>
 
           <div className="text-center">
             <div className="flex items-center gap-2 justify-center">
-              <select
-                value={year}
-                onChange={e => { setYear(Number(e.target.value)); setSelectedDay(null); }}
-                className="bg-transparent text-white font-bold text-lg focus:outline-none cursor-pointer"
-              >
+              <select value={year} onChange={e => { setYear(Number(e.target.value)); setSelectedDay(null); }}
+                className="bg-transparent text-white font-bold text-lg focus:outline-none cursor-pointer">
                 {Array.from({ length: 56 }, (_, i) => 1975 + i).map(y => (
                   <option key={y} value={y} className="bg-[#0d0d1a]">{y}년</option>
                 ))}
               </select>
               <span className="text-white font-bold text-lg">{MONTH_NAMES[month]}</span>
             </div>
-            {/* 연주·월주 */}
             <div className="flex items-center justify-center gap-3 mt-1">
               <span className="text-xs text-gray-500">
                 연주 <span className="text-white font-semibold">{yearPillar.cg}{yearPillar.jj}</span>
@@ -189,11 +292,8 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          <button
-            onClick={nextMonth}
-            disabled={year === 2030 && month === 12}
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition"
-          >›</button>
+          <button onClick={nextMonth} disabled={year === 2030 && month === 12}
+            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition">›</button>
         </div>
 
         {/* 사용자 맞춤 안내 */}
@@ -218,12 +318,10 @@ export default function CalendarPage() {
 
         {/* 달력 그리드 */}
         <div className="grid grid-cols-7 gap-0.5">
-          {/* 앞 빈 셀 */}
           {Array.from({ length: firstDow }).map((_, i) => (
             <div key={`empty-${i}`} className="h-[70px]" />
           ))}
 
-          {/* 날짜 셀 */}
           {days.map(info => {
             const dow = (firstDow + info.day - 1) % 7;
             const isToday = year === today.getFullYear() && month === today.getMonth() + 1 && info.day === today.getDate();
@@ -232,15 +330,11 @@ export default function CalendarPage() {
             const uuns = userIlgan ? getUunseong(userIlgan, info.ilju.jj) : null;
             const uunsColor = uuns ? UUNSEONG_COLOR[uuns] : null;
             const isSelected = selectedDay?.day === info.day;
-
-            // 길일 (제왕·건록·장생) / 흉일 (사·묘·절) 하이라이트 border
             const isLucky = uuns && ["제왕","건록","장생"].includes(uuns);
             const isUnlucky = uuns && ["사","묘","절"].includes(uuns);
 
             return (
-              <div
-                key={info.day}
-                onClick={() => setSelectedDay(isSelected ? null : info)}
+              <div key={info.day} onClick={() => setSelectedDay(isSelected ? null : info)}
                 className={`h-[70px] rounded-lg cursor-pointer transition-all relative overflow-hidden
                   ${isSelected ? "ring-2 ring-violet-400" : ""}
                   ${isToday ? "ring-2 ring-yellow-400/60" : ""}
@@ -250,36 +344,22 @@ export default function CalendarPage() {
                 `}
                 style={{ background: `${elStyle.bg}33` }}
               >
-                {/* 절기 표시 */}
                 {info.isSolarTerm && (
                   <div className="absolute top-0 right-0 bg-violet-500/60 text-[8px] text-white px-1 rounded-bl-md leading-4">
                     {SOLAR_TERM_NAME[month]}
                   </div>
                 )}
-
                 <div className="p-1 flex flex-col items-center justify-center h-full gap-0.5">
-                  {/* 날짜 */}
-                  <span className={`text-[11px] font-bold ${
-                    dow === 0 ? "text-red-400" : dow === 6 ? "text-blue-400" : "text-gray-400"
-                  } ${isToday ? "bg-yellow-400/20 rounded-full w-5 h-5 flex items-center justify-center" : ""}`}>
+                  <span className={`text-[11px] font-bold ${dow === 0 ? "text-red-400" : dow === 6 ? "text-blue-400" : "text-gray-400"} ${isToday ? "bg-yellow-400/20 rounded-full w-5 h-5 flex items-center justify-center" : ""}`}>
                     {info.day}
                   </span>
-
-                  {/* 일주 */}
-                  <span
-                    className="text-sm font-black leading-none"
-                    style={{ color: elStyle.text }}
-                  >
+                  <span className="text-sm font-black leading-none" style={{ color: elStyle.text }}>
                     {info.ilju.cg}{info.ilju.jj}
                   </span>
-
-                  {/* 오행 점 */}
                   <div className="flex gap-0.5 mt-0.5">
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: ELEMENT_DOT[info.cgEl] }} />
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: ELEMENT_DOT[info.jjEl] }} />
                   </div>
-
-                  {/* 12운성 (사주 있을 때만) */}
                   {uuns && (
                     <span className="text-[9px] font-semibold" style={{ color: uunsColor || "#94a3b8" }}>
                       {uuns}
@@ -293,13 +373,7 @@ export default function CalendarPage() {
 
         {/* 선택된 날 상세 패널 */}
         {selectedDay && (
-          <DetailPanel
-            info={selectedDay}
-            year={year}
-            month={month}
-            userIlgan={userIlgan}
-            userName={userName}
-          />
+          <DetailPanel info={selectedDay} year={year} month={month} userIlgan={userIlgan} userName={userName} />
         )}
 
         {/* 범례 */}
@@ -325,10 +399,8 @@ export default function CalendarPage() {
 
         {/* 오늘로 이동 버튼 */}
         {(year !== today.getFullYear() || month !== today.getMonth() + 1) && (
-          <button
-            onClick={() => { setYear(today.getFullYear()); setMonth(today.getMonth() + 1); setSelectedDay(null); }}
-            className="mt-4 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition"
-          >
+          <button onClick={() => { setYear(today.getFullYear()); setMonth(today.getMonth() + 1); setSelectedDay(null); }}
+            className="mt-4 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition">
             오늘로 돌아가기
           </button>
         )}
@@ -337,10 +409,7 @@ export default function CalendarPage() {
   );
 }
 
-// ── 상세 패널 ──────────────────────────────────────────────────────────────────
-function DetailPanel({
-  info, year, month, userIlgan, userName,
-}: {
+function DetailPanel({ info, year, month, userIlgan, userName }: {
   info: DayInfo; year: number; month: number; userIlgan: string | null; userName: string;
 }) {
   const uuns = userIlgan ? getUunseong(userIlgan, info.ilju.jj) : null;
@@ -365,17 +434,12 @@ function DetailPanel({
   };
 
   return (
-    <div
-      className="mt-4 rounded-2xl border p-5"
-      style={{ background: `${elStyle.bg}55`, borderColor: `${elStyle.border}80` }}
-    >
+    <div className="mt-4 rounded-2xl border p-5" style={{ background: `${elStyle.bg}55`, borderColor: `${elStyle.border}80` }}>
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-xs text-gray-500 mb-1">{year}년 {month}월 {info.day}일</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black" style={{ color: elStyle.text }}>
-              {info.ilju.cg}{info.ilju.jj}
-            </span>
+            <span className="text-3xl font-black" style={{ color: elStyle.text }}>{info.ilju.cg}{info.ilju.jj}</span>
             <span className="text-sm text-gray-500">일주</span>
           </div>
         </div>
@@ -385,7 +449,6 @@ function DetailPanel({
         </div>
       </div>
 
-      {/* 오행 */}
       <div className="flex gap-3 mb-4">
         <div className="flex-1 bg-white/5 rounded-xl p-3 text-center">
           <p className="text-xs text-gray-600 mb-1">일간 오행</p>
@@ -403,11 +466,9 @@ function DetailPanel({
         </div>
       </div>
 
-      {/* 사용자 맞춤 분석 */}
       {userIlgan && (
         <div className="bg-white/5 rounded-xl p-4 space-y-3">
           <p className="text-xs text-gray-400 font-semibold">{userName}님({userIlgan}일간) 기준 오늘 에너지</p>
-
           {sipseongCg && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-500">일간 관계</span>
@@ -424,19 +485,14 @@ function DetailPanel({
             <>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">12운성</span>
-                <span className="text-sm font-bold" style={{ color: UUNSEONG_COLOR[uuns] || "#94a3b8" }}>
-                  {UUNSEONG_LABEL[uuns] || uuns}
-                </span>
+                <span className="text-sm font-bold" style={{ color: UUNSEONG_COLOR[uuns] || "#94a3b8" }}>{UUNSEONG_LABEL[uuns] || uuns}</span>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed border-t border-white/10 pt-3">
-                {UUNSEONG_DESC[uuns] || ""}
-              </p>
+              <p className="text-xs text-gray-400 leading-relaxed border-t border-white/10 pt-3">{UUNSEONG_DESC[uuns] || ""}</p>
             </>
           )}
         </div>
       )}
 
-      {/* 절기 안내 */}
       {info.isSolarTerm && (
         <div className="mt-3 bg-violet-500/15 border border-violet-500/25 rounded-xl px-3 py-2">
           <p className="text-xs text-violet-300">

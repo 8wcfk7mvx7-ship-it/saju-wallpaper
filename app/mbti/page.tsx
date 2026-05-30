@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
+import { loadSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
 
 const MBTI_TYPES = ["INTJ","INTP","INFJ","INFP","ISTJ","ISTP","ISFJ","ISFP","ENTJ","ENTP","ENFJ","ENFP","ESTJ","ESTP","ESFJ","ESFP"] as const;
@@ -75,8 +76,21 @@ const MBTI_CAREER: Record<MBTI, string[]> = {
   ESFP:["연예인·가수","이벤트 사회자","관광 가이드","뷰티 전문가"],
 };
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 export default function MbtiPage() {
   const router = useRouter();
+  const [step, setStep] = useState<"splash" | "main">("splash");
+  const [showBtn, setShowBtn] = useState(false);
+  const [counter] = useState(() => Math.floor(Math.random() * 400) + 1600);
   const [mbti, setMbti] = useState<MBTI | "">("");
   const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
   const [userName, setUserName] = useState("");
@@ -93,18 +107,22 @@ export default function MbtiPage() {
   }>(null);
 
   useEffect(() => {
+    const t = setTimeout(() => setShowBtn(true), 2500);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     try {
-      const raw = sessionStorage.getItem("sajuForm");
-      if (!raw) return;
-      const form = JSON.parse(raw);
-      setUserName(form.name || "");
+      const saved = loadSajuData();
+      if (!saved) return;
+      setUserName(saved.name || "");
       const r = analyzeSaju({
-        birthYear: form.birthYear, birthMonth: form.birthMonth,
-        birthDay: form.birthDay, birthHour: form.birthHour ?? null,
-        birthMinute: null, name: form.name || "",
-        gender: form.gender ?? "male",
-        birthPlace: "", style: "auto",
-        productType: "mobile", useJajasi: false,
+        birthYear: saved.birthYear, birthMonth: saved.birthMonth,
+        birthDay: saved.birthDay, birthHour: saved.birthHour ?? null,
+        birthMinute: saved.birthMinute ?? null, name: saved.name || "",
+        gender: saved.gender ?? "female",
+        birthPlace: saved.birthPlace || "서울", style: "auto",
+        productType: "mobile", useJajasi: saved.useJajasi || false,
       });
       setSajuResult(r);
     } catch {}
@@ -141,6 +159,84 @@ export default function MbtiPage() {
     setResult({ ilgan, dominant, mbtiEl, synergy, careers, compat, elMatch, elMatchColor, elMatchDesc });
   }
 
+  if (step === "splash") return (
+    <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-violet-900/25 blur-[160px]" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-900/20 blur-[130px]" />
+      </div>
+      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+
+      <div className="relative z-10 max-w-md w-full text-center space-y-0">
+        <FadeIn delay={0} className="mb-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5">
+              <span className="pulse w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
+              <span className="text-xs font-bold text-violet-300 tracking-widest uppercase">Summer Palace · MBTI×사주</span>
+            </div>
+            <div className="text-5xl drop-shadow-[0_0_40px_rgba(139,92,246,0.5)]">🧬</div>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={100} className="mb-10">
+          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 pulse" />
+            <span className="text-indigo-200 text-sm font-semibold">
+              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 조합 분석 중
+            </span>
+          </div>
+        </FadeIn>
+
+        <div className="space-y-4 mb-12">
+          {[
+            { text: "MBTI는 성격.", big: false, delay: 200 },
+            { text: "사주는 타고난 에너지.", big: false, delay: 700 },
+            { text: "둘이 맞아야 진짜 나옵니다.", big: true, delay: 1200 },
+            { text: "시너지가 다릅니다.", big: true, delay: 1800 },
+          ].map((line, i) => (
+            <FadeIn key={i} delay={line.delay}>
+              <p className={`leading-snug ${line.big
+                ? "text-3xl font-black bg-gradient-to-r from-violet-300 via-indigo-200 to-violet-300 bg-clip-text text-transparent"
+                : "text-xl text-gray-400 font-medium"
+              }`}>{line.text}</p>
+            </FadeIn>
+          ))}
+        </div>
+
+        <FadeIn delay={2200} className="mb-10">
+          <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+            {[
+              { icon: "🧬", title: "일간 × MBTI", desc: "타고난 조합 시너지" },
+              { icon: "⚡", title: "오행 궁합", desc: "에너지 방향성 일치도" },
+              { icon: "💼", title: "추천 직업", desc: "사주+MBTI 맞춤" },
+              { icon: "❤️", title: "궁합 MBTI", desc: "내 오행과 맞는 유형" },
+            ].map((f, i) => (
+              <div key={i} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <span className="text-xl">{f.icon}</span>
+                <p className="text-xs font-bold text-white mt-1">{f.title}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+
+        <div style={{
+          opacity: showBtn ? 1 : 0,
+          transform: showBtn ? "translateY(0) scale(1)" : "translateY(20px) scale(0.96)",
+          transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+        }}>
+          <button onClick={() => setStep("main")}
+            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
+            style={{ background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(124,58,237,0.4)" }}>
+            내 MBTI × 사주 분석하기 →
+          </button>
+          <p className="text-xs text-gray-700 mt-4">무료 · 사주 저장 시 자동 반영</p>
+        </div>
+      </div>
+    </main>
+  );
+
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -149,7 +245,7 @@ export default function MbtiPage() {
       </div>
 
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-        <button onClick={() => router.push("/")} className="text-gray-400 hover:text-white text-sm mb-6 block">← 홈</button>
+        <button onClick={() => setStep("splash")} className="text-gray-400 hover:text-white text-sm mb-6 block">← 뒤로</button>
 
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🧬</div>

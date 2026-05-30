@@ -57,10 +57,10 @@ const SERVICES: {
     viral: "지금 배경화면이 에너지를 갉아먹고 있을 수 있습니다",
     desc: "내 사주에 부족한 오행을 채워주는 AI 맞춤 배경화면. 목·화·토·금·수 중 내가 보완해야 할 기운을 찾아드립니다.",
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
-    href: "/saju", badge: "무료 분석",
-    color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
+    href: "/saju", badge: "AI 유료",
+    color: "#a78bfa", badgeBg: "rgba(201,168,76,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
-    categories: ["전체", "무료", "라이프"],
+    categories: ["전체", "라이프"],
   },
   {
     id: "gunghap", emoji: "💑",
@@ -373,7 +373,7 @@ export default function MainPage() {
               boxShadow: "0 8px 32px rgba(124,58,237,0.35)",
             }}
           >
-            무료로 내 사주 분석하기
+            내 오행 배경화면 만들기
             <span>→</span>
           </button>
 
@@ -534,7 +534,7 @@ export default function MainPage() {
               onClick={() => router.push("/saju")}
               className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105"
               style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
-              무료 분석 시작하기 →
+              배경화면 만들기 →
             </button>
           </div>
         </section>
@@ -606,12 +606,12 @@ export default function MainPage() {
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors">카카오 채널</a>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-            <a href="mailto:support@summerpalace.ai.kr" className="hover:text-amber-400/70 transition-colors">고객문의</a>
+            <a href="mailto:smple@outlook.kr" className="hover:text-amber-400/70 transition-colors">고객문의</a>
           </div>
 
           {/* 사업자 정보 */}
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
-            <p>상호: 여름궁전(Summer Palace) · 대표: 정윤조 · 이메일: support@summerpalace.ai.kr</p>
+            <p>상호: 여름궁전(Summer Palace) · 대표: 정윤조 · 이메일: smple@outlook.kr</p>
             <p>통신판매업 신고번호: 제2025-서울-00000호 · 사업자등록번호: 000-00-00000</p>
             <p>
               주소: 서울특별시 · 카카오채널:&nbsp;

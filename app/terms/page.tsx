@@ -173,7 +173,7 @@ export default function TermsPage() {
             </ul>
             <p className="mt-2">③ 환불 신청은 아래 연락처로 주문번호·결제 일시·결제 금액을 함께 안내해주세요.</p>
             <div className="bg-white/5 rounded-xl p-3 mt-1 text-xs space-y-1">
-              <p>📧 이메일: <span className="text-violet-300">support@summerpalace.ai.kr</span></p>
+              <p>📧 이메일: <span className="text-violet-300">smple@outlook.kr</span></p>
               <p>💬 카카오 채널: <span className="text-yellow-400">http://pf.kakao.com/_cuksX</span></p>
               <p className="text-gray-500">· 환불 심사 후 영업일 기준 3~5일 이내 처리됩니다.</p>
               <p className="text-gray-500">· 카드 환불은 카드사 처리 기간에 따라 최대 7일 소요될 수 있습니다.</p>
@@ -250,7 +250,7 @@ export default function TermsPage() {
           </Section>
 
           <Section num={15} title="분쟁 해결 절차">
-            <p>① 서비스 이용 관련 분쟁 발생 시 이용자는 먼저 회사 고객센터(support@summerpalace.ai.kr)를 통해 불만을 접수하고, 회사는 접수일로부터 영업일 기준 5일 이내에 처리 결과를 안내합니다.</p>
+            <p>① 서비스 이용 관련 분쟁 발생 시 이용자는 먼저 회사 고객센터(smple@outlook.kr)를 통해 불만을 접수하고, 회사는 접수일로부터 영업일 기준 5일 이내에 처리 결과를 안내합니다.</p>
             <p>② 회사는 소비자 분쟁을 원만히 해결하기 위해 한국소비자원, 전자거래분쟁조정위원회 등 분쟁조정기관의 조정을 따를 수 있습니다.</p>
             <p>③ 이용자는 공정거래위원회 운영 소비자상담센터(1372), 한국소비자원(www.kca.go.kr)을 통해 분쟁 조정을 신청할 수 있습니다.</p>
           </Section>
@@ -280,7 +280,7 @@ export default function TermsPage() {
         <div className="mt-6 border-t border-white/5 pt-6">
           <p className="text-xs text-gray-700 font-bold mb-2 text-center">사업자 정보</p>
           <div className="text-xs text-gray-700 text-center space-y-1 leading-relaxed">
-            <p>상호: 여름궁전(Summer Palace) &middot; 이메일: support@summerpalace.ai.kr</p>
+            <p>상호: 여름궁전(Summer Palace) &middot; 이메일: smple@outlook.kr</p>
             <p>서비스: summerpalace.ai.kr &middot; 카카오 채널: http://pf.kakao.com/_cuksX</p>
             <p className="text-gray-800 mt-2">ⓒ 2025 Summer Palace. All rights reserved.</p>
           </div>

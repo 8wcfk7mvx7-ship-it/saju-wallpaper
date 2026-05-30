@@ -208,6 +208,7 @@ export default function CharmPage() {
   const [step, setStep] = useState<"entry" | "form">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
+  const [counter] = useState(() => Math.floor(Math.random() * 600) + 3500);
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
     birthYear: "", birthMonth: "", birthDay: "",
@@ -271,7 +272,21 @@ export default function CharmPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/20 blur-[130px]" />
       </div>
       <div className="relative z-10 max-w-md w-full text-center">
-        <FadeIn delay={0}><div className="text-5xl mb-14 drop-shadow-[0_0_40px_rgba(244,114,182,0.6)]">✨</div></FadeIn>
+        <FadeIn delay={0}>
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/30 rounded-full px-4 py-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
+              <span className="text-xs font-bold text-pink-300 tracking-widest uppercase">Summer Palace · 매력 분석</span>
+            </div>
+            <div className="text-5xl drop-shadow-[0_0_40px_rgba(244,114,182,0.6)]">✨</div>
+            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-indigo-200 text-sm font-semibold">
+                지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 매력 분석 중
+              </span>
+            </div>
+          </div>
+        </FadeIn>
         <div className="space-y-4 mb-14">
           {[
             { t: "저 사람은 왜 저렇게", big: false, delay: 200 },

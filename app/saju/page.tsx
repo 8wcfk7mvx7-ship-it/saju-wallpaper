@@ -29,9 +29,6 @@ function FadeInLine({ children, delay = 0, className = "" }: {
 
 const BG_HANJA = [
   { char: "木", x: "7%",  y: "10%", size: 160, opacity: 0.06, delay: 0,    dur: 18 },
-  { char: "火", x: "83%", y: "7%",  size: 140, opacity: 0.06, delay: 3000, dur: 22 },
-  { char: "土", x: "70%", y: "55%", size: 130, opacity: 0.05, delay: 6000, dur: 20 },
-  { char: "金", x: "5%",  y: "62%", size: 150, opacity: 0.06, delay: 2000, dur: 25 },
   { char: "水", x: "40%", y: "85%", size: 120, opacity: 0.05, delay: 4500, dur: 21 },
 ];
 
@@ -173,7 +170,7 @@ export default function LandingPage() {
           >
             <span className="relative z-10">나의 부족한 기운 확인하기</span>
           </button>
-          <p className="text-xs text-gray-700 mt-4">무료 분석 · 1분 완성</p>
+          <p className="text-xs text-gray-700 mt-4">AI 생성 · 유료 서비스</p>
         </div>
 
       </div>

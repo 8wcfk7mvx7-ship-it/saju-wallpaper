@@ -150,7 +150,7 @@ export default function PrivacyPage() {
             <div className="text-gray-400 pl-7">
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm space-y-1">
                 <p><span className="text-gray-500">서비스명:</span> <span className="text-gray-300">Summer Palace</span></p>
-                <p><span className="text-gray-500">이메일:</span> <span className="text-gray-300">support@summerpalace.ai.kr</span></p>
+                <p><span className="text-gray-500">이메일:</span> <span className="text-gray-300">smple@outlook.kr</span></p>
                 <p><span className="text-gray-500">사이트:</span> <span className="text-gray-300">summerpalace.ai.kr</span></p>
               </div>
             </div>
