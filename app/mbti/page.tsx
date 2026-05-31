@@ -1,9 +1,72 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
-import { loadSajuData } from "@/lib/savedSaju";
+import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
+
+const CY_MB = new Date().getFullYear();
+const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
+const MONTHS_MB = Array.from({ length: 12 }, (_, i) => i + 1);
+const DAYS_MB = Array.from({ length: 31 }, (_, i) => i + 1);
+const SIJIN_MB = [
+  { v: "",   label: "모름 (시간 불명)" },
+  { v: "23", label: "자시(子時) 23:00 – 00:59" },
+  { v: "1",  label: "축시(丑時) 01:00 – 02:59" },
+  { v: "3",  label: "인시(寅時) 03:00 – 04:59" },
+  { v: "5",  label: "묘시(卯時) 05:00 – 06:59" },
+  { v: "7",  label: "진시(辰時) 07:00 – 08:59" },
+  { v: "9",  label: "사시(巳時) 09:00 – 10:59" },
+  { v: "11", label: "오시(午時) 11:00 – 12:59" },
+  { v: "13", label: "미시(未時) 13:00 – 14:59" },
+  { v: "15", label: "신시(申時) 15:00 – 16:59" },
+  { v: "17", label: "유시(酉時) 17:00 – 18:59" },
+  { v: "19", label: "술시(戌時) 19:00 – 20:59" },
+  { v: "21", label: "해시(亥時) 21:00 – 22:59" },
+];
+
+function MbPicker({ value, options, onChange, placeholder, suffix }: {
+  value: string; options: { v: string; label: string }[];
+  onChange: (v: string) => void; placeholder: string; suffix?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+  useEffect(() => {
+    if (open && listRef.current && value) {
+      const el = listRef.current.querySelector(`[data-v="${value}"]`);
+      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
+    }
+  }, [open, value]);
+  const display = options.find(o => o.v === value)?.label ?? "";
+  return (
+    <div ref={ref} className="relative w-full">
+      <div onClick={() => setOpen(!open)}
+        className={`flex items-center justify-between bg-white/5 border rounded-xl px-3 py-2.5 cursor-pointer transition select-none hover:border-violet-500/60 ${open ? "border-violet-500" : "border-white/10"}`}>
+        <span className={`text-sm ${display ? "text-white" : "text-gray-600"}`}>
+          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
+        </span>
+        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+      </div>
+      {open && (
+        <div ref={listRef} className="absolute z-50 w-full mt-1 bg-[#12121e] border border-white/20 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 180 }}>
+          {options.map(opt => (
+            <div key={opt.v} data-v={opt.v}
+              onClick={() => { onChange(opt.v); setOpen(false); }}
+              className={`px-3 py-2 text-sm cursor-pointer transition-colors ${value === opt.v ? "text-violet-300 bg-violet-900/50 font-semibold" : "text-gray-300 hover:bg-white/8"}`}>
+              {opt.label}{suffix && opt.v ? ` ${suffix}` : ""}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const MBTI_TYPES = ["INTJ","INTP","INFJ","INFP","ISTJ","ISTP","ISFJ","ISFP","ENTJ","ENTP","ENFJ","ENFP","ESTJ","ESTP","ESFJ","ESFP"] as const;
 type MBTI = typeof MBTI_TYPES[number];
@@ -93,7 +156,6 @@ export default function MbtiPage() {
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1600);
   const [mbti, setMbti] = useState<MBTI | "">("");
   const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
-  const [userName, setUserName] = useState("");
   const [result, setResult] = useState<null | {
     ilgan: string;
     dominant: Element;
@@ -106,27 +168,69 @@ export default function MbtiPage() {
     elMatchDesc: string;
   }>(null);
 
+  // 생년월일 입력 폼 상태
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState<"female" | "male">("female");
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [birthHour, setBirthHour] = useState("");
+  const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(() => setShowBtn(true), 2500);
     return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
+    // pre-fill form from localStorage (don't auto-analyze)
     try {
       const saved = loadSajuData();
       if (!saved) return;
-      setUserName(saved.name || "");
-      const r = analyzeSaju({
-        birthYear: saved.birthYear, birthMonth: saved.birthMonth,
-        birthDay: saved.birthDay, birthHour: saved.birthHour ?? null,
-        birthMinute: saved.birthMinute ?? null, name: saved.name || "",
-        gender: saved.gender ?? "female",
-        birthPlace: saved.birthPlace || "서울", style: "auto",
-        productType: "mobile", useJajasi: saved.useJajasi || false,
-      });
-      setSajuResult(r);
+      setName(saved.name || "");
+      if (saved.gender) setGender(saved.gender as "female" | "male");
+      if (saved.birthYear) setBirthYear(String(saved.birthYear));
+      if (saved.birthMonth) setBirthMonth(String(saved.birthMonth));
+      if (saved.birthDay) setBirthDay(String(saved.birthDay));
+      if (saved.birthHour != null) setBirthHour(String(saved.birthHour));
     } catch {}
   }, []);
+
+  async function handleConfirmSaju() {
+    const y = parseInt(birthYear), mo = parseInt(birthMonth), d = parseInt(birthDay);
+    if (isNaN(y) || isNaN(mo) || isNaN(d)) {
+      alert("생년월일을 모두 선택해주세요.");
+      return;
+    }
+    let sy = y, smo = mo, sd = d;
+    if (calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(y, mo, d, isLeapMonth);
+        const s = cal.getSolarCalendar();
+        if (!s?.year) throw new Error();
+        sy = s.year; smo = s.month; sd = s.day;
+      } catch {
+        alert("음력 날짜를 양력으로 변환할 수 없습니다. 날짜를 다시 확인해주세요.");
+        return;
+      }
+    }
+    const h = birthHour === "" ? null : Number(birthHour);
+    saveSajuData({ name, gender, birthYear: sy, birthMonth: smo, birthDay: sd, birthHour: h, birthMinute: null, birthHourUnknown: h == null, birthPlace: "서울", style: "auto", useJajasi: false });
+    try {
+      const r = analyzeSaju({
+        birthYear: sy, birthMonth: smo, birthDay: sd, birthHour: h,
+        birthMinute: null, name: name || "분석", gender, birthPlace: "서울",
+        style: "auto", productType: "mobile", useJajasi: false,
+      });
+      setSajuResult(r);
+    } catch {
+      alert("사주 정보를 다시 확인해주세요.");
+    }
+  }
 
   function analyze() {
     if (!mbti || !sajuResult) return;
@@ -254,21 +358,77 @@ export default function MbtiPage() {
         </div>
 
         {!sajuResult ? (
-          <div className="bg-amber-900/20 border border-amber-700/30 rounded-2xl p-6 text-center mb-6">
-            <p className="text-amber-300 font-bold mb-2">사주 정보가 필요합니다</p>
-            <p className="text-sm text-gray-400 mb-4">먼저 사주를 입력하고 돌아오세요</p>
-            <button
-              onClick={() => router.push("/saju")}
-              className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-6 py-3 rounded-xl transition"
-            >
-              사주 입력하러 가기
+          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6 space-y-4">
+            <p className="text-sm font-bold text-gray-300">생년월일 입력</p>
+
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="이름"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition" />
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">성별</label>
+              <div className="flex gap-2">
+                {(["female","male"] as const).map(g => (
+                  <button key={g} type="button" onClick={() => setGender(g)}
+                    className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${gender === g ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400 border border-white/10"}`}>
+                    {g === "female" ? "여성" : "남성"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-gray-500">생년월일</label>
+                <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  {(["solar","lunar"] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setCalendarType(t); setIsLeapMonth(false); setBirthMonth(""); setBirthDay(""); }}
+                      className={`px-3 py-1 text-xs font-medium transition ${calendarType === t ? "bg-violet-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
+                      {t === "solar" ? "양력" : "음력"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {calendarType === "lunar" && (
+                <label className="flex items-center gap-2 text-xs text-gray-400 mb-2 cursor-pointer select-none">
+                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="accent-violet-500" />
+                  윤달
+                </label>
+              )}
+              <div className="grid grid-cols-3 gap-2">
+                <MbPicker value={birthYear} options={YEARS_MB.map(y => ({ v: String(y), label: String(y) }))}
+                  onChange={setBirthYear} placeholder="연도" suffix="년" />
+                <MbPicker value={birthMonth} options={MONTHS_MB.map(m => ({ v: String(m), label: String(m) }))}
+                  onChange={setBirthMonth} placeholder="월" suffix="월" />
+                <MbPicker value={birthDay} options={DAYS_MB.map(d => ({ v: String(d), label: String(d) }))}
+                  onChange={setBirthDay} placeholder="일" suffix="일" />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
+              <MbPicker value={birthHour} options={SIJIN_MB} onChange={setBirthHour} placeholder="출생시간 (선택)" />
+            </div>
+
+            <button onClick={handleConfirmSaju}
+              className="w-full py-3 rounded-xl font-black text-sm text-white transition"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}>
+              사주 분석 시작 →
             </button>
           </div>
         ) : (
-          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 mb-6">
-            <p className="text-xs text-gray-500 mb-2">불러온 사주</p>
-            <p className="text-sm text-white font-bold">{userName ? `${userName}님` : "내 사주"} — {sajuResult.fourPillars}</p>
-            <p className="text-xs text-gray-400 mt-1">일간: {sajuResult.pillarsDetail.day.cg} · 주력 오행: {sajuResult.dominant[0]}</p>
+          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">분석 사주</p>
+              <p className="text-sm text-white font-bold">{sajuResult.fourPillars}</p>
+              <p className="text-xs text-gray-400 mt-0.5">일간 {sajuResult.pillarsDetail.day.cg} · 주력 오행 {sajuResult.dominant[0]}</p>
+            </div>
+            <button onClick={() => { setSajuResult(null); setResult(null); setMbti(""); }}
+              className="text-xs text-gray-500 hover:text-gray-300 transition px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 shrink-0">
+              다시 입력
+            </button>
           </div>
         )}
 
