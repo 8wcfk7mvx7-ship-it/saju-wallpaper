@@ -5,6 +5,56 @@ import KakaoLoginButton from "@/components/KakaoLoginButton";
 
 type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special";
 
+// ── 언어 ─────────────────────────────────────────────────────────────────────
+const LANGS = { ko: "한국어", en: "English", id: "Bahasa Indonesia" } as const;
+type Lang = keyof typeof LANGS;
+
+const UI: Record<Lang, {
+  h1: [string, string, string];
+  heroSub: string;
+  heroCta: string;
+  servicesHeading: string;
+  reviewsHeading: string;
+  bannerCta: string;
+  catLabel: Record<Category, string>;
+  start: string;
+  charging: string;
+}> = {
+  ko: {
+    h1: ["당신의 사주,", "지금 이 순간도", "말하고 있습니다"],
+    heroSub: "남들은 이미 확인했습니다. 당신만 아직 모르고 있었어요.",
+    heroCta: "내 오행 배경화면 만들기",
+    servicesHeading: "지금 바로 확인하세요",
+    reviewsHeading: "실제 이용 후기",
+    bannerCta: "배경화면 만들기 →",
+    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special" },
+    start: "시작",
+    charging: "충전",
+  },
+  en: {
+    h1: ["Your Saju", "is speaking to you,", "right now"],
+    heroSub: "Others have already checked. You're the only one who doesn't know yet.",
+    heroCta: "Create My Elemental Wallpaper",
+    servicesHeading: "Check Right Now",
+    reviewsHeading: "Real User Reviews",
+    bannerCta: "Create Wallpaper →",
+    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Special" },
+    start: "Go",
+    charging: "Charge",
+  },
+  id: {
+    h1: ["Saju Anda", "sedang berbicara,", "saat ini juga"],
+    heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum tahu.",
+    heroCta: "Buat Wallpaper Elemen Saya",
+    servicesHeading: "Cek Sekarang",
+    reviewsHeading: "Ulasan Pengguna",
+    bannerCta: "Buat Wallpaper →",
+    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Nasib", "라이프": "Gaya Hidup", "Special": "Spesial" },
+    start: "Mulai",
+    charging: "Isi",
+  },
+};
+
 const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "전체",    icon: "☯",  desc: "전체 서비스" },
   { key: "무료",    icon: "🆓",  desc: "무료 서비스" },
@@ -49,7 +99,7 @@ const ACTIVITIES = [
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[];
+  border: string; glow: string; categories: Category[]; saleSticker?: string;
 }[] = [
   {
     id: "saju", emoji: "🔮",
@@ -61,6 +111,7 @@ const SERVICES: {
     color: "#a78bfa", badgeBg: "rgba(201,168,76,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
     categories: ["전체", "라이프"],
+    saleSticker: "50% OFF",
   },
   {
     id: "gunghap", emoji: "💑",
@@ -79,10 +130,10 @@ const SERVICES: {
     viral: "본인만 모르는 숨겨진 이성 매력이 있습니다",
     desc: "도화살·홍염살·12운성으로 보는 이성 매력. 나도 몰랐던 타고난 매력 포인트를 완전히 공개합니다.",
     tags: ["도화살", "홍염살", "이성운"],
-    href: "/charm", badge: "무료+유료",
+    href: "/charm", badge: "₩1,900",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
-    categories: ["전체", "무료", "연애·궁합"],
+    categories: ["전체", "연애·궁합"],
   },
   {
     id: "mbti", emoji: "🧬",
@@ -116,6 +167,7 @@ const SERVICES: {
     color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
     categories: ["전체", "금전·투자", "운명·대운", "Special"],
+    saleSticker: "50% OFF",
   },
   {
     id: "place", emoji: "🌍",
@@ -127,6 +179,7 @@ const SERVICES: {
     color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
     categories: ["전체", "운명·대운", "라이프", "Special"],
+    saleSticker: "50% OFF",
   },
   {
     id: "overcome", emoji: "⚡",
@@ -164,7 +217,7 @@ const SERVICES: {
 ];
 
 // ── 카드 컴포넌트 ─────────────────────────────────────────────────────────────
-function ServiceCard({ svc, index }: { svc: typeof SERVICES[0]; index: number }) {
+function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; index: number; startLabel: string }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -180,63 +233,80 @@ function ServiceCard({ svc, index }: { svc: typeof SERVICES[0]; index: number })
   }, []);
 
   return (
-    <div
-      ref={ref}
-      onClick={() => router.push(svc.href)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.7s ease ${index * 60}ms, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${index * 60}ms`,
-        borderColor: hovered ? svc.border : "rgba(255,255,255,0.07)",
-        boxShadow: hovered ? `0 8px 40px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
-        background: hovered ? `radial-gradient(ellipse at top left, ${svc.glow} 0%, rgba(10,10,20,0.95) 60%)` : "rgba(10,10,20,0.6)",
-      }}
-      className="relative border rounded-2xl p-5 cursor-pointer transition-all duration-400 flex flex-col gap-3 backdrop-blur-sm"
-    >
-      {/* 뱃지 */}
-      <div className="flex items-start justify-between">
-        <div
-          className="text-3xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0"
-          style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${svc.border}` }}
-        >
-          {svc.emoji}
+    <div ref={ref} className="relative">
+      {/* 50% OFF 스티커 — 카드 밖으로 삐져나옴 */}
+      {svc.saleSticker && (
+        <div className="absolute -top-3.5 -right-2 z-20 rotate-[13deg] pointer-events-none select-none">
+          <div
+            className="text-white text-[11px] font-black px-3 py-1.5 rounded-lg leading-none tracking-wide"
+            style={{
+              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+              boxShadow: "0 4px 14px rgba(239,68,68,0.6), 0 1px 3px rgba(0,0,0,0.4)",
+              border: "1.5px solid rgba(255,120,120,0.45)",
+            }}
+          >
+            {svc.saleSticker}
+          </div>
         </div>
-        <span
-          className="text-xs font-black px-2.5 py-1 rounded-full text-white"
-          style={{ background: svc.badgeBg }}
-        >
-          {svc.badge}
-        </span>
-      </div>
+      )}
 
-      <div>
-        <h3 className="text-base font-black text-white mb-1 leading-tight">{svc.title}</h3>
-        <p className="text-xs font-semibold mb-2" style={{ color: svc.color }}>
-          &ldquo;{svc.viral}&rdquo;
-        </p>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
-          {svc.desc}
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-1">
-          {svc.tags.map(tag => (
-            <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-              style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.07)" }}>
-              {tag}
-            </span>
-          ))}
+      <div
+        onClick={() => router.push(svc.href)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(24px)",
+          transition: `opacity 0.7s ease ${index * 60}ms, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${index * 60}ms`,
+          borderColor: hovered ? svc.border : "rgba(255,255,255,0.07)",
+          boxShadow: hovered ? `0 8px 40px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
+          background: hovered ? `radial-gradient(ellipse at top left, ${svc.glow} 0%, rgba(10,10,20,0.95) 60%)` : "rgba(10,10,20,0.6)",
+        }}
+        className="relative border rounded-2xl p-5 cursor-pointer transition-all duration-400 flex flex-col gap-3 backdrop-blur-sm"
+      >
+        {/* 뱃지 */}
+        <div className="flex items-start justify-between">
+          <div
+            className="text-3xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0"
+            style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${svc.border}` }}
+          >
+            {svc.emoji}
+          </div>
+          <span
+            className="text-xs font-black px-2.5 py-1 rounded-full text-white"
+            style={{ background: svc.badgeBg }}
+          >
+            {svc.badge}
+          </span>
         </div>
-        <span
-          className="text-xs font-bold flex items-center gap-1 shrink-0"
-          style={{ color: svc.color }}
-        >
-          시작
-          <span style={{ transform: hovered ? "translateX(4px)" : "translateX(0)", transition: "transform 0.2s ease", display: "inline-block" }}>→</span>
-        </span>
+
+        <div>
+          <h3 className="text-base font-black text-white mb-1 leading-tight">{svc.title}</h3>
+          <p className="text-xs font-semibold mb-2" style={{ color: svc.color }}>
+            &ldquo;{svc.viral}&rdquo;
+          </p>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
+            {svc.desc}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-1">
+            {svc.tags.map(tag => (
+              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
+                style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                {tag}
+              </span>
+            ))}
+          </div>
+          <span
+            className="text-xs font-bold flex items-center gap-1 shrink-0"
+            style={{ color: svc.color }}
+          >
+            {startLabel}
+            <span style={{ transform: hovered ? "translateX(4px)" : "translateX(0)", transition: "transform 0.2s ease", display: "inline-block" }}>→</span>
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -250,6 +320,34 @@ export default function MainPage() {
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
+
+  // 언어
+  const [lang, setLang] = useState<Lang>("ko");
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  // 블루베리 잔액
+  const [blueberries, setBlueberries] = useState(0);
+
+  const t = UI[lang];
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("sp_lang") as Lang | null;
+    if (savedLang && savedLang in LANGS) setLang(savedLang);
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
+  }, []);
+
+  useEffect(() => {
+    if (!showLangMenu) return;
+    const handleClick = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setShowLangMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showLangMenu]);
 
   useEffect(() => {
     fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: "/" }) }).catch(() => {});
@@ -288,7 +386,76 @@ export default function MainPage() {
               AI 사주
             </span>
           </button>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-2">
+            {/* 블루베리 잔액/충전 */}
+            <button
+              onClick={() => router.push("/charge")}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-indigo-500/20"
+              style={{
+                background: blueberries > 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.04)",
+                border: blueberries > 0 ? "1px solid rgba(99,102,241,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                color: blueberries > 0 ? "#a78bfa" : "rgba(255,255,255,0.4)",
+              }}
+            >
+              <span>🫐</span>
+              <span className="hidden sm:inline">
+                {blueberries > 0 ? blueberries.toLocaleString() : t.charging}
+              </span>
+              <span className="sm:hidden">
+                {blueberries > 0 ? blueberries.toLocaleString() : "+"}
+              </span>
+            </button>
+
+            {/* 언어 선택기 */}
+            <div ref={langMenuRef} className="relative">
+              <button
+                onClick={() => setShowLangMenu(v => !v)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
+                <span>🌐</span>
+                <span className="hidden sm:inline">{LANGS[lang]}</span>
+                <span className="sm:hidden">{lang.toUpperCase()}</span>
+                <span style={{ fontSize: 7, opacity: 0.6 }}>▼</span>
+              </button>
+
+              {showLangMenu && (
+                <div
+                  className="absolute right-0 top-full mt-2 rounded-xl overflow-hidden z-50"
+                  style={{
+                    background: "rgba(12,12,24,0.98)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
+                    minWidth: 170,
+                  }}
+                >
+                  {(Object.entries(LANGS) as [Lang, string][]).map(([code, name]) => (
+                    <button
+                      key={code}
+                      onClick={() => {
+                        setLang(code);
+                        localStorage.setItem("sp_lang", code);
+                        setShowLangMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-sm transition-colors"
+                      style={{
+                        color: code === lang ? "#c9a84c" : "rgba(255,255,255,0.65)",
+                        background: code === lang ? "rgba(201,168,76,0.07)" : "transparent",
+                        borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      }}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <KakaoLoginButton redirectTo="/" />
           </div>
         </div>
@@ -321,14 +488,14 @@ export default function MainPage() {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}>
-            당신의 사주,<br />
-            <span style={{ WebkitTextFillColor: "#c9a84c" }}>지금 이 순간도</span><br />
-            말하고 있습니다
+            {t.h1[0]}<br />
+            <span style={{ WebkitTextFillColor: "#c9a84c" }}>{t.h1[1]}</span><br />
+            {t.h1[2]}
           </h1>
 
           <p className="text-sm sm:text-base max-w-md mx-auto mb-3 leading-relaxed"
             style={{ color: "rgba(255,255,255,0.42)" }}>
-            남들은 이미 확인했습니다.<br className="sm:hidden" /> 당신만 아직 모르고 있었어요.
+            {t.heroSub}
           </p>
 
           {/* 강렬한 바이럴 카피 */}
@@ -373,7 +540,7 @@ export default function MainPage() {
               boxShadow: "0 8px 32px rgba(124,58,237,0.35)",
             }}
           >
-            내 오행 배경화면 만들기
+            {t.heroCta}
             <span>→</span>
           </button>
 
@@ -381,7 +548,7 @@ export default function MainPage() {
           <div className="mt-10 relative">
             <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.25)" }}>카테고리로 찾기</p>
             <div className="flex gap-2 justify-center flex-wrap">
-              {CATEGORIES.map(({ key, icon, desc }) => (
+              {CATEGORIES.map(({ key, icon }) => (
                 <button
                   key={key}
                   onClick={() => {
@@ -396,8 +563,8 @@ export default function MainPage() {
                   }}
                 >
                   <span>{icon}</span>
-                  <span className="hidden sm:inline">{desc}</span>
-                  <span className="sm:hidden">{key}</span>
+                  <span className="hidden sm:inline">{t.catLabel[key]}</span>
+                  <span className="sm:hidden">{t.catLabel[key]}</span>
                 </button>
               ))}
             </div>
@@ -432,7 +599,7 @@ export default function MainPage() {
           <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>AI SERVICES</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">지금 바로 확인하세요</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-white">{t.servicesHeading}</h2>
             </div>
             <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
               {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지 서비스
@@ -482,7 +649,7 @@ export default function MainPage() {
                     }}
                   >
                     <span>{icon}</span>
-                    <span>{key}</span>
+                    <span>{t.catLabel[key]}</span>
                     {isActive && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
                         style={{ background: "rgba(255,255,255,0.12)" }}>
@@ -498,16 +665,15 @@ export default function MainPage() {
               style={{ background: "linear-gradient(to right, transparent, #06060e)" }} />
           </div>
 
-          {/* 데스크탑: 2컬럼, 모바일: 1컬럼 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 데스크탑: 2컬럼, 모바일: 1컬럼 — 카드 overflow 허용으로 스티커 노출 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-visible">
             {SERVICES
               .filter(s => s.categories.includes(activeCategory))
               .map((svc, i) => (
-                <ServiceCard key={svc.id} svc={svc} index={i} />
+                <ServiceCard key={svc.id} svc={svc} index={i} startLabel={t.start} />
               ))}
           </div>
 
-          {/* 빈 카테고리 처리 */}
           {SERVICES.filter(s => s.categories.includes(activeCategory)).length === 0 && (
             <div className="text-center py-16 text-gray-600 text-sm">
               준비 중인 서비스입니다
@@ -534,7 +700,7 @@ export default function MainPage() {
               onClick={() => router.push("/saju")}
               className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105"
               style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
-              배경화면 만들기 →
+              {t.bannerCta}
             </button>
           </div>
         </section>
@@ -544,7 +710,7 @@ export default function MainPage() {
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>REVIEWS</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">실제 이용 후기</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-white">{t.reviewsHeading}</h2>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-yellow-400 text-sm">★★★★★</span>
@@ -595,7 +761,6 @@ export default function MainPage() {
       {/* ── 푸터 ── */}
       <footer className="border-t pt-8 pb-28 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {/* 링크 메뉴 */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs mb-6"
             style={{ color: "rgba(255,255,255,0.35)" }}>
             <button onClick={() => router.push("/terms")} className="hover:text-amber-400/70 transition-colors">이용약관</button>
@@ -609,7 +774,6 @@ export default function MainPage() {
             <a href="mailto:smple@outlook.kr" className="hover:text-amber-400/70 transition-colors">고객문의</a>
           </div>
 
-          {/* 사업자 정보 */}
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
             <p>상호: 여름궁전(Summer Palace) · 대표: 정윤조 · 이메일: smple@outlook.kr</p>
             <p>통신판매업 신고번호: 제2025-서울-00000호 · 사업자등록번호: 000-00-00000</p>
@@ -635,7 +799,7 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/saju" },
-            { icon: "📦", label: "보관함", href: "/mypage" },
+            { icon: "🫐", label: "블루베리", href: "/charge" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
