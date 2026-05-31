@@ -233,7 +233,8 @@ function analyzeCrossSamhap(jjs1:string[], jjs2:string[]): SamhapResult[] {
     const breakScore=broken.length*(-8);
     const baseScore=isComplete?18:(hasCenter?12:8);
     const score=baseScore+breakScore;
-    const desc=`${branches.join("")} (${el}국) — ${isComplete?"완전삼합":"반합"}${broken.length>0?` ⚡${broken.join(", ")}으로 일부 파괴`:""}`;;
+    const inOSulNote = el==='화' ? ' ※ 상대의 단점까지 감싸려는 포용 과잉 주의' : '';
+    const desc=`${branches.join("")} (${el}국) — ${isComplete?"완전삼합":"반합"}${inOSulNote}${broken.length>0?` ⚡${broken.join(", ")}으로 일부 파괴`:""}`;;
     results.push({group:branches.join(""),el,found,isComplete,score,broken,desc});
   }
   return results;
@@ -261,7 +262,16 @@ function analyzePillar(label:string,weight:number,cg1:string,jj1:string,cg2:stri
       if(!yh) ev.push({type:'삼합',desc:`삼합 반합 ${jj1}·${jj2}(${el}국)${[jj1,jj2].includes(center)?"★":""}`,score:10*weight});
     }
   }
-  if(isPair(JIJI_CHUNG,jj1,jj2)) ev.push({type:'충',desc:`지지충 ${jj1}↔${jj2}`,score:-14*weight});
+  if(isPair(JIJI_CHUNG,jj1,jj2)){
+    const isJaO=(jj1==='자'&&jj2==='오')||(jj1==='오'&&jj2==='자');
+    ev.push({
+      type:'충',
+      desc: isJaO
+        ? `자오충(水火) — 강렬한 자극과 케미. 식지 않는 긴장감, 단 감정 기복 주의`
+        : `지지충 ${jj1}↔${jj2} — 마찰과 자극. 자극추구형엔 케미, 안정추구형엔 소모`,
+      score: isJaO ? -6*weight : -11*weight,
+    });
+  }
   if(isPair(WONJIN,jj1,jj2))     ev.push({type:'원진',desc:`원진살 ${jj1}↔${jj2}`,score:-18*weight});
   if(isPair(JIJI_HAE,jj1,jj2))   ev.push({type:'해',desc:`지지해 ${jj1}↔${jj2}`,score:-9*weight});
   if(isPair(JIJI_PA,jj1,jj2))    ev.push({type:'파',desc:`지지파 ${jj1}↔${jj2}`,score:-7*weight});
@@ -972,7 +982,10 @@ export default function GunghapPage(){
 
             {/* ④ 주별 분석 */}
             <div style={{marginBottom:12}}>
-              <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:700,letterSpacing:'0.1em',marginBottom:8}}>주별 합충 분석</p>
+              <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:700,letterSpacing:'0.1em',marginBottom:6}}>주별 합충 분석</p>
+              <p style={{fontSize:11,color:'rgba(255,255,255,0.22)',lineHeight:1.6,marginBottom:10}}>
+                충(沖)은 무조건 나쁜 게 아닙니다. 두 사람 사이에 강한 자극과 긴장을 만들어 처음엔 강하게 끌리게 하는 에너지이기도 합니다. 자극추구형 커플에게는 충이 오히려 케미의 원천이 됩니다.
+              </p>
               {result.pillars.map((pl,i)=>(
                 <div key={i} style={{background:'rgba(255,255,255,0.03)',borderRadius:13,padding:'12px 14px',
                   marginBottom:8,border:`1px solid ${pl.subScore>=0?'rgba(16,172,132,0.15)':'rgba(238,90,36,0.2)'}`}}>
