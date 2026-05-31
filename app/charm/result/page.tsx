@@ -323,21 +323,38 @@ function CharmResultContent() {
               </div>
 
               {/* 잠금 오버레이 */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl backdrop-blur-[2px] bg-black/50">
-                <div className="text-center px-6 py-8">
-                  <p className="text-4xl mb-4">🔐</p>
-                  <p className="font-black text-white text-xl mb-2">프리미엄 매력 보고서</p>
-                  <p className="text-gray-300 text-sm mb-1">오행별 개운법 완전판</p>
-                  <p className="text-gray-300 text-sm mb-1">AI 매력 인사이트 & 전략 3가지</p>
-                  <p className="text-gray-300 text-sm mb-1">극관계 (나를 좋아할 이성 공략법)</p>
-                  <p className="text-gray-300 text-sm mb-5">PDF 5장 저장</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl backdrop-blur-[2px] bg-black/60">
+                <div className="px-5 py-7 w-full max-w-sm mx-auto">
+                  <p className="font-black text-white text-lg leading-snug mb-0.5">지금 이 등급,</p>
+                  <p className="font-black text-xl leading-snug mb-4" style={{
+                    background: "linear-gradient(135deg, #f9a8d4, #c4b5fd, #818cf8)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  }}>2단계 더 올릴 수 있습니다</p>
+
+                  <div className="space-y-2 mb-5">
+                    {[
+                      { icon: "⚡", title: "매력 등급 올리는 오행 개운 전략", desc: "색상·방향·시간대 — 오늘부터 바로 적용" },
+                      { icon: "💘", title: "이성이 나한테 먼저 다가오게 만드는 법", desc: "극관계 공략 포인트 + 접근 스크립트" },
+                      { icon: "🚨", title: "지금 내 매력을 갉아먹는 약점 1가지", desc: "이걸 모르면 계속 기회를 놓칩니다" },
+                      { icon: "🧬", title: "AI 맞춤 매력 극대화 전략 3가지", desc: "내 일간·오행 분석 기반 액션 플랜" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2.5 rounded-xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <span className="text-sm flex-shrink-0 mt-0.5">{item.icon}</span>
+                        <div>
+                          <p className="text-sm font-bold text-white leading-tight">{item.title}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                   <button
                     onClick={handlePayment}
-                    className="bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black px-8 py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
+                    className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
                   >
-                    전체 보고서 받기 ₩{CHARM_PRICE.toLocaleString()}
+                    내 매력 극대화 보고서 ₩{CHARM_PRICE.toLocaleString()}
                   </button>
-                  <p className="text-xs text-gray-600 mt-3">토스페이 · 카드 결제 · 안전결제</p>
+                  <p className="text-xs text-center mt-2.5" style={{ color: "rgba(255,255,255,0.2)" }}>토스페이 · 카드 · PDF 저장 포함</p>
                 </div>
               </div>
             </div>
@@ -398,9 +415,9 @@ function CharmResultContent() {
               onClick={handlePayment}
               className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
             >
-              {grade.emoji} 프리미엄 보고서 + PDF ₩{CHARM_PRICE.toLocaleString()}
+              {grade.emoji} 매력 등급 2단계 올리기 ₩{CHARM_PRICE.toLocaleString()}
             </button>
-            <p className="text-center text-xs text-gray-600 mt-2">개운법 · AI 전략 · 극관계 · PDF 저장 포함</p>
+            <p className="text-center text-xs text-gray-600 mt-2">이성이 먼저 다가오게 만드는 법이 여기 있습니다</p>
           </div>
         </div>
       )}
