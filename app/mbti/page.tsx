@@ -188,7 +188,7 @@ export default function MbtiPage() {
     try {
       const saved = loadSajuData();
       if (!saved) return;
-      setName(saved.name || "");
+      // 이름은 placeholder로 표시 — 직접 입력하게
       if (saved.gender) setGender(saved.gender as "female" | "male");
       if (saved.birthYear) setBirthYear(String(saved.birthYear));
       if (saved.birthMonth) setBirthMonth(String(saved.birthMonth));
@@ -363,7 +363,7 @@ export default function MbtiPage() {
 
             <div>
               <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="이름"
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition" />
             </div>
 

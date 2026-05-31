@@ -124,7 +124,7 @@ export default function DaewoonPage() {
     setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");
     const saved = loadSajuData();
     if (saved) {
-      setName(saved.name || "");
+      // 이름은 placeholder로 표시 — 직접 입력하게
       setGender((saved.gender as "male" | "female") || "female");
       setBirthYear(saved.birthYear);
       setBirthMonth(saved.birthMonth);
@@ -294,7 +294,7 @@ export default function DaewoonPage() {
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder="이름을 입력하세요"
+                placeholder="홍길동"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
               />
             </div>

@@ -229,11 +229,10 @@ export default function CharmPage() {
       setHasSaved(true);
       setForm(prev => ({
         ...prev,
-        name: saved.name || "",
         gender: saved.gender || "female",
-        birthYear: saved.birthYear ? String(saved.birthYear) : "",
-        birthMonth: saved.birthMonth ? String(saved.birthMonth) : "",
-        birthDay: saved.birthDay ? String(saved.birthDay) : "",
+        birthYear: saved.birthYear ? String(saved.birthYear) : "1995",
+        birthMonth: saved.birthMonth ? String(saved.birthMonth) : "6",
+        birthDay: saved.birthDay ? String(saved.birthDay) : "2",
         birthTime: {
           hour: saved.birthHour ?? null,
           minute: saved.birthMinute ?? null,

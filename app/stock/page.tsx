@@ -300,12 +300,12 @@ export default function StockPage() {
     if (saved) {
       setHasSaved(true);
       setForm({
-        name: saved.name || "",
+        name: "",
         gender: saved.gender || "female",
-        birthYear: saved.birthYear ? String(saved.birthYear) : "",
-        birthMonth: saved.birthMonth ? String(saved.birthMonth) : "",
-        birthDay: saved.birthDay ? String(saved.birthDay) : "",
-        birthPlace: saved.birthPlace || "서울",
+        birthYear: saved.birthYear ? String(saved.birthYear) : "1995",
+        birthMonth: saved.birthMonth ? String(saved.birthMonth) : "6",
+        birthDay: saved.birthDay ? String(saved.birthDay) : "2",
+        birthPlace: saved.birthPlace || "부산",
       });
       setBirthTime({
         hour: saved.birthHourUnknown ? null : (saved.birthHour ?? null),
