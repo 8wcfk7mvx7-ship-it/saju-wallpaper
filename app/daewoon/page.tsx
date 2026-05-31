@@ -1,9 +1,72 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
+
+const CY = new Date().getFullYear();
+const YEARS_DW  = Array.from({ length: CY - 1919 }, (_, i) => CY - i);
+const MONTHS_DW = Array.from({ length: 12 }, (_, i) => i + 1);
+const DAYS_DW   = Array.from({ length: 31 }, (_, i) => i + 1);
+const SIJIN_DW = [
+  { v: "",   label: "모름 (시간 불명)" },
+  { v: "23", label: "자시(子時) 23:00 – 00:59" },
+  { v: "1",  label: "축시(丑時) 01:00 – 02:59" },
+  { v: "3",  label: "인시(寅時) 03:00 – 04:59" },
+  { v: "5",  label: "묘시(卯時) 05:00 – 06:59" },
+  { v: "7",  label: "진시(辰時) 07:00 – 08:59" },
+  { v: "9",  label: "사시(巳時) 09:00 – 10:59" },
+  { v: "11", label: "오시(午時) 11:00 – 12:59" },
+  { v: "13", label: "미시(未時) 13:00 – 14:59" },
+  { v: "15", label: "신시(申時) 15:00 – 16:59" },
+  { v: "17", label: "유시(酉時) 17:00 – 18:59" },
+  { v: "19", label: "술시(戌時) 19:00 – 20:59" },
+  { v: "21", label: "해시(亥時) 21:00 – 22:59" },
+];
+
+function DwPicker({ value, options, onChange, placeholder, suffix }: {
+  value: string; options: {v:string;label:string}[];
+  onChange: (v:string) => void; placeholder: string; suffix?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+  useEffect(() => {
+    if (open && listRef.current && value) {
+      const el = listRef.current.querySelector(`[data-v="${value}"]`);
+      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
+    }
+  }, [open, value]);
+  const display = options.find(o => o.v === value)?.label ?? "";
+  return (
+    <div ref={ref} className="relative w-full">
+      <div onClick={() => setOpen(!open)}
+        className={`flex items-center justify-between bg-white/5 border rounded-xl px-4 py-3 cursor-pointer transition select-none hover:border-violet-500/60 ${open ? "border-violet-500" : "border-white/10"}`}>
+        <span className={display ? "text-white text-sm" : "text-gray-600 text-sm"}>
+          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
+        </span>
+        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+      </div>
+      {open && (
+        <div ref={listRef} className="absolute z-50 w-full mt-1 bg-[#12121e] border border-white/20 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 200 }}>
+          {options.map(opt => (
+            <div key={opt.v} data-v={opt.v}
+              onClick={() => { onChange(opt.v); setOpen(false); }}
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${value === opt.v ? "text-violet-300 bg-violet-900/50 font-semibold" : "text-gray-300 hover:bg-white/8"}`}>
+              {opt.label}{suffix ? ` ${suffix}` : ""}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +109,8 @@ export default function DaewoonPage() {
   const [birthMonth, setBirthMonth] = useState(6);
   const [birthDay, setBirthDay] = useState(15);
   const [birthHour, setBirthHour] = useState<number | null>(null);
+  const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
@@ -68,17 +133,32 @@ export default function DaewoonPage() {
     }
   }, []);
 
-  function analyze() {
+  async function analyze() {
+    let y = birthYear, mo = birthMonth, d = birthDay;
+    if (calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(y, mo, d, isLeapMonth);
+        const s = cal.getSolarCalendar();
+        if (!s?.year) throw new Error();
+        y = s.year; mo = s.month; d = s.day;
+      } catch {
+        alert("음력 날짜를 양력으로 변환할 수 없습니다. 날짜를 다시 확인해주세요.");
+        return;
+      }
+    }
     try {
       const r = analyzeSaju({
-        birthYear, birthMonth, birthDay,
+        birthYear: y, birthMonth: mo, birthDay: d,
         birthHour, birthMinute: 0,
         name: name || "분석", gender,
         birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
       });
       const mp = r.pillarsDetail.month;
-      const dw = calcDaewoon(birthYear, birthMonth, birthDay, gender, r.pillarsDetail.day.cg, mp);
-      const sw = calcSewoon(birthYear, r.pillarsDetail.day.cg);
+      const dw = calcDaewoon(y, mo, d, gender, r.pillarsDetail.day.cg, mp);
+      const sw = calcSewoon(y, r.pillarsDetail.day.cg);
       setIlgan(r.pillarsDetail.day.cg);
       setMonthJj(mp.jj);
       setDaewoon(dw);
@@ -214,59 +294,66 @@ export default function DaewoonPage() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">성별</label>
-                <select
-                  value={gender}
-                  onChange={e => setGender(e.target.value as "male" | "female")}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
-                >
-                  <option value="female">여성</option>
-                  <option value="male">남성</option>
-                </select>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">성별</label>
+              <select
+                value={gender}
+                onChange={e => setGender(e.target.value as "male" | "female")}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+              >
+                <option value="female">여성</option>
+                <option value="male">남성</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 block mb-2">생년월일</label>
+              <div className="flex gap-2 mb-3">
+                {(["solar", "lunar"] as const).map(t => (
+                  <button key={t} type="button"
+                    onClick={() => setCalendarType(t)}
+                    className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${calendarType === t ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400 border border-white/10"}`}
+                  >
+                    {t === "solar" ? "양력" : "음력"}
+                  </button>
+                ))}
               </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">출생연도</label>
-                <input
-                  type="number" value={birthYear} min={1920} max={2010}
-                  onChange={e => setBirthYear(Number(e.target.value))}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
+              {calendarType === "lunar" && (
+                <label className="flex items-center gap-2 text-xs text-gray-400 mb-3 cursor-pointer select-none">
+                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="accent-violet-500" />
+                  윤달
+                </label>
+              )}
+              <div className="grid grid-cols-3 gap-2">
+                <DwPicker
+                  value={String(birthYear)}
+                  options={YEARS_DW.map(y => ({ v: String(y), label: String(y) }))}
+                  onChange={v => setBirthYear(Number(v))}
+                  placeholder="연도" suffix="년"
+                />
+                <DwPicker
+                  value={String(birthMonth)}
+                  options={MONTHS_DW.map(m => ({ v: String(m), label: String(m) }))}
+                  onChange={v => setBirthMonth(Number(v))}
+                  placeholder="월" suffix="월"
+                />
+                <DwPicker
+                  value={String(birthDay)}
+                  options={DAYS_DW.map(d => ({ v: String(d), label: String(d) }))}
+                  onChange={v => setBirthDay(Number(v))}
+                  placeholder="일" suffix="일"
                 />
               </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">출생월</label>
-                <select
-                  value={birthMonth}
-                  onChange={e => setBirthMonth(Number(e.target.value))}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                    <option key={m} value={m}>{m}월</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">출생일</label>
-                <input
-                  type="number" value={birthDay} min={1} max={31}
-                  onChange={e => setBirthDay(Number(e.target.value))}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
-                <select
-                  value={birthHour ?? ""}
-                  onChange={e => setBirthHour(e.target.value === "" ? null : Number(e.target.value))}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
-                >
-                  <option value="">모름</option>
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <option key={i} value={i}>{i}시</option>
-                  ))}
-                </select>
-              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
+              <DwPicker
+                value={birthHour == null ? "" : String(birthHour)}
+                options={SIJIN_DW}
+                onChange={v => setBirthHour(v === "" ? null : Number(v))}
+                placeholder="출생시간 선택 (선택)"
+              />
             </div>
           </div>
 
