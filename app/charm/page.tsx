@@ -214,7 +214,7 @@ export default function CharmPage() {
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
     birthYear: "", birthMonth: "", birthDay: "",
-    birthTime: { hour: 12, minute: 30, unknown: false, useJajasi: false },
+    birthTime: { hour: null, minute: null, unknown: true, useJajasi: false },
     birthPlace: "서울",
   });
 
@@ -235,8 +235,8 @@ export default function CharmPage() {
         birthMonth: saved.birthMonth ? String(saved.birthMonth) : "",
         birthDay: saved.birthDay ? String(saved.birthDay) : "",
         birthTime: {
-          hour: saved.birthHour ?? 12,
-          minute: saved.birthMinute ?? 30,
+          hour: saved.birthHour ?? null,
+          minute: saved.birthMinute ?? null,
           unknown: saved.birthHourUnknown || false,
           useJajasi: saved.useJajasi || false,
         },

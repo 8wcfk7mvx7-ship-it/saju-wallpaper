@@ -1,9 +1,67 @@
 "use client";
-import { useState, useEffect, useCallback, type CSSProperties, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+
+const CY_GH = new Date().getFullYear();
+const YEARS_GH = Array.from({ length: CY_GH - 1919 }, (_, i) => CY_GH - i);
+const MONTHS_GH = Array.from({ length: 12 }, (_, i) => i + 1);
+const DAYS_GH = Array.from({ length: 31 }, (_, i) => i + 1);
+
+function GhPicker({ value, options, onChange, placeholder, suffix, style }: {
+  value: string; options: { v: string; label: string }[];
+  onChange: (v: string) => void; placeholder: string; suffix?: string; style?: CSSProperties;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+  useEffect(() => {
+    if (open && listRef.current && value) {
+      const el = listRef.current.querySelector(`[data-v="${value}"]`);
+      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
+    }
+  }, [open, value]);
+  const display = options.find(o => o.v === value)?.label ?? "";
+  return (
+    <div ref={ref} style={{ position: "relative", ...style }}>
+      <div onClick={() => setOpen(!open)} style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        background: "rgba(255,255,255,0.05)", border: `1.5px solid ${open ? "rgba(167,139,250,0.6)" : "rgba(255,255,255,0.1)"}`,
+        borderRadius: 10, padding: "10px 12px", cursor: "pointer", userSelect: "none",
+      }}>
+        <span style={{ fontSize: 13, color: display ? "#fff" : "rgba(255,255,255,0.3)" }}>
+          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
+        </span>
+        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+      </div>
+      {open && (
+        <div ref={listRef} style={{
+          position: "absolute", zIndex: 100, width: "100%", marginTop: 4,
+          background: "#12121e", border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 10, maxHeight: 180, overflowY: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+        }}>
+          {options.map(opt => (
+            <div key={opt.v} data-v={opt.v} onClick={() => { onChange(opt.v); setOpen(false); }} style={{
+              padding: "9px 12px", fontSize: 13, cursor: "pointer",
+              background: value === opt.v ? "rgba(139,92,246,0.3)" : "transparent",
+              color: value === opt.v ? "#c4b5fd" : "rgba(255,255,255,0.7)",
+              fontWeight: value === opt.v ? 700 : 400,
+            }}>
+              {opt.label}{suffix && opt.v ? ` ${suffix}` : ""}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════
    관계 테이블
@@ -323,6 +381,8 @@ export default function GunghapPage(){
   const [step,setStep]=useState<'entry'|'form'|'result'>('entry');
   const [relationType,setRelationType]=useState('');
   const selectedRelation=RELATION_TYPES.find(r=>r.id===relationType)||null;
+  const [p1Cal,setP1Cal]=useState<{type:'solar'|'lunar';leap:boolean}>({type:'solar',leap:false});
+  const [p2Cal,setP2Cal]=useState<{type:'solar'|'lunar';leap:boolean}>({type:'solar',leap:false});
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
 
   const fillP1=useCallback(()=>{
@@ -341,10 +401,28 @@ export default function GunghapPage(){
     });
   },[]);
 
-  const calc=()=>{
-    const y1=+p1.year,m1=+p1.month,d1=+p1.day;
-    const y2=+p2.year,m2=+p2.month,d2=+p2.day;
-    if(!p1.name||!p2.name||!y1||!m1||!d1||!y2||!m2||!d2) return;
+  const calc=async()=>{
+    let y1=+p1.year,m1=+p1.month,d1=+p1.day;
+    let y2=+p2.year,m2=+p2.month,d2=+p2.day;
+    if(!p1.name||!p2.name||!y1||!m1||!d1||!y2||!m2||!d2) { alert('두 사람의 이름과 생년월일을 모두 입력해주세요.'); return; }
+    if(p1Cal.type==='lunar'){
+      try{
+        // @ts-ignore
+        const KLC=(await import('korean-lunar-calendar')).default;
+        const cal=new KLC(); cal.setLunarDate(y1,m1,d1,p1Cal.leap);
+        const s=cal.getSolarCalendar(); if(!s?.year) throw new Error();
+        y1=s.year; m1=s.month; d1=s.day;
+      } catch { alert('첫 번째 사람의 음력 날짜를 변환할 수 없습니다.'); return; }
+    }
+    if(p2Cal.type==='lunar'){
+      try{
+        // @ts-ignore
+        const KLC=(await import('korean-lunar-calendar')).default;
+        const cal=new KLC(); cal.setLunarDate(y2,m2,d2,p2Cal.leap);
+        const s=cal.getSolarCalendar(); if(!s?.year) throw new Error();
+        y2=s.year; m2=s.month; d2=s.day;
+      } catch { alert('두 번째 사람의 음력 날짜를 변환할 수 없습니다.'); return; }
+    }
     const h1=p1.birthTime.unknown?null:p1.birthTime.hour;
     const min1=p1.birthTime.unknown?null:(p1.birthTime.minute??0);
     const h2=p2.birthTime.unknown?null:p2.birthTime.hour;
@@ -407,7 +485,11 @@ export default function GunghapPage(){
 
   const gradeColors:{[k:string]:string}={합:'#10ac84',삼합:'#10ac84',암합:'#4ecdc4',충:'#ee5a24',원진:'#c0392b',해:'#e67e22',파:'#e67e22',형:'#e74c3c',암충:'#e74c3c'};
 
-  const Form=({p,setP,idx,personLabel}:{p:PI;setP:(v:PI)=>void;idx:1|2;personLabel?:string})=>(
+  const Form=({p,setP,idx,personLabel,cal,setCal}:{
+    p:PI;setP:(v:PI)=>void;idx:1|2;personLabel?:string;
+    cal:{type:'solar'|'lunar';leap:boolean};
+    setCal:(v:{type:'solar'|'lunar';leap:boolean})=>void;
+  })=>(
     <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',
       border:'1px solid rgba(255,255,255,0.07)',marginBottom:idx===1?12:0}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
@@ -433,16 +515,33 @@ export default function GunghapPage(){
         ))}
       </div>
       <input style={{...inp(),marginBottom:8}} placeholder="이름 또는 별명" value={p.name} onChange={e=>setP({...p,name:e.target.value})}/>
+      {/* 양력/음력 토글 */}
+      <div style={{display:'flex',marginBottom:8,gap:6}}>
+        {(['solar','lunar'] as const).map(t=>(
+          <button key={t} type="button" onClick={()=>setCal({...cal,type:t,leap:false})} style={{
+            flex:1,padding:'7px 0',borderRadius:8,border:'1.5px solid',cursor:'pointer',fontSize:12,fontWeight:700,
+            borderColor:cal.type===t?'rgba(167,139,250,0.6)':'rgba(255,255,255,0.08)',
+            background:cal.type===t?'rgba(139,92,246,0.15)':'transparent',
+            color:cal.type===t?'#c4b5fd':'rgba(255,255,255,0.35)',
+          }}>{t==='solar'?'양력':'음력'}</button>
+        ))}
+      </div>
+      {cal.type==='lunar'&&(
+        <label style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'rgba(255,255,255,0.45)',marginBottom:8,cursor:'pointer'}}>
+          <input type="checkbox" checked={cal.leap} onChange={e=>setCal({...cal,leap:e.target.checked})} style={{accentColor:'#a78bfa'}}/>
+          윤달
+        </label>
+      )}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:7,marginBottom:10}}>
-        <input style={inp()} placeholder="출생연도" type="number" value={p.year} onChange={e=>setP({...p,year:e.target.value})}/>
-        <select style={selStyle()} value={p.month} onChange={e=>setP({...p,month:e.target.value})}>
-          <option value="">월</option>
-          {Array.from({length:12},(_,i)=><option key={i+1} value={i+1}>{i+1}월</option>)}
-        </select>
-        <select style={selStyle()} value={p.day} onChange={e=>setP({...p,day:e.target.value})}>
-          <option value="">일</option>
-          {Array.from({length:31},(_,i)=><option key={i+1} value={i+1}>{i+1}일</option>)}
-        </select>
+        <GhPicker value={p.year}
+          options={YEARS_GH.map(y=>({v:String(y),label:String(y)}))}
+          onChange={v=>setP({...p,year:v})} placeholder="연도" suffix="년"/>
+        <GhPicker value={p.month}
+          options={MONTHS_GH.map(m=>({v:String(m),label:String(m)}))}
+          onChange={v=>setP({...p,month:v})} placeholder="월" suffix="월"/>
+        <GhPicker value={p.day}
+          options={DAYS_GH.map(d=>({v:String(d),label:String(d)}))}
+          onChange={v=>setP({...p,day:v})} placeholder="일" suffix="일"/>
       </div>
       <div style={{marginBottom:10}}>
         <p style={{color:'rgba(255,255,255,0.35)',fontSize:11,fontWeight:700,marginBottom:8}}>태어난 시간</p>
@@ -648,11 +747,11 @@ export default function GunghapPage(){
                     3년이 지나도 결국 <strong>서로를 갉아먹습니다</strong>
                   </p>
                 </div>
-                <Form p={p1} setP={setP1} idx={1}/>
+                <Form p={p1} setP={setP1} idx={1} cal={p1Cal} setCal={setP1Cal}/>
                 <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
                   {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
                 </div>
-                <Form p={p2} setP={setP2} idx={2} personLabel={selectedRelation?.p2Label}/>
+                <Form p={p2} setP={setP2} idx={2} personLabel={selectedRelation?.p2Label} cal={p2Cal} setCal={setP2Cal}/>
                 <button onClick={calc} style={{
                   width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',
                   background:'linear-gradient(135deg,#7c3aed,#6366f1)',color:'#fff',

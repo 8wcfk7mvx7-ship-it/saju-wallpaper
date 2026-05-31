@@ -285,7 +285,7 @@ export default function StockPage() {
     birthPlace: "서울",
   });
   const [birthTime, setBirthTime] = useState<BirthTimeValue>({
-    hour: 12, minute: 30, unknown: false, useJajasi: false,
+    hour: null, minute: null, unknown: true, useJajasi: false,
   });
   const [result, setResult] = useState<ReturnType<typeof analyzeSaju> | null>(null);
   const [blurRemoved, setBlurRemoved] = useState(false);
@@ -308,8 +308,8 @@ export default function StockPage() {
         birthPlace: saved.birthPlace || "서울",
       });
       setBirthTime({
-        hour: saved.birthHourUnknown ? null : (saved.birthHour ?? 12),
-        minute: saved.birthHourUnknown ? null : (saved.birthMinute ?? 30),
+        hour: saved.birthHourUnknown ? null : (saved.birthHour ?? null),
+        minute: saved.birthHourUnknown ? null : (saved.birthMinute ?? null),
         unknown: saved.birthHourUnknown || false,
         useJajasi: saved.useJajasi || false,
       });
