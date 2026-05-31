@@ -35,6 +35,7 @@ const CATEGORY_LABELS = {
   dashboard: "📊 대시보드",
   wallpaper: "🖼 배경화면 (DALL-E)",
   report: "📄 보고서 (Claude)",
+  notice: "📢 공지사항",
   preview: "👁 결과 미리보기",
 };
 
@@ -49,7 +50,11 @@ export default function AdminPage() {
   const [saving, setSaving] = useState<string | null>(null); // key being saved
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "wallpaper" | "report" | "preview">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "wallpaper" | "report" | "notice" | "preview">("dashboard");
+  const [dbConnected, setDbConnected] = useState(false);
+  const [noticeText, setNoticeText] = useState("");
+  const [noticeEditMode, setNoticeEditMode] = useState(false);
+  const [noticeSaving, setNoticeSaving] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [previewYear, setPreviewYear] = useState("1990");
@@ -85,6 +90,7 @@ export default function AdminPage() {
       }
       const data = await res.json();
       setPrompts(data.prompts || []);
+      setDbConnected(!!data.dbConnected);
       setAuthed(true);
       sessionStorage.setItem("adminPw", pw);
       setAuthError("");
@@ -292,9 +298,20 @@ export default function AdminPage() {
           </p>
         </div>
 
+        {/* DB 미연결 경고 */}
+        {!dbConnected && (
+          <div className="bg-red-500/10 border border-red-500/25 rounded-xl p-3 mb-4 flex items-center gap-2">
+            <span className="text-red-400 text-lg">⚠️</span>
+            <div>
+              <p className="text-red-300 text-xs font-bold">Supabase 미연결 — 프롬프트 저장이 되지 않습니다</p>
+              <p className="text-red-400/60 text-xs">Vercel 환경변수에 SUPABASE_URL · SUPABASE_SERVICE_KEY를 설정하세요</p>
+            </div>
+          </div>
+        )}
+
         {/* 탭 */}
         <div className="flex gap-2 mb-6 flex-wrap">
-          {(["dashboard", "wallpaper", "report", "preview"] as const).map(tab => (
+          {(["dashboard", "wallpaper", "report", "notice", "preview"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -302,6 +319,7 @@ export default function AdminPage() {
                 activeTab === tab
                   ? tab === "preview" ? "bg-emerald-600 text-white"
                     : tab === "dashboard" ? "bg-sky-600 text-white"
+                    : tab === "notice" ? "bg-orange-600 text-white"
                     : "bg-indigo-600 text-white"
                   : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
               }`}
@@ -520,6 +538,88 @@ create table if not exists kakao_users (
                 ⚠️ /result 와 /report 는 실제 saju 계산 데이터가 sessionStorage에 있어야 합니다.<br />
                 <strong>배경화면(/result)</strong> → 먼저 /form에서 분석을 실행하거나 /loading을 통해 데이터를 생성하세요.<br />
                 <strong>보고서(/report)</strong> → /generating을 통해 AI 생성 후 자동 이동됩니다.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 공지사항 탭 */}
+        {activeTab === "notice" && (
+          <div className="space-y-5">
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
+              <p className="text-sm text-orange-300 leading-relaxed">
+                <strong>📢 공지사항 관리</strong><br />
+                여기서 입력한 내용이 메인 페이지 상단 공지 티커에 표시됩니다.<br />
+                <span className="text-orange-400/70 text-xs">각 줄이 하나의 공지 항목이 됩니다. 엔터로 구분하세요.</span>
+              </p>
+            </div>
+
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-gray-300">현재 공지사항 목록</p>
+                {!noticeEditMode && (
+                  <button
+                    onClick={() => {
+                      const stored = localStorage.getItem("admin_notices") || "🎉 Summer Palace AI 사주 — 지금 무료로 체험해보세요!\n🔮 19금 사주 분석 오픈 — 나의 성적 매력을 알아보세요\n✨ 일진달력 업데이트 — 오늘의 운세를 확인하세요";
+                      setNoticeText(stored);
+                      setNoticeEditMode(true);
+                    }}
+                    className="text-xs px-3 py-1.5 rounded-lg bg-orange-600/30 hover:bg-orange-600/50 text-orange-300 transition-colors"
+                  >
+                    수정
+                  </button>
+                )}
+              </div>
+
+              {noticeEditMode ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={noticeText}
+                    onChange={e => setNoticeText(e.target.value)}
+                    rows={8}
+                    placeholder="공지사항 내용 (한 줄 = 하나의 공지)"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 leading-relaxed focus:outline-none focus:border-orange-500 resize-y font-mono"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setNoticeSaving(true);
+                        try { localStorage.setItem("admin_notices", noticeText); } catch {}
+                        setTimeout(() => {
+                          setNoticeSaving(false);
+                          setNoticeEditMode(false);
+                          setSavedMsg("✅ 공지사항 저장 완료 (로컬)");
+                          setTimeout(() => setSavedMsg(null), 3000);
+                        }, 500);
+                      }}
+                      disabled={noticeSaving}
+                      className="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 font-medium text-sm transition-colors disabled:opacity-50"
+                    >
+                      {noticeSaving ? "저장 중..." : "💾 저장"}
+                    </button>
+                    <button
+                      onClick={() => setNoticeEditMode(false)}
+                      className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition-colors"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {(localStorage.getItem("admin_notices") || "🎉 Summer Palace AI 사주 — 지금 무료로 체험해보세요!\n🔮 19금 사주 분석 오픈 — 나의 성적 매력을 알아보세요\n✨ 일진달력 업데이트 — 오늘의 운세를 확인하세요").split("\n").filter(Boolean).map((line, i) => (
+                    <div key={i} className="flex items-start gap-2 bg-white/[0.03] rounded-xl px-4 py-3">
+                      <span className="text-orange-400/50 text-xs font-mono mt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                      <p className="text-sm text-gray-300 leading-relaxed">{line}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+              <p className="text-xs text-amber-300/70 leading-relaxed">
+                💡 현재 공지는 브라우저 localStorage에 저장됩니다. Supabase 연결 후에는 DB에 저장되어 모든 기기에 공유됩니다.
               </p>
             </div>
           </div>

@@ -110,6 +110,161 @@ function getKST() {
   return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
 }
 
+function ContactSection() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [errMsg, setErrMsg] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrMsg(data.error || "오류가 발생했습니다");
+        setStatus("error");
+      } else {
+        setStatus("done");
+      }
+    } catch {
+      setErrMsg("네트워크 오류. 잠시 후 다시 시도해주세요.");
+      setStatus("error");
+    }
+  }
+
+  return (
+    <section className="border-t py-14" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8">
+          <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "rgba(201,168,76,0.5)" }}>
+            Contact
+          </p>
+          <h2 className="text-2xl font-black text-white mb-2">문의하기</h2>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+            궁금한 점, 오류 신고, 환불 문의 등 편하게 보내주세요.
+          </p>
+        </div>
+
+        {status === "done" ? (
+          <div className="text-center py-10">
+            <p className="text-4xl mb-4">✅</p>
+            <p className="text-white font-bold text-lg mb-2">문의가 접수되었습니다</p>
+            <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+              {email}로 접수 확인 메일을 보내드렸습니다.<br />
+              영업일 기준 1~2일 이내에 답변 드리겠습니다.
+            </p>
+            <button
+              onClick={() => { setStatus("idle"); setName(""); setEmail(""); setMessage(""); }}
+              className="text-xs px-4 py-2 rounded-xl border transition"
+              style={{ borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.4)" }}
+            >
+              새 문의 작성
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  이름 <span className="text-amber-400/60">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="홍길동"
+                  required
+                  className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  이메일 <span className="text-amber-400/60">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
+                문의 내용 <span className="text-amber-400/60">*</span>
+              </label>
+              <textarea
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                placeholder="문의 내용을 자세히 적어주세요..."
+                required
+                rows={5}
+                className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50 resize-y"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  minHeight: 120,
+                }}
+              />
+            </div>
+
+            {status === "error" && (
+              <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">
+                {errMsg}
+              </p>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+              <button
+                type="submit"
+                disabled={status === "sending" || !name.trim() || !email.trim() || !message.trim()}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-sm font-black transition-all active:scale-[0.98] disabled:opacity-50"
+                style={{
+                  background: "linear-gradient(135deg, #c9a84c 0%, #d4a843 100%)",
+                  color: "#06060e",
+                  boxShadow: "0 6px 24px rgba(201,168,76,0.2)",
+                }}
+              >
+                {status === "sending" ? "전송 중..." : "✉️ 문의 보내기"}
+              </button>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+                또는 카카오 채널로 빠르게 문의:&nbsp;
+                <a
+                  href="http://pf.kakao.com/_cuksX"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-yellow-400/60 transition-colors underline"
+                >
+                  pf.kakao.com/_cuksX
+                </a>
+              </span>
+            </div>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function IljinCalendar() {
   const today = getKST();
   const [year, setYear] = useState(today.year);
@@ -925,6 +1080,9 @@ export default function MainPage() {
       <section className="py-10 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <IljinCalendar />
       </section>
+
+      {/* ── 문의하기 섹션 ── */}
+      <ContactSection />
 
       {/* ── 푸터 ── */}
       <footer className="border-t pt-8 pb-28 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>

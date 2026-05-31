@@ -164,14 +164,18 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   진술충:   {hanja:"辰戌沖", category:"unlucky",  desc:"관재·구설과 재산 다툼이 따르기 쉽습니다. 소화기 건강을 주의하세요"},
   사해충:   {hanja:"巳亥沖", category:"unlucky",  desc:"예기치 못한 사고와 변동이 따릅니다. 심장·신장 건강에 유의하세요"},
   // 삼형살(三刑殺) 및 형(刑)
-  인사신삼형:{hanja:"寅巳申三刑",category:"unlucky", desc:"지세지형(持勢之刑). 권력욕이 강하나 자기파괴적 성향이 있습니다. 관재·수술·사고를 주의하세요"},
-  축술미삼형:{hanja:"丑戌未三刑",category:"unlucky", desc:"무은지형(無恩之刑). 배신당하거나 배신하기 쉽습니다. 다리·위장 건강 주의"},
-  자묘형:   {hanja:"子卯刑",   category:"unlucky",  desc:"무례지형(無禮之刑). 예의 없는 행동으로 구설수에 오르기 쉽습니다. 관계 갈등 주의"},
-  자형살:   {hanja:"自刑殺",   category:"unlucky",  desc:"같은 지지가 겹쳐 스스로 화를 자초합니다. 자기파괴적 행동과 자해적 결정을 주의하세요"},
+  인사신삼형:{hanja:"寅巳申三刑",category:"unlucky", desc:"지세지형(持勢之刑). 권력욕이 강하나 자기파괴적 성향이 있습니다. 관재·수술·사고·소송을 주의하세요. 세 지지 모두 갖춰질수록 강도가 세집니다"},
+  축술미삼형:{hanja:"丑戌未三刑",category:"unlucky", desc:"무은지형(無恩之刑). 배신당하거나 배신하기 쉽습니다. 은혜를 원수로 갚는 관계를 조심하고 다리·위장 건강을 주의하세요"},
+  자묘형:   {hanja:"子卯刑",   category:"unlucky",  desc:"무례지형(無禮之刑). 예의 없는 언행으로 구설수에 오르기 쉽습니다. 법적 분쟁·관계 갈등에 주의하고 충동을 자제하세요"},
+  // 자형살(自刑殺) — 같은 지지 중복
+  해해형:   {hanja:"亥亥自刑", category:"unlucky",  desc:"⚠️ 亥亥 자형 — 우울증·정서 불안 주의. 어둠과 물(水)의 기운이 겹쳐 내면의 갈등과 자기파멸적 사고가 깊어집니다. 고독·과음·자포자기를 경계하고 정신건강을 챙기세요"},
+  오오형:   {hanja:"午午自刑", category:"unlucky",  desc:"午午 자형 — 충동·과로 주의. 화(火) 기운이 과해져 감정 폭발과 번아웃이 잦아집니다. 흥분을 가라앉히고 쉬어가는 법을 익혀야 합니다"},
+  유유형:   {hanja:"酉酉自刑", category:"unlucky",  desc:"酉酉 자형 — 예민·집착 주의. 금(金) 기운이 겹쳐 결벽증적 완벽주의와 날카로운 비판으로 인간관계가 소원해집니다. 유연성을 기르세요"},
+  진진형:   {hanja:"辰辰自刑", category:"unlucky",  desc:"辰辰 자형 — 고집·자기집착 주의. 토(土) 기운이 굳어져 융통성 없는 독선으로 주변과 마찰이 잦아집니다. 타인의 의견을 경청하세요"},
   // 지지파(地支破) — 이별·손재의 기운
-  지지파:   {hanja:"地支破",   category:"unlucky",  desc:"이별·손재·인연 파탄의 기운입니다. 재물 손실과 관계의 이별을 주의하세요"},
+  지지파:   {hanja:"地支破",   category:"unlucky",  desc:"이별·손재·인연 파탄의 기운입니다. 재물 손실과 소중한 관계의 이별을 주의하세요. 계약·보증·동업에 신중을 기하세요"},
   // 지지해(地支害/穿) — 방해·배신의 기운
-  지지해:   {hanja:"地支害",   category:"unlucky",  desc:"육해(六害). 방해와 장애가 따르며 가까운 사람의 배신을 조심하세요"},
+  지지해:   {hanja:"地支害",   category:"unlucky",  desc:"육해(六害). 방해·장애가 따르며 가까운 사람의 배신을 조심하세요. 각 쌍별 작용: 자미·축오·인유·묘신·진해·사술 — 해당 기운의 충돌로 인한 음성적 갈등"},
 };
 
 // 양인살: 일간 기준 양인 지지
@@ -1394,11 +1398,13 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     selfFormCnt[d.jj] = selfFormCnt[d.jj] || [];
     selfFormCnt[d.jj].push(label);
   }
-  const selfFormAffected: string[] = [];
+  const selfFormMap: Record<string, string> = {
+    해: "해해형", 오: "오오형", 유: "유유형", 진: "진진형",
+  };
   for (const b of ["진","오","유","해"]) {
-    if ((selfFormCnt[b] || []).length >= 2) selfFormAffected.push(...(selfFormCnt[b] || []));
+    const affected = selfFormCnt[b] || [];
+    if (affected.length >= 2) addSinsal(selfFormMap[b], [...new Set(affected)]);
   }
-  if (selfFormAffected.length > 0) addSinsal('자형살', [...new Set(selfFormAffected)]);
 
   // === 지지파(地支破) 신살 등록 ===
   const JIJI_PA_SINSAL_PAIRS = [
