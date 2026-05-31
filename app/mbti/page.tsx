@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
+import ProfilePicker from "@/components/ProfilePicker";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 const CY_MB = new Date().getFullYear();
 const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
@@ -264,6 +266,15 @@ export default function MbtiPage() {
         </div>
 
         {!sajuResult ? (
+          <>
+          <ProfilePicker onSelect={p => {
+            setName(p.name);
+            setGender(p.gender);
+            setBirthYear(String(p.birthYear));
+            setBirthMonth(String(p.birthMonth));
+            setBirthDay(String(p.birthDay));
+            if (!p.birthHourUnknown && p.birthHour >= 0) setBirthHour(String(p.birthHour));
+          }} />
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6 space-y-4">
             <p className="text-sm font-bold text-gray-300">생년월일 입력</p>
 
@@ -324,6 +335,7 @@ export default function MbtiPage() {
               사주 분석 시작 →
             </button>
           </div>
+          </>
         ) : (
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 mb-6 flex items-center justify-between">
             <div>
@@ -389,6 +401,13 @@ export default function MbtiPage() {
 
         {result && (
           <div className="space-y-4">
+            <SaveProfilePrompt
+              name={name}
+              birthYear={parseInt(birthYear)} birthMonth={parseInt(birthMonth)} birthDay={parseInt(birthDay)}
+              birthHour={birthHour === "" ? null : parseInt(birthHour)}
+              birthHourUnknown={birthHour === ""}
+              gender={gender}
+            />
             {/* 오행 × MBTI 궁합 */}
             <div className="rounded-3xl border p-6" style={{ borderColor:`${result.elMatchColor}44`, background:`${result.elMatchColor}11` }}>
               <div className="flex items-center justify-between mb-3">

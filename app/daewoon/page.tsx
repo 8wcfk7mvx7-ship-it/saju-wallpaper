@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
+import ProfilePicker from "@/components/ProfilePicker";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 const CY = new Date().getFullYear();
 const YEARS_DW  = Array.from({ length: CY - 1919 }, (_, i) => CY - i);
@@ -288,6 +290,16 @@ export default function DaewoonPage() {
             </ul>
           </div>
 
+          <ProfilePicker onSelect={p => {
+            setName(p.name);
+            setGender(p.gender);
+            setBirthYear(p.birthYear);
+            setBirthMonth(p.birthMonth);
+            setBirthDay(p.birthDay);
+            if (!p.birthHourUnknown && p.birthHour >= 0) setBirthHour(p.birthHour);
+            else setBirthHour(null);
+          }} />
+
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 space-y-4">
             <div>
               <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
@@ -394,6 +406,11 @@ export default function DaewoonPage() {
             {daewoon.direction} ({daewoon.direction === "순행" ? "양남/음녀" : "음남/양녀"})
           </p>
         </div>
+
+        <SaveProfilePrompt
+          name={name} birthYear={birthYear} birthMonth={birthMonth} birthDay={birthDay}
+          birthHour={birthHour} birthHourUnknown={birthHour == null} gender={gender}
+        />
 
         <div className="bg-violet-500/10 border border-violet-500/25 rounded-2xl p-4 mb-6">
           <p className="text-xs text-violet-400 font-semibold mb-1">⏰ 교운기 (첫 대운 진입)</p>

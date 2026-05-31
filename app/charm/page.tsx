@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
+import ProfilePicker from "@/components/ProfilePicker";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 export const dynamic = "force-dynamic";
 
@@ -344,6 +346,21 @@ export default function CharmPage() {
           <h1 className="text-3xl font-black mb-2 bg-gradient-to-r from-pink-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">사주 매력 분석</h1>
           <p className="text-gray-400 text-sm">일간 매력 · 신살 · 오행 외모 · 찐친이 보는 실체</p>
         </div>
+        <ProfilePicker onSelect={p => setForm(f => ({
+          ...f,
+          name: p.name,
+          gender: p.gender,
+          birthYear: String(p.birthYear),
+          birthMonth: String(p.birthMonth),
+          birthDay: String(p.birthDay),
+          birthTime: {
+            hour: p.birthHourUnknown ? null : p.birthHour,
+            minute: null,
+            unknown: p.birthHourUnknown,
+            useJajasi: false,
+          },
+        }))} />
+
         <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 space-y-6 shadow-2xl shadow-black/40">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">이름</label>

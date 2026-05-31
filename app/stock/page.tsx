@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import ProfilePicker from "@/components/ProfilePicker";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 // ─── 드롭다운 피커 ───────────────────────────────────────────────────────────
 function DropdownPicker({
@@ -422,6 +424,23 @@ export default function StockPage() {
             <h1 className="text-3xl font-black mb-2 bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">사주 주식 투자 분석</h1>
             <p className="text-gray-400 text-sm">오행으로 보는 투자 성향 · ETF · 레버리지 · 코인 친화도</p>
           </div>
+          <ProfilePicker onSelect={p => {
+            setForm(f => ({
+              ...f,
+              name: p.name,
+              gender: p.gender,
+              birthYear: String(p.birthYear),
+              birthMonth: String(p.birthMonth),
+              birthDay: String(p.birthDay),
+            }));
+            setBirthTime({
+              hour: p.birthHourUnknown ? null : p.birthHour,
+              minute: null,
+              unknown: p.birthHourUnknown,
+              useJajasi: false,
+            });
+          }} />
+
           <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 space-y-6 shadow-2xl shadow-black/40">
             {/* 이름 */}
             <div>
@@ -525,6 +544,14 @@ export default function StockPage() {
           <h2 className="text-2xl font-black mb-1">{form.name}님의 투자 DNA</h2>
           <p className="text-gray-500 text-sm">{result.fourPillars}</p>
         </div>
+
+        <SaveProfilePrompt
+          name={form.name}
+          birthYear={parseInt(form.birthYear)} birthMonth={parseInt(form.birthMonth)} birthDay={parseInt(form.birthDay)}
+          birthHour={birthTime.unknown ? null : birthTime.hour}
+          birthHourUnknown={birthTime.unknown}
+          gender={form.gender}
+        />
 
         {/* ① 오행 분포 — 공개 */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
