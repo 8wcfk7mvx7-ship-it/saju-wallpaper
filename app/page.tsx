@@ -794,13 +794,11 @@ export default function MainPage() {
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors">환불규정</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-            <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors">카카오 채널</a>
-            <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-            <a href="mailto:smple@outlook.kr" className="hover:text-amber-400/70 transition-colors">고객문의</a>
+            <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors">고객센터(카카오 채널)</a>
           </div>
 
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
-            <p>상호: 여름궁전(Summer Palace) · 대표: 정윤조 · 이메일: smple@outlook.kr</p>
+            <p>상호: 여름궁전(Summer Palace) · 대표: 정다정 · 이메일: smple@outlook.kr</p>
             <p>통신판매업 신고번호: 제2025-서울-00000호 · 사업자등록번호: 000-00-00000</p>
             <p>
               주소: 서울특별시 · 카카오채널:&nbsp;
