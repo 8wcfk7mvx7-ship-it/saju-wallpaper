@@ -333,17 +333,14 @@ function CharmResultContent() {
 
                   <div className="space-y-2 mb-5">
                     {[
-                      { icon: "⚡", title: "매력 등급 올리는 오행 개운 전략", desc: "색상·방향·시간대 — 오늘부터 바로 적용" },
-                      { icon: "💘", title: "이성이 나한테 먼저 다가오게 만드는 법", desc: "극관계 공략 포인트 + 접근 스크립트" },
-                      { icon: "🚨", title: "지금 내 매력을 갉아먹는 약점 1가지", desc: "이걸 모르면 계속 기회를 놓칩니다" },
-                      { icon: "🧬", title: "AI 맞춤 매력 극대화 전략 3가지", desc: "내 일간·오행 분석 기반 액션 플랜" },
+                      { title: "매력 등급 올리는 오행 개운 전략", desc: "색상·방향·시간대 — 오늘부터 바로 적용" },
+                      { title: "이성이 나한테 먼저 다가오게 만드는 법", desc: "극관계 공략 포인트 + 접근 스크립트" },
+                      { title: "지금 내 매력을 갉아먹는 약점 1가지", desc: "이걸 모르면 계속 기회를 놓칩니다" },
+                      { title: "AI 맞춤 매력 극대화 전략 3가지", desc: "내 일간·오행 분석 기반 액션 플랜" },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-2.5 rounded-xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                        <span className="text-sm flex-shrink-0 mt-0.5">{item.icon}</span>
-                        <div>
-                          <p className="text-sm font-bold text-white leading-tight">{item.title}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{item.desc}</p>
-                        </div>
+                      <div key={i} className="rounded-xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <p className="text-sm font-bold text-white leading-tight">{item.title}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{item.desc}</p>
                       </div>
                     ))}
                   </div>
