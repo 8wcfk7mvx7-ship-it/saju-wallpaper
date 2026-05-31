@@ -1074,15 +1074,16 @@ export default function MainPage() {
             ))}
           </div>
         </section>
+
+        {/* ── 문의하기 ── */}
+        <ContactSection />
+
       </div>
 
       {/* ── 일진달력 섹션 ── */}
       <section className="py-10 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <IljinCalendar />
       </section>
-
-      {/* ── 문의하기 섹션 ── */}
-      <ContactSection />
 
       {/* ── 푸터 ── */}
       <footer className="border-t pt-8 pb-28 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>
