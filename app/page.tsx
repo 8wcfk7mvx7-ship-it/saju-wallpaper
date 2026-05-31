@@ -24,7 +24,7 @@ const UI: Record<Lang, {
   ko: {
     h1: ["당신의 사주,", "지금 이 순간도", "말하고 있습니다"],
     heroSub: "남들은 이미 확인했습니다. 당신만 아직 모르고 있었어요.",
-    heroCta: "내 오행 배경화면 만들기",
+    heroCta: "내 사주의 모든 것 파악하기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
@@ -35,7 +35,7 @@ const UI: Record<Lang, {
   en: {
     h1: ["Your Saju", "is speaking to you,", "right now"],
     heroSub: "Others have already checked. You're the only one who doesn't know yet.",
-    heroCta: "Create My Elemental Wallpaper",
+    heroCta: "Discover Your Full Destiny",
     servicesHeading: "Check Right Now",
     reviewsHeading: "Real User Reviews",
     bannerCta: "Create Wallpaper →",
@@ -46,7 +46,7 @@ const UI: Record<Lang, {
   id: {
     h1: ["Saju Anda", "sedang berbicara,", "saat ini juga"],
     heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum tahu.",
-    heroCta: "Buat Wallpaper Elemen Saya",
+    heroCta: "Ungkap Seluruh Nasib Saya",
     servicesHeading: "Cek Sekarang",
     reviewsHeading: "Ulasan Pengguna",
     bannerCta: "Buat Wallpaper →",
@@ -372,10 +372,10 @@ const SERVICES: {
     viral: "지금 만나는 사람, 내 에너지를 갉아먹는 사주일 수 있어요",
     desc: "원진살·귀문관살·합충 관계로 보는 깊은 궁합. 바람기 DNA부터 이별 위험도까지 전부 분석합니다.",
     tags: ["원진살", "합충", "바람기 분석"],
-    href: "/gunghap", badge: "무료 분석",
-    color: "#f9a8d4", badgeBg: "rgba(236,72,153,0.85)",
+    href: "/gunghap", badge: "유료",
+    color: "#f9a8d4", badgeBg: "rgba(139,92,246,0.85)",
     border: "rgba(236,72,153,0.3)", glow: "rgba(236,72,153,0.12)",
-    categories: ["전체", "무료", "연애·궁합"],
+    categories: ["전체", "연애·궁합"],
   },
   {
     id: "spy", emoji: "🕵️",

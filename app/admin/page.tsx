@@ -219,7 +219,8 @@ export default function AdminPage() {
     } else if (target === "charm") {
       router.push("/charm");
     } else if (target === "result") {
-      router.push("/result");
+      // /loading이 sajuResult를 계산해서 /result로 이동시켜줌
+      router.push("/loading");
     } else if (target === "report") {
       router.push("/report");
     }
@@ -515,7 +516,7 @@ create table if not exists kakao_users (
             {/* 바로가기 버튼들 */}
             <div className="grid grid-cols-1 gap-3">
               {[
-                { label: "🖼 배경화면 결과 (/result)", target: "result" as const, color: "bg-indigo-600 hover:bg-indigo-500", desc: "오행 배경화면 결과 페이지 (blur 해제)" },
+                { label: "🖼 배경화면 결과 (/loading→/result)", target: "result" as const, color: "bg-indigo-600 hover:bg-indigo-500", desc: "사주 계산 → 배경화면 결과 페이지 (약 5초 로딩)" },
                 { label: "📄 전체 보고서 (/report)", target: "report" as const, color: "bg-violet-600 hover:bg-violet-500", desc: "유료 전체 보고서 페이지" },
                 { label: "⚙️ AI 생성 중 (/generating)", target: "generating" as const, color: "bg-amber-600 hover:bg-amber-500", desc: "보고서 AI 생성 로딩 → /report 이동" },
                 { label: "📈 주식 결과 (/stock)", target: "stock" as const, color: "bg-emerald-600 hover:bg-emerald-500", desc: "주식 투자 분석 결과 (blur 해제)" },
