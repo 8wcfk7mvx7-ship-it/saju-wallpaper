@@ -81,6 +81,11 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [userIlgan, setUserIlgan] = useState<string | null>(null);
   const [userName, setUserName] = useState("나");
+  const [showIlganInput, setShowIlganInput] = useState(false);
+  const [inputYear, setInputYear] = useState("1990");
+  const [inputMonth, setInputMonth] = useState("1");
+  const [inputDay, setInputDay] = useState("1");
+  const [inputGender, setInputGender] = useState<"male" | "female">("female");
 
   useEffect(() => {
     const t = setTimeout(() => setShowBtn(true), 2500);
@@ -88,14 +93,15 @@ export default function CalendarPage() {
   }, []);
 
   useEffect(() => {
+    // sessionStorage에 "진짜" 저장된 사주 데이터가 있고, 이름이 "테스트"가 아닌 경우만 로드
     const saved = loadSajuData();
-    if (saved) {
-      setUserName(saved.name || "나");
+    if (saved && saved.name && saved.name !== "테스트" && saved.birthYear) {
+      setUserName(saved.name);
       try {
         const r = analyzeSaju({
           birthYear: saved.birthYear, birthMonth: saved.birthMonth, birthDay: saved.birthDay,
           birthHour: saved.birthHour ?? null, birthMinute: saved.birthMinute ?? null,
-          name: saved.name || "", gender: saved.gender || "female",
+          name: saved.name, gender: saved.gender || "female",
           birthPlace: saved.birthPlace || "서울",
           style: "auto", productType: "report", useJajasi: false,
         });
@@ -103,6 +109,19 @@ export default function CalendarPage() {
       } catch {}
     }
   }, []);
+
+  function applyIlgan() {
+    try {
+      const r = analyzeSaju({
+        birthYear: parseInt(inputYear), birthMonth: parseInt(inputMonth), birthDay: parseInt(inputDay),
+        birthHour: null, birthMinute: null, name: "나", gender: inputGender,
+        birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+      });
+      setUserIlgan(r.pillarsDetail.day.cg);
+      setUserName("나");
+      setShowIlganInput(false);
+    } catch {}
+  }
 
   const yearPillar = useMemo(() => getYearPillar(year), [year]);
 
@@ -296,15 +315,70 @@ export default function CalendarPage() {
             className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition">›</button>
         </div>
 
-        {/* 사용자 맞춤 안내 */}
-        {userIlgan && (
-          <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl px-3 py-2 mb-4 flex items-center gap-2">
-            <span className="text-lg">✨</span>
-            <p className="text-xs text-violet-300 leading-relaxed">
-              <strong>{userName}님</strong> 일간 <strong>{userIlgan}</strong> 기준 — 각 일주와의 12운성이 표시됩니다.
-              <span className="text-violet-400/60 ml-1">진초록=왕성 / 진빨강=흉일</span>
-            </p>
+        {/* 내 일간 설정 */}
+        {userIlgan ? (
+          <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl px-3 py-2 mb-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">✨</span>
+              <p className="text-xs text-violet-300 leading-relaxed">
+                일간 <strong className="text-white">{userIlgan}</strong> 기준 — 각 날짜의 12운성이 표시됩니다.
+                <span className="text-violet-400/60 ml-1">진초록=왕성 / 진빨강=흉일</span>
+              </p>
+            </div>
+            <button
+              onClick={() => { setUserIlgan(null); setShowIlganInput(false); }}
+              className="text-[10px] text-gray-600 hover:text-gray-400 transition shrink-0"
+            >✕ 초기화</button>
           </div>
+        ) : showIlganInput ? (
+          <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-4 space-y-3">
+            <p className="text-xs font-semibold text-gray-300">내 생년월일 입력 — 일간 자동 계산</p>
+            <div className="grid grid-cols-3 gap-2">
+              <input
+                type="number" value={inputYear} onChange={e => setInputYear(e.target.value)}
+                placeholder="출생연도" min={1940} max={2010}
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
+              />
+              <input
+                type="number" value={inputMonth} onChange={e => setInputMonth(e.target.value)}
+                placeholder="월" min={1} max={12}
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
+              />
+              <input
+                type="number" value={inputDay} onChange={e => setInputDay(e.target.value)}
+                placeholder="일" min={1} max={31}
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setInputGender("female")}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${inputGender === "female" ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400"}`}
+              >여성</button>
+              <button
+                onClick={() => setInputGender("male")}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${inputGender === "male" ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400"}`}
+              >남성</button>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={applyIlgan}
+                className="flex-1 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-sm font-bold text-white transition"
+              >적용하기</button>
+              <button
+                onClick={() => setShowIlganInput(false)}
+                className="px-4 py-2.5 rounded-xl bg-white/5 text-sm text-gray-500 transition"
+              >취소</button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowIlganInput(true)}
+            className="w-full mb-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
+            style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", color: "rgba(167,139,250,0.8)" }}
+          >
+            ✨ 내 생년월일 입력 — 맞춤 12운성 보기
+          </button>
         )}
 
         {/* 요일 헤더 */}
