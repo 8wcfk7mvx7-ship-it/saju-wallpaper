@@ -11,6 +11,7 @@ import {
   type CharmGradeResult,
 } from "@/lib/charmEngine";
 import { generateOrderId } from "@/lib/toss";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,11 @@ function CharmResultContent() {
   const [grade, setGrade] = useState<CharmGradeResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
   const [showPayCTA, setShowPayCTA] = useState(false);
+  const [birthYear, setBirthYear] = useState(0);
+  const [birthMonth, setBirthMonth] = useState(0);
+  const [birthDay, setBirthDay] = useState(0);
+  const [birthHour, setBirthHour] = useState<number | null>(null);
+  const [birthHourUnknown, setBirthHourUnknown] = useState(false);
 
   useEffect(() => {
     try {
@@ -57,6 +63,11 @@ function CharmResultContent() {
       setName(form.name || "");
       setGender(form.gender || "female");
       setGrade(calcCharmGrade(r));
+      setBirthYear(parseInt(form.birthYear) || 0);
+      setBirthMonth(parseInt(form.birthMonth) || 0);
+      setBirthDay(parseInt(form.birthDay) || 0);
+      setBirthHour(form.birthHour ?? null);
+      setBirthHourUnknown(form.birthTime?.unknown || form.birthHour == null);
       const paid = sessionStorage.getItem("charmPaid") === "true";
       setIsPaid(paid);
     } catch { router.replace("/charm"); }
@@ -84,7 +95,6 @@ function CharmResultContent() {
   const uuCharm = UUNSEONG_CHARM[uunseong];
 
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
-  const mySalsMissing = SAL_CHARM_DB.filter(s => !result.sinsalList.some(sl => sl.name === s.key)).slice(0, 5);
 
   const handlePayment = () => {
     const orderId = generateOrderId();
@@ -114,6 +124,17 @@ function CharmResultContent() {
           </h1>
           <p className="text-gray-500 text-sm">{result.fourPillars}</p>
         </div>
+        {birthYear > 0 && (
+          <SaveProfilePrompt
+            name={name}
+            birthYear={birthYear}
+            birthMonth={birthMonth}
+            birthDay={birthDay}
+            birthHour={birthHour}
+            birthHourUnknown={birthHourUnknown}
+            gender={gender}
+          />
+        )}
 
         {/* ═══ 매력 등급 카드 — 포차 메뉴판 스타일 ═══ */}
         <div className="rounded-3xl border mb-5 overflow-hidden" style={{ borderColor: `${grade.color}44`, background: grade.bg }}>
@@ -221,18 +242,6 @@ function CharmResultContent() {
             <p className="text-sm text-gray-500 mb-4">주요 매력 신살은 없지만, 일간에서 오는 고유한 매력이 있습니다.</p>
           )}
 
-          {mySalsMissing.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-600 mb-2">이 신살은 없음</p>
-              {mySalsMissing.map((s) => (
-                <div key={s.key} className="flex items-center gap-3 p-2.5 rounded-xl border bg-white/[0.02] border-white/5">
-                  <span className="text-base shrink-0 opacity-30">{s.icon}</span>
-                  <span className="text-xs text-gray-600">{s.cat}</span>
-                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-700">없음</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* ═══ 지지 매력 타입 ═══ */}

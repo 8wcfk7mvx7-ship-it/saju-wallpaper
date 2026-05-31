@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import ProfilePicker from "@/components/ProfilePicker";
+import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 
 const CY_GH = new Date().getFullYear();
 const YEARS_GH = Array.from({ length: CY_GH - 1919 }, (_, i) => CY_GH - i);
@@ -747,6 +749,20 @@ export default function GunghapPage(){
                     3년이 지나도 결국 <strong>서로를 갉아먹습니다</strong>
                   </p>
                 </div>
+                <ProfilePicker onSelect={p => setP1({
+                  name: p.name || '',
+                  gender: p.gender,
+                  year: String(p.birthYear),
+                  month: String(p.birthMonth),
+                  day: String(p.birthDay),
+                  birthTime: {
+                    hour: p.birthHourUnknown ? null : (p.birthHour === -1 ? null : p.birthHour),
+                    minute: null,
+                    unknown: p.birthHourUnknown || p.birthHour === -1,
+                    useJajasi: false,
+                  },
+                  birthPlace: '서울',
+                })} />
                 <Form p={p1} setP={setP1} idx={1} cal={p1Cal} setCal={setP1Cal}/>
                 <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
                   {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
@@ -791,6 +807,15 @@ export default function GunghapPage(){
               <div style={{fontSize:17,fontWeight:900,color:result.gradeColor,marginBottom:5}}>{result.grade}</div>
               <div style={{fontSize:14,fontWeight:800,marginBottom:5}}>{result.gradeTitle}</div>
               <div style={{fontSize:13,color:'rgba(255,255,255,0.45)',lineHeight:1.6}}>{result.gradeDesc}</div>
+              <SaveProfilePrompt
+                name={p1.name}
+                birthYear={parseInt(p1.year) || 0}
+                birthMonth={parseInt(p1.month) || 0}
+                birthDay={parseInt(p1.day) || 0}
+                birthHour={p1.birthTime.unknown ? null : p1.birthTime.hour}
+                birthHourUnknown={p1.birthTime.unknown || p1.birthTime.hour === null}
+                gender={p1.gender}
+              />
             </div>
 
             {/* 사주 */}
