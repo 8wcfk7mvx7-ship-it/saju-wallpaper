@@ -6,6 +6,7 @@ import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 const CY_MB = new Date().getFullYear();
 const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
@@ -147,6 +148,15 @@ export default function MbtiPage() {
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1600);
   const [mbti, setMbti] = useState<MBTI | "">("");
   const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const pendingResultRef = useRef<null | {
+    ilgan: string; dominant: Element;
+    mbtiEl: { primary: Element; secondary: Element; desc: string };
+    synergy: string; careers: string[];
+    compat: { best: MBTI[]; good: MBTI[]; caution: MBTI[] };
+    elMatch: "완벽" | "좋음" | "보통" | "주의";
+    elMatchColor: string; elMatchDesc: string;
+  }>(null);
   const [result, setResult] = useState<null | {
     ilgan: string;
     dominant: Element;
@@ -246,8 +256,16 @@ export default function MbtiPage() {
       elMatchDesc = `${dominant} 오행과 ${mbti}는 균형 잡힌 조합입니다. 특별한 시너지보다 안정적인 에너지 흐름이 특징입니다.`;
     }
 
-    setResult({ ilgan, dominant, mbtiEl, synergy, careers, compat, elMatch, elMatchColor, elMatchDesc });
+    pendingResultRef.current = { ilgan, dominant, mbtiEl, synergy, careers, compat, elMatch, elMatchColor, elMatchDesc };
+    setIsAnalyzing(true);
   }
+
+  if (isAnalyzing) return (
+    <AnalysisLoading
+      subject={`${name || ""}님의 사주 MBTI`}
+      onDone={() => { setResult(pendingResultRef.current); setIsAnalyzing(false); }}
+    />
+  );
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">

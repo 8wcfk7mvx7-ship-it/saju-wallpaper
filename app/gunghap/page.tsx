@@ -6,6 +6,7 @@ import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 const CY_GH = new Date().getFullYear();
 const YEARS_GH = Array.from({ length: CY_GH - 1919 }, (_, i) => CY_GH - i);
@@ -390,7 +391,7 @@ export default function GunghapPage(){
   const [counter]=useState(()=>Math.floor(Math.random()*200)+120);
   const [totalCount]=useState(()=>Math.floor(Math.random()*12000)+32000);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
-  const [step,setStep]=useState<'entry'|'form'|'result'>('entry');
+  const [step,setStep]=useState<'entry'|'form'|'loading'|'result'>('entry');
   const [relationType,setRelationType]=useState('');
   const selectedRelation=RELATION_TYPES.find(r=>r.id===relationType)||null;
   const [p1Cal,setP1Cal]=useState<{type:'solar'|'lunar';leap:boolean}>({type:'solar',leap:false});
@@ -485,7 +486,7 @@ export default function GunghapPage(){
     else{grade='위험';gradeColor='#ee5a24';gradeEmoji='💀';gradeTitle='에너지를 갉아먹는 궁합';gradeDesc='상극 에너지가 강합니다. 의식적 노력 없이는 소모적인 관계가 됩니다.';}
 
     setResult({johu,samhap,pillars,baram,yongsinDesc,ohaengDesc,totalScore,grade,gradeColor,gradeEmoji,gradeTitle,gradeDesc,r1,r2});
-    setStep('result');
+    setStep('loading');
   };
 
   const inp=(s?:CSSProperties):CSSProperties=>({
@@ -565,6 +566,10 @@ export default function GunghapPage(){
       </div>
       <input style={inp()} placeholder="출생 도시 (서울 / 부산 등)" value={p.birthPlace} onChange={e=>setP({...p,birthPlace:e.target.value})}/>
     </div>
+  );
+
+  if(step==='loading') return (
+    <AnalysisLoading subject={`${p1.name}·${p2.name} 궁합`} onDone={()=>setStep('result')} />
   );
 
   return (

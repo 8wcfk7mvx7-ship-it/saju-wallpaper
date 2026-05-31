@@ -6,6 +6,7 @@ import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 // ─── 드롭다운 피커 ───────────────────────────────────────────────────────────
 function DropdownPicker({
@@ -274,7 +275,7 @@ interface FormState {
 // ─── 메인 컴포넌트 ───────────────────────────────────────────────────────────
 export default function StockPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"entry" | "form" | "result">("entry");
+  const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 250) + 130);
   const [totalCount] = useState(() => Math.floor(Math.random() * 12000) + 24000);
@@ -348,8 +349,13 @@ export default function StockPage() {
     const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, name: form.name, gender: form.gender, birthPlace: form.birthPlace, style: "auto", productType: "report", useJajasi: birthTime.useJajasi });
     setResult(r);
     setBlurRemoved(false);
-    setStep("result");
+    setStep("loading");
   };
+
+  // ── 로딩 ──────────────────────────────────────────────────────────────────
+  if (step === "loading") return (
+    <AnalysisLoading subject={`${form.name}님의 투자 성향`} onDone={() => setStep("result")} />
+  );
 
   // ── 엔트리 ────────────────────────────────────────────────────────────────
   if (step === "entry") {

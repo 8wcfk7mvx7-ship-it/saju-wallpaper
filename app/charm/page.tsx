@@ -6,6 +6,7 @@ import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 export const dynamic = "force-dynamic";
 
@@ -207,7 +208,7 @@ function DropdownPicker({ value, options, onChange, placeholder, suffix }: {
 // ─── 매인 컴포넌트 ────────────────────────────────────────────────────────────
 export default function CharmPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"entry" | "form">("entry");
+  const [step, setStep] = useState<"entry" | "form" | "loading">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 600) + 3500);
@@ -276,8 +277,13 @@ export default function CharmPage() {
     const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: min, name: form.name, gender: form.gender, birthPlace: form.birthPlace, style: "auto", productType: "report", useJajasi: form.birthTime.useJajasi });
     const charmData = { form: { ...form, birthHour: h, birthMinute: min }, result: r };
     try { sessionStorage.setItem("charmData", JSON.stringify(charmData)); } catch {}
-    router.push("/charm/result");
+    setStep("loading");
   };
+
+  // ── 로딩 ─────────────────────────────────────────────────────────────────
+  if (step === "loading") return (
+    <AnalysisLoading subject={`${form.name}님의 매력`} onDone={() => router.push("/charm/result")} />
+  );
 
   // ── 엔트리 ───────────────────────────────────────────────────────────────
   if (step === "entry") return (

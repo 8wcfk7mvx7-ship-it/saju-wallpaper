@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 export const dynamic = "force-dynamic";
 
@@ -124,7 +125,7 @@ export default function PlacePage() {
   const [lacking, setLacking] = useState<string[]>([]);
   const [yongshinEl, setYongshinEl] = useState<string>("토");
   const [hasSaju, setHasSaju] = useState(false);
-  const [step, setStep] = useState<"splash" | "entry" | "free-preview">("splash");
+  const [step, setStep] = useState<"splash" | "entry" | "loading" | "free-preview">("splash");
   const [selectedEl, setSelectedEl] = useState<string>("");
   const [counter] = useState(() => Math.floor(Math.random() * 120) + 87);
   const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 18000);
@@ -155,6 +156,10 @@ export default function PlacePage() {
   const krData = KR_CITY_BY_ELEMENT[displayEl];
   const worldData = WORLD_BY_ELEMENT[displayEl];
   const dirData = DIRECTION_BY_ELEMENT[displayEl];
+
+  if (step === "loading") return (
+    <AnalysisLoading subject={`${name ? name + "님의 " : ""}운명의 도시`} onDone={() => setStep("free-preview")} />
+  );
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
@@ -246,7 +251,7 @@ export default function PlacePage() {
 
               {/* CTA */}
               <button
-                onClick={() => setStep(hasSaju ? "free-preview" : "entry")}
+                onClick={() => setStep(hasSaju ? "loading" : "entry")}
                 className="w-full py-5 rounded-2xl text-white font-black text-lg mb-3 transition-all active:scale-[0.98]"
                 style={{ background: "linear-gradient(135deg, #d97706, #ca8a04, #16a34a)", boxShadow: "0 8px 40px rgba(202,138,4,0.4)" }}
               >
@@ -274,7 +279,7 @@ export default function PlacePage() {
                 {(["목","화","토","금","수"] as const).map(el => {
                   const e = ELEMENT_LABELS[el];
                   return (
-                    <button key={el} onClick={() => { setSelectedEl(el); setStep("free-preview"); }}
+                    <button key={el} onClick={() => { setSelectedEl(el); setStep("loading"); }}
                       className={`py-3 rounded-xl text-center transition-all border ${selectedEl === el ? "border-white/40 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/8"}`}>
                       <p className="text-xl">{e.emoji}</p>
                       <p className="text-xs mt-1 font-bold" style={{ color: e.color }}>{el}</p>

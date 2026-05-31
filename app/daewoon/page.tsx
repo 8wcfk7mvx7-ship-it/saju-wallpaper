@@ -6,6 +6,7 @@ import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import AnalysisLoading from "@/components/AnalysisLoading";
 
 const CY = new Date().getFullYear();
 const YEARS_DW  = Array.from({ length: CY - 1919 }, (_, i) => CY - i);
@@ -117,7 +118,7 @@ export default function DaewoonPage() {
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
   const [monthJj, setMonthJj] = useState("");
-  const [step, setStep] = useState<"splash" | "entry" | "preview">("splash");
+  const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
   const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 28000);
@@ -169,7 +170,7 @@ export default function DaewoonPage() {
       setMonthJj(mp.jj);
       setDaewoon(dw);
       setSewoon(sw);
-      setStep("preview");
+      setStep("loading");
     } catch {
       alert("사주 정보를 다시 확인해주세요.");
     }
@@ -180,6 +181,11 @@ export default function DaewoonPage() {
     sessionStorage.setItem("daewoonData", JSON.stringify({ name, gender, birthYear, birthMonth, birthDay, birthHour }));
     router.push(`/daewoon/pay?orderId=${orderId}&amount=${PRICE}`);
   }
+
+  // ── 로딩 ──
+  if (step === "loading") return (
+    <AnalysisLoading subject={`${name || ""}님의 대운·세운`} onDone={() => setStep("preview")} />
+  );
 
   // ── 스플래시 ──
   if (step === "splash") {
