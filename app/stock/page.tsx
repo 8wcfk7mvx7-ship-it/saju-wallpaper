@@ -277,6 +277,8 @@ export default function StockPage() {
   const [counter] = useState(() => Math.floor(Math.random() * 250) + 130);
   const [totalCount] = useState(() => Math.floor(Math.random() * 12000) + 24000);
   const [hasSaved, setHasSaved] = useState(false);
+  const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
     birthYear: "", birthMonth: "", birthDay: "",
@@ -318,11 +320,25 @@ export default function StockPage() {
   const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
-  const handleAnalyze = () => {
-    const y = parseInt(form.birthYear), mo = parseInt(form.birthMonth), d = parseInt(form.birthDay);
+  const handleAnalyze = async () => {
+    let y = parseInt(form.birthYear), mo = parseInt(form.birthMonth), d = parseInt(form.birthDay);
     if (!form.name || isNaN(y) || isNaN(mo) || isNaN(d)) {
       alert("이름과 생년월일을 모두 입력해주세요.");
       return;
+    }
+    if (calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(y, mo, d, isLeapMonth);
+        const s = cal.getSolarCalendar();
+        if (!s?.year) throw new Error();
+        y = s.year; mo = s.month; d = s.day;
+      } catch {
+        alert("음력 날짜를 양력으로 변환할 수 없습니다. 날짜를 다시 확인해주세요.");
+        return;
+      }
     }
     const h = birthTime.unknown ? null : birthTime.hour;
     const min = birthTime.unknown ? null : (birthTime.minute ?? 0);
@@ -428,7 +444,17 @@ export default function StockPage() {
             </div>
             {/* 생년월일 */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">생년월일 (양력)</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium text-gray-300">생년월일</label>
+                <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  {(["solar","lunar"] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setCalendarType(t); setIsLeapMonth(false); setForm(f => ({ ...f, birthMonth: "", birthDay: "" })); }}
+                      className={`px-4 py-1.5 text-sm font-medium transition ${calendarType === t ? "bg-emerald-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
+                      {t === "solar" ? "양력" : "음력"}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="mb-3">
                 <DropdownPicker value={form.birthYear} options={yearOpts} onChange={v => setForm({ ...form, birthYear: v })} placeholder="연도 선택" suffix="년" />
               </div>
@@ -436,6 +462,12 @@ export default function StockPage() {
                 <DropdownPicker value={form.birthMonth} options={monthOpts} onChange={v => setForm({ ...form, birthMonth: v })} placeholder="월 선택" suffix="월" />
                 <DropdownPicker value={form.birthDay} options={dayOpts} onChange={v => setForm({ ...form, birthDay: v })} placeholder="일 선택" suffix="일" />
               </div>
+              {calendarType === "lunar" && (
+                <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-emerald-500" />
+                  <span className="text-xs text-gray-400">윤달에 태어난 경우 체크</span>
+                </label>
+              )}
             </div>
             {/* 태어난 시간 — 십이시진 */}
             <div>
