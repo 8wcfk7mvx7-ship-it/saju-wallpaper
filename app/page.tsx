@@ -369,14 +369,13 @@ export default function MainPage() {
   }, []);
 
   useEffect(() => {
-    const delay = 800 + Math.random() * 700;
     const interval = setInterval(() => {
       setNoticeVisible(false);
       setTimeout(() => {
         setNoticeIndex(i => (i + 1) % NOTICES.length);
         setNoticeVisible(true);
       }, 350);
-    }, delay);
+    }, 1500);
     return () => clearInterval(interval);
   }, []);
 
