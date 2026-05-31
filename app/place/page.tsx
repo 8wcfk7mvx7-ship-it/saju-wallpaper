@@ -329,28 +329,38 @@ export default function PlacePage() {
                   <span className="text-xs font-normal text-white/25">동네·먹거리까지</span>
                 </h2>
                 <div className="space-y-3">
-                  {krData.cities.map((city, i) => (
-                    <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">{city.emoji}</span>
-                        <span className="font-black text-white">{city.name}</span>
-                        {i === 0 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
-                        {i === 1 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">2순위</span>}
-                        {i === 2 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">3순위</span>}
-                      </div>
-                      <p className="text-xs text-white/45 leading-relaxed mb-3">{city.reason}</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-white/5 rounded-xl px-3 py-2">
-                          <p className="text-[10px] text-white/30 mb-0.5">📍 동네</p>
-                          <p className="text-xs text-white/60">{city.neighborhoods}</p>
+                  {krData.cities.map((city, i) => {
+                    const isBlurred = i >= 1;
+                    return (
+                      <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+                        {isBlurred && (
+                          <div className="absolute inset-0 bg-[#06060e]/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
+                            <p className="text-2xl mb-2">🔒</p>
+                            <p className="text-xs text-white/40 font-bold">{i + 1}순위 도시</p>
+                            <p className="text-[10px] text-white/25 mt-1">₩{PRICE.toLocaleString()}에 전체 공개</p>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{city.emoji}</span>
+                          <span className="font-black text-white">{city.name}</span>
+                          {i === 0 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
+                          {i === 1 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">2순위</span>}
+                          {i === 2 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">3순위</span>}
                         </div>
-                        <div className="bg-white/5 rounded-xl px-3 py-2">
-                          <p className="text-[10px] text-white/30 mb-0.5">🍽️ 먹거리</p>
-                          <p className="text-xs text-white/60">{city.food}</p>
+                        <p className="text-xs text-white/45 leading-relaxed mb-3">{city.reason}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-white/5 rounded-xl px-3 py-2">
+                            <p className="text-[10px] text-white/30 mb-0.5">📍 동네</p>
+                            <p className="text-xs text-white/60">{city.neighborhoods}</p>
+                          </div>
+                          <div className="bg-white/5 rounded-xl px-3 py-2">
+                            <p className="text-[10px] text-white/30 mb-0.5">🍽️ 먹거리</p>
+                            <p className="text-xs text-white/60">{city.food}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div className="bg-amber-500/8 border border-amber-500/18 rounded-xl px-4 py-3">
                     <p className="text-xs text-amber-300/70 leading-relaxed">⚠️ {krData.avoid}</p>
                   </div>
