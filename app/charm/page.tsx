@@ -213,9 +213,9 @@ export default function CharmPage() {
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: "", gender: "female",
-    birthYear: "", birthMonth: "", birthDay: "",
-    birthTime: { hour: null, minute: null, unknown: true, useJajasi: false },
-    birthPlace: "서울",
+    birthYear: "1995", birthMonth: "6", birthDay: "2",
+    birthTime: { hour: 11, minute: 4, unknown: false, useJajasi: false },
+    birthPlace: "부산",
   });
 
   useEffect(() => {

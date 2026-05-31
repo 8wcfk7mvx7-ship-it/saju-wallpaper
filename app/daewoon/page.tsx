@@ -105,10 +105,10 @@ export default function DaewoonPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"male" | "female">("female");
-  const [birthYear, setBirthYear] = useState(0);
-  const [birthMonth, setBirthMonth] = useState(0);
-  const [birthDay, setBirthDay] = useState(0);
-  const [birthHour, setBirthHour] = useState<number | null>(null);
+  const [birthYear, setBirthYear] = useState(1995);
+  const [birthMonth, setBirthMonth] = useState(6);
+  const [birthDay, setBirthDay] = useState(2);
+  const [birthHour, setBirthHour] = useState<number | null>(11);
   const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
@@ -134,7 +134,7 @@ export default function DaewoonPage() {
   }, []);
 
   async function analyze() {
-    if (!birthYear || !birthMonth || !birthDay) {
+    if (!birthYear || !birthMonth || !birthDay || birthYear < 1920 || birthMonth < 1 || birthDay < 1) {
       alert("생년월일을 모두 선택해주세요.");
       return;
     }

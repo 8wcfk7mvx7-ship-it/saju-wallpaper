@@ -171,10 +171,10 @@ export default function MbtiPage() {
   // 생년월일 입력 폼 상태
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"female" | "male">("female");
-  const [birthYear, setBirthYear] = useState("");
-  const [birthMonth, setBirthMonth] = useState("");
-  const [birthDay, setBirthDay] = useState("");
-  const [birthHour, setBirthHour] = useState("");
+  const [birthYear, setBirthYear] = useState("1995");
+  const [birthMonth, setBirthMonth] = useState("6");
+  const [birthDay, setBirthDay] = useState("2");
+  const [birthHour, setBirthHour] = useState("11");
   const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
 
