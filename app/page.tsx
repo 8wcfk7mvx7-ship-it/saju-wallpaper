@@ -321,6 +321,8 @@ export default function MainPage() {
   const [todayCounter] = useState(() => Math.floor(Math.random() * 400) + 800);
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
+  const [noticeIndex, setNoticeIndex] = useState(0);
+  const [noticeVisible, setNoticeVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
 
   // 언어
@@ -363,6 +365,18 @@ export default function MainPage() {
         setActivityVisible(true);
       }, 400);
     }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const delay = 800 + Math.random() * 700;
+    const interval = setInterval(() => {
+      setNoticeVisible(false);
+      setTimeout(() => {
+        setNoticeIndex(i => (i + 1) % NOTICES.length);
+        setNoticeVisible(true);
+      }, 350);
+    }, delay);
     return () => clearInterval(interval);
   }, []);
 
@@ -573,26 +587,36 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* ── 공지사항 ── */}
+        {/* ── 공지사항 (1줄 롤링) ── */}
         <section className="mb-10">
-          <div className="rounded-2xl border overflow-hidden"
-            style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(10,10,20,0.5)" }}>
-            <div className="px-5 py-3 border-b flex items-center gap-2"
-              style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
-              <span className="text-sm font-black text-white">📢 공지사항</span>
-            </div>
-            <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
-              {NOTICES.map((n, i) => (
-                <div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02] transition-colors cursor-pointer">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
-                    style={{ background: n.badge === "NEW" ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.06)", color: n.color }}>
-                    {n.badge}
-                  </span>
-                  <span className="text-sm flex-1 text-white/70">{n.title}</span>
-                  <span className="text-xs shrink-0" style={{ color: "rgba(255,255,255,0.25)" }}>{n.date}</span>
-                </div>
-              ))}
-            </div>
+          <div
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer hover:bg-white/[0.03] transition-colors"
+            style={{ background: "rgba(10,10,20,0.5)", border: "1px solid rgba(255,255,255,0.07)" }}
+            onClick={() => router.push("/notice")}
+          >
+            <span className="text-xs font-bold shrink-0" style={{ color: "#fbbf24" }}>📢</span>
+            <span
+              className="text-xs font-bold shrink-0 px-2 py-0.5 rounded-full"
+              style={{
+                background: NOTICES[noticeIndex].badge === "NEW" ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.06)",
+                color: NOTICES[noticeIndex].color,
+                transition: "opacity 0.35s ease",
+                opacity: noticeVisible ? 1 : 0,
+              }}
+            >
+              {NOTICES[noticeIndex].badge}
+            </span>
+            <span
+              className="text-xs flex-1 truncate"
+              style={{
+                color: "rgba(255,255,255,0.6)",
+                transition: "opacity 0.35s ease",
+                opacity: noticeVisible ? 1 : 0,
+              }}
+            >
+              {NOTICES[noticeIndex].title}
+            </span>
+            <span className="text-gray-600 text-xs shrink-0">›</span>
           </div>
         </section>
 
