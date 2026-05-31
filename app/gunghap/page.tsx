@@ -282,6 +282,23 @@ function FadeSlide({children,delay=0,style}:{children:ReactNode;delay?:number;st
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   관계 유형
+═══════════════════════════════════════════════════════════════ */
+const RELATION_TYPES: {
+  id: string; emoji: string; label: string;
+  formTitle: string; formSub: string; p2Label: string;
+}[] = [
+  { id:"애인",    emoji:"💝", label:"애인",    formTitle:"지금 사귀는 사람,",   formSub:"이 사람, 진짜 내 편인가요?",          p2Label:"애인" },
+  { id:"배우자",  emoji:"💍", label:"배우자",  formTitle:"배우자와 나,",          formSub:"우리 사이의 진짜 에너지는?",          p2Label:"배우자" },
+  { id:"전애인",  emoji:"💔", label:"전애인",  formTitle:"헤어진 그 사람,",       formSub:"왜 안 됐는지 사주가 말해줍니다",     p2Label:"전애인" },
+  { id:"전배우자",emoji:"🖤", label:"전배우자",formTitle:"전배우자와 나,",        formSub:"사주가 처음부터 알고 있었습니다",     p2Label:"전배우자" },
+  { id:"친구",    emoji:"🤝", label:"친구",    formTitle:"그 친구와 나,",         formSub:"진짜 맞는 친구인지 확인하세요",       p2Label:"친구" },
+  { id:"짝사랑",  emoji:"🫀", label:"짝사랑",  formTitle:"짝사랑하는 그 사람,",   formSub:"사주가 허락한 인연인가요?",           p2Label:"그 사람" },
+  { id:"반려동물",emoji:"🐾", label:"반려동물",formTitle:"반려동물과 나,",        formSub:"우리가 서로 잘 맞는지 알아봐요",      p2Label:"반려동물" },
+  { id:"가족",    emoji:"👨‍👩‍👧", label:"가족",    formTitle:"가족과 나,",            formSub:"가족과의 사주 에너지를 확인하세요",  p2Label:"가족" },
+];
+
 const FEATURES=[
   {icon:"🌡️",title:"조후(調候) 궁합",desc:"두 사람의 사주 온도가 맞지 않으면 함께할수록 소모됩니다"},
   {icon:"✴️",title:"삼합 에너지",desc:"인오술·해묘미… 이 조합이 두 사람을 하나로 묶거나 끊어냅니다"},
@@ -304,6 +321,8 @@ export default function GunghapPage(){
   const [totalCount]=useState(()=>Math.floor(Math.random()*12000)+32000);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
   const [step,setStep]=useState<'entry'|'form'|'result'>('entry');
+  const [relationType,setRelationType]=useState('');
+  const selectedRelation=RELATION_TYPES.find(r=>r.id===relationType)||null;
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
 
   const fillP1=useCallback(()=>{
@@ -388,12 +407,12 @@ export default function GunghapPage(){
 
   const gradeColors:{[k:string]:string}={합:'#10ac84',삼합:'#10ac84',암합:'#4ecdc4',충:'#ee5a24',원진:'#c0392b',해:'#e67e22',파:'#e67e22',형:'#e74c3c',암충:'#e74c3c'};
 
-  const Form=({p,setP,idx}:{p:PI;setP:(v:PI)=>void;idx:1|2})=>(
+  const Form=({p,setP,idx,personLabel}:{p:PI;setP:(v:PI)=>void;idx:1|2;personLabel?:string})=>(
     <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',
       border:'1px solid rgba(255,255,255,0.07)',marginBottom:idx===1?12:0}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
         <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>
-          {idx===1?'첫 번째 사람':'두 번째 사람'}
+          {idx===1?'나':(personLabel||'두 번째 사람')}
         </p>
         {idx===1&&(
           <button type="button" onClick={fillP1} style={{
@@ -580,12 +599,48 @@ export default function GunghapPage(){
               <>
                 <div style={{textAlign:'center',marginBottom:22}}>
                   <h1 style={{fontSize:24,fontWeight:900,lineHeight:1.35,marginBottom:10}}>
-                    지금 사귀는 사람,<br/><span style={{color:'#a78bfa'}}>진짜 내 편인가요?</span>
+                    {selectedRelation?selectedRelation.formTitle:'그 사람과 나,'}<br/>
+                    <span style={{color:'#a78bfa'}}>
+                      {selectedRelation?selectedRelation.formSub:'진짜 내 편인가요?'}
+                    </span>
                   </h1>
                   <p style={{color:'rgba(255,255,255,0.45)',fontSize:13,lineHeight:1.6}}>
                     조후·삼합·합충·원진살·바람기 — <strong style={{color:'rgba(255,255,255,0.7)'}}>사주가 처음부터 알고 있었습니다</strong>
                   </p>
                 </div>
+
+                {/* 관계 선택 드롭다운 */}
+                <div style={{marginBottom:18}}>
+                  <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,
+                    letterSpacing:'0.12em',marginBottom:8}}>어떤 관계인가요?</p>
+                  <div style={{position:'relative'}}>
+                    <select
+                      value={relationType}
+                      onChange={e=>setRelationType(e.target.value)}
+                      style={{
+                        width:'100%',padding:'13px 40px 13px 14px',
+                        border:'1.5px solid rgba(167,139,250,0.35)',
+                        borderRadius:12,fontSize:14,fontWeight:700,
+                        background:'rgba(167,139,250,0.08)',
+                        color:relationType?'#c4b5fd':'rgba(255,255,255,0.35)',
+                        outline:'none',cursor:'pointer',
+                        appearance:'none' as const,fontFamily:'inherit',
+                      }}
+                    >
+                      <option value="" style={{background:'#1a1a2e',color:'rgba(255,255,255,0.5)'}}>
+                        관계를 선택하세요
+                      </option>
+                      {RELATION_TYPES.map(rt=>(
+                        <option key={rt.id} value={rt.id} style={{background:'#1a1a2e',color:'#fff'}}>
+                          {rt.emoji} {rt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',
+                      color:'rgba(255,255,255,0.3)',fontSize:10,pointerEvents:'none'}}>▼</span>
+                  </div>
+                </div>
+
                 <div style={{background:'rgba(167,139,250,0.07)',border:'1px solid rgba(167,139,250,0.18)',
                   borderRadius:12,padding:'11px 16px',marginBottom:18,textAlign:'center'}}>
                   <p style={{color:'#c4b5fd',fontSize:13,margin:0,lineHeight:1.6}}>
@@ -594,8 +649,10 @@ export default function GunghapPage(){
                   </p>
                 </div>
                 <Form p={p1} setP={setP1} idx={1}/>
-                <div style={{textAlign:'center',padding:'8px 0',fontSize:18,color:'rgba(255,255,255,0.18)',fontWeight:900}}>VS</div>
-                <Form p={p2} setP={setP2} idx={2}/>
+                <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
+                  {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
+                </div>
+                <Form p={p2} setP={setP2} idx={2} personLabel={selectedRelation?.p2Label}/>
                 <button onClick={calc} style={{
                   width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',
                   background:'linear-gradient(135deg,#7c3aed,#6366f1)',color:'#fff',
@@ -612,6 +669,14 @@ export default function GunghapPage(){
             {/* 점수 */}
             <div style={{textAlign:'center',marginBottom:20}}>
               <div style={{fontSize:44,marginBottom:4}}>{result.gradeEmoji}</div>
+              {selectedRelation&&(
+                <div style={{marginBottom:6}}>
+                  <span style={{fontSize:11,fontWeight:700,padding:'3px 12px',borderRadius:100,
+                    background:'rgba(167,139,250,0.15)',border:'1px solid rgba(167,139,250,0.3)',color:'#c4b5fd'}}>
+                    {selectedRelation.emoji} {selectedRelation.label} 궁합
+                  </span>
+                </div>
+              )}
               <div style={{fontSize:12,color:'rgba(255,255,255,0.3)',marginBottom:4}}>
                 {p1.name}({p1.year}) {p1.gender==='male'?'👨':'👩'} &nbsp;+&nbsp; {p2.name}({p2.year}) {p2.gender==='male'?'👨':'👩'}
               </div>
