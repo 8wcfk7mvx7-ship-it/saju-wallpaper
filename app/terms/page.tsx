@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Tab = "terms" | "refund";
@@ -27,12 +27,10 @@ const Li = ({ children, icon = "dot" }: { children: React.ReactNode; icon?: "che
   );
 };
 
-export default function TermsPage() {
+function TermsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [tab, setTab] = useState<Tab>(() => {
-    return "terms";
-  });
+  const [tab, setTab] = useState<Tab>("terms");
 
   useEffect(() => {
     const t = searchParams.get("tab");
@@ -412,5 +410,13 @@ export default function TermsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function TermsPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-[#06060e]" />}>
+      <TermsContent />
+    </Suspense>
   );
 }
