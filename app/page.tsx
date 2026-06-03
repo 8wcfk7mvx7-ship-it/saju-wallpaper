@@ -144,11 +144,11 @@ function ContactSection() {
     <section className="border-t py-14" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8">
-          <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "rgba(201,168,76,0.5)" }}>
+          <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "rgba(201,168,76,0.7)" }}>
             Contact
           </p>
           <h2 className="text-2xl font-black text-white mb-2">문의하기</h2>
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
             궁금한 점, 오류 신고, 환불 문의 등 편하게 보내주세요.
           </p>
         </div>
@@ -157,14 +157,14 @@ function ContactSection() {
           <div className="text-center py-10">
             <p className="text-4xl mb-4">✅</p>
             <p className="text-white font-bold text-lg mb-2">문의가 접수되었습니다</p>
-            <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>
               {email}로 접수 확인 메일을 보내드렸습니다.<br />
               영업일 기준 1~2일 이내에 답변 드리겠습니다.
             </p>
             <button
               onClick={() => { setStatus("idle"); setName(""); setEmail(""); setMessage(""); }}
               className="text-xs px-4 py-2 rounded-xl border transition"
-              style={{ borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.4)" }}
+              style={{ borderColor: "rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.6)" }}
             >
               새 문의 작성
             </button>
@@ -173,8 +173,8 @@ function ContactSection() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  이름 <span className="text-amber-400/60">*</span>
+                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  이름 <span className="text-amber-400/80">*</span>
                 </label>
                 <input
                   type="text"
@@ -182,16 +182,16 @@ function ContactSection() {
                   onChange={e => setName(e.target.value)}
                   placeholder="홍길동"
                   required
-                  className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50"
+                  className="w-full rounded-2xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-amber-500/60"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.18)",
                   }}
                 />
               </div>
               <div>
-                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  이메일 <span className="text-amber-400/60">*</span>
+                <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  이메일 <span className="text-amber-400/80">*</span>
                 </label>
                 <input
                   type="email"
@@ -199,18 +199,18 @@ function ContactSection() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50"
+                  className="w-full rounded-2xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-amber-500/60"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.18)",
                   }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
-                문의 내용 <span className="text-amber-400/60">*</span>
+              <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                문의 내용 <span className="text-amber-400/80">*</span>
               </label>
               <textarea
                 value={message}
@@ -218,10 +218,10 @@ function ContactSection() {
                 placeholder="문의 내용을 자세히 적어주세요..."
                 required
                 rows={5}
-                className="w-full rounded-2xl px-4 py-3 text-sm text-white outline-none transition focus:border-amber-500/50 resize-y"
+                className="w-full rounded-2xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-amber-500/60 resize-y"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.18)",
                   minHeight: 120,
                 }}
               />
@@ -246,13 +246,13 @@ function ContactSection() {
               >
                 {status === "sending" ? "전송 중..." : "✉️ 문의 보내기"}
               </button>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
                 또는 카카오 채널로 빠르게 문의:&nbsp;
                 <a
                   href="http://pf.kakao.com/_cuksX"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-yellow-400/60 transition-colors underline"
+                  className="text-yellow-400/70 hover:text-yellow-400 transition-colors underline"
                 >
                   pf.kakao.com/_cuksX
                 </a>
