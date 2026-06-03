@@ -371,7 +371,8 @@ function SpyContent() {
   const genderLabel = gender === "male" ? "그 남자" : "그 여자";
 
   return (
-    <main className="min-h-screen bg-[#0a0101] text-white">
+    <main className="min-h-screen bg-[#0a0101] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}`}</style>
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]"
           style={{ backgroundColor: grade.color + "18" }} />
