@@ -30,7 +30,7 @@ const UI: Record<Lang, {
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
-    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "🔞 19금" },
+    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "19금" },
     start: "시작",
     charging: "충전",
   },
@@ -41,7 +41,7 @@ const UI: Record<Lang, {
     servicesHeading: "Check Right Now",
     reviewsHeading: "Real User Reviews",
     bannerCta: "Create Wallpaper →",
-    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Special", "19금": "🔞 Adult" },
+    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Special", "19금": "Adult" },
     start: "Go",
     charging: "Charge",
   },
@@ -52,7 +52,7 @@ const UI: Record<Lang, {
     servicesHeading: "Cek Sekarang",
     reviewsHeading: "Ulasan Pengguna",
     bannerCta: "Buat Wallpaper →",
-    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Nasib", "라이프": "Gaya Hidup", "Special": "Spesial", "19금": "🔞 Dewasa" },
+    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Nasib", "라이프": "Gaya Hidup", "Special": "Spesial", "19금": "Dewasa" },
     start: "Mulai",
     charging: "Isi",
   },
@@ -428,19 +428,25 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 
   return (
     <div ref={ref} className="relative">
-      {/* 50% OFF 스티커 — 카드 밖으로 삐져나옴 */}
+      {/* 50% OFF 찢어진 테이프 스티커 */}
       {svc.saleSticker && (
-        <div className="absolute -top-3.5 -right-2 z-20 rotate-[13deg] pointer-events-none select-none">
-          <div
-            className="text-white text-[11px] font-black px-3 py-1.5 rounded-lg leading-none tracking-wide"
-            style={{
-              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-              boxShadow: "0 4px 14px rgba(239,68,68,0.6), 0 1px 3px rgba(0,0,0,0.4)",
-              border: "1.5px solid rgba(255,120,120,0.45)",
-            }}
-          >
-            {svc.saleSticker}
-          </div>
+        <div className="absolute -top-4 -right-3 z-20 rotate-[11deg] pointer-events-none select-none" style={{ filter: "drop-shadow(0 3px 8px rgba(220,38,38,0.55))" }}>
+          <svg width="72" height="32" viewBox="0 0 72 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* 찢어진 왼쪽 끝 */}
+            <path d="M0 10 Q2 6 4 10 Q6 14 8 9 Q10 4 12 8 Q14 12 16 8 L16 24 Q14 22 12 25 Q10 28 8 24 Q6 20 4 24 Q2 28 0 24 Z"
+              fill="#b91c1c" />
+            {/* 메인 몸통 */}
+            <rect x="14" y="4" width="44" height="24" fill="#dc2626" />
+            {/* 찢어진 오른쪽 끝 */}
+            <path d="M58 4 L58 28 Q60 24 62 28 Q64 32 66 27 Q68 22 70 26 Q72 30 72 28 L72 10 Q72 8 70 6 Q68 4 66 8 Q64 12 62 7 Q60 2 58 4 Z"
+              fill="#b91c1c" />
+            {/* 테이프 광택 */}
+            <rect x="14" y="4" width="44" height="8" fill="rgba(255,255,255,0.12)" />
+            {/* 텍스트 */}
+            <text x="36" y="21" textAnchor="middle" fill="white" fontSize="11" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="0.5">
+              {svc.saleSticker}
+            </text>
+          </svg>
         </div>
       )}
 
