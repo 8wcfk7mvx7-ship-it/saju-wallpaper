@@ -509,8 +509,17 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 // ── 메인 ─────────────────────────────────────────────────────────────────────
 export default function MainPage() {
   const router = useRouter();
-  const [counter] = useState(() => Math.floor(Math.random() * 8000) + 42000);
-  const [todayCounter] = useState(() => Math.floor(Math.random() * 400) + 800);
+  const [counter] = useState(() => {
+    const base = new Date("2026-06-03T00:00:00+09:00");
+    const now = new Date();
+    const days = Math.max(0, Math.floor((now.getTime() - base.getTime()) / 86400000));
+    const minuteOfDay = now.getHours() * 60 + now.getMinutes();
+    return Math.min(21000 + days * 43 + Math.floor(minuteOfDay / 33) + Math.floor(Math.random() * 5), 30000);
+  });
+  const [todayCounter] = useState(() => {
+    const minuteOfDay = new Date().getHours() * 60 + new Date().getMinutes();
+    return 180 + Math.floor(minuteOfDay / 4) + Math.floor(Math.random() * 8);
+  });
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
   const [noticeIndex, setNoticeIndex] = useState(0);
