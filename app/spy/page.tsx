@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import AdultGate from "@/components/AdultGate";
 
 export const dynamic = "force-dynamic";
 
@@ -168,7 +169,7 @@ function getGrade(score: number) {
 }
 
 // ── 메인 ─────────────────────────────────────────────────────────────────────
-export default function SpyPage() {
+function SpyContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [gender, setGender] = useState<"male" | "female">("male");
@@ -525,3 +526,5 @@ export default function SpyPage() {
     </main>
   );
 }
+
+export default function SpyPage() { return <AdultGate><SpyContent /></AdultGate>; }
