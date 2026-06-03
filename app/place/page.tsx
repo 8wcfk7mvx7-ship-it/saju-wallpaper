@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
 
 export const dynamic = "force-dynamic";
 
 const PRICE = 990;
+const CURRENT_YEAR = 2026;
 
 const KR_CITY_BY_ELEMENT: Record<string, {
   cities: { name: string; reason: string; emoji: string; neighborhoods: string; food: string }[];
@@ -19,13 +21,13 @@ const KR_CITY_BY_ELEMENT: Record<string, {
       { name: "전북 전주", reason: "전통문화와 역사가 살아있는 도시. 목의 인문학적 기운이 강합니다. 글쓰기·예술에 날개를 달아줍니다.", emoji: "📜", neighborhoods: "한옥마을, 객리단길", food: "비빔밥, 콩나물국밥, 막걸리" },
       { name: "경북 안동", reason: "유교 전통의 뿌리 깊은 도시. 목의 뿌리(根) 에너지로 자아를 다잡아 줍니다.", emoji: "🏯", neighborhoods: "하회마을, 구시장", food: "찜닭, 안동소주, 헛제삿밥" },
     ],
-    avoid: "목이 과다하면 금(金) 기운의 도시(인천·포항·창원)는 충돌을 일으킬 수 있습니다.",
+    avoid: "목이 과다하면 금(金) 기운의 도시(인천·포항·울산)는 충돌을 일으킬 수 있습니다.",
   },
   화: {
     cities: [
       { name: "부산", reason: "열정적이고 역동적인 에너지의 도시. 화(火)의 불꽃 기운이 넘쳐 사업과 인간관계가 활발해집니다.", emoji: "🔥", neighborhoods: "해운대, 광안리, 부평깡통시장", food: "돼지국밥, 밀면, 씨앗호떡" },
       { name: "제주도", reason: "화산섬의 뜨거운 용암 에너지. 화의 변화와 창조 기운이 강합니다. 새로운 전환점을 만들고 싶을 때.", emoji: "🌋", neighborhoods: "애월, 협재, 성산일출봉", food: "흑돼지, 옥돔, 한라봉" },
-      { name: "경남 통영·거제", reason: "남해의 풍요로운 햇빛과 바다. 화의 풍요 에너지가 재물운을 활성화합니다.", emoji: "☀️", neighborhoods: "통영항, 한려수도", food: "굴, 도다리쑥국, 충무김밥" },
+      { name: "경남 통영", reason: "남해의 풍요로운 햇빛과 빛나는 바다. 화의 풍요 에너지가 재물운을 활성화합니다.", emoji: "☀️", neighborhoods: "통영항, 한려수도, 동피랑벽화마을", food: "굴, 도다리쑥국, 충무김밥" },
     ],
     avoid: "화가 과다하면 수(水) 기운의 도시(강원 강릉·경기 여주)에서 오히려 충돌이 생길 수 있습니다.",
   },
@@ -40,7 +42,7 @@ const KR_CITY_BY_ELEMENT: Record<string, {
   금: {
     cities: [
       { name: "인천", reason: "항구와 물류의 도시. 금(金)의 결단·실행 에너지가 넘칩니다. 무역·비즈니스에 최적의 기운.", emoji: "⚓", neighborhoods: "송도, 차이나타운, 개항장", food: "쫄면, 닭강정, 짜장면" },
-      { name: "경기 수원·성남", reason: "첨단 산업과 기술의 중심지. 금의 정밀·완벽 에너지가 직장과 커리어를 빛냅니다.", emoji: "⚙️", neighborhoods: "수원화성, 판교 테크노밸리", food: "왕갈비, 통닭, 수원 순대" },
+      { name: "경남 거제·울산", reason: "조선·자동차·중공업 산업의 메카. 금(金)의 강인한 실행 에너지가 직업운과 재물운을 강하게 끌어올립니다.", emoji: "⚙️", neighborhoods: "거제 외도, 울산 태화강 국가정원", food: "꼼장어, 물곰탕, 미더덕찜" },
       { name: "경북 포항", reason: "철강 산업의 도시. 금의 강인한 에너지가 의지력과 추진력을 극대화합니다.", emoji: "🔩", neighborhoods: "포스코 일대, 죽도시장", food: "물회, 과메기, 구룡포 대게" },
     ],
     avoid: "금이 과다하면 화(火) 기운의 도시(부산·제주)에서 충돌이 생길 수 있습니다.",
@@ -60,37 +62,37 @@ const WORLD_BY_ELEMENT: Record<string, {
 }> = {
   목: {
     countries: [
-      { name: "캐나다", flag: "🇨🇦", reason: "울창한 숲과 광대한 자연. 목(木)의 성장·자유 에너지가 넘쳐 이민·유학에 최적의 나라입니다.", cities: "밴쿠버, 빅토리아, 몬트리올", vibe: "자연·자유·다문화" },
-      { name: "뉴질랜드", flag: "🇳🇿", reason: "청정 자연과 초원. 목의 신선하고 창의적인 에너지가 넘칩니다. 워킹홀리데이·이민 운이 강한 곳.", cities: "오클랜드, 퀸스타운, 크라이스트처치", vibe: "모험·청정·성장" },
-      { name: "독일", flag: "🇩🇪", reason: "깊이 있는 학문과 문화의 나라. 목의 인문학적 기운이 강해 유학·기술 연수에 탁월합니다.", cities: "베를린, 뮌헨, 함부르크", vibe: "기술·학문·질서" },
+      { name: "일본", flag: "🇯🇵", reason: "을목(乙木)의 나라. 섬세한 장인정신과 벚꽃·녹음으로 상징되는 유연한 목의 기운. 유학·디자인·요식업·기술직에서 강한 운이 따릅니다.", cities: "도쿄, 교토, 후쿠오카", vibe: "장인·미학·섬세함" },
+      { name: "대한민국", flag: "🇰🇷", reason: "갑목(甲木)의 나라. 곧게 뻗는 강한 목의 기운으로 성장·도전 에너지가 강합니다. 창업·IT·한류 콘텐츠에서 운이 뜁니다.", cities: "서울, 부산, 제주", vibe: "성장·도전·혁신" },
+      { name: "캐나다", flag: "🇨🇦", reason: "울창한 삼림과 광대한 자연. 목(木)의 자유·성장 에너지가 넘쳐 이민·유학·자연 기반 산업에 최적입니다.", cities: "밴쿠버, 빅토리아, 몬트리올", vibe: "자연·자유·다문화" },
     ],
   },
   화: {
     countries: [
-      { name: "스페인", flag: "🇪🇸", reason: "열정과 예술의 나라. 화(火)의 창의·표현 에너지가 넘쳐 예술·패션·음악에서 빛납니다.", cities: "바르셀로나, 마드리드, 세비야", vibe: "열정·예술·축제" },
-      { name: "브라질", flag: "🇧🇷", reason: "삼바와 열대의 열정. 화의 풍요와 생명력 에너지가 사업과 인간관계를 폭발적으로 확장시킵니다.", cities: "상파울루, 리우데자네이루", vibe: "에너지·사업·인맥" },
-      { name: "이탈리아", flag: "🇮🇹", reason: "미식·예술·패션의 나라. 화의 아름다움과 풍요 에너지가 감성과 창의력을 최고조로 끌어올립니다.", cities: "로마, 밀라노, 피렌체", vibe: "예술·미식·감성" },
+      { name: "태국", flag: "🇹🇭", reason: "열대의 강렬한 화기(火氣). 뜨거운 태양과 역동적인 상업 에너지. 사업 확장·관광·요식업에서 폭발적인 기운이 따릅니다.", cities: "방콕, 치앙마이, 파타야", vibe: "열기·사업·역동성" },
+      { name: "스페인", flag: "🇪🇸", reason: "열정과 예술의 화(火) 기운. 표현·창의·외향적 에너지가 넘쳐 예술·패션·음악 분야에서 빛납니다.", cities: "바르셀로나, 마드리드, 세비야", vibe: "열정·예술·축제" },
+      { name: "이탈리아", flag: "🇮🇹", reason: "미식·예술·명품의 화 기운. 감각적이고 화려한 에너지가 브랜드·디자인·창작 분야를 활성화합니다.", cities: "로마, 밀라노, 피렌체", vibe: "예술·미식·명품" },
     ],
   },
   토: {
     countries: [
-      { name: "스위스", flag: "🇨🇭", reason: "안정과 중립의 나라. 토(土)의 균형·신뢰 에너지가 금융·의학·외교 분야에서 강점을 발휘합니다.", cities: "취리히, 제네바, 베른", vibe: "안정·신뢰·고품격" },
-      { name: "중국", flag: "🇨🇳", reason: "황하의 대지 에너지. 토의 중심·포용 에너지가 넘쳐 무역·제조업에서 큰 기회가 옵니다.", cities: "상하이, 베이징, 청두", vibe: "무역·기회·역동성" },
-      { name: "인도", flag: "🇮🇳", reason: "대지와 영성의 나라. 토의 깊이 있는 지혜와 철학 에너지. 명상·요가·IT 분야에서 빛납니다.", cities: "뭄바이, 델리, 벵갈루루", vibe: "영성·IT·철학" },
+      { name: "중국", flag: "🇨🇳", reason: "무토(戊土)의 나라. 황하 대지의 두텁고 육중한 토 에너지. 무역·제조·부동산·내수시장에서 압도적인 기회가 옵니다.", cities: "상하이, 베이징, 청두", vibe: "무역·규모·실리" },
+      { name: "스위스", flag: "🇨🇭", reason: "안정과 중립의 토(土) 기운. 균형·정밀·신뢰 에너지가 금융·의료·외교 분야에서 강점을 발휘합니다.", cities: "취리히, 제네바, 베른", vibe: "안정·신뢰·정밀" },
+      { name: "인도", flag: "🇮🇳", reason: "광대한 대지의 토 기운. 철학적 깊이와 IT 실용주의가 결합된 나라. 기술 창업·소프트웨어 분야에서 강합니다.", cities: "뭄바이, 델리, 벵갈루루", vibe: "규모·IT·철학" },
     ],
   },
   금: {
     countries: [
-      { name: "미국", flag: "🇺🇸", reason: "금(金)의 결단·실행·성공 에너지의 나라. 비즈니스·기술·금융에서 최강의 기운을 발휘합니다.", cities: "뉴욕, 실리콘밸리, 시카고", vibe: "성공·도전·스케일" },
-      { name: "싱가포르", flag: "🇸🇬", reason: "아시아 금융의 중심. 금의 정밀·효율 에너지가 넘쳐 커리어와 재물운이 최고조로 올라갑니다.", cities: "싱가포르 시티 전역", vibe: "금융·효율·청결" },
-      { name: "UAE(두바이)", flag: "🇦🇪", reason: "금과 사막의 부의 에너지. 금의 화려함과 재물 기운이 압도적입니다. 사업·투자에서 강한 운이 따릅니다.", cities: "두바이, 아부다비", vibe: "부·투자·화려함" },
+      { name: "미국", flag: "🇺🇸", reason: "경금(庚金)의 나라. 강렬하고 단호한 실행 에너지. 글로벌 표준을 만드는 기술·금융·군사 강국. 비즈니스 확장에 최강의 기운.", cities: "뉴욕, 실리콘밸리, 시카고", vibe: "실행·도전·글로벌" },
+      { name: "독일", flag: "🇩🇪", reason: "신금(辛金)의 나라. 정밀하고 세공된 금의 기운. 공학·자동차·제조·연구에서 세계 최고 수준. 기술직·이공계 유학에 최적.", cities: "베를린, 뮌헨, 함부르크", vibe: "정밀·공학·질서" },
+      { name: "싱가포르", flag: "🇸🇬", reason: "아시아 금융의 금(金) 기운. 효율·법치·국제화가 결합된 나라. 커리어·재물운이 빠르게 상승하는 환경입니다.", cities: "싱가포르 시티 전역", vibe: "금융·효율·국제화" },
     ],
   },
   수: {
     countries: [
-      { name: "일본", flag: "🇯🇵", reason: "섬나라의 수(水) 에너지. 정교함과 감성의 나라. 수의 지혜·기술·예술 기운이 넘쳐 유학·비즈니스 운이 강합니다.", cities: "도쿄, 오사카, 교토", vibe: "감성·정교함·기술" },
-      { name: "네덜란드", flag: "🇳🇱", reason: "운하의 나라. 수의 유연하고 창의적인 에너지. 무역·디자인·기술 분야에서 최적의 환경입니다.", cities: "암스테르담, 로테르담, 헤이그", vibe: "자유·디자인·무역" },
-      { name: "노르웨이", flag: "🇳🇴", reason: "피오르와 북극의 물 에너지. 수의 깊은 지혜와 탐구 에너지. 학문·연구·자연 관련 분야에서 빛납니다.", cities: "오슬로, 베르겐, 트론헤임", vibe: "탐구·자연·지혜" },
+      { name: "러시아", flag: "🇷🇺", reason: "임수(壬水)의 나라. 광대하고 차가운 대하(大河)의 기운. 논리·전략·과학·수학에서 세계적 역량을 발휘합니다. 이공계 학문 연구에 강한 운.", cities: "모스크바, 상트페테르부르크, 노보시비르스크", vibe: "전략·과학·논리" },
+      { name: "영국", flag: "🇬🇧", reason: "계수(癸水)의 나라. 안개와 빗속의 섬나라. 냉철한 분석력과 합리주의 에너지. 학문·법률·금융·연구직에서 체계적인 운이 따릅니다.", cities: "런던, 에든버러, 옥스퍼드", vibe: "분석·합리·학문" },
+      { name: "노르웨이", flag: "🇳🇴", reason: "피오르의 깊고 차가운 수(水) 에너지. 객관적 데이터 기반 의사결정과 연구 환경이 뛰어납니다. 이공계·환경 분야에 강합니다.", cities: "오슬로, 베르겐, 트론헤임", vibe: "연구·데이터·자연" },
     ],
   },
 };
@@ -113,56 +115,136 @@ const ELEMENT_LABELS: Record<string, { color: string; emoji: string; label: stri
 
 const FEATURES = [
   { icon: "🇰🇷", title: "한국 추천 도시 3곳", desc: "용신 오행별 국내 최적 거주지 — 동네·먹거리·에너지까지" },
-  { icon: "🌍", title: "해외 추천 국가 3곳", desc: "이민·유학·취업에 유리한 나라 (1순위 무료 공개)" },
+  { icon: "🌍", title: "해외 추천 국가 3곳", desc: "이민·유학·취업에 유리한 나라 (3순위 무료 공개)" },
   { icon: "🧭", title: "유리한 방위", desc: "침실·책상·소파 배치까지 — 공간 에너지 최적화" },
-  { icon: "⚠️", title: "피해야 할 도시", desc: "내 기운을 꺾는 도시를 피하는 것만으로도 운이 달라집니다" },
+  { icon: "🏙️", title: "현재 도시 궁합 분석", desc: "지금 사는 도시가 내 사주와 맞는지 즉시 진단" },
 ];
+
+// ─── 현재 도시 오행 추론 ────────────────────────────────────────────────────
+const CITY_ELEMENT_MAP: Record<string, string> = {
+  서울: "토", 경기: "토", 수원: "금", 성남: "금", 용인: "토", 화성: "토", 평택: "금",
+  인천: "금", 부산: "화", 대구: "화", 광주: "화", 대전: "토", 울산: "금", 세종: "토",
+  강릉: "수", 동해: "수", 속초: "목", 양양: "목", 춘천: "수", 가평: "수",
+  전주: "목", 안동: "목", 공주: "토", 부여: "토", 이천: "토", 여주: "토",
+  순천: "토", 담양: "토", 여수: "수", 제주: "화", 통영: "화", 거제: "금", 포항: "금",
+};
+
+function findCityElement(city: string): string | null {
+  if (!city.trim()) return null;
+  const trimmed = city.trim();
+  for (const [keyword, el] of Object.entries(CITY_ELEMENT_MAP)) {
+    if (trimmed.includes(keyword)) return el;
+  }
+  // KR 데이터에서 직접 검색
+  for (const [el, data] of Object.entries(KR_CITY_BY_ELEMENT)) {
+    for (const c of data.cities) {
+      const simpleName = c.name.replace(/강원|경남|경기|전남|충남|전북|경북|경기\s/, "").trim();
+      if (trimmed.includes(simpleName) || simpleName.split("·").some(n => trimmed.includes(n))) {
+        return el;
+      }
+    }
+  }
+  return null;
+}
+
+type Step = "splash" | "form" | "loading" | "result";
+type CalType = "solar" | "lunar";
 
 export default function PlacePage() {
   const router = useRouter();
+  const [step, setStep] = useState<Step>("splash");
   const [name, setName] = useState("");
-  const [dominant, setDominant] = useState<string[]>([]);
-  const [lacking, setLacking] = useState<string[]>([]);
-  const [yongshinEl, setYongshinEl] = useState<string>("토");
-  const [hasSaju, setHasSaju] = useState(false);
-  const [step, setStep] = useState<"splash" | "entry" | "loading" | "free-preview">("splash");
-  const [selectedEl, setSelectedEl] = useState<string>("");
+  const [birthYear, setBirthYear] = useState(1990);
+  const [birthMonth, setBirthMonth] = useState(0);
+  const [birthDay, setBirthDay] = useState(0);
+  const [calType, setCalType] = useState<CalType>("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [currentCity, setCurrentCity] = useState("");
+  const [yongshinEl, setYongshinEl] = useState("토");
+  const [selectedEl, setSelectedEl] = useState("");
+  const [currentCityEl, setCurrentCityEl] = useState<string | null>(null);
+  const [formError, setFormError] = useState("");
   const [counter] = useState(() => Math.floor(Math.random() * 120) + 87);
   const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 18000);
 
   useEffect(() => {
     const saved = loadSajuData();
-    if (saved) {
-      setHasSaju(true);
+    if (saved && saved.name !== "테스트") {
       setName(saved.name || "");
-      try {
-        const r = analyzeSaju({
-          birthYear: saved.birthYear, birthMonth: saved.birthMonth, birthDay: saved.birthDay,
-          birthHour: saved.birthHour ?? null, birthMinute: saved.birthMinute ?? null,
-          name: saved.name || "", gender: saved.gender || "female",
-          birthPlace: saved.birthPlace || "서울",
-          style: "auto", productType: "report", useJajasi: false,
-        });
-        setDominant(r.dominant);
-        setLacking(r.lacking);
-        setYongshinEl(r.yongshin.yongshin);
-        setSelectedEl(r.yongshin.yongshin || r.lacking[0] || "토");
-        // splash 단계 유지 — 사용자가 CTA 클릭 후 이동
-      } catch {}
+      if (saved.birthYear) setBirthYear(saved.birthYear);
+      if (saved.birthMonth) setBirthMonth(saved.birthMonth);
+      if (saved.birthDay) setBirthDay(saved.birthDay);
     }
   }, []);
+
+  async function handleFormSubmit() {
+    if (!birthYear || !birthMonth || !birthDay) {
+      setFormError("생년월일을 모두 입력해주세요.");
+      return;
+    }
+    setFormError("");
+    setStep("loading");
+
+    let fy = birthYear, fm = birthMonth, fd = birthDay;
+
+    if (calType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(fy, fm, fd, isLeapMonth);
+        const sol = cal.getSolarCalendar();
+        if (!sol?.year) throw new Error("변환 실패");
+        fy = sol.year; fm = sol.month; fd = sol.day;
+      } catch {
+        setFormError("음력 날짜 변환에 실패했습니다. 날짜를 다시 확인해주세요.");
+        setStep("form");
+        return;
+      }
+    }
+
+    try {
+      const r = analyzeSaju({
+        birthYear: fy, birthMonth: fm, birthDay: fd,
+        birthHour: birthTime.unknown ? null : birthTime.hour,
+        birthMinute: birthTime.unknown ? null : birthTime.minute,
+        name: name || "나", gender: "female", birthPlace: "서울",
+        style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
+      });
+      const el = r.yongshin.yongshin || r.lacking[0] || "토";
+      setYongshinEl(el);
+      setSelectedEl(el);
+    } catch {
+      setYongshinEl("토");
+      setSelectedEl("토");
+    }
+
+    setCurrentCityEl(findCityElement(currentCity));
+  }
+
+  if (step === "loading") return (
+    <AnalysisLoading subject={`${name ? name + "님의 " : ""}운명의 도시`} onDone={() => setStep("result")} />
+  );
 
   const displayEl = selectedEl || yongshinEl || "토";
   const krData = KR_CITY_BY_ELEMENT[displayEl];
   const worldData = WORLD_BY_ELEMENT[displayEl];
   const dirData = DIRECTION_BY_ELEMENT[displayEl];
+  const elInfo = ELEMENT_LABELS[displayEl];
 
-  if (step === "loading") return (
-    <AnalysisLoading subject={`${name ? name + "님의 " : ""}운명의 도시`} onDone={() => setStep("free-preview")} />
-  );
+  const yearOptions = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const selectCls = "w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm appearance-none focus:outline-none focus:border-amber-500/50";
 
   return (
-    <main className="min-h-screen bg-[#06060e] text-white">
+    <main className="min-h-screen bg-[#06060e] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <style>{`
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        select option{background:#0d0d1a;color:#fff}
+      `}</style>
 
       {/* ══ SPLASH ══ */}
       {step === "splash" && (
@@ -179,7 +261,6 @@ export default function PlacePage() {
             </div>
 
             <div className="max-w-md mx-auto px-6 pt-12 pb-28 text-center">
-              {/* 실시간 뱃지 */}
               <div className="flex flex-col items-center gap-2 mb-8">
                 <div className="inline-flex items-center gap-2 bg-amber-500/12 border border-amber-500/28 rounded-full px-4 py-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block" />
@@ -190,7 +271,6 @@ export default function PlacePage() {
                 <span className="text-xs text-white/25">누적 <strong className="text-white/40">{totalCount.toLocaleString()}명</strong> 분석 완료</span>
               </div>
 
-              {/* 헤드라인 */}
               <h1 className="text-3xl font-black leading-tight mb-5 tracking-tight">
                 지금 살고 있는 도시가<br />
                 <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-green-300 bg-clip-text text-transparent">
@@ -199,7 +279,6 @@ export default function PlacePage() {
                 아무리 노력해도 안 풀립니다
               </h1>
 
-              {/* FOMO 서브타이틀 */}
               <div className="bg-red-500/8 border border-red-500/20 rounded-2xl px-5 py-4 mb-7">
                 <p className="text-sm text-red-200/80 leading-relaxed">
                   ⚠️ 이사 한 번으로 운이 바뀌는 사람들이 있습니다.<br />
@@ -207,7 +286,6 @@ export default function PlacePage() {
                 </p>
               </div>
 
-              {/* 피처 카드 */}
               <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-1 mb-7 text-left">
                 {FEATURES.map((f, i) => (
                   <div key={i} className={`flex items-start gap-4 px-4 py-3.5 ${i < FEATURES.length - 1 ? "border-b border-white/[0.05]" : ""}`}>
@@ -220,7 +298,6 @@ export default function PlacePage() {
                 ))}
               </div>
 
-              {/* 오행 미리보기 */}
               <div className="flex justify-center gap-2 mb-7">
                 {(["목","화","토","금","수"] as const).map(el => {
                   const e = ELEMENT_LABELS[el];
@@ -235,12 +312,11 @@ export default function PlacePage() {
                 })}
               </div>
 
-              {/* 통계 */}
               <div className="grid grid-cols-3 gap-3 mb-8">
                 {[
                   { val: "5개", label: "오행 분석" },
                   { val: "30+", label: "추천 도시" },
-                  { val: "무료", label: "1순위 공개" },
+                  { val: "무료", label: "3순위 공개" },
                 ].map((s, i) => (
                   <div key={i} className="text-center">
                     <p className="text-2xl font-black text-white">{s.val}</p>
@@ -249,200 +325,272 @@ export default function PlacePage() {
                 ))}
               </div>
 
-              {/* CTA */}
               <button
-                onClick={() => setStep(hasSaju ? "loading" : "entry")}
+                onClick={() => setStep("form")}
                 className="w-full py-5 rounded-2xl text-white font-black text-lg mb-3 transition-all active:scale-[0.98]"
                 style={{ background: "linear-gradient(135deg, #d97706, #ca8a04, #16a34a)", boxShadow: "0 8px 40px rgba(202,138,4,0.4)" }}
               >
-                🗺️ {hasSaju ? `${name ? name + "님의 " : ""}운명의 도시 찾기` : "내 운명의 도시 찾기"}
+                🗺️ 내 운명의 도시 찾기
               </button>
-              <p className="text-xs text-white/20">가입 없음 · 광고 없음 · 1순위 무료</p>
+              <p className="text-xs text-white/20">가입 없음 · 광고 없음 · 3순위 무료</p>
             </div>
           </div>
-
-          <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
         </div>
       )}
 
-      {/* ══ ENTRY + FREE-PREVIEW ══ */}
-      {step !== "splash" && (
-        <div className="max-w-lg mx-auto px-5 py-10 pb-28">
+      {/* ══ FORM ══ */}
+      {step === "form" && (
+        <div className="max-w-lg mx-auto px-5 py-10 pb-20">
           <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
-          {/* 오행 선택 */}
-          {(!hasSaju || step === "entry") && (
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6">
-              <p className="text-sm font-bold text-white mb-1">용신 오행을 선택하세요</p>
-              <p className="text-xs text-white/35 mb-4">사주를 분석한 적 있다면 용신 오행을 선택하세요</p>
-              <div className="grid grid-cols-5 gap-2">
-                {(["목","화","토","금","수"] as const).map(el => {
-                  const e = ELEMENT_LABELS[el];
-                  return (
-                    <button key={el} onClick={() => { setSelectedEl(el); setStep("loading"); }}
-                      className={`py-3 rounded-xl text-center transition-all border ${selectedEl === el ? "border-white/40 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/8"}`}>
-                      <p className="text-xl">{e.emoji}</p>
-                      <p className="text-xs mt-1 font-bold" style={{ color: e.color }}>{el}</p>
-                      <p className="text-[9px] text-white/30 mt-0.5">{e.keyword.split("·")[0]}</p>
-                    </button>
-                  );
-                })}
+          <h2 className="text-xl font-black text-white mb-1">생년월일 입력</h2>
+          <p className="text-xs text-white/35 mb-8">사주를 분석해 내 기운과 맞는 도시를 찾습니다</p>
+
+          <div className="space-y-5">
+            {/* 이름 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 (선택)</label>
+              <input
+                type="text" value={name} onChange={e => setName(e.target.value)}
+                placeholder="이름을 입력하세요"
+                className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
+              />
+            </div>
+
+            {/* 양력/음력 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
+              <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                {(["solar", "lunar"] as CalType[]).map(t => (
+                  <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
+                    className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-amber-600 text-white" : "text-white/40 hover:text-white/70"}`}>
+                    {t === "solar" ? "양력" : "음력"}
+                  </button>
+                ))}
               </div>
-              {hasSaju && (
-                <p className="text-xs text-white/30 mt-3 text-center">
-                  사주 분석 결과: 용신 <strong className="text-white/60">{ELEMENT_LABELS[yongshinEl]?.label}</strong> / 부족 <strong className="text-white/60">{lacking.map(l => ELEMENT_LABELS[l]?.label).join("·")}</strong>
-                </p>
+            </div>
+
+            {/* 생년월일 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일</label>
+              <div className="grid grid-cols-3 gap-2">
+                <select value={birthYear} onChange={e => setBirthYear(Number(e.target.value))} className={selectCls}>
+                  <option value={0}>년도</option>
+                  {yearOptions.map(y => <option key={y} value={y}>{y}년</option>)}
+                </select>
+                <select value={birthMonth} onChange={e => setBirthMonth(Number(e.target.value))} className={selectCls}>
+                  <option value={0}>월</option>
+                  {monthOptions.map(m => <option key={m} value={m}>{m}월</option>)}
+                </select>
+                <select value={birthDay} onChange={e => setBirthDay(Number(e.target.value))} className={selectCls}>
+                  <option value={0}>일</option>
+                  {dayOptions.map(d => <option key={d} value={d}>{d}일</option>)}
+                </select>
+              </div>
+              {calType === "lunar" && (
+                <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-amber-500" />
+                  <span className="text-xs text-white/45">윤달에 태어난 경우 체크</span>
+                </label>
               )}
             </div>
-          )}
 
-          {step === "free-preview" && krData && (
-            <>
-              {/* 선택 배너 */}
-              <div className="flex items-center gap-3 mb-5 p-4 rounded-2xl" style={{ background: `${ELEMENT_LABELS[displayEl]?.color}10`, border: `1px solid ${ELEMENT_LABELS[displayEl]?.color}30` }}>
-                <span className="text-3xl">{ELEMENT_LABELS[displayEl]?.emoji}</span>
-                <div className="flex-1">
-                  <p className="text-xs text-white/40 mb-0.5">
-                    {hasSaju && name ? `${name}님 용신 기준` : "선택된 오행"}
-                  </p>
-                  <p className="text-base font-black" style={{ color: ELEMENT_LABELS[displayEl]?.color }}>
-                    {ELEMENT_LABELS[displayEl]?.label} 기운을 보강하는 곳
-                  </p>
-                  <p className="text-xs text-white/30 mt-0.5">{ELEMENT_LABELS[displayEl]?.keyword}</p>
-                </div>
-                <button onClick={() => setStep("entry")} className="text-xs text-white/30 hover:text-white/60 transition">다시 선택</button>
-              </div>
+            {/* 출생 시간 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간 (야자시·조자시 포함)</label>
+              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="violet" />
+            </div>
 
-              {/* 방위 */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-                <p className="text-xs text-white/40 font-bold mb-3 uppercase tracking-wider">🧭 유리한 방위</p>
-                <div className="flex gap-2 mb-3">
-                  {dirData.dirs.map(d => (
-                    <span key={d} className="text-sm font-black px-4 py-1.5 rounded-full bg-white/10 text-white">{d}</span>
-                  ))}
-                </div>
-                <p className="text-xs text-white/45 leading-relaxed mb-2">{dirData.desc}</p>
-                <div className="bg-white/5 rounded-xl px-3 py-2">
-                  <p className="text-xs text-white/35 leading-relaxed">💡 {dirData.room}</p>
-                </div>
-              </div>
+            {/* 현재 사는 도시 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">현재 사는 도시</label>
+              <input
+                type="text" value={currentCity} onChange={e => setCurrentCity(e.target.value)}
+                placeholder="예: 서울, 부산, 인천, 제주..."
+                className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
+              />
+              <p className="text-[10px] text-white/25 mt-1.5">현재 도시와 사주의 궁합을 분석합니다</p>
+            </div>
 
-              {/* 한국 도시 */}
-              <div className="mb-6">
-                <h2 className="text-sm font-bold text-white/70 mb-3 flex items-center gap-2">
-                  🇰🇷 추천 한국 도시
-                  <span className="text-xs font-normal text-white/25">동네·먹거리까지</span>
-                </h2>
-                <div className="space-y-3">
-                  {krData.cities.map((city, i) => {
-                    const isBlurred = i >= 1;
-                    return (
-                      <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
-                        {isBlurred && (
-                          <div className="absolute inset-0 bg-[#06060e]/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
-                            <p className="text-2xl mb-2">🔒</p>
-                            <p className="text-xs text-white/40 font-bold">{i + 1}순위 도시</p>
-                            <p className="text-[10px] text-white/25 mt-1">₩{PRICE.toLocaleString()}에 전체 공개</p>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">{city.emoji}</span>
-                          <span className="font-black text-white">{city.name}</span>
-                          {i === 0 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
-                          {i === 1 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">2순위</span>}
-                          {i === 2 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">3순위</span>}
-                        </div>
-                        <p className="text-xs text-white/45 leading-relaxed mb-3">{city.reason}</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white/5 rounded-xl px-3 py-2">
-                            <p className="text-[10px] text-white/30 mb-0.5">📍 동네</p>
-                            <p className="text-xs text-white/60">{city.neighborhoods}</p>
-                          </div>
-                          <div className="bg-white/5 rounded-xl px-3 py-2">
-                            <p className="text-[10px] text-white/30 mb-0.5">🍽️ 먹거리</p>
-                            <p className="text-xs text-white/60">{city.food}</p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div className="bg-amber-500/8 border border-amber-500/18 rounded-xl px-4 py-3">
-                    <p className="text-xs text-amber-300/70 leading-relaxed">⚠️ {krData.avoid}</p>
-                  </div>
-                </div>
-              </div>
+            {formError && (
+              <p className="text-xs text-red-400 text-center">{formError}</p>
+            )}
 
-              {/* 해외 국가 */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-sm font-bold text-white/70">🌍 추천 해외 국가</h2>
-                  <span className="text-xs text-white/25">1순위 무료 공개</span>
-                </div>
-                <div className="space-y-3">
-                  {worldData.countries.map((country, i) => {
-                    const isBlurred = i >= 1;
-                    return (
-                      <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
-                        {isBlurred && (
-                          <div className="absolute inset-0 bg-[#06060e]/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
-                            <p className="text-2xl mb-2">🔒</p>
-                            <p className="text-xs text-white/40 font-bold">{i + 1}순위 국가</p>
-                            <p className="text-[10px] text-white/25 mt-1">₩{PRICE.toLocaleString()}에 전체 공개</p>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-3xl">{country.flag}</span>
-                          <div>
-                            <span className="font-black text-white">{country.name}</span>
-                            <p className="text-[10px] text-white/30 mt-0.5">{country.vibe}</p>
-                          </div>
-                          {i === 0 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
-                        </div>
-                        <p className="text-xs text-white/45 leading-relaxed mb-2">{country.reason}</p>
-                        <p className="text-[11px] text-white/25">추천 도시: {country.cities}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+            <button
+              onClick={handleFormSubmit}
+              className="w-full py-4 rounded-2xl font-black text-white text-base transition-all active:scale-[0.98]"
+              style={{ background: "linear-gradient(135deg, #d97706, #ca8a04, #16a34a)", boxShadow: "0 8px 30px rgba(202,138,4,0.35)" }}
+            >
+              🗺️ 내 운명의 도시 찾기
+            </button>
+          </div>
+        </div>
+      )}
 
-              {/* 다른 오행 보기 */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-6">
-                <p className="text-xs text-white/30 mb-3">다른 오행으로 보기</p>
-                <div className="flex flex-wrap gap-2">
-                  {(["목","화","토","금","수"] as const).filter(el => el !== displayEl).map(el => {
-                    const e = ELEMENT_LABELS[el];
-                    return (
-                      <button key={el} onClick={() => setSelectedEl(el)}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs transition border border-white/10"
-                        style={{ color: e.color }}>
-                        {e.emoji} {e.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
+      {/* ══ RESULT ══ */}
+      {step === "result" && krData && (
+        <div className="max-w-lg mx-auto px-5 py-10 pb-12">
+          <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
-          {/* 프리미엄 CTA */}
-          {step === "free-preview" && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
-              <div className="max-w-lg mx-auto">
-                <button
-                  onClick={() => {
-                    const orderId = `place-${Date.now()}`;
-                    sessionStorage.setItem("placeEl", displayEl);
-                    router.push(`/place/pay?orderId=${orderId}&amount=${PRICE}&el=${displayEl}`);
-                  }}
-                  className="w-full py-4 rounded-2xl font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
-                  style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}>
-                  전체 공개 (해외 2·3순위 + PDF) — ₩{PRICE.toLocaleString()}
-                </button>
-                <p className="text-center text-xs text-white/25 mt-2">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
-              </div>
+          {/* 용신 배너 */}
+          <div className="flex items-center gap-3 mb-5 p-4 rounded-2xl" style={{ background: `${elInfo?.color}10`, border: `1px solid ${elInfo?.color}30` }}>
+            <span className="text-3xl">{elInfo?.emoji}</span>
+            <div className="flex-1">
+              <p className="text-xs text-white/40 mb-0.5">{name ? `${name}님 용신 기준` : "용신 기준"}</p>
+              <p className="text-base font-black" style={{ color: elInfo?.color }}>{elInfo?.label} 기운을 보강하는 곳</p>
+              <p className="text-xs text-white/30 mt-0.5">{elInfo?.keyword}</p>
+            </div>
+            <button onClick={() => setStep("form")} className="text-xs text-white/30 hover:text-white/60 transition">다시 입력</button>
+          </div>
+
+          {/* 현재 도시 궁합 */}
+          {currentCity && (
+            <div className={`rounded-2xl p-4 mb-5 border ${currentCityEl === displayEl
+              ? "bg-green-500/8 border-green-500/25"
+              : currentCityEl
+                ? "bg-red-500/8 border-red-500/20"
+                : "bg-white/5 border-white/10"}`}>
+              <p className="text-sm font-bold mb-1">
+                {currentCityEl === displayEl
+                  ? `✅ ${currentCity}은 사주와 잘 맞습니다`
+                  : currentCityEl
+                    ? `⚠️ ${currentCity}은 사주와 기운이 다릅니다`
+                    : `🔍 ${currentCity} 기운 분석`}
+              </p>
+              <p className="text-xs text-white/45 leading-relaxed">
+                {currentCityEl === displayEl
+                  ? `현재 도시(${ELEMENT_LABELS[currentCityEl]?.label} 기운)가 용신 오행과 일치합니다. 지금 위치에서 운을 꽃피울 수 있습니다.`
+                  : currentCityEl
+                    ? `현재 도시는 ${ELEMENT_LABELS[currentCityEl]?.label} 기운입니다. 용신 ${elInfo?.label}과 충돌할 수 있어 아래 추천 도시로의 이동을 고려해보세요.`
+                    : "해당 도시 데이터가 없습니다. 아래 추천 도시를 참고해 판단해주세요."}
+              </p>
             </div>
           )}
+
+          {/* 방위 */}
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-xs text-white/40 font-bold mb-3 uppercase tracking-wider">🧭 유리한 방위</p>
+            <div className="flex gap-2 mb-3">
+              {dirData.dirs.map(d => (
+                <span key={d} className="text-sm font-black px-4 py-1.5 rounded-full bg-white/10 text-white">{d}</span>
+              ))}
+            </div>
+            <p className="text-xs text-white/45 leading-relaxed mb-2">{dirData.desc}</p>
+            <div className="bg-white/5 rounded-xl px-3 py-2">
+              <p className="text-xs text-white/35 leading-relaxed">💡 {dirData.room}</p>
+            </div>
+          </div>
+
+          {/* 한국 도시 */}
+          <div className="mb-6">
+            <h2 className="text-sm font-bold text-white/70 mb-3 flex items-center gap-2">
+              🇰🇷 추천 한국 도시
+              <span className="text-xs font-normal text-white/25">동네·먹거리까지</span>
+            </h2>
+            <div className="space-y-3">
+              {krData.cities.map((city, i) => {
+                const isBlurred = i < 2;
+                return (
+                  <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+                    <div style={{ filter: isBlurred ? "blur(5px)" : "none", userSelect: isBlurred ? "none" : "auto", pointerEvents: isBlurred ? "none" : "auto" }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">{city.emoji}</span>
+                        <span className="font-black text-white">{city.name}</span>
+                        {i === 2 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">3순위 무료</span>}
+                        {i === 0 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
+                        {i === 1 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">2순위</span>}
+                      </div>
+                      <p className="text-xs text-white/45 leading-relaxed mb-3">{city.reason}</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-white/5 rounded-xl px-3 py-2">
+                          <p className="text-[10px] text-white/30 mb-0.5">📍 동네</p>
+                          <p className="text-xs text-white/60">{city.neighborhoods}</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl px-3 py-2">
+                          <p className="text-[10px] text-white/30 mb-0.5">🍽️ 먹거리</p>
+                          <p className="text-xs text-white/60">{city.food}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {isBlurred && (
+                      <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                           style={{ background: "linear-gradient(to bottom, rgba(6,6,14,0.1) 0%, rgba(6,6,14,0.55) 100%)" }} />
+                    )}
+                  </div>
+                );
+              })}
+              <div className="bg-amber-500/8 border border-amber-500/18 rounded-xl px-4 py-3">
+                <p className="text-xs text-amber-300/70 leading-relaxed">⚠️ {krData.avoid}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 해외 국가 */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-white/70">🌍 추천 해외 국가</h2>
+              <span className="text-xs text-white/25">3순위 무료 공개</span>
+            </div>
+            <div className="space-y-3">
+              {worldData.countries.map((country, i) => {
+                const isBlurred = i < 2;
+                return (
+                  <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+                    <div style={{ filter: isBlurred ? "blur(5px)" : "none", userSelect: isBlurred ? "none" : "auto", pointerEvents: isBlurred ? "none" : "auto" }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-3xl">{country.flag}</span>
+                        <div>
+                          <span className="font-black text-white">{country.name}</span>
+                          <p className="text-[10px] text-white/30 mt-0.5">{country.vibe}</p>
+                        </div>
+                        {i === 2 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-auto">3순위 무료</span>}
+                        {i === 0 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">1순위</span>}
+                        {i === 1 && <span className="text-[10px] bg-white/10 text-white/40 px-2 py-0.5 rounded-full font-bold ml-auto">2순위</span>}
+                      </div>
+                      <p className="text-xs text-white/45 leading-relaxed mb-2">{country.reason}</p>
+                      <p className="text-[11px] text-white/25">추천 도시: {country.cities}</p>
+                    </div>
+                    {isBlurred && (
+                      <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                           style={{ background: "linear-gradient(to bottom, rgba(6,6,14,0.1) 0%, rgba(6,6,14,0.55) 100%)" }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 다른 오행 */}
+          <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-8">
+            <p className="text-xs text-white/30 mb-3">다른 오행으로 보기</p>
+            <div className="flex flex-wrap gap-2">
+              {(["목","화","토","금","수"] as const).filter(el => el !== displayEl).map(el => {
+                const e = ELEMENT_LABELS[el];
+                return (
+                  <button key={el} onClick={() => setSelectedEl(el)}
+                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs transition border border-white/10"
+                    style={{ color: e.color }}>
+                    {e.emoji} {e.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 프리미엄 CTA (인라인, 고정 아님) */}
+          <div className="rounded-2xl overflow-hidden">
+            <button
+              onClick={() => {
+                const orderId = `place-${Date.now()}`;
+                sessionStorage.setItem("placeEl", displayEl);
+                router.push(`/place/pay?orderId=${orderId}&amount=${PRICE}&el=${displayEl}`);
+              }}
+              className="w-full py-5 font-black text-white text-base hover:opacity-90 transition-opacity"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}>
+              🔓 1·2순위 전체 공개 + PDF — ₩{PRICE.toLocaleString()}
+            </button>
+            <p className="text-center text-xs text-white/25 mt-3">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
+          </div>
         </div>
       )}
     </main>
