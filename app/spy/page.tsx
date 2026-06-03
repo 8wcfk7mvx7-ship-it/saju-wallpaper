@@ -172,25 +172,33 @@ function getGrade(score: number) {
 function SpyContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [gender, setGender] = useState<"male" | "female">("male");
-  const [year,  setYear]  = useState("");
-  const [month, setMonth] = useState("");
-  const [day,   setDay]   = useState("");
-  const resultRef = useRef<SajuResult | null>(null);
+  const [myYear,  setMyYear]  = useState("");
+  const [myMonth, setMyMonth] = useState("");
+  const [myDay,   setMyDay]   = useState("");
+  const [year,    setYear]    = useState("");
+  const [month,   setMonth]   = useState("");
+  const [day,     setDay]     = useState("");
+  const resultRef   = useRef<SajuResult | null>(null);
+  const myResultRef = useRef<SajuResult | null>(null);
 
   const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
   const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   function handleAnalyze() {
-    if (!year || !month || !day) return;
-    const r = analyzeSaju({
-      birthYear: parseInt(year), birthMonth: parseInt(month), birthDay: parseInt(day),
+    if (!myYear || !myMonth || !myDay || !year || !month || !day) return;
+    myResultRef.current = analyzeSaju({
+      birthYear: parseInt(myYear), birthMonth: parseInt(myMonth), birthDay: parseInt(myDay),
       birthHour: null, birthMinute: null,
-      name: "그 사람", gender,
+      name: "나", gender: "male",
       birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
     });
-    resultRef.current = r;
+    resultRef.current = analyzeSaju({
+      birthYear: parseInt(year), birthMonth: parseInt(month), birthDay: parseInt(day),
+      birthHour: null, birthMinute: null,
+      name: "그 사람", gender: "male",
+      birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+    });
     setStep("loading");
   }
 
@@ -215,7 +223,8 @@ function SpyContent() {
             <span className="text-gray-300 font-medium">오직 사실만 말합니다.</span>
           </p>
           <p className="text-gray-600 text-sm mb-12">
-            바람기 · 도화살 · 불륜 가능성까지<br />사주 명리로 정직하게 분석합니다
+            나와 그 사람의 생년월일을 함께 입력합니다<br />
+            성별 무관 — 동성 커플도 분석 가능합니다
           </p>
 
           <div className="w-full space-y-3 mb-10 text-left">
@@ -235,11 +244,6 @@ function SpyContent() {
             ))}
           </div>
 
-          <p className="text-xs text-gray-600 mb-6">
-            애인의 생년월일만 입력합니다.<br />
-            사주 명리는 날짜만으로 핵심 기운을 파악합니다.
-          </p>
-
           <button onClick={() => setStep("form")}
             className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
             염탐 시작하기
@@ -254,7 +258,7 @@ function SpyContent() {
 
   // ── 입력 폼 ───────────────────────────────────────────────────────────────
   if (step === "form") {
-    const ready = !!year && !!month && !!day;
+    const ready = !!myYear && !!myMonth && !!myDay && !!year && !!month && !!day;
     return (
       <main className="min-h-screen bg-[#0a0101] text-white">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -267,33 +271,38 @@ function SpyContent() {
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-black mb-2">그 사람 정보 입력</h2>
+            <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
             <p className="text-gray-500 text-sm">이름은 받지 않습니다. 생년월일만으로 충분합니다.</p>
           </div>
 
           <div className="space-y-5">
-            {/* 성별 */}
+            {/* 나의 생년월일 */}
             <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-3">애인 성별</label>
+              <label className="block text-sm font-semibold mb-3 text-gray-400">
+                <span className="text-white font-black">나</span>의 생년월일
+              </label>
+              <div className="mb-3">
+                <DropPick value={myYear} opts={yearOpts} onChange={setMyYear} placeholder="연도 선택" suffix="년" />
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                {(["male", "female"] as const).map(g => (
-                  <button key={g} type="button" onClick={() => setGender(g)}
-                    className={`py-3 rounded-xl border font-semibold text-sm transition ${
-                      gender === g
-                        ? "bg-red-900/50 border-red-500 text-red-200"
-                        : "bg-white/5 border-white/15 text-gray-400 hover:border-white/30"
-                    }`}>
-                    {g === "male" ? "남성" : "여성"}
-                  </button>
-                ))}
+                <DropPick value={myMonth} opts={monthOpts} onChange={setMyMonth} placeholder="월" suffix="월" />
+                <DropPick value={myDay}   opts={dayOpts}   onChange={setMyDay}   placeholder="일" suffix="일" />
               </div>
             </div>
 
-            {/* 생년월일 */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-xs font-bold text-gray-600 tracking-widest">VS</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
+
+            {/* 그 사람의 생년월일 */}
             <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-3">생년월일</label>
+              <label className="block text-sm font-semibold mb-3 text-gray-400">
+                <span className="text-red-300 font-black">그 사람</span>의 생년월일
+              </label>
               <div className="mb-3">
-                <DropPick value={year} opts={yearOpts} onChange={setYear} placeholder="연도 선택" suffix="년" />
+                <DropPick value={year}  opts={yearOpts}  onChange={setYear}  placeholder="연도 선택" suffix="년" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <DropPick value={month} opts={monthOpts} onChange={setMonth} placeholder="월" suffix="월" />
@@ -303,8 +312,8 @@ function SpyContent() {
 
             <div className="bg-red-950/20 border border-red-900/30 rounded-xl px-4 py-3">
               <p className="text-xs text-red-400/80 leading-relaxed">
-                시간은 받지 않습니다. 사주 명리는 생년월일만으로도 핵심 기운을 파악합니다.
-                이 분석은 엔터테인먼트 목적으로 제공됩니다.
+                시간은 받지 않습니다. 생년월일만으로 핵심 기운을 파악합니다.<br />
+                성별 무관 — 동성 커플도 동일하게 분석됩니다.
               </p>
             </div>
 
@@ -328,14 +337,15 @@ function SpyContent() {
   }
 
   // ── 결과 ──────────────────────────────────────────────────────────────────
-  const result = resultRef.current;
+  const result   = resultRef.current;
+  const myResult = myResultRef.current;
   if (!result) return null;
 
   const hasSinsal = (name: string) => result.sinsalList.some(s => s.name === name);
-  const has도화  = hasSinsal("도화살");
-  const has홍염  = hasSinsal("홍염살");
-  const has진도화 = hasSinsal("진도화");
-  const has역마  = hasSinsal("역마살");
+  const has도화   = hasSinsal("도화살");
+  const has홍염   = hasSinsal("홍염살");
+  const has진도화  = hasSinsal("진도화");
+  const has역마   = hasSinsal("역마살");
   const iljiUunseong = result.pillarsDetail.day.uunseong;
   const hasMokYok    = iljiUunseong === "목욕";
   const haHwa        = result.dominant.includes("화");
@@ -368,8 +378,6 @@ function SpyContent() {
   if (result.dominant.includes("금")) safePoints.push("금(金) 기운 강함 — 원칙과 의리를 중시하는 기질이 있습니다.");
   if (safePoints.length === 0) safePoints.push("종합적으로 판단할 때 주변 환경과 본인의 의지가 결정적입니다.");
 
-  const genderLabel = gender === "male" ? "그 남자" : "그 여자";
-
   return (
     <main className="min-h-screen bg-[#0a0101] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}`}</style>
@@ -386,9 +394,28 @@ function SpyContent() {
           <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
         </div>
 
+        {/* 두 사람의 일주 */}
+        {myResult && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">두 사람의 일주</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="text-center p-4 rounded-xl bg-white/[0.04] border border-white/8">
+                <p className="text-[10px] text-gray-600 font-bold tracking-widest uppercase mb-1.5">나</p>
+                <p className="text-2xl font-black text-white mb-0.5">{myResult.pillarsDetail.day.cg}{myResult.pillarsDetail.day.jj}</p>
+                <p className="text-xs text-gray-500">일주</p>
+              </div>
+              <div className="text-center p-4 rounded-xl border" style={{ backgroundColor: grade.bg, borderColor: grade.border }}>
+                <p className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: grade.color }}>그 사람</p>
+                <p className="text-2xl font-black mb-0.5" style={{ color: grade.color }}>{result.pillarsDetail.day.cg}{result.pillarsDetail.day.jj}</p>
+                <p className="text-xs text-gray-500">일주</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 헤더 */}
         <div className="text-center mb-6">
-          <p className="text-xs text-gray-500 mb-1">{genderLabel}의 일주</p>
+          <p className="text-xs text-gray-500 mb-1">그 사람의 일주</p>
           <h2 className="text-3xl font-black mb-1">{result.pillarsDetail.day.cg}{result.pillarsDetail.day.jj}일주</h2>
           <p className="text-gray-600 text-xs">{result.fourPillars}</p>
         </div>
@@ -410,7 +437,6 @@ function SpyContent() {
               <p className="text-xs text-gray-500">/ 100</p>
             </div>
           </div>
-          {/* 점수 바 */}
           <div className="w-full bg-white/10 rounded-full h-2.5 mb-3">
             <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: grade.color }} />
           </div>
@@ -519,7 +545,8 @@ function SpyContent() {
           </p>
         </div>
 
-        <button onClick={() => { setYear(""); setMonth(""); setDay(""); setStep("form"); }}
+        <button
+          onClick={() => { setMyYear(""); setMyMonth(""); setMyDay(""); setYear(""); setMonth(""); setDay(""); setStep("form"); }}
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-red-700/40 text-red-400 hover:bg-red-950/30 transition-all">
           다른 사람 분석하기
         </button>

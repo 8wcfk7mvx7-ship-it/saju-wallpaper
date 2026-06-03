@@ -9,7 +9,7 @@ const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr:
 type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special" | "19금";
 
 // ── 언어 ─────────────────────────────────────────────────────────────────────
-const LANGS = { ko: "한국어", en: "English", id: "Bahasa Indonesia" } as const;
+const LANGS = { ko: "한국어", en: "English", id: "Bahasa Indonesia", ta: "தமிழ்" } as const;
 type Lang = keyof typeof LANGS;
 
 const UI: Record<Lang, {
@@ -32,29 +32,40 @@ const UI: Record<Lang, {
     bannerCta: "배경화면 만들기 →",
     catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "19금" },
     start: "시작",
-    charging: "충전",
+    charging: "블루베리 충전",
   },
   en: {
-    h1: ["Your Saju", "is speaking to you,", "right now"],
-    heroSub: "Others have already checked. You're the only one who doesn't know yet.",
-    heroCta: "Discover Your Full Destiny",
-    servicesHeading: "Check Right Now",
-    reviewsHeading: "Real User Reviews",
+    h1: ["Your Saju", "is speaking to you", "right now"],
+    heroSub: "Everyone else has already checked. You're the only one still in the dark.",
+    heroCta: "Uncover My Full Destiny",
+    servicesHeading: "Explore Services",
+    reviewsHeading: "Real Reviews",
     bannerCta: "Create Wallpaper →",
-    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Special", "19금": "Adult" },
-    start: "Go",
-    charging: "Charge",
+    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Premium", "19금": "Adults" },
+    start: "Start",
+    charging: "Top Up",
   },
   id: {
-    h1: ["Saju Anda", "sedang berbicara,", "saat ini juga"],
-    heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum tahu.",
-    heroCta: "Ungkap Seluruh Nasib Saya",
-    servicesHeading: "Cek Sekarang",
-    reviewsHeading: "Ulasan Pengguna",
+    h1: ["Saju Anda", "sedang berbicara", "kepada Anda sekarang"],
+    heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum mengetahuinya.",
+    heroCta: "Ungkap Seluruh Takdir Saya",
+    servicesHeading: "Jelajahi Sekarang",
+    reviewsHeading: "Ulasan Nyata",
     bannerCta: "Buat Wallpaper →",
-    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Nasib", "라이프": "Gaya Hidup", "Special": "Spesial", "19금": "Dewasa" },
+    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Takdir", "라이프": "Gaya Hidup", "Special": "Premium", "19금": "Dewasa" },
     start: "Mulai",
-    charging: "Isi",
+    charging: "Isi Ulang",
+  },
+  ta: {
+    h1: ["உங்கள் சாஜு,", "இப்போதும்", "பேசுகிறது"],
+    heroSub: "மற்றவர்கள் ஏற்கனவே சரிபார்த்தனர். நீங்கள் மட்டும் இன்னும் தெரியாமல் இருக்கிறீர்கள்.",
+    heroCta: "என் சாஜுவை முழுமையாக அறிக",
+    servicesHeading: "இப்போதே பார்க்கவும்",
+    reviewsHeading: "உண்மையான மதிப்புரைகள்",
+    bannerCta: "வால்பேப்பர் உருவாக்கு →",
+    catLabel: { "전체": "அனைத்தும்", "무료": "இலவசம்", "연애·궁합": "காதல்", "금전·투자": "பணம்", "운명·대운": "விதி", "라이프": "வாழ்க்கை", "Special": "சிறப்பு", "19금": "வயதுவந்தோர்" },
+    start: "தொடங்கு",
+    charging: "நிரப்பு",
   },
 };
 
@@ -81,10 +92,10 @@ const REVIEWS = [
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
 const NOTICES = [
-  { date: "2026.05.30", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
-  { date: "2026.05.29", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
-  { date: "2026.05.28", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
-  { date: "2026.05.20", title: "일진 달력 1975~2030 신규 오픈", badge: "NEW", color: "#fbbf24" },
+  { date: "2026.06.03", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
+  { date: "2026.06.02", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
+  { date: "2026.06.01", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
+  { date: "2026.05.28", title: "일진 달력 1975~2030 신규 오픈", badge: "NEW", color: "#fbbf24" },
 ];
 
 // ── 실시간 활동 알림 ──────────────────────────────────────────────────────────
@@ -998,9 +1009,6 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* ── 문의하기 ── */}
-        <ContactSection />
-
       </div>
 
       {/* ── 일진달력 섹션 ── */}
@@ -1008,8 +1016,13 @@ export default function MainPage() {
         <IljinCalendar />
       </section>
 
+      {/* ── 문의하기 ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10">
+        <ContactSection />
+      </div>
+
       {/* ── 푸터 ── */}
-      <footer className="border-t pt-8 pb-28 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>
+      <footer className="border-t pt-8 pb-40 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs mb-6"
             style={{ color: "rgba(255,255,255,0.35)" }}>
@@ -1040,14 +1053,19 @@ export default function MainPage() {
         </div>
       </footer>
 
+      {/* ── 모바일 카카오 플로팅 CTA ── */}
+      <div className="fixed bottom-[4.5rem] left-4 right-4 z-40 sm:hidden">
+        <KakaoLoginButton redirectTo="/" floating />
+      </div>
+
       {/* ── 모바일 하단 네비게이션 ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"
         style={{ background: "rgba(6,6,14,0.97)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}>
-        <div className="flex items-stretch h-16">
+        <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/saju" },
-            { icon: "🫐", label: "블루베리", href: "/charge" },
+            { icon: "💰", label: "블루베리 충전", href: "/charge" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
@@ -1062,7 +1080,7 @@ export default function MainPage() {
                 className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors"
                 style={{ color: item.href === "/" ? "#c9a84c" : "rgba(255,255,255,0.4)" }}>
                 <span className="text-xl">{item.icon}</span>
-                <span className="text-[10px]">{item.label}</span>
+                <span className="text-[10px] leading-tight text-center px-0.5">{item.label}</span>
               </button>
             )
           ))}
