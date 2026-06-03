@@ -41,7 +41,7 @@ export default function IljinCalendar() {
           <h2 className="text-sm font-black" style={{ color: "rgba(255,255,255,0.65)" }}>
             일진달력 <span className="text-[11px] font-normal" style={{ color: "rgba(255,255,255,0.2)" }}>日辰曆</span>
           </h2>
-          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.25)" }}>매일의 하늘과 땅의 기운 · 1975~2030</p>
+          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.25)" }}>매일의 하늘과 땅의 기운</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={prevMonth}

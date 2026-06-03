@@ -143,15 +143,15 @@ function ContactSection() {
   }
 
   return (
-    <section className="border-t py-14" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+    <section className="py-4">
+      <div className="max-w-full">
         <div className="text-center mb-8">
           <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "rgba(201,168,76,0.7)" }}>
             Contact
           </p>
           <h2 className="text-2xl font-black text-white mb-2">문의하기</h2>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-            궁금한 점, 오류 신고, 환불 문의 등 편하게 보내주세요.
+            궁금한 점, 오류 신고 등 편하게 보내주세요.
           </p>
         </div>
 
@@ -239,27 +239,31 @@ function ContactSection() {
               <button
                 type="submit"
                 disabled={status === "sending" || !name.trim() || !email.trim() || !message.trim()}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-sm font-black transition-all active:scale-[0.98] disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-sm font-black transition-all active:scale-[0.98] disabled:opacity-40"
                 style={{
-                  background: "linear-gradient(135deg, #c9a84c 0%, #d4a843 100%)",
+                  background: "rgba(201,168,76,0.85)",
                   color: "#06060e",
-                  boxShadow: "0 6px 24px rgba(201,168,76,0.2)",
+                  boxShadow: "0 4px 20px rgba(201,168,76,0.25)",
                 }}
               >
-                {status === "sending" ? "전송 중..." : "✉️ 문의 보내기"}
+                {status === "sending" ? "전송 중..." : "문의 보내기"}
               </button>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-                또는 카카오 채널로 빠르게 문의:&nbsp;
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
+                또는&nbsp;
                 <a
                   href="http://pf.kakao.com/_cuksX"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-yellow-400/70 hover:text-yellow-400 transition-colors underline"
+                  className="transition-colors underline underline-offset-2"
+                  style={{ color: "rgba(254,229,0,0.75)" }}
                 >
-                  pf.kakao.com/_cuksX
+                  카카오 채널로 빠르게 문의
                 </a>
               </span>
             </div>
+            <p className="text-[10px] pt-2" style={{ color: "rgba(255,255,255,0.25)" }}>
+              환불 문의는 <button onClick={() => window?.open?.("/refund","_blank")} className="underline underline-offset-2 cursor-pointer hover:opacity-70 transition">환불규정 페이지</button>를 먼저 확인해주세요.
+            </p>
           </form>
         )}
       </div>
@@ -439,22 +443,21 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 
   return (
     <div ref={ref} className="relative">
-      {/* 50% OFF 찢어진 테이프 스티커 */}
+      {/* 50% OFF 거친 테이프 스티커 */}
       {svc.saleSticker && (
-        <div className="absolute -top-4 -right-3 z-20 rotate-[11deg] pointer-events-none select-none" style={{ filter: "drop-shadow(0 3px 8px rgba(220,38,38,0.55))" }}>
-          <svg width="72" height="32" viewBox="0 0 72 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* 찢어진 왼쪽 끝 */}
-            <path d="M0 10 Q2 6 4 10 Q6 14 8 9 Q10 4 12 8 Q14 12 16 8 L16 24 Q14 22 12 25 Q10 28 8 24 Q6 20 4 24 Q2 28 0 24 Z"
-              fill="#b91c1c" />
-            {/* 메인 몸통 */}
-            <rect x="14" y="4" width="44" height="24" fill="#dc2626" />
-            {/* 찢어진 오른쪽 끝 */}
-            <path d="M58 4 L58 28 Q60 24 62 28 Q64 32 66 27 Q68 22 70 26 Q72 30 72 28 L72 10 Q72 8 70 6 Q68 4 66 8 Q64 12 62 7 Q60 2 58 4 Z"
-              fill="#b91c1c" />
-            {/* 테이프 광택 */}
-            <rect x="14" y="4" width="44" height="8" fill="rgba(255,255,255,0.12)" />
-            {/* 텍스트 */}
-            <text x="36" y="21" textAnchor="middle" fill="white" fontSize="11" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="0.5">
+        <div className="absolute -top-3 -right-2 z-20 rotate-[8deg] pointer-events-none select-none" style={{ filter: "drop-shadow(0 2px 6px rgba(185,28,28,0.7))" }}>
+          <svg width="80" height="28" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* 왼쪽 거친 찢김 */}
+            <path d="M0 8 Q1 5 3 9 Q5 13 7 7 Q9 1 11 6 Q13 11 15 5 L15 23 Q13 27 11 22 Q9 17 7 21 Q5 25 3 19 Q1 13 0 18 Z" fill="#991b1b"/>
+            {/* 몸통 */}
+            <rect x="13" y="2" width="52" height="24" fill="#dc2626"/>
+            {/* 오른쪽 거친 찢김 */}
+            <path d="M65 2 L65 26 Q67 22 69 27 Q71 32 73 26 Q75 20 77 25 Q79 30 80 27 L80 7 Q79 3 77 7 Q75 11 73 5 Q71 -1 69 4 Q67 9 65 2 Z" fill="#991b1b"/>
+            {/* 테이프 반투명 광택 */}
+            <rect x="13" y="2" width="52" height="9" fill="rgba(255,255,255,0.10)"/>
+            {/* 가로줄 텍스처 */}
+            <rect x="13" y="13" width="52" height="1" fill="rgba(0,0,0,0.08)"/>
+            <text x="40" y="19" textAnchor="middle" fill="white" fontSize="10.5" fontWeight="900" fontFamily="Arial Black, Arial, sans-serif" letterSpacing="1">
               {svc.saleSticker}
             </text>
           </svg>
@@ -933,27 +936,21 @@ export default function MainPage() {
           )}
         </section>
 
-        {/* ── 바이럴 배너 ── */}
-        <section className="mb-14">
-          <div className="rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(201,168,76,0.1) 100%)", border: "1px solid rgba(201,168,76,0.2)" }}>
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] text-[200px] font-black select-none pointer-events-none"
+        {/* ── 바이럴 띠 배너 ── */}
+        <section className="mb-14 -mx-4 sm:-mx-6">
+          <div className="relative py-10 sm:py-14 px-6 sm:px-12 text-center overflow-hidden"
+            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(10,10,20,0.9) 40%, rgba(201,168,76,0.12) 100%)", borderTop: "1px solid rgba(201,168,76,0.15)", borderBottom: "1px solid rgba(201,168,76,0.15)" }}>
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.025] text-[220px] font-black select-none pointer-events-none"
               style={{ fontFamily: "'Noto Serif KR', serif" }}>☯</div>
-            <p className="text-xs font-semibold mb-2" style={{ color: "#c9a84c" }}>Summer Palace 이용 전 vs 후</p>
-            <h3 className="text-lg sm:text-2xl font-black text-white mb-4 leading-tight">
+            <p className="text-xs font-semibold mb-3 tracking-widest uppercase" style={{ color: "rgba(201,168,76,0.65)" }}>Before & After</p>
+            <h3 className="text-xl sm:text-3xl font-black text-white mb-4 leading-snug">
               &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
               <span style={{ color: "#c9a84c" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
-            <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p className="text-sm max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.4)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
-              내가 타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
+              타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
             </p>
-            <button
-              onClick={() => router.push("/saju")}
-              className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105"
-              style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
-              {t.bannerCta}
-            </button>
           </div>
         </section>
 
@@ -1011,15 +1008,19 @@ export default function MainPage() {
 
       </div>
 
-      {/* ── 일진달력 섹션 ── */}
-      <section className="py-10 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        <IljinCalendar />
+      {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
+      <section className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-2 gap-10 items-start">
+          {/* 모바일: 일진달력 먼저 */}
+          <div className="order-1">
+            <IljinCalendar />
+          </div>
+          {/* 모바일: 문의하기 아래 */}
+          <div className="order-2">
+            <ContactSection />
+          </div>
+        </div>
       </section>
-
-      {/* ── 문의하기 ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10">
-        <ContactSection />
-      </div>
 
       {/* ── 푸터 ── */}
       <footer className="border-t pt-8 pb-40 sm:pb-8" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(6,6,14,0.9)" }}>
@@ -1037,10 +1038,10 @@ export default function MainPage() {
 
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
             <p>상호: 여름궁전(Summer Palace) · 대표: 정다정 · 이메일: smple@outlook.kr</p>
-            <p>통신판매업 신고번호: 제2025-서울-00000호 · 사업자등록번호: 707-28-01614</p>
+            <p>통신판매업 신고번호: 제2025-경남-00000호 · 사업자등록번호: 707-28-01614</p>
             <p>
-              주소: 서울특별시 · 카카오채널:&nbsp;
-              <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/50 transition-colors">http://pf.kakao.com/_cuksX</a>
+              주소: 경상남도 거제시 장평3로2길 40-3, 102 · 카카오채널:&nbsp;
+              <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/50 transition-colors underline underline-offset-2">클릭</a>
             </p>
             <p>호스팅 서비스: Vercel Inc. · 결제: 토스페이먼츠(주)</p>
           </div>

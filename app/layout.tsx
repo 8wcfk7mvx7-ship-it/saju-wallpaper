@@ -9,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "사주팔자 오행 배경화면 | AI 맞춤 분석",
-  description: "AI가 당신의 사주팔자를 분석하여 오행 에너지에 맞는 맞춤형 배경화면과 상세 보고서를 제공합니다.",
+  title: "여름궁전 사주 명리 분석",
+  description: "사주팔자 명리학 기반 AI 분석 서비스. 타고난 오행 에너지를 이해하고 삶의 방향을 찾아드립니다.",
 };
 
 export default function RootLayout({
