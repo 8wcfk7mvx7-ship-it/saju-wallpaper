@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Nanum_Myeongjo } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const nanumMyeongjo = Nanum_Myeongjo({
-  weight: ["400", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-myeongjo",
+const chosunMyungjo = localFont({
+  src: "../public/fonts/ChosunilboMyungjo.woff",
+  variable: "--font-chosun",
   display: "swap",
-  preload: false,
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +22,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${nanumMyeongjo.variable} h-full antialiased`}
+      className={`${chosunMyungjo.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
