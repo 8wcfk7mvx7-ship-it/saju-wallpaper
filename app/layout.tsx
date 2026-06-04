@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Noto_Serif_KR } from "next/font/google";
+import { Nanum_Myeongjo } from "next/font/google";
 import "./globals.css";
 
-const notoSerifKR = Noto_Serif_KR({
-  weight: ["400", "500", "600", "700", "900"],
+const nanumMyeongjo = Nanum_Myeongjo({
+  weight: ["400", "700", "800"],
   subsets: ["latin"],
-  variable: "--font-serif-kr",
+  variable: "--font-myeongjo",
   display: "swap",
   preload: false,
 });
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${notoSerifKR.variable} h-full antialiased`}
+      className={`${nanumMyeongjo.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
