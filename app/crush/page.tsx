@@ -55,7 +55,7 @@ interface CrushResult {
 async function analyzeCrush(targetData: {
   birthYear: number; birthMonth: number; birthDay: number;
   birthTime: BirthTimeValue; calType: "solar" | "lunar"; isLeapMonth: boolean;
-  gender: "male" | "female";
+  gender: "male" | "female"; birthPlace: string;
 }, myData?: {
   birthYear: number; birthMonth: number; birthDay: number;
 }): Promise<CrushResult> {
@@ -65,7 +65,7 @@ async function analyzeCrush(targetData: {
     birthDay: targetData.birthDay,
     birthHour: targetData.birthTime.unknown ? null : targetData.birthTime.hour,
     birthMinute: targetData.birthTime.unknown ? null : targetData.birthTime.minute,
-    name: "상대방", gender: targetData.gender, birthPlace: "서울",
+    name: "상대방", gender: targetData.gender, birthPlace: targetData.birthPlace || "서울",
     style: "auto", productType: "report",
     useJajasi: targetData.birthTime.useJajasi,
   });
@@ -93,6 +93,7 @@ export default function CrushPage() {
   const [targetMonth, setTargetMonth] = useState(0);
   const [targetDay, setTargetDay] = useState(0);
   const [targetTime, setTargetTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [targetBirthPlace, setTargetBirthPlace] = useState("서울");
 
   // 내 정보 (선택)
   const [myYear, setMyYear] = useState(0);
@@ -125,7 +126,7 @@ export default function CrushPage() {
 
     try {
       const res = await analyzeCrush(
-        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender },
+        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender, birthPlace: targetBirthPlace },
         myYear && myMonth && myDay ? { birthYear: myYear, birthMonth: myMonth, birthDay: myDay } : undefined,
       );
       setResult(res);
@@ -274,6 +275,21 @@ export default function CrushPage() {
               그 사람 태어난 시간 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(모르면 모름 선택)</span>
             </label>
             <BirthTimePicker value={targetTime} onChange={setTargetTime} accent="violet" />
+          </div>
+
+          {/* 태어난 장소 */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
+              그 사람 태어난 장소 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(진태양시 경도보정 자동 적용)</span>
+            </label>
+            <input
+              type="text"
+              value={targetBirthPlace}
+              onChange={e => setTargetBirthPlace(e.target.value)}
+              placeholder="서울 / 부산 / 도쿄 / 뉴욕 등"
+              className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)" }}
+            />
           </div>
 
           {/* 구분선 */}
