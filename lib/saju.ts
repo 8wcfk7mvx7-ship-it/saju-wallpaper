@@ -2204,3 +2204,119 @@ export function getIljuInfo(dayCg: string, dayJj: string) {
 export function getSipsungPositionDesc(position: "연주"|"월주"|"일지"|"시주", sipsung: string): string {
   return SIPSUNG_BY_POSITION[position]?.[sipsung] ?? "";
 }
+
+// ── 간여지동(干與支同) ─────────────────────────────────────────────────────
+// 천간과 지지가 같은 오행·음양일 때 자아가 강하게 고정되는 특성
+
+export interface GanyeoJidongTrait {
+  element: string;         // 오행
+  general: string;         // 해당 오행 간여지동 공통 특성
+  specific: string;        // 해당 일주만의 특성
+  stubbornness: number;    // 고집 강도 1~5
+  keywords: string[];
+}
+
+// 간여지동 전체 공통 특성
+export const GANYEO_JIDONG_GENERAL = {
+  desc: "천간과 지지가 같은 기운으로 자아(自我)가 한 방향으로 강하게 고정된다. 속마음이 행동에 그대로 드러나서 '속이 훤히 보이는' 사람이라는 인상을 주기 쉽다. 자아가 비대해 주변 시선에 영향받지 않으려 하지만, 역설적으로 인정욕구가 강하다.",
+  weakness: "월주 간여지동이 일주 간여지동을 극(剋)하는 구조이면 고집이 어느 정도 완화되는 편이다.",
+};
+
+// 일주별 간여지동 상세 특성
+export const GANYEO_JIDONG_ILJU: Record<string, GanyeoJidongTrait> = {
+  갑인: {
+    element: "목",
+    general: "목(木) 간여지동: 자기 신념이 곧 진리라고 느끼며 좀처럼 방향을 바꾸지 않는다. 고집의 방향이 '성장'과 연결되어 있어 주변을 이끌려는 성향이 강하다.",
+    specific: "갑인일주는 대장 기질이 뚜렷하고 자존심이 매우 세다. 자기 페이스를 방해받으면 불쾌함을 숨기지 못한다.",
+    stubbornness: 4,
+    keywords: ["독립심","자존심","리더십","고집"],
+  },
+  을묘: {
+    element: "목",
+    general: "목(木) 간여지동: 자기 신념이 곧 진리라고 느끼며 좀처럼 방향을 바꾸지 않는다.",
+    specific: "을묘일주는 간여지동 중 고집이 가장 완강한 축에 속한다. 부드러운 외모와 달리 내면은 절대 굽히지 않는 심지가 있다. 갑인보다 소리는 작지만 더 끈질기게 자기 주장을 관철한다. '개 고집'이라는 평을 듣기도 한다.",
+    stubbornness: 5,
+    keywords: ["고집","인내","유연해 보이지만 불굴","자기중심"],
+  },
+  병오: {
+    element: "화",
+    general: "화(火) 간여지동: 열정적이고 즉각적이며 감정 표현이 직접적이다. 에너지 소모가 빠르고, 관심의 중심에 서고 싶어 한다.",
+    specific: "병오일주는 화려하고 표현이 과감하다. 자기 존재감을 드러내고 싶은 욕구가 강해 무리에서 튀는 행동을 하기도 한다. 감정 기복이 있지만 뒤끝은 없다.",
+    stubbornness: 3,
+    keywords: ["열정","즉흥","존재감","뒤끝없음"],
+  },
+  정사: {
+    element: "화",
+    general: "화(火) 간여지동: 열정적이고 즉각적이며 감정 표현이 직접적이다.",
+    specific: "정사일주는 병오보다 내면 지향적이다. 자기만의 세계와 취향이 뚜렷하고, 신뢰하는 사람에게만 속을 연다. 음화(陰火)답게 불꽃이 오래 타며 집착 경향이 있다.",
+    stubbornness: 3,
+    keywords: ["집착","신비로움","선택적 개방","지속성"],
+  },
+  무오: {
+    element: "토·화",
+    general: "무토 일간이 오화 지지를 깔고 있어 화생토(火生土)로 에너지가 더 강하게 쌓인다. 자신감이 두껍고 쉽게 흔들리지 않는다.",
+    specific: "무오일주는 묵직한 자존감과 실용주의가 결합된다. 말보다 행동이 앞서고, 한번 결정하면 좀처럼 번복하지 않는다.",
+    stubbornness: 4,
+    keywords: ["자신감","실용","묵직함","불굴"],
+  },
+  기미: {
+    element: "토",
+    general: "토(土) 간여지동: 안정 지향적이고 중재하는 척하지만, 실제론 자기 중심축을 절대 움직이지 않는다. 고집이 가장 티 안 나게 강한 유형이다.",
+    specific: "기미일주는 을묘와 함께 고집 랭킹 상위권이다. 겉으로는 순하고 맞장구를 잘 치지만 막상 자기 뜻과 다른 결론이 나면 움직이지 않는다. 속내를 잘 드러내지 않는다.",
+    stubbornness: 5,
+    keywords: ["고집","겉다름","순해 보임","내면 불변"],
+  },
+  경신: {
+    element: "금",
+    general: "금(金) 간여지동: 논리와 근거로 반박하는 데 탁월하다. '너 똑똑하다' 소리를 듣지만, 상대가 지쳐 포기하게 만드는 방식이다.",
+    specific: "경신일주는 금 간여지동 중 내로남불 경향이 두드러진다. 자신에겐 너그럽고 타인에겐 엄격한 기준을 적용한다. 허세가 섞여 있어 실속보다 이미지를 중시하기도 한다.",
+    stubbornness: 4,
+    keywords: ["논리","내로남불","허세","자기확신"],
+  },
+  신유: {
+    element: "금",
+    general: "금(金) 간여지동: 논리와 근거로 조목조목 반박하는 데 탁월하다. 감정보다 이성으로 설득하려 한다.",
+    specific: "신유일주는 경신보다 세밀하고 예민하다. 틀린 것을 그냥 넘기지 못하며, 완벽주의적 고집이 있다. 음금(陰金)답게 칼날이 날카롭고 비판이 직접적이다.",
+    stubbornness: 4,
+    keywords: ["완벽주의","예민함","비판적","논리"],
+  },
+  임자: {
+    element: "수",
+    general: "수(水) 간여지동: 사유가 깊고 언변이 유창하다. 생각의 폭이 넓지만 종종 '개똥철학'처럼 보이는 독자적 세계관을 갖는다.",
+    specific: "임자일주는 말빨이 뛰어나고 자기 세계관이 뚜렷하다. 을묘처럼 고집이 외형에서 드러나지 않고, 공감받지 못하면 내면에서 우울감으로 이어지는 경향이 있다. '내 말을 이해해줄 사람이 없다'는 외로움을 느끼기 쉽다.",
+    stubbornness: 3,
+    keywords: ["말빨","개똥철학","공감욕구","우울감 취약"],
+  },
+  계해: {
+    element: "수",
+    general: "수(水) 간여지동: 사유가 깊고 언변이 유창하다.",
+    specific: "계해일주는 임자보다 감각적이고 직관적이다. 음수(陰水)의 특성상 흡수력이 강하고, 상대의 감정을 잘 읽는다. 그러나 자기 감정의 경계선은 함부로 건드리면 차갑게 닫아버린다.",
+    stubbornness: 3,
+    keywords: ["직관","감수성","경계설정","냉온차이"],
+  },
+};
+
+// 간여지동 헬퍼: 해당 일주가 간여지동인지 확인
+export function isGanyeoJidong(dayCg: string, dayJj: string): boolean {
+  return (dayCg + dayJj) in GANYEO_JIDONG_ILJU;
+}
+
+// 간여지동 헬퍼: 월주가 일주를 극하는지 확인 (고집 완화 조건)
+const OHAENG_GEUKHAE: Record<string, string> = {
+  목: "금", 화: "수", 토: "목", 금: "화", 수: "토",
+};
+const CG_OHAENG: Record<string, string> = {
+  갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수",
+};
+const JJ_OHAENG: Record<string, string> = {
+  자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수",
+};
+
+export function monthJidongGeuksIlju(monthCg: string, monthJj: string, dayCg: string, dayJj: string): boolean {
+  const monthGanyeoKey = monthCg + monthJj;
+  const dayTrait = GANYEO_JIDONG_ILJU[dayCg + dayJj];
+  if (!dayTrait || !(monthGanyeoKey in GANYEO_JIDONG_ILJU)) return false;
+  const monthOhaeng = CG_OHAENG[monthCg] ?? JJ_OHAENG[monthJj];
+  const dayOhaeng = CG_OHAENG[dayCg];
+  return OHAENG_GEUKHAE[monthOhaeng] === dayOhaeng;
+}
