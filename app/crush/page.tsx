@@ -1,7 +1,87 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult } from "@/lib/saju";
+
+// 일간별 짝사랑 성공 비결
+const CRUSH_SUCCESS: Record<string, {
+  hook: string;        // 첫 마음을 여는 핵심
+  timing: string;      // 타이밍 전략
+  doThis: string[];    // 반드시 해야 할 것 3가지
+  neverDo: string;     // 절대 금물
+  phrase: string;      // 심장 흔드는 한 마디
+}> = {
+  갑: {
+    hook: "실력·성과를 인정받고 싶어하는 사람입니다. 갑목 일간에게는 '당신이 대단하다'는 말보다 '당신 덕분에 나도 자랐다'는 표현이 훨씬 더 깊이 박힙니다.",
+    timing: "갑목은 새 프로젝트 시작 직후, 성과가 나올 때 에너지가 폭발합니다. 이 사람이 뭔가를 달성하거나 새로운 목표를 세운 직후 옆에 있으세요.",
+    doThis: ["함께 뭔가를 '도전'하거나 '성취'하는 경험을 만드세요", "리더로 빛날 수 있는 상황을 만들어 주세요", "존경을 표현하되, 의존하지 마세요 — 동등한 파트너 이미지"],
+    neverDo: "갑목에게 약점을 드러내거나 끌려다니는 모습을 보이면 매력이 급감합니다. 주도권 싸움도 절대 금물.",
+    phrase: "\"당신 옆에 있으면 나도 뭔가 해낼 수 있을 것 같아요.\"",
+  },
+  을: {
+    hook: "을목은 겉으론 유연하지만 속은 예민합니다. '나만 알아줬으면 하는 감성'이 있어요. 군중 속에서 이 사람만 보고 있다는 섬세한 신호를 꾸준히 보내세요.",
+    timing: "을목은 분위기와 날씨에 감정이 흔들립니다. 봄비 내리는 날, 카페 창가, 조용한 전시회 — 분위기가 자연스럽게 무드를 만들어주는 순간을 노리세요.",
+    doThis: ["상대가 한 말을 기억했다가 나중에 꺼내세요 — 이 사람은 '기억력'에 감동 받습니다", "예쁜 것, 맛있는 것, 감각적인 것을 함께 즐기는 루틴을 만드세요", "불안할 때 옆에 있어주되 절대 강요하지 마세요"],
+    neverDo: "을목에게 갑자기 '우리 어떻게 생각해요?'라며 답을 요구하면 도망갑니다. 천천히, 자연스럽게.",
+    phrase: "\"당신이 말한 거 아직도 기억해요. 그때 너무 예뻤어요.\"",
+  },
+  병: {
+    hook: "병화는 태양입니다. 주목받고 싶고, 자신의 열정을 알아줬으면 합니다. 이 사람의 빛을 가리지 말고 오히려 더 빛나게 만들어 주세요.",
+    timing: "병화는 에너지가 높은 낮 시간대, 활기찬 장소에서 감정이 열립니다. 조용한 밤보다 활기 있는 낮이나 저녁 초반에 승부하세요.",
+    doThis: ["공개적으로 칭찬하세요 — 다른 사람들 앞에서 이 사람을 추켜세우면 효과 2배", "같이 신나는 걸 하세요 — 스포츠, 콘서트, 여행", "밝고 긍정적인 자신을 보여주세요 — 어둡거나 힘든 이야기는 나중에"],
+    neverDo: "병화에게 소극적이거나 말수가 적으면 매력이 사라집니다. 에너지로 맞서야 합니다.",
+    phrase: "\"당신이 있는 자리는 항상 밝아지는 것 같아요.\"",
+  },
+  정: {
+    hook: "정화는 촛불입니다. 특정 사람에게 깊이 집중하는 스타일. 이 사람에게 '나는 당신만 보고 있다'는 신호가 쌓이면 마음이 열립니다.",
+    timing: "정화는 저녁 이후, 조용하고 아늑한 공간에서 감정이 열립니다. 둘만 있는 공간, 따뜻한 분위기가 핵심입니다.",
+    doThis: ["깊은 대화를 유도하세요 — 취향, 꿈, 가치관을 물어보세요", "감성적인 선물이나 메시지로 '나는 당신을 특별히 생각한다'를 표현하세요", "이 사람의 관심사를 미리 공부해서 대화에 활용하세요"],
+    neverDo: "정화에게 관심을 뜨겁게 줬다가 갑자기 식으면 신뢰를 잃습니다. 꾸준함이 생명.",
+    phrase: "\"당신 이야기를 하다 보면 시간 가는 줄 모르겠어요.\"",
+  },
+  무: {
+    hook: "무토는 산입니다. 넓고 포용력 있지만 신뢰를 쌓는 데 시간이 걸립니다. 처음부터 감정을 들이밀지 말고, 믿을 수 있는 사람이라는 인상을 먼저 쌓으세요.",
+    timing: "무토는 급변하는 상황보다 일상에서 꾸준히 쌓인 신뢰를 통해 마음이 열립니다. 비일상적인 이벤트보다 반복되는 일상 속 접점을 늘리세요.",
+    doThis: ["약속은 반드시 지키세요 — 작은 약속 하나라도 어기면 신뢰가 무너집니다", "든든하고 책임감 있는 모습을 보여주세요", "이 사람이 힘들 때 묵묵히 옆에 있어주세요 — 말보다 행동"],
+    neverDo: "무토에게 성급하게 관계를 정의하거나 결론을 요구하지 마세요. 기다리는 것 자체가 전략입니다.",
+    phrase: "\"어떤 상황이어도 당신 편이에요. 그건 변하지 않아요.\"",
+  },
+  기: {
+    hook: "기토는 밭입니다. 세심하고 현실적인 것에 감동받습니다. 거창한 로맨스보다 일상의 작은 배려와 실용적인 관심이 이 사람의 마음을 녹입니다.",
+    timing: "기토는 일상의 반복 속에서 감정이 쌓입니다. 특별한 날보다 평범한 날에 반복적으로 챙기는 것이 훨씬 효과적입니다.",
+    doThis: ["밥 먹었어요? 오늘 날씨 쌀쌀하던데 — 사소한 일상 챙기기가 최강 무기", "이 사람이 힘들다고 하면 바로 실질적인 도움을 주세요", "깔끔하고 신뢰감 있는 외모와 행동을 유지하세요"],
+    neverDo: "기토에게 감정 기복을 보이거나 불안정한 모습을 자주 드러내면 거리를 두기 시작합니다.",
+    phrase: "\"오늘 뭐 먹었어요? 요즘 좀 힘들어 보이던데 잘 챙겨 드세요.\"",
+  },
+  경: {
+    hook: "경금은 칼입니다. 솔직하고 직설적인 것을 좋아합니다. 돌려 말하거나 뜸 들이는 것을 싫어해요. 당신의 진심을 명확하게 전달하는 것이 오히려 매력 포인트가 됩니다.",
+    timing: "경금은 활동적이고 승부하는 상황에서 매력을 느낍니다. 같이 운동하거나 경쟁적인 게임, 도전적인 활동에서 함께하면 빠르게 가까워집니다.",
+    doThis: ["당당하고 자신감 있는 모습을 보여주세요 — 경금은 강한 사람에게 매력을 느낍니다", "직접적으로 만남을 요청하세요 — 간접적인 힌트는 효과가 없습니다", "체력과 건강에 신경 쓰는 모습을 보여주세요"],
+    neverDo: "경금에게 우유부단하거나 결정을 못 내리는 모습은 매력을 잃게 합니다. 확실하게 행동하세요.",
+    phrase: "\"솔직히 말할게요. 당신이 자꾸 마음에 걸려요.\"",
+  },
+  신: {
+    hook: "신금은 보석입니다. 아름다운 것, 세련된 것에 민감하게 반응합니다. 외적인 완성도와 품격이 첫 번째 관문입니다. 그다음은 내면의 깊이.",
+    timing: "신금은 완벽한 세팅에서 감정이 열립니다. 분위기 좋은 레스토랑, 잘 차려입은 모습, 준비된 만남 — 임프로비제이션보다 계획된 것이 훨씬 좋습니다.",
+    doThis: ["자신의 외모와 스타일에 공들이세요 — 첫인상이 전부일 수 있습니다", "이 사람의 미적 감각을 존중하고 공유하세요", "섬세하고 완성도 높은 선물이나 경험을 선사하세요"],
+    neverDo: "신금에게 준비 안 된 모습, 대충대충, 지저분한 것은 절대 금물입니다.",
+    phrase: "\"당신 취향이 너무 좋아요. 어떻게 이런 걸 발견했어요?\"",
+  },
+  임: {
+    hook: "임수는 바다입니다. 자유를 사랑하고 틀에 박힌 것을 싫어합니다. 평범한 데이트보다 의외성과 새로움이 이 사람의 심장을 움직입니다.",
+    timing: "임수는 새로운 자극이 있을 때 감정이 활성화됩니다. 가보지 않은 곳, 해보지 않은 것, 예상치 못한 순간에 승부하세요.",
+    doThis: ["예상을 깨는 만남을 만들어 보세요 — '이런 것도 해봤어요?' 방식", "지적 대화를 나눌 수 있는 자신의 깊이를 보여주세요", "자유를 존중해 주세요 — 구속하거나 집착하면 즉시 멀어집니다"],
+    neverDo: "임수에게 루틴하고 예측 가능한 패턴은 지루함의 신호입니다. 늘 새로워야 합니다.",
+    phrase: "\"이런 거 해본 적 있어요? 같이 가봐요.\"",
+  },
+  계: {
+    hook: "계수는 이슬입니다. 섬세하고 감수성이 풍부해요. 직접적인 접근보다 서서히 스며드는 방식이 효과적입니다. 감성적 교감을 쌓아가는 것이 핵심.",
+    timing: "계수는 감성이 고조되는 저녁, 비 오는 날, 음악이 있는 공간에서 마음이 열립니다. 감각을 자극하는 환경을 만드세요.",
+    doThis: ["이 사람의 감수성을 인정하고 공감해 주세요 — '나도 그 느낌 알아요'가 최고의 연결", "음악·영화·글 등 감성적인 것을 함께 나누세요", "조급하지 않게, 천천히 감정의 파도에 올라타세요"],
+    neverDo: "계수에게 감정을 분석하거나 논리적으로 설득하려 하면 오히려 차가워집니다.",
+    phrase: "\"이 음악 들으면 왜 당신 생각이 나는지 모르겠어요.\"",
+  },
+};
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 export const dynamic = "force-dynamic";
 
@@ -55,7 +135,7 @@ interface CrushResult {
 async function analyzeCrush(targetData: {
   birthYear: number; birthMonth: number; birthDay: number;
   birthTime: BirthTimeValue; calType: "solar" | "lunar"; isLeapMonth: boolean;
-  gender: "male" | "female";
+  gender: "male" | "female"; birthPlace: string;
 }, myData?: {
   birthYear: number; birthMonth: number; birthDay: number;
 }): Promise<CrushResult> {
@@ -65,7 +145,7 @@ async function analyzeCrush(targetData: {
     birthDay: targetData.birthDay,
     birthHour: targetData.birthTime.unknown ? null : targetData.birthTime.hour,
     birthMinute: targetData.birthTime.unknown ? null : targetData.birthTime.minute,
-    name: "상대방", gender: targetData.gender, birthPlace: "서울",
+    name: "상대방", gender: targetData.gender, birthPlace: targetData.birthPlace || "서울",
     style: "auto", productType: "report",
     useJajasi: targetData.birthTime.useJajasi,
   });
@@ -93,6 +173,7 @@ export default function CrushPage() {
   const [targetMonth, setTargetMonth] = useState(0);
   const [targetDay, setTargetDay] = useState(0);
   const [targetTime, setTargetTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [targetBirthPlace, setTargetBirthPlace] = useState("서울");
 
   // 내 정보 (선택)
   const [myYear, setMyYear] = useState(0);
@@ -101,6 +182,7 @@ export default function CrushPage() {
 
   const [formError, setFormError] = useState("");
   const [result, setResult] = useState<CrushResult | null>(null);
+  const [targetSaju, setTargetSaju] = useState<SajuResult | null>(null);
 
   useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2000); return () => clearTimeout(t); }, []);
 
@@ -124,8 +206,16 @@ export default function CrushPage() {
     }
 
     try {
+      const sajuR = analyzeSaju({
+        birthYear: fy, birthMonth: fm, birthDay: fd,
+        birthHour: targetTime.unknown ? null : targetTime.hour,
+        birthMinute: targetTime.unknown ? null : targetTime.minute,
+        name: "상대방", gender: targetGender, birthPlace: targetBirthPlace || "서울",
+        style: "auto", productType: "report", useJajasi: targetTime.useJajasi,
+      });
+      setTargetSaju(sajuR);
       const res = await analyzeCrush(
-        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender },
+        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender, birthPlace: targetBirthPlace },
         myYear && myMonth && myDay ? { birthYear: myYear, birthMonth: myMonth, birthDay: myDay } : undefined,
       );
       setResult(res);
@@ -276,6 +366,21 @@ export default function CrushPage() {
             <BirthTimePicker value={targetTime} onChange={setTargetTime} accent="violet" />
           </div>
 
+          {/* 태어난 장소 */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
+              그 사람 태어난 장소 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(진태양시 경도보정 자동 적용)</span>
+            </label>
+            <input
+              type="text"
+              value={targetBirthPlace}
+              onChange={e => setTargetBirthPlace(e.target.value)}
+              placeholder="서울 / 부산 / 도쿄 / 뉴욕 등"
+              className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)" }}
+            />
+          </div>
+
           {/* 구분선 */}
           <div className="flex items-center gap-3 py-2">
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
@@ -386,6 +491,151 @@ export default function CrushPage() {
             </p>
           </div>
         ))}
+
+        {/* 상대방 사주 원국 */}
+        {targetSaju && (() => {
+          const p = targetSaju.pillarsDetail;
+          const pillars = [
+            { label: "연주", cg: p.year.cg, jj: p.year.jj, ssCg: p.year.sipseongCg, ssJj: p.year.sipseongJj },
+            { label: "월주", cg: p.month.cg, jj: p.month.jj, ssCg: p.month.sipseongCg, ssJj: p.month.sipseongJj },
+            { label: "일주", cg: p.day.cg, jj: p.day.jj, ssCg: "일간", ssJj: p.day.sipseongJj },
+            ...(p.hour ? [{ label: "시주", cg: p.hour.cg, jj: p.hour.jj, ssCg: p.hour.sipseongCg, ssJj: p.hour.sipseongJj }] : []),
+          ];
+          return (
+            <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>그 사람의 사주 원국</p>
+              <div className={`grid gap-2 ${pillars.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+                {pillars.map((pl, i) => (
+                  <div key={i} className="rounded-xl p-3 text-center border" style={{ borderColor: pl.label === "일주" ? "rgba(244,63,94,0.4)" : "rgba(255,255,255,0.08)", background: pl.label === "일주" ? "rgba(244,63,94,0.1)" : "rgba(255,255,255,0.03)" }}>
+                    <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>{pl.label}</p>
+                    <p className="text-[10px] mb-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{pl.ssCg || "–"}</p>
+                    <p className="text-lg font-black text-white">{pl.cg}</p>
+                    <div className="h-px my-1" style={{ background: "rgba(255,255,255,0.1)" }} />
+                    <p className="text-lg font-black text-white">{pl.jj}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: pl.label === "일주" ? "#fb7185" : "rgba(255,255,255,0.35)" }}>{pl.ssJj || "–"}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.25)" }}>{targetSaju.fourPillars}</p>
+            </div>
+          );
+        })()}
+
+        {/* 일간 성격 — 그 사람 */}
+        {targetSaju && (() => {
+          const ilgan = targetSaju.pillarsDetail.day.cg;
+          const info = ILGAN_PERSONALITY[ilgan];
+          if (!info) return null;
+          return (
+            <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🔮</span>
+                <h3 className="text-sm font-black" style={{ color: "#f43f5e" }}>그 사람의 일간 — {info.short}</h3>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {info.keyword.split("·").map(k => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(244,63,94,0.12)", color: "#fb7185", border: "1px solid rgba(244,63,94,0.25)" }}>{k}</span>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{info.detail}</p>
+            </div>
+          );
+        })()}
+
+        {/* 겉모습 vs 속마음 */}
+        {targetSaju && (() => {
+          const ilgan = targetSaju.pillarsDetail.day.cg;
+          const io = ILGAN_INNER_OUTER[ilgan];
+          if (!io) return null;
+          return (
+            <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🪞</span>
+                <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>겉모습 vs 속마음</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="rounded-xl p-3" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>밖으로 보이는 모습</p>
+                  <p className="text-sm font-bold text-white">{io.outer}</p>
+                </div>
+                <div className="rounded-xl p-3" style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.2)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fb7185" }}>내면의 진짜 욕구</p>
+                  <p className="text-sm font-bold text-white">{io.inner}</p>
+                </div>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{io.synthesis}</p>
+            </div>
+          );
+        })()}
+
+        {/* 신살 목록 */}
+        {targetSaju && targetSaju.sinsalList.length > 0 && (
+          <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">⭐</span>
+              <h3 className="text-sm font-black" style={{ color: "#fbbf24" }}>그 사람의 신살 (神殺)</h3>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {targetSaju.sinsalList.map((s, i) => (
+                <div key={i} className="rounded-xl px-3 py-2" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                  <p className="text-xs font-bold" style={{ color: "#fbbf24" }}>{s.name}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 짝사랑 성공 비결 */}
+        {targetSaju && (() => {
+          const ilgan = targetSaju.pillarsDetail.day.cg;
+          const tip = CRUSH_SUCCESS[ilgan];
+          if (!tip) return null;
+          return (
+            <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(244,63,94,0.35)", background: "rgba(244,63,94,0.06)" }}>
+              <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: "rgba(244,63,94,0.2)" }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">💡</span>
+                  <h3 className="text-sm font-black" style={{ color: "#fb7185" }}>짝사랑 성공 비결 — {ilgan}일간 맞춤 전략</h3>
+                </div>
+              </div>
+              <div className="p-5 space-y-4">
+                {/* 핵심 훅 */}
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>🎯 마음을 여는 핵심</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{tip.hook}</p>
+                </div>
+                {/* 타이밍 */}
+                <div className="rounded-xl p-4" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fbbf24" }}>⏰ 타이밍 전략</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{tip.timing}</p>
+                </div>
+                {/* 반드시 할 것 */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#34d399" }}>✅ 반드시 해야 할 것</p>
+                  <div className="space-y-2">
+                    {tip.doThis.map((d, i) => (
+                      <div key={i} className="flex items-start gap-2 rounded-xl px-3 py-2.5" style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.15)" }}>
+                        <span className="text-xs font-black mt-0.5 shrink-0" style={{ color: "#34d399" }}>0{i + 1}</span>
+                        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{d}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* 절대 금물 */}
+                <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#f87171" }}>🚫 절대 금물</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{tip.neverDo}</p>
+                </div>
+                {/* 심장 흔드는 한 마디 */}
+                <div className="rounded-xl p-4 text-center" style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.25)" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>💬 심장 흔드는 한 마디</p>
+                  <p className="text-sm font-bold italic" style={{ color: "#fff" }}>{tip.phrase}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 공유 + CTA */}
         <div className="mt-6 rounded-2xl p-5 text-center"

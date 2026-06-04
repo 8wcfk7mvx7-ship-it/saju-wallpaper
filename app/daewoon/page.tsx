@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
+import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -120,11 +120,15 @@ export default function DaewoonPage() {
   const [monthJj, setMonthJj] = useState("");
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
   const [totalCount] = useState(() => Math.floor(Math.random() * 1500) + 7200);
 
   useEffect(() => {
-    setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");
+    const isAdmin = localStorage.getItem("sp_admin") === "true";
+    setIsPaid(isAdmin || sessionStorage.getItem("daewoonPaid") === "true");
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
     const saved = loadSajuData();
     if (saved) {
       // 이름은 placeholder로 표시 — 직접 입력하게
@@ -427,6 +431,23 @@ export default function DaewoonPage() {
           </p>
         </div>
 
+        {/* 일간 성격 */}
+        {(() => {
+          const info = ILGAN_PERSONALITY[ilgan];
+          if (!info) return null;
+          return (
+            <div className="mb-6 rounded-2xl p-4 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.08)" }}>
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-2">일간 기질 — {info.short}</p>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {info.keyword.split("·").map(k => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>{k}</span>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{info.detail}</p>
+            </div>
+          );
+        })()}
+
         <div className="mb-6">
           <h2 className="text-sm font-bold text-gray-300 mb-3">대운 흐름 (80년)</h2>
           <div className="space-y-2">
@@ -522,12 +543,27 @@ export default function DaewoonPage() {
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
             <div className="max-w-lg mx-auto">
-              <button
-                onClick={goPay}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
-              >
-                전체 보고서 + AI 해설 + PDF — ₩{PRICE.toLocaleString()}
-              </button>
+              {blueberries >= PRICE ? (
+                <button
+                  onClick={() => {
+                    const next = blueberries - PRICE;
+                    localStorage.setItem("sp_blueberries", String(next));
+                    sessionStorage.setItem("daewoonPaid", "true");
+                    setBlueberries(next);
+                    setIsPaid(true);
+                  }}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
+                >
+                  🫐 블루베리 {PRICE.toLocaleString()}개로 즉시 열기
+                </button>
+              ) : (
+                <button
+                  onClick={goPay}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
+                >
+                  전체 보고서 + AI 해설 + PDF — ₩{PRICE.toLocaleString()}
+                </button>
+              )}
               <p className="text-center text-xs text-gray-600 mt-2">교운기·대운 8개 전체·세운 14년치 완전 공개</p>
             </div>
           </div>

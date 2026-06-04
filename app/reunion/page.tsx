@@ -185,11 +185,15 @@ export default function ReunionPage() {
   const [theirData, setTheirData] = useState<PersonData>(EMPTY_PERSON());
   const [result, setResult] = useState<ReunionResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const isAdmin = localStorage.getItem("sp_admin") === "true";
     const paid = localStorage.getItem(PAID_KEY) === "true";
-    setIsPaid(paid);
+    setIsPaid(isAdmin || paid);
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
       try {
@@ -470,13 +474,29 @@ export default function ReunionPage() {
                 망설이는 동안 그 사람의 마음이 멀어질 수 있어요.
                 재회 전략을 지금 확인하세요.
               </p>
-              <button
-                onClick={handleUnlock}
-                className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
-                style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 6px 24px rgba(234,88,12,0.4)" }}
-              >
-                전체 분석 보기 — ₩3,900
-              </button>
+              {blueberries >= 3900 ? (
+                <button
+                  onClick={() => {
+                    const next = blueberries - 3900;
+                    localStorage.setItem("sp_blueberries", String(next));
+                    localStorage.setItem(PAID_KEY, "true");
+                    setBlueberries(next);
+                    setIsPaid(true);
+                  }}
+                  className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98] mb-2"
+                  style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 6px 24px rgba(99,102,241,0.4)" }}
+                >
+                  🫐 블루베리 3,900개로 즉시 열기
+                </button>
+              ) : (
+                <button
+                  onClick={handleUnlock}
+                  className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 6px 24px rgba(234,88,12,0.4)" }}
+                >
+                  전체 분석 보기 — ₩3,900
+                </button>
+              )}
               <p className="text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>일회성 결제 · 영구 보관</p>
             </div>
           )}

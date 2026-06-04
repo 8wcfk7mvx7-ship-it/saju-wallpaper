@@ -140,6 +140,7 @@ const REVIEWS = [
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
 const NOTICES = [
+  { date: "2026.06.04", title: "짝사랑 성공 비결 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.03", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.02", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.01", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
@@ -158,6 +159,30 @@ const ACTIVITIES = [
   "병술일간 한○○님이 도시 추천을 받았습니다",
   "정유일간 윤○○님이 대운 보고서를 구입했습니다",
   "계축일주 강○○님이 궁합 위험도를 확인했습니다",
+];
+
+// ── 라이브 피드 ───────────────────────────────────────────────────────────────
+const LIVE_FEED_POOL = [
+  { name: "윤○현", desc: "석양 아래 귀갓길의 여행자", rarity: 37.9 },
+  { name: "최○우", desc: "봄바람에 흔들리는 버드나무", rarity: 31.3 },
+  { name: "오○진", desc: "심해의 진주조개", rarity: 6.6 },
+  { name: "이○민", desc: "사막을 건너는 낙타의 끈기", rarity: 5.1 },
+  { name: "김○혁", desc: "빈 들판의 마지막 씨앗", rarity: 2.1 },
+  { name: "강○빈", desc: "아침 안개 속 정원사", rarity: 23.0 },
+  { name: "홍○연", desc: "석양 아래 귀갓길의 여행자", rarity: 28.6 },
+  { name: "송○호", desc: "벼랑 끝의 독수리", rarity: 3.4 },
+  { name: "박○서", desc: "고요한 새벽의 등불", rarity: 44.2 },
+  { name: "정○아", desc: "태풍 전야의 고요함", rarity: 8.7 },
+  { name: "한○준", desc: "물 위에 떠가는 연잎", rarity: 17.5 },
+  { name: "임○하", desc: "달빛 아래 선인장", rarity: 1.8 },
+  { name: "조○현", desc: "바람을 가르는 화살", rarity: 62.3 },
+  { name: "신○영", desc: "여명의 첫 새소리", rarity: 12.4 },
+  { name: "황○찬", desc: "눈보라 속 홀로 선 소나무", rarity: 4.2 },
+  { name: "문○지", desc: "가을 강가의 갈대", rarity: 38.9 },
+  { name: "차○선", desc: "폭풍 속에 핀 야생화", rarity: 9.3 },
+  { name: "노○빈", desc: "사계절을 담은 호수", rarity: 51.7 },
+  { name: "유○현", desc: "새벽 이슬의 거울", rarity: 7.2 },
+  { name: "권○수", desc: "모래 위의 나침반", rarity: 3.1 },
 ];
 
 function ContactSection() {
@@ -398,10 +423,10 @@ const SERVICES: {
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "무료",
+    href: "/hotcompat", badge: "₩4,900",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
+    categories: ["전체", "연애·궁합", "19금"],
   },
   {
     id: "charm", emoji: "✨",
@@ -473,10 +498,10 @@ const SERVICES: {
   },
   {
     id: "calendar", emoji: "📅",
-    title: "길일 찾기",
+    title: "길일·흉일 확인",
     viral: "결정의 날짜를 고르면 결과가 달라집니다",
     desc: "이사·결혼·시험·개업·계약·수술·여행·투자·연애·임신 — 내 사주와 맞는 최적의 날짜를 찾아드립니다.",
-    tags: ["길일", "날짜 선택", "이사·결혼·시험"],
+    tags: ["길일·흉일", "날짜 선택", "이사·결혼·시험"],
     href: "/calendar", badge: "₩990",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
@@ -617,6 +642,8 @@ export default function MainPage() {
   const [noticeIndex, setNoticeIndex] = useState(0);
   const [noticeVisible, setNoticeVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
+  const [feedOffset, setFeedOffset] = useState(0);
+  const [feedVisible, setFeedVisible] = useState(true);
 
   // 언어
   const [lang, setLang] = useState<Lang>("ko");
@@ -672,8 +699,19 @@ export default function MainPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFeedVisible(false);
+      setTimeout(() => {
+        setFeedOffset(i => (i + 1) % LIVE_FEED_POOL.length);
+        setFeedVisible(true);
+      }, 350);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <main className="min-h-screen bg-[#06060e] text-white">
+    <main className="min-h-screen bg-[#06060e] text-white overflow-x-hidden">
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -682,8 +720,8 @@ export default function MainPage() {
         <div className="absolute top-[40%] left-[30%] w-[500px] h-[500px] rounded-full blur-[180px]" style={{ background: "rgba(201,168,76,0.03)" }} />
       </div>
 
-      {/* ── 상단 네비게이션 ── */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
+      {/* ── 상단 네비게이션 (모바일 숨김) ── */}
+      <nav className="hidden sm:block sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
         style={{ background: "rgba(6,6,14,0.85)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <button onClick={() => router.push("/")} className="flex items-center gap-2.5">
@@ -827,24 +865,6 @@ export default function MainPage() {
             ))}
           </div>
 
-          {/* 통계 */}
-          <div className="flex items-center justify-center gap-0 mb-8">
-            {[
-              { label: "누적 분석", value: `${counter.toLocaleString()}명` },
-              { label: "지금 접속 중", value: `${todayCounter.toLocaleString()}명` },
-              { label: "만족도", value: "98.3%" },
-              { label: "평균 분석", value: "3분" },
-            ].map((s, i) => (
-              <div key={i} className="flex items-center">
-                <div className="text-center px-4 sm:px-6">
-                  <p className="text-lg sm:text-xl font-black" style={{ color: "#e8c97a" }}>{s.value}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{s.label}</p>
-                </div>
-                {i < 3 && <div className="w-px h-8" style={{ background: "rgba(201,168,76,0.15)" }} />}
-              </div>
-            ))}
-          </div>
-
           <button
             onClick={() => router.push("/saju")}
             className="inline-flex items-center gap-2 font-black text-base px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95"
@@ -857,6 +877,72 @@ export default function MainPage() {
             {t.heroCta}
             <span>→</span>
           </button>
+
+          {/* ── 실시간 통계 + 라이브 피드 ── */}
+          <div className="mt-10 max-w-sm mx-auto">
+            {/* 3-col stats */}
+            <div className="flex items-center justify-center gap-0 mb-5">
+              <div className="text-center px-5">
+                <p className="text-2xl font-black" style={{ color: "#f97316" }}>{todayCounter}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>지금 열람 중</p>
+              </div>
+              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="text-center px-5">
+                <p className="text-2xl font-black text-white">{Math.floor(counter / 14).toLocaleString()}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>오늘 열람</p>
+              </div>
+              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="text-center px-5">
+                <p className="text-2xl font-black text-white">{counter.toLocaleString()}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>누적 열람</p>
+              </div>
+            </div>
+
+            {/* 구분선 */}
+            <div className="w-full mb-4" style={{ height: 1, background: "rgba(255,255,255,0.07)" }} />
+
+            {/* 라이브 피드 헤더 */}
+            <div className="flex items-center gap-1.5 mb-3 justify-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>지금 사주를 열람 중인 분들</span>
+            </div>
+
+            {/* 라이브 피드 4행 */}
+            <div
+              className="space-y-2"
+              style={{ opacity: feedVisible ? 1 : 0, transition: "opacity 0.35s ease" }}
+            >
+              {Array.from({ length: 4 }).map((_, i) => {
+                const entry = LIVE_FEED_POOL[(feedOffset + i) % LIVE_FEED_POOL.length];
+                const isRare = entry.rarity < 10;
+                return (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
+                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    {/* 아바타 */}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black"
+                      style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+                      {entry.name.slice(0, 2)}
+                    </div>
+                    {/* 이름 + 설명 */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-white">{entry.name}</p>
+                      <p className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)" }}>{entry.desc}</p>
+                    </div>
+                    {/* 희소성 */}
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-black" style={{ color: isRare ? "#f97316" : "rgba(255,255,255,0.5)" }}>
+                        희소성 {entry.rarity}%
+                      </p>
+                      <p className="text-[10px] flex items-center justify-end gap-1" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
+                        열람 중
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
           <div className="mt-10 relative">
@@ -1135,7 +1221,7 @@ export default function MainPage() {
         </div>
       </footer>
 
-      {/* ── 모바일 카카오 플로팅 CTA ── */}
+      {/* ── 모바일 카카오 로그인 고정 플로팅 (하단 nav 위) ── */}
       <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 sm:hidden px-4 pb-2">
         <KakaoLoginButton redirectTo="/" floating />
       </div>
@@ -1147,7 +1233,7 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/saju" },
-            { icon: "👤", label: "마이페이지", href: "/mypage" },
+            { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
