@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPrompt } from "@/lib/prompts";
+import { analyzeJaeseongPosition, SINGANG_TRAITS, JAESEONG_POSITION_INSIGHT } from "@/lib/saju";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -82,6 +83,15 @@ export async function POST(req: NextRequest) {
           .join(", ")
       : "";
 
+    // 신강/신약 기질 + 재성 위치 분석
+    const strengthKey = (yongshin?.strength || "중화") as "신강"|"신약"|"중화";
+    const singangTrait = SINGANG_TRAITS[strengthKey];
+    const ilgan = (dayPillar || "")[0] || "";
+    const jaeseongPos = (pillarsDetail && ilgan)
+      ? analyzeJaeseongPosition(ilgan, pillarsDetail as Parameters<typeof analyzeJaeseongPosition>[1])
+      : "없음";
+    const jaeseongInsight = JAESEONG_POSITION_INSIGHT[jaeseongPos];
+
     // DB에서 커스텀 프롬프트 로드 (없으면 기본값 사용)
     const [systemPrefix, systemSuffix, tone, specialMsg] = await Promise.all([
       getPrompt("report_system_prefix"),
@@ -118,6 +128,18 @@ export async function POST(req: NextRequest) {
 - 용신(보완할 기운): ${EL_NAME[yongshin?.yongshin] || yongshin?.yongshin || "?"}
 - 희신: ${EL_NAME[yongshin?.heeshin] || yongshin?.heeshin || "?"}
 - 기신(피할 기운): ${EL_NAME[yongshin?.gishin] || yongshin?.gishin || "?"}
+
+## 신강·신약 기질 분석
+- 판단 기준: ${singangTrait.mindset}
+- 관계 경계: ${singangTrait.boundary}
+- 정신 패턴: ${singangTrait.mental}
+- 생활 스타일: ${singangTrait.style}
+- 유의점: ${singangTrait.caution}
+
+## 재성(財星) 위치 분석
+- 위치: ${jaeseongPos} (${jaeseongInsight.desc})
+- 재물 유형: ${jaeseongInsight.wealth}
+- 재물 운용 스타일: ${jaeseongInsight.style}
 
 ## 십성 분포
 ${sipseongList}

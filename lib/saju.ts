@@ -2320,3 +2320,88 @@ export function monthJidongGeuksIlju(monthCg: string, monthJj: string, dayCg: st
   const dayOhaeng = CG_OHAENG[dayCg];
   return OHAENG_GEUKHAE[monthOhaeng] === dayOhaeng;
 }
+
+// ── 신강·신약 심층 기질 해설 ──────────────────────────────────────────────
+export const SINGANG_TRAITS: Record<"신강"|"신약"|"중화", {
+  mindset: string; boundary: string; mental: string; style: string; caution: string;
+}> = {
+  신강: {
+    mindset: "자기 기준으로 좋고 나쁨을 판단합니다. 외부 시선보다 스스로의 판단을 우선하며, 본인에게 검증된 것을 선호합니다.",
+    boundary: "개인 영역에 대한 감각이 분명합니다. 다수의 공론보다 1:1 소통을 선호하며, 스스로 허용한 관계에만 마음을 엽니다.",
+    mental: "경쟁보다 내면에서 먼저 이기고 시작하는 정신적 강인함이 있습니다. 걱정과 불안도 있으나 스스로 수용하며 균형을 찾는 능력이 탁월합니다.",
+    style: "익숙함에 가치를 두고, 지금 이 상태에서도 충분한 만족을 찾는 안빈낙도(安貧樂道) 기질이 있습니다. 포기처럼 보여도 내면의 욕심은 사라지지 않습니다.",
+    caution: "비겁이 강하다는 것은 책임지고 싶은 대상이 많다는 뜻이기도 합니다. 늘 부족한 듯한 불안감이 있으나, 실제로는 충분히 갖춰져 있는 경우가 많습니다.",
+  },
+  신약: {
+    mindset: "외부 환경과 타인의 에너지에 민감하게 반응합니다. 분위기를 잘 읽고, 관계 속에서 힘을 얻습니다.",
+    boundary: "소통과 공유에 열려 있습니다. 집단 안에서 에너지를 얻고, 함께할 때 능력이 배가됩니다.",
+    mental: "환경 변화에 유연하게 적응합니다. 좋은 인연과 도움의 기운이 함께할 때 잠재력이 최대로 발현됩니다.",
+    style: "새로운 정보와 주변의 조언을 적극적으로 수용합니다. 최신 흐름에 민감하고 트렌드를 빠르게 흡수합니다.",
+    caution: "타인의 기운에 지나치게 영향받지 않도록 자신의 중심을 유지하는 것이 중요합니다.",
+  },
+  중화: {
+    mindset: "자신의 기준과 외부 정보를 함께 활용하는 균형 감각이 있습니다. 편향 없이 상황을 판단합니다.",
+    boundary: "상황에 따라 유연하게 거리를 조절합니다. 극단보다 중도를 선택하는 경향이 있습니다.",
+    mental: "감정 기복이 크지 않고, 큰 파도 없이 꾸준히 앞으로 나아가는 안정성이 장점입니다.",
+    style: "다양한 선택지를 고려한 후 결정합니다. 급격한 변화보다 점진적인 성장을 선호합니다.",
+    caution: "부족한 기운을 보충하는 용신을 꾸준히 활용하는 것이 장기적으로 중요합니다.",
+  },
+};
+
+// ── 재성 위치 심층 해석 (천간·지지·지장간) ──────────────────────────────
+// 천간=드러난 재성, 지지=반은 숨긴 재성, 지장간=깊이 숨긴 재성
+export const JAESEONG_POSITION_INSIGHT: Record<"천간"|"지지"|"지장간"|"없음", {
+  desc: string; wealth: string; style: string;
+}> = {
+  천간: {
+    desc: "재성(財星)이 천간(天干)에 드러나 있습니다.",
+    wealth: "유동적 자산, 현금 흐름, 빠른 수익 구조와 어울립니다.",
+    style: "재물 목표를 공개적으로 드러내고 주변과 정보를 나누는 성향입니다. 기회를 빠르게 포착하지만, 재물이 흩어지거나 외부에 노출될 가능성도 함께 존재합니다.",
+  },
+  지지: {
+    desc: "재성(財星)이 지지(地支)에 자리합니다.",
+    wealth: "부동산·실물 자산·장기 투자와 어울립니다.",
+    style: "재물을 드러내지 않고 음적(陰的)으로 축적합니다. 가까운 사람에게도 재물 정보를 쉽게 공유하지 않으며, 실속 중심으로 안정되게 보전합니다.",
+  },
+  지장간: {
+    desc: "재성(財星)이 지장간(地藏干) 깊숙이 숨어 있습니다. 고전 명리에서 '절대 뺏기지 않는 재물'로 해석합니다.",
+    wealth: "비공개 자산, 조용한 적립, 드러나지 않는 형태의 자산과 어울립니다.",
+    style: "재물 정보를 극히 소수에게만 공유하며, 혼자 조용히 실행하는 방식으로 재물을 모읍니다. 외부에 노출되지 않아 뺏기기 어렵고 실속이 단단합니다.",
+  },
+  없음: {
+    desc: "사주 내에서 재성(財星)이 두드러지게 발견되지 않습니다.",
+    wealth: "용신·희신 기운을 통해 간접적으로 재물 흐름이 형성됩니다.",
+    style: "재물에 대한 직접적 집착보다, 본인의 재능·관계·학식을 통해 자연스럽게 따르는 재물 구조일 수 있습니다.",
+  },
+};
+
+// 사주 결과에서 재성이 천간·지지·지장간 중 어디에 위치하는지 분석
+export function analyzeJaeseongPosition(
+  ilgan: string,
+  pillarsDetail: SajuResult["pillarsDetail"]
+): "천간" | "지지" | "지장간" | "없음" {
+  const JAESEONG = new Set(["편재", "정재"]);
+  const jaeseongEl = OHAENG_CONTROLS[CHEONGAN_ELEMENT[ilgan] as Element];
+
+  const pillars = [
+    pillarsDetail.year,
+    pillarsDetail.month,
+    pillarsDetail.day,
+    pillarsDetail.hour,
+  ].filter(Boolean) as PillarDetail[];
+
+  for (const p of pillars) {
+    if (JAESEONG.has(p.sipseongCg)) return "천간";
+  }
+  for (const p of pillars) {
+    if (JAESEONG.has(p.sipseongJj)) return "지지";
+  }
+  for (const p of pillars) {
+    for (const ch of p.jijangan.split("")) {
+      const el = CHEONGAN_ELEMENT[ch];
+      if (el && el === jaeseongEl) return "지장간";
+    }
+  }
+
+  return "없음";
+}
