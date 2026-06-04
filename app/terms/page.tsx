@@ -255,13 +255,31 @@ function TermsContent() {
         {/* ── 환불규정 탭 ── */}
         {tab === "refund" && (
           <>
-            <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-5 mb-10">
-              <p className="text-amber-300 font-bold text-sm mb-2">📌 결제 전 반드시 확인하세요</p>
-              <p className="text-amber-200/80 text-xs leading-relaxed">
-                Summer Palace는 결제 즉시 AI가 개인 맞춤 콘텐츠를 생성하는 <strong>디지털 콘텐츠 서비스</strong>입니다.
-                「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따라,
-                <strong> AI 콘텐츠 생성이 시작된 이후에는 청약철회(환불)가 법적으로 제한</strong>됩니다.
+            <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-5 mb-6">
+              <p className="text-red-300 font-black text-sm mb-2">🚨 결제 전 필수 고지 (법적 효력)</p>
+              <p className="text-red-200/80 text-xs leading-relaxed">
+                Summer Palace의 모든 유료 서비스는 <strong>결제 완료 즉시 서버에서 AI 콘텐츠 생성이 시작</strong>됩니다.
+                이용자가 결제 화면에서 동의 체크박스를 선택함으로써 본 환불불가 조건에 사전 동의한 것으로 처리됩니다.
+                「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호 및 「콘텐츠산업 진흥법」 제27조에 따라,
+                <strong> 사전 동의한 디지털 콘텐츠의 경우 제공 즉시 청약철회가 불가합니다.</strong>
               </p>
+            </div>
+
+            {/* 서비스 제공 기간 및 방법 */}
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8 text-sm">
+              <p className="text-white font-bold mb-3">📋 서비스 제공 기간 및 방법</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                <span className="text-gray-500">제공 시점</span>
+                <span className="text-white font-bold">결제 완료 즉시 (수 초 이내)</span>
+                <span className="text-gray-500">제공 방법</span>
+                <span className="text-gray-300">서비스 화면 내 텍스트·이미지 표시</span>
+                <span className="text-gray-500">이용 기간</span>
+                <span className="text-gray-300">결제 후 영구 이용 가능 (서비스 운영 기간 내)</span>
+                <span className="text-gray-500">교환</span>
+                <span className="text-red-400 font-bold">불가 — 디지털 콘텐츠 특성상 교환 없음</span>
+                <span className="text-gray-500">반품</span>
+                <span className="text-red-400 font-bold">불가 — 디지털 콘텐츠 특성상 반품 없음</span>
+              </div>
             </div>
 
             <div className="space-y-8 text-sm leading-relaxed">
@@ -271,46 +289,58 @@ function TermsContent() {
                   <span className="text-amber-400 font-black">1.</span> 기본 원칙
                 </h2>
                 <div className="text-gray-400 pl-5 space-y-2">
-                  <p>① 여름궁전(Summer Palace)의 모든 유료 서비스는 결제 즉시 AI 콘텐츠 생성이 시작되는 <strong className="text-white">디지털 콘텐츠</strong>로, 「전자상거래법」 제17조 제2항 제5호·「콘텐츠산업 진흥법」 제27조에 근거하여 일정 조건 하에 청약철회가 제한됩니다.</p>
-                  <p>② 회사는 소비자 보호를 위해 전자상거래법이 허용하는 범위 내에서 최대한 환불을 처리하며, 환불 불가 조건은 결제 화면에 명시하고 이용자의 사전 동의를 받습니다.</p>
-                  <p>③ 모든 환불은 원결제 수단으로 처리됩니다.</p>
+                  <p>① 본 서비스의 모든 유료 콘텐츠는 결제 완료와 동시에 서버에서 AI 생성이 시작되는 즉시 제공 디지털 콘텐츠입니다. 결제 화면의 동의 체크 선택으로 이용자는 본 조건에 사전 동의한 것으로 간주됩니다.</p>
+                  <p>② 「전자상거래법」 제17조 제2항 제5호·「콘텐츠산업 진흥법」 제27조에 따라, 사전 동의한 즉시 제공 디지털 콘텐츠는 원칙적으로 청약철회가 불가합니다.</p>
+                  <p>③ 단, 회사의 귀책 사유(시스템 오류·이중 결제·금액 오류)에 해당하는 경우에 한해 환불을 처리합니다.</p>
+                  <p>④ 모든 환불은 원결제 수단으로만 처리되며, 현금·포인트·다른 결제 수단으로의 변경은 불가합니다.</p>
                 </div>
               </section>
 
               <section>
                 <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                  <span className="text-green-400 font-black">2.</span>
-                  환불 가능한 경우 <span className="text-green-400 text-xs font-normal">(전액 환불)</span>
+                  <span className="text-gray-500 font-black">2.</span> 취소 가능 시점
+                </h2>
+                <div className="text-gray-400 pl-5 space-y-2">
+                  <p className="text-white text-xs font-bold bg-white/5 rounded-lg px-3 py-2">결제창에서 결제 버튼을 누르기 전까지만 취소 가능</p>
+                  <p>결제 버튼 클릭 후 결제가 승인된 시점부터는 취소 불가합니다. 결제 진행 중 이탈·타임아웃의 경우 PG사(토스페이먼츠) 처리 결과에 따릅니다.</p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+                  <span className="text-green-400 font-black">3.</span>
+                  환불 가능한 경우 <span className="text-green-400 text-xs font-normal">(회사 귀책 한정, 전액 환불)</span>
                 </h2>
                 <div className="text-gray-400 pl-5">
                   <ul className="space-y-2.5">
-                    <Li icon="check"><span><strong className="text-gray-300">결제 후 생성 미시작</strong>: 결제 완료 후 10분 이내 환불 요청 + AI 콘텐츠 생성이 아직 시작되지 않은 경우</span></Li>
-                    <Li icon="check"><span><strong className="text-gray-300">시스템 오류</strong>: 서버 오류, AI API 장애 등으로 콘텐츠가 정상 생성·제공되지 않은 경우</span></Li>
-                    <Li icon="check"><span><strong className="text-gray-300">이중 결제</strong>: 동일 주문건이 두 번 결제된 경우 (중복 결제 금액 전액)</span></Li>
-                    <Li icon="check"><span><strong className="text-gray-300">금액 오류</strong>: 결제 금액이 서비스 화면에 표시된 금액과 다른 경우</span></Li>
-                    <Li icon="check"><span><strong className="text-gray-300">미성년자 결제</strong>: 만 14세 미만 이용자가 법정대리인 동의 없이 결제한 경우</span></Li>
+                    <Li icon="check"><span><strong className="text-gray-300">서비스 미제공</strong>: 결제 완료 후 서버 오류·API 장애 등으로 콘텐츠가 생성되지 않고 빈 화면·오류가 표시된 경우 (스크린샷 등 증빙 필요)</span></Li>
+                    <Li icon="check"><span><strong className="text-gray-300">이중 결제</strong>: 동일 주문번호(orderId)가 두 번 결제 처리된 경우 (중복분 전액)</span></Li>
+                    <Li icon="check"><span><strong className="text-gray-300">금액 오류</strong>: 서비스 화면에 명시된 금액과 실제 청구 금액이 다른 경우</span></Li>
+                    <Li icon="check"><span><strong className="text-gray-300">미성년자 결제</strong>: 만 14세 미만이 법정대리인 동의 없이 결제한 것이 증명된 경우</span></Li>
                   </ul>
                 </div>
               </section>
 
               <section>
                 <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                  <span className="text-red-400 font-black">3.</span> 환불 불가한 경우
+                  <span className="text-red-400 font-black">4.</span> 환불 불가한 경우 (원칙적 전면 불가)
                 </h2>
-                <div className="bg-red-500/5 border border-red-500/15 rounded-xl p-4 mb-3">
-                  <p className="text-red-300/80 text-xs">
-                    아래 경우는 「전자상거래법」 제17조 제2항 제5호에 의거, 디지털 콘텐츠의 특성상 법적으로 청약철회가 제한됩니다.
+                <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 mb-3">
+                  <p className="text-red-300/90 text-xs font-bold">
+                    아래 모든 경우는 「전자상거래법」 제17조 제2항 제5호에 의거, 결제 화면 사전 동의에 따라 청약철회가 불가합니다.
                   </p>
                 </div>
                 <div className="text-gray-400 pl-5">
                   <ul className="space-y-2.5">
-                    <Li icon="x"><span>AI 콘텐츠(배경화면 이미지, 분석 보고서, 운세 텍스트)가 <strong className="text-gray-300">생성 완료</strong>되어 화면에 표시된 경우</span></Li>
-                    <Li icon="x"><span>생성된 결과물을 <strong className="text-gray-300">화면에서 확인(열람)</strong>한 경우</span></Li>
-                    <Li icon="x"><span>PDF 파일을 <strong className="text-gray-300">다운로드</strong>한 경우</span></Li>
-                    <Li icon="x"><span>이미지를 <strong className="text-gray-300">저장하거나 공유</strong>한 경우</span></Li>
-                    <Li icon="x"><span>콘텐츠 내용이 <strong className="text-gray-300">마음에 들지 않거나 기대와 다른 경우</strong></span></Li>
-                    <Li icon="x"><span>결제 후 <strong className="text-gray-300">10분이 경과</strong>한 경우 (시스템 오류 제외)</span></Li>
-                    <Li icon="x"><span>이용자가 입력한 생년월일·이름·성별 등 <strong className="text-gray-300">정보 오입력</strong>으로 인한 결과 불만족</span></Li>
+                    <Li icon="x"><span>결제 완료 즉시 — <strong className="text-gray-300">서버에서 AI 생성이 개시된 경우</strong> (결제 승인 후 즉시 해당)</span></Li>
+                    <Li icon="x"><span>생성된 결과물을 화면에서 <strong className="text-gray-300">1초라도 확인</strong>한 경우</span></Li>
+                    <Li icon="x"><span>분석 내용이 <strong className="text-gray-300">기대와 다르거나 마음에 들지 않는</strong> 경우</span></Li>
+                    <Li icon="x"><span>이용자가 생년월일·성별·시간 등 <strong className="text-gray-300">정보를 잘못 입력</strong>하여 원하지 않는 결과가 나온 경우</span></Li>
+                    <Li icon="x"><span>사주 해석의 <strong className="text-gray-300">주관적 불만족</strong> (AI 특성상 동일 입력값에도 결과가 달라질 수 있음을 사전 고지)</span></Li>
+                    <Li icon="x"><span><strong className="text-gray-300">다른 서비스와 중복 이용</strong>하거나 다른 플랫폼에서 유사 분석을 이미 받은 경우</span></Li>
+                    <Li icon="x"><span>결제 후 <strong className="text-gray-300">단순 변심</strong></span></Li>
+                    <Li icon="x"><span>PDF 다운로드·이미지 저장·캡처·공유 등 <strong className="text-gray-300">콘텐츠를 외부로 반출</strong>한 경우</span></Li>
+                    <Li icon="x"><span>결제 화면에서 <strong className="text-gray-300">이용약관·환불불가 조건에 동의 체크</strong> 후 결제를 진행한 경우 (모든 결제에 해당)</span></Li>
                   </ul>
                 </div>
               </section>
