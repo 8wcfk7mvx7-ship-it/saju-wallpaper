@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  ILJU_60, ILGAN_PERSONALITY, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER
+} from "@/lib/saju";
 
 // ── 스크롤 페이드인 컴포넌트 ────────────────────────────────────────────────
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -541,6 +544,87 @@ export default function ResultPage() {
         </div>
         </FadeIn>
 
+        {/* ─── 일주 60갑자 분석 ─── */}
+        {sajuResult.pillarsDetail?.day && (() => {
+          const dayCg = sajuResult.pillarsDetail.day.cg;
+          const dayJj = sajuResult.pillarsDetail.day.jj;
+          const key = dayCg + dayJj;
+          const ilju = ILJU_60[key];
+          if (!ilju) return null;
+          const ilganInfo = ILGAN_PERSONALITY[dayCg];
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-gradient-to-br from-violet-950/60 to-indigo-950/50 border border-violet-500/25 rounded-2xl overflow-hidden">
+              <div className="px-6 pt-6 pb-4 border-b border-white/8">
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <div>
+                    <p className="text-xs text-violet-400 font-bold tracking-widest uppercase mb-1.5">일주 (日柱) 분석</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-white">{dayCg}{dayJj}일주</span>
+                      <span className="text-sm text-violet-300">{ilju.uunseong}</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">{ilju.image}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-xs text-gray-600 mb-0.5">핵심 키워드</p>
+                    <p className="text-xs font-bold text-violet-300 bg-violet-500/15 border border-violet-500/25 px-2.5 py-1 rounded-full">{ilju.keyword}</p>
+                  </div>
+                </div>
+                {ilganInfo && (
+                  <p className="text-[11px] text-gray-500 mt-2">{ilganInfo.short} · {ilganInfo.keyword}</p>
+                )}
+              </div>
+              <div className="px-6 py-5 space-y-3">
+                <div className="bg-black/20 border border-white/8 rounded-xl p-4">
+                  <p className="text-[10px] text-violet-400 font-bold tracking-widest mb-2">성격·기질</p>
+                  <p className="text-sm text-gray-200 leading-relaxed">{ilju.personality}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-black/20 border border-white/8 rounded-xl p-3">
+                    <p className="text-[10px] text-rose-400 font-bold tracking-widest mb-1.5">❤️ 연애 스타일</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">{ilju.love}</p>
+                  </div>
+                  <div className="bg-black/20 border border-white/8 rounded-xl p-3">
+                    <p className="text-[10px] text-amber-400 font-bold tracking-widest mb-1.5">💼 직업 적성</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">{ilju.career}</p>
+                  </div>
+                </div>
+                <div className="bg-orange-950/30 border border-orange-500/20 rounded-xl p-3">
+                  <p className="text-[10px] text-orange-400 font-bold tracking-widest mb-1.5">⚠️ 주의 사항</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">{ilju.caution}</p>
+                </div>
+              </div>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
+        {/* ─── 일간 성격 심층 분석 ─── */}
+        {sajuResult.pillarsDetail?.day && (() => {
+          const dayCg = sajuResult.pillarsDetail.day.cg;
+          const info = ILGAN_PERSONALITY[dayCg];
+          if (!info) return null;
+          const CG_HANJA: Record<string,string> = {갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸"};
+          const CG_EL_COLOR: Record<string,string> = {갑:"#4ade80",을:"#4ade80",병:"#f87171",정:"#f87171",무:"#d4a373",기:"#d4a373",경:"#dde6f0",신:"#dde6f0",임:"#7dd3fc",계:"#7dd3fc"};
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-black border border-white/20"
+                  style={{ backgroundColor: CG_EL_COLOR[dayCg] + "22", color: CG_EL_COLOR[dayCg] }}>
+                  {CG_HANJA[dayCg]}
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{info.short}</h2>
+                  <p className="text-xs text-gray-500">{info.keyword}</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">{info.detail}</p>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
         {/* 오행 차트 */}
         <FadeIn delay={60}>
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -724,6 +808,46 @@ export default function ResultPage() {
           );
         })()}
 
+        {/* ─── 신강/신약 심층 분석 ─── */}
+        {sajuResult.yongshin?.strength && (() => {
+          const strength = sajuResult.yongshin.strength as "신강" | "신약" | "중화";
+          const traits = SINGANG_TRAITS[strength];
+          if (!traits) return null;
+          const colorMap: Record<string, { bg: string; border: string; text: string }> = {
+            신강: { bg: "from-amber-950/50 to-orange-950/30", border: "border-amber-500/25", text: "text-amber-300" },
+            신약: { bg: "from-sky-950/50 to-indigo-950/30", border: "border-sky-500/25", text: "text-sky-300" },
+            중화: { bg: "from-emerald-950/40 to-teal-950/30", border: "border-emerald-500/25", text: "text-emerald-300" },
+          };
+          const c = colorMap[strength];
+          return (
+            <FadeIn delay={60}>
+            <div className={`bg-gradient-to-br ${c.bg} border ${c.border} rounded-2xl p-6`}>
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="font-bold text-lg">🧭 {strength} — 내 사주의 힘</h2>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${c.border} ${c.text} bg-white/5`}>{strength}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "사고 방식", value: traits.mindset, icon: "🧠" },
+                  { label: "대인 관계", value: traits.boundary, icon: "🤝" },
+                  { label: "정신적 강점", value: traits.mental, icon: "💪" },
+                  { label: "삶의 스타일", value: traits.style, icon: "🌟" },
+                ].map((item, i) => (
+                  <div key={i} className="bg-black/20 border border-white/8 rounded-xl p-3">
+                    <p className="text-[10px] text-gray-500 font-bold mb-1.5">{item.icon} {item.label}</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 bg-black/25 border border-white/8 rounded-xl p-3">
+                <p className="text-[10px] text-gray-500 font-bold mb-1">⚠️ 주의 포인트</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{traits.caution}</p>
+              </div>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
         {/* ─── 12운성 인생 분석 ─── */}
         {sajuResult.pillarsDetail && (() => {
           const det = sajuResult.pillarsDetail;
@@ -853,6 +977,92 @@ export default function ResultPage() {
               <p className="text-[11px] text-gray-600 mt-3 pt-3 border-t border-white/10">
                 지장간의 정기(본기)가 가장 강한 영향을 미치며, 대운·세운과 만날 때 그 기운이 활성화됩니다.
               </p>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
+        {/* ─── 건강 주의 분석 ─── */}
+        {lacking[0] && (() => {
+          const el = lacking[0] as "목"|"화"|"토"|"금"|"수";
+          const health = OHAENG_HEALTH[el];
+          if (!health) return null;
+          const EL_COLOR: Record<string,string> = {목:"#4ade80",화:"#f87171",토:"#d4a373",금:"#dde6f0",수:"#7dd3fc"};
+          const col = EL_COLOR[el];
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="font-bold text-lg">🏥 건강 주의 분석</h2>
+                <span className="text-xs text-gray-500">{el}(기운 부족) 기준</span>
+              </div>
+              <div className="flex items-start gap-4 mb-4 bg-black/20 border border-white/8 rounded-xl p-4">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">취약 장기</p>
+                  <p className="text-base font-bold" style={{color:col}}>{health.organs}</p>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 mb-1.5">주의 증상</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {health.symptoms.map((s,i) => (
+                      <span key={i} className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: col+"18", border:`1px solid ${col}30`, color: col }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-blue-950/30 border border-blue-500/20 rounded-xl p-3 mb-3">
+                <p className="text-[10px] text-blue-400 font-bold mb-1">💡 생활 관리법</p>
+                <p className="text-xs text-gray-300 leading-relaxed">{health.lifestyle}</p>
+              </div>
+              <p className="text-[11px] text-gray-600 leading-relaxed">{health.caution}</p>
+            </div>
+            </FadeIn>
+          );
+        })()}
+
+        {/* ─── 직업 적성 분석 ─── */}
+        {(() => {
+          const dominant = [...Object.entries(activeScores)].sort((a,b) => b[1]-a[1]);
+          const topEl = dominant[0]?.[0] as "목"|"화"|"토"|"금"|"수";
+          if (!topEl) return null;
+          const career = OHAENG_CAREER[topEl];
+          if (!career) return null;
+          const EL_COLOR: Record<string,string> = {목:"#4ade80",화:"#f87171",토:"#d4a373",금:"#dde6f0",수:"#7dd3fc"};
+          const EL_EMOJI: Record<string,string> = {목:"🌿",화:"🔥",토:"🌍",금:"⚡",수:"💧"};
+          const col = EL_COLOR[topEl];
+          return (
+            <FadeIn delay={60}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="font-bold text-lg">💼 직업 적성 분석</h2>
+                <span className="text-xs" style={{color:col}}>{EL_EMOJI[topEl]} {topEl} 기운 우세</span>
+              </div>
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 mb-2.5">추천 직종</p>
+                <div className="flex flex-wrap gap-2">
+                  {career.suited.map((s,i) => (
+                    <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium"
+                      style={{ background: col+"18", border:`1px solid ${col}30`, color: col }}>
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4 bg-black/20 border border-white/8 rounded-xl p-3">
+                <p className="text-[10px] text-gray-500 mb-1.5">핵심 강점</p>
+                <p className="text-xs text-gray-300 leading-relaxed">{career.strengths}</p>
+              </div>
+              <div className="mb-3 bg-black/20 border border-white/8 rounded-xl p-3">
+                <p className="text-[10px] text-gray-500 mb-1.5">유리한 산업군</p>
+                <p className="text-xs text-gray-400">{career.industries.join(" · ")}</p>
+              </div>
+              <div className="bg-orange-950/30 border border-orange-500/20 rounded-xl p-3">
+                <p className="text-[10px] text-orange-400 font-bold mb-1">⚠️ 주의</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{career.caution}</p>
+              </div>
             </div>
             </FadeIn>
           );
