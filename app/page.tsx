@@ -349,6 +349,17 @@ const SERVICES: {
     categories: ["전체", "무료", "연애·궁합"],
   },
   {
+    id: "crush", emoji: "💘",
+    title: "짝사랑 사주 분석",
+    viral: "이 사람, 내가 꼬실 수 있는 사주인지 확인해보세요",
+    desc: "짝사랑하는 상대의 이상형·심리 패턴·공략 포인트를 사주로 완전 분석. 쟁재남인지, 어떻게 다가가야 심장이 흔들리는지 알려드립니다.",
+    tags: ["이상형 분석", "공략법", "쟁재남 진단"],
+    href: "/crush", badge: "무료",
+    color: "#fb7185", badgeBg: "rgba(225,29,72,0.85)",
+    border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
+    categories: ["전체", "무료", "연애·궁합"],
+  },
+  {
     id: "spy", emoji: "🕵️",
     title: "애인 사주 염탐하기",
     viral: "당신의 편은 들지 않습니다. 오직 사실만 말합니다.",
@@ -455,7 +466,7 @@ const SERVICES: {
     viral: "결정의 날짜를 고르면 결과가 달라집니다",
     desc: "이사·결혼·시험·개업·계약·수술·여행·투자·연애·임신 — 내 사주와 맞는 최적의 날짜를 찾아드립니다.",
     tags: ["길일", "날짜 선택", "이사·결혼·시험"],
-    href: "/calendar", badge: "무료",
+    href: "/calendar", badge: "₩990",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
     categories: ["전체", "무료", "운명·대운", "라이프"],
@@ -586,8 +597,9 @@ export default function MainPage() {
     return next;
   });
   const [todayCounter] = useState(() => {
-    const minuteOfDay = new Date().getHours() * 60 + new Date().getMinutes();
-    return 180 + Math.floor(minuteOfDay / 4) + Math.floor(Math.random() * 8);
+    const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
+    const isNight = kstH >= 23 || kstH < 7;
+    return isNight ? 28 + Math.floor(Math.random() * 11) : 92 + Math.floor(Math.random() * 17);
   });
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
@@ -811,7 +823,7 @@ export default function MainPage() {
           <div className="flex items-center justify-center gap-0 mb-8">
             {[
               { label: "누적 분석", value: `${counter.toLocaleString()}명` },
-              { label: "오늘 방문", value: `${todayCounter.toLocaleString()}명` },
+              { label: "지금 접속 중", value: `${todayCounter.toLocaleString()}명` },
               { label: "만족도", value: "98.3%" },
               { label: "평균 분석", value: "3분" },
             ].map((s, i) => (

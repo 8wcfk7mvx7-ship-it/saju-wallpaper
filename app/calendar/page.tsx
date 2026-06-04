@@ -173,7 +173,11 @@ export default function CalendarPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
   const [showBtn, setShowBtn] = useState(false);
-  const [counter] = useState(() => Math.floor(Math.random() * 500) + 1400);
+  const [counter] = useState(() => {
+    const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
+    const isNight = kstH >= 23 || kstH < 7;
+    return isNight ? 28 + Math.floor(Math.random() * 11) : 92 + Math.floor(Math.random() * 17);
+  });
 
   // form state
   const [name, setName] = useState("");
@@ -193,16 +197,52 @@ export default function CalendarPage() {
   const [viewMonth, setViewMonth] = useState(new Date().getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState<{ day: number; dp: { cg: string; jj: string }; score: number; uuns: string } | null>(null);
 
+  const [isPaid, setIsPaid] = useState(false);
+
+  // Compute 3 months upfront so handleUnlock can reference them
+  const todayDate = new Date();
+  const months: { year: number; month: number }[] = Array.from({ length: 3 }, (_, i) => {
+    const d = new Date(todayDate.getFullYear(), todayDate.getMonth() + i, 1);
+    return { year: d.getFullYear(), month: d.getMonth() + 1 };
+  });
+
   useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2500); return () => clearTimeout(t); }, []);
 
   useEffect(() => {
-    const saved = loadSajuData();
-    if (saved && saved.birthYear) {
-      if (saved.name) setName(saved.name);
-      if (saved.gender) setGender(saved.gender as "male" | "female");
-      setBirthYear(saved.birthYear);
-      if (saved.birthMonth) setBirthMonth(saved.birthMonth);
-      if (saved.birthDay) setBirthDay(saved.birthDay);
+    setIsPaid(localStorage.getItem("sp_calendar_paid") === "true");
+
+    // Restore session after payment redirect
+    const sess = sessionStorage.getItem("sp_calendar_session");
+    if (sess) {
+      try {
+        const d = JSON.parse(sess);
+        if (d.name) setName(d.name);
+        if (d.gender) setGender(d.gender);
+        if (d.calType) setCalType(d.calType);
+        if (d.isLeapMonth !== undefined) setIsLeapMonth(d.isLeapMonth);
+        if (d.birthYear) setBirthYear(d.birthYear);
+        if (d.birthMonth) setBirthMonth(d.birthMonth);
+        if (d.birthDay) setBirthDay(d.birthDay);
+        if (d.birthTime) setBirthTime(d.birthTime);
+        if (d.selectedEvent) setSelectedEvent(d.selectedEvent);
+        if (d.userIlgan) {
+          setUserIlgan(d.userIlgan);
+          const now = new Date();
+          setViewYear(now.getFullYear());
+          setViewMonth(now.getMonth() + 1);
+          setStep("result");
+        }
+        sessionStorage.removeItem("sp_calendar_session");
+      } catch {}
+    } else {
+      const saved = loadSajuData();
+      if (saved && saved.birthYear) {
+        if (saved.name) setName(saved.name);
+        if (saved.gender) setGender(saved.gender as "male" | "female");
+        setBirthYear(saved.birthYear);
+        if (saved.birthMonth) setBirthMonth(saved.birthMonth);
+        if (saved.birthDay) setBirthDay(saved.birthDay);
+      }
     }
   }, []);
 
@@ -240,6 +280,15 @@ export default function CalendarPage() {
     } catch {
       setFormError("분석 오류. 날짜를 확인해주세요.");
     }
+  }
+
+  function handleUnlock() {
+    sessionStorage.setItem("sp_calendar_session", JSON.stringify({
+      name, gender, calType, isLeapMonth, birthYear, birthMonth, birthDay,
+      birthTime, selectedEvent, userIlgan,
+    }));
+    const orderId = `cal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    router.push(`/calendar/pay?orderId=${orderId}`);
   }
 
   const eventInfo = EVENT_TYPES.find(e => e.id === selectedEvent);
@@ -310,7 +359,7 @@ export default function CalendarPage() {
             style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
             내 길일 찾기 →
           </button>
-          <p className="text-xs text-gray-700 mt-4">무료 · 생년월일 입력 후 바로 확인</p>
+          <p className="text-xs text-gray-600 mt-4">이번 달 무료 · 다음 2개월은 ₩990</p>
         </div>
       </div>
     </main>
@@ -419,12 +468,7 @@ export default function CalendarPage() {
   );
 
   // ── RESULT ────────────────────────────────────────────────────────────────────
-  const today = new Date();
-  const months: { year: number; month: number }[] = [];
-  for (let i = 0; i < 3; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-    months.push({ year: d.getFullYear(), month: d.getMonth() + 1 });
-  }
+  const today = todayDate;
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
@@ -440,6 +484,16 @@ export default function CalendarPage() {
               일간 <strong className="text-white">{userIlgan}</strong> 기준 · 향후 3개월
             </p>
           </div>
+        </div>
+
+        {/* 3개월 분석 공지 */}
+        <div className="mb-5 px-4 py-3 rounded-xl text-xs flex items-start gap-2"
+          style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <span style={{ color: "#e8c97a" }}>📌</span>
+          <span style={{ color: "rgba(255,255,255,0.55)" }}>
+            오늘 기준 <strong className="text-white">3개월</strong> ({months[0].month}월 · {months[1].month}월 · {months[2].month}월) 데이터만 분석됩니다.
+            {" "}{months[0].month}월은 무료 공개, {months[1].month}~{months[2].month}월은 ₩990 결제 후 확인 가능합니다.
+          </span>
         </div>
 
         {/* 범례 */}
@@ -458,14 +512,15 @@ export default function CalendarPage() {
         </div>
 
         {/* 3개월 캘린더 */}
-        {months.map(({ year, month }) => {
+        {months.map(({ year, month }, monthIdx) => {
           const dim = daysInMonth(year, month);
           const fdow = firstDow(year, month);
           const cells: (number | null)[] = [...Array(fdow).fill(null), ...Array.from({ length: dim }, (_, i) => i + 1)];
           while (cells.length % 7 !== 0) cells.push(null);
+          const isLocked = monthIdx > 0 && !isPaid;
 
           return (
-            <div key={`${year}-${month}`} className="mb-8">
+            <div key={`${year}-${month}`} className="mb-8 relative">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-black text-white">{year}년 {month}월</h2>
                 <span className="text-[10px] px-2 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.1)", color: "#34d399", border: "1px solid rgba(16,185,129,0.2)" }}>
@@ -530,8 +585,26 @@ export default function CalendarPage() {
                 })}
               </div>
 
+              {/* 잠금 오버레이 */}
+              {isLocked && (
+                <div className="absolute inset-0 rounded-lg flex flex-col items-center justify-center z-10"
+                  style={{ backdropFilter: "blur(6px)", background: "rgba(6,6,14,0.75)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                  <div className="text-center px-6">
+                    <div className="text-3xl mb-2">🔒</div>
+                    <p className="text-sm font-black text-white mb-1">{month}월 길일·흉일</p>
+                    <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>결제 후 즉시 확인 가능</p>
+                    <button onClick={handleUnlock}
+                      className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+                      style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
+                      ₩990 결제 후 전체 보기
+                    </button>
+                    <p className="text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
+                  </div>
+                </div>
+              )}
+
               {/* 선택된 날 상세 */}
-              {selectedDay && viewYear === year && viewMonth === month && (
+              {!isLocked && selectedDay && viewYear === year && viewMonth === month && (
                 <div className="mt-3 rounded-2xl p-5"
                   style={{
                     background: selectedDay.score >= 2 ? "rgba(16,185,129,0.1)" : selectedDay.score <= -2 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.05)",
