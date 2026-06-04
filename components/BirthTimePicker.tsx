@@ -116,6 +116,7 @@ interface Props {
   value: BirthTimeValue;
   onChange: (v: BirthTimeValue) => void;
   accent?: "indigo" | "emerald" | "violet";
+  simplified?: boolean; // charm용: 시간 1개 드롭다운만, 야자시·모름 없음
 }
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => {
@@ -140,26 +141,49 @@ const ACCENT_CHECK: Record<string, string> = {
   violet: "bg-violet-500/15 border-violet-400/40 text-violet-300",
 };
 
-export default function BirthTimePicker({ value, onChange, accent = "indigo" }: Props) {
+export default function BirthTimePicker({ value, onChange, accent = "indigo", simplified = false }: Props) {
   const accentBorder = ACCENT_BORDER[accent];
   const accentCheck = ACCENT_CHECK[accent];
 
   const sijinIdx = value.hour !== null ? hourToSijinIdx(value.hour) : -1;
   const sijin = sijinIdx >= 0 ? SIJIN_LIST[sijinIdx] : null;
 
+  // simplified 모드: 시간 스크롤 1개만 (charm용)
+  if (simplified) {
+    return (
+      <div className="space-y-2">
+        <ScrollPicker
+          value={value.hour !== null ? String(value.hour) : ""}
+          options={HOUR_OPTIONS}
+          onChange={v => onChange({ ...value, hour: Number(v), minute: 30, unknown: false })}
+          placeholder="시 선택 (선택사항)"
+          accentBorder={accentBorder}
+        />
+        {sijin && (
+          <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+            {sijin.name}({sijin.hanja}) · {sijin.range}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   if (value.unknown) {
     return (
       <div>
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center mb-3">
-          <p className="text-gray-500 text-sm">태어난 시간을 입력하지 않아도 분석 가능합니다.</p>
-          <p className="text-gray-600 text-xs mt-1">시간 입력 시 시주(時柱)까지 분석하여 더 정확합니다.</p>
-        </div>
+        <ScrollPicker
+          value=""
+          options={HOUR_OPTIONS}
+          onChange={v => onChange({ ...value, unknown: false, hour: Number(v), minute: 30 })}
+          placeholder="시 선택"
+          accentBorder={accentBorder}
+        />
         <button
           type="button"
-          onClick={() => onChange({ ...value, unknown: false, hour: 10, minute: 30 })}
-          className="w-full py-2.5 rounded-xl border border-white/15 text-gray-400 hover:text-gray-200 text-sm transition bg-white/[0.03]"
+          onClick={() => onChange({ hour: null, minute: null, unknown: true, useJajasi: false })}
+          className="mt-2 w-full py-2.5 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition bg-white/[0.02]"
         >
-          시간 직접 입력하기
+          태어난 시간 모름
         </button>
       </div>
     );

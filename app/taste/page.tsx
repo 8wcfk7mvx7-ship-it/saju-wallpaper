@@ -1,10 +1,61 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 export const dynamic = "force-dynamic";
+
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
+const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
+const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
+
+// ── 드롭다운 (amber 테마) ──────────────────────────────────────────────────────
+function DropPick({ value, opts, onChange, placeholder, suffix }: {
+  value: string; opts: { v: string; label: string }[];
+  onChange: (v: string) => void; placeholder: string; suffix?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref  = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, []);
+  useEffect(() => {
+    if (open && list.current && value) {
+      const el = list.current.querySelector(`[data-v="${value}"]`);
+      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
+    }
+  }, [open, value]);
+  const display = opts.find(o => o.v === value)?.label ?? "";
+  return (
+    <div ref={ref} className="relative w-full">
+      <div onClick={() => setOpen(o => !o)}
+        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
+          open ? "border-amber-500 bg-amber-950/30" : "border-white/15 bg-white/5 hover:border-amber-500/50"
+        }`}>
+        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
+        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+      </div>
+      {open && (
+        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#1a1000] border border-amber-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
+          {opts.map(o => (
+            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
+                value === o.v ? "text-amber-300 bg-amber-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"
+              }`}>
+              {o.label}{suffix ? ` ${suffix}` : ""}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── 오행별 취향 DB ────────────────────────────────────────────────────────────
 interface TasteItem { title: string; why: string; genre: string; }
@@ -116,7 +167,6 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
   },
 };
 
-// ── 일간별 취향 보충 ──────────────────────────────────────────────────────────
 const ILGAN_TASTE: Record<string, { movie: string; book: string; tag: string }> = {
   갑: { movie: "킹 오브 씨프", book: "리더십 파이프라인", tag: "리더십형 콘텐츠" },
   을: { movie: "브리짓 존스의 일기", book: "오늘도 나는 나를 사랑한다", tag: "공감·감성형 콘텐츠" },
@@ -142,10 +192,21 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
 
 export default function TastePage() {
   const router = useRouter();
-  const [step, setStep] = useState<"splash" | "main">("splash");
+  const [step, setStep] = useState<"splash" | "input" | "main">("splash");
   const [showBtn, setShowBtn] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 500) + 2800);
-  const [hasSaju, setHasSaju] = useState(false);
+
+  // 입력 폼 상태
+  const [formName, setFormName] = useState("");
+  const [gender, setGender] = useState<"female" | "male">("female");
+  const [calType, setCalType] = useState<"solar" | "lunar">("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+
+  // 결과 상태
   const [element, setElement] = useState<string>("수");
   const [ilgan, setIlgan] = useState<string>("임");
   const [name, setName] = useState("나");
@@ -159,36 +220,62 @@ export default function TastePage() {
   useEffect(() => {
     const saved = loadSajuData();
     if (saved) {
-      setHasSaju(true);
-      setName(saved.name || "나");
-      try {
-        const r = analyzeSaju({
-          birthYear: saved.birthYear,
-          birthMonth: saved.birthMonth,
-          birthDay: saved.birthDay,
-          birthHour: saved.birthHour ?? null,
-          birthMinute: saved.birthMinute ?? null,
-          name: saved.name || "",
-          gender: saved.gender || "female",
-          birthPlace: saved.birthPlace || "서울",
-          style: "auto",
-          productType: "report",
-          useJajasi: saved.useJajasi || false,
-        });
-        setElement(r.dominant[0] || "수");
-        setIlgan(r.pillarsDetail.day.cg || "임");
-      } catch {}
+      setFormName(saved.name || "");
+      if (saved.gender) setGender(saved.gender as "female" | "male");
+      if (saved.birthYear) setBirthYear(String(saved.birthYear));
+      if (saved.birthMonth) setBirthMonth(String(saved.birthMonth));
+      if (saved.birthDay) setBirthDay(String(saved.birthDay));
     }
   }, []);
+
+  async function handleAnalyze() {
+    if (!birthYear || !birthMonth || !birthDay) {
+      alert("생년월일을 모두 선택해주세요.");
+      return;
+    }
+    let y = parseInt(birthYear), m = parseInt(birthMonth), d = parseInt(birthDay);
+    if (calType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(y, m, d, isLeapMonth);
+        const s = cal.getSolarCalendar();
+        if (!s?.year) throw new Error();
+        y = s.year; m = s.month; d = s.day;
+      } catch {
+        alert("음력 날짜를 양력으로 변환할 수 없습니다.");
+        return;
+      }
+    }
+    const h = birthTime.unknown ? null : birthTime.hour;
+    const min = birthTime.unknown ? null : birthTime.minute;
+    try {
+      const r = analyzeSaju({
+        birthYear: y, birthMonth: m, birthDay: d,
+        birthHour: h, birthMinute: min,
+        name: formName || "나", gender,
+        birthPlace: "서울", style: "auto", productType: "report",
+        useJajasi: birthTime.useJajasi,
+      });
+      setElement(r.dominant[0] || "수");
+      setIlgan(r.pillarsDetail.day.cg || "임");
+      setName(formName || "나");
+      setActiveTab("movies");
+      setStep("main");
+    } catch {
+      alert("생년월일을 다시 확인해주세요.");
+    }
+  }
 
   const taste = ELEMENT_TASTE[element] || ELEMENT_TASTE["수"];
   const ilganTaste = ILGAN_TASTE[ilgan];
 
-  const TABS = [
-    { key: "movies" as const, label: "🎬 영화", items: taste.movies },
-    { key: "books" as const, label: "📚 책", items: taste.books },
-  ];
+  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
+  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
+  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
+  // ── 스플래시 ──────────────────────────────────────────────────────────────
   if (step === "splash") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
@@ -256,19 +343,113 @@ export default function TastePage() {
           transform: showBtn ? "translateY(0) scale(1)" : "translateY(20px) scale(0.96)",
           transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
         }}>
-          <button onClick={() => setStep("main")}
+          <button onClick={() => setStep("input")}
             className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
             style={{ background: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)", color: "#1a0f00", boxShadow: "0 8px 32px -4px rgba(217,119,6,0.4)" }}>
             내 취향 분석하기 →
           </button>
-          <p className="text-xs text-gray-700 mt-4">무료 · 사주 저장 시 자동 반영</p>
+          <p className="text-xs text-gray-700 mt-4">무료 · 생년월일 입력 후 바로 확인</p>
         </div>
       </div>
     </main>
   );
 
+  // ── 입력 폼 ───────────────────────────────────────────────────────────────
+  if (step === "input") {
+    const ready = !!birthYear && !!birthMonth && !!birthDay;
+    return (
+      <main className="min-h-screen bg-[#06060e] text-white">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-amber-900/15 blur-[160px]" />
+          <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
+        </div>
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+          <div className="flex items-center justify-between mb-8">
+            <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
+            <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
+          </div>
+
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-3">🎬</div>
+            <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
+            <p className="text-gray-500 text-sm">사주로 취향을 분석합니다</p>
+          </div>
+
+          <div className="space-y-5">
+            {/* 이름 */}
+            <div>
+              <label className="text-xs text-gray-500 block mb-1.5">이름 (선택사항)</label>
+              <input
+                value={formName}
+                onChange={e => setFormName(e.target.value)}
+                placeholder="홍길동"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition"
+              />
+            </div>
+
+            {/* 성별 */}
+            <div>
+              <label className="text-xs text-gray-500 block mb-1.5">성별</label>
+              <div className="flex gap-2">
+                {(["female", "male"] as const).map(g => (
+                  <button key={g} type="button" onClick={() => setGender(g)}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition ${gender === g ? "text-white" : "bg-white/5 text-gray-400 border border-white/10"}`}
+                    style={gender === g ? { background: "linear-gradient(135deg, #d97706, #f59e0b)", color: "#1a0f00" } : {}}>
+                    {g === "female" ? "여성" : "남성"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 양력/음력 */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-gray-500">생년월일</label>
+                <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  {(["solar", "lunar"] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); setBirthMonth(""); setBirthDay(""); }}
+                      className={`px-3 py-1 text-xs font-medium transition ${calType === t ? "bg-amber-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
+                      {t === "solar" ? "양력" : "음력"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {calType === "lunar" && (
+                <label className="flex items-center gap-2 text-xs text-gray-400 mb-2 cursor-pointer select-none">
+                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="accent-amber-500" />
+                  윤달
+                </label>
+              )}
+              <DropPick value={birthYear} opts={yearOpts} onChange={setBirthYear} placeholder="연도 선택" suffix="년" />
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <DropPick value={birthMonth} opts={monthOpts} onChange={setBirthMonth} placeholder="월" suffix="월" />
+                <DropPick value={birthDay}   opts={dayOpts}   onChange={setBirthDay}   placeholder="일" suffix="일" />
+              </div>
+            </div>
+
+            {/* 시간 */}
+            <div>
+              <label className="text-xs text-gray-500 block mb-2">태어난 시간 <span className="text-gray-700">(선택사항)</span></label>
+              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
+            </div>
+
+            <button onClick={handleAnalyze} disabled={!ready}
+              className={`w-full py-4 rounded-2xl font-black text-lg tracking-tight transition-all active:scale-[0.98] ${
+                ready ? "text-[#1a0f00] shadow-lg" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"
+              }`}
+              style={ready ? { background: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)", boxShadow: "0 8px 32px -4px rgba(217,119,6,0.4)" } : {}}>
+              취향 분석하기 →
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ── 결과 ─────────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen bg-[#06060e] text-white">
+    <main className="min-h-screen bg-[#06060e] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}`}</style>
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: `${taste.color}30` }} />
         <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-violet-900/15 blur-[100px]" />
@@ -277,7 +458,7 @@ export default function TastePage() {
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
+          <button onClick={() => setStep("input")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
           <span className="text-xs text-green-400/60 bg-green-500/10 border border-green-500/15 px-2 py-1 rounded-full">무료</span>
         </div>
 
@@ -285,35 +466,15 @@ export default function TastePage() {
         <div className="text-center mb-6">
           <div className="text-4xl mb-3">{taste.emoji}</div>
           <h1 className="text-2xl font-black mb-1 bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
-            {name}님이 좋아할 것들
+            {name}의 취향 분석
           </h1>
-          {hasSaju ? (
-            <p className="text-gray-400 text-sm">
-              {element}({["목","화","토","금","수"].find(e=>e===element) || element}) 오행 · {ilgan}일간 — {taste.personality}
-            </p>
-          ) : (
-            <p className="text-gray-500 text-sm">저장된 사주가 없습니다. 다른 페이지에서 먼저 분석하세요.</p>
-          )}
+          <p className="text-gray-400 text-sm">
+            {element}({["목","화","토","금","수"].find(e=>e===element) || element}) 오행 · {ilgan}일간 — {taste.personality}
+          </p>
         </div>
 
-        {/* 오행 선택 (사주 없을 때) */}
-        {!hasSaju && (
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 mb-2 text-center">오행을 직접 선택하세요</p>
-            <div className="flex gap-2 justify-center">
-              {(["목","화","토","금","수"] as const).map(el => (
-                <button key={el} onClick={() => setElement(el)}
-                  className={`w-10 h-10 rounded-full font-bold text-sm transition ${element === el ? "text-white" : "bg-white/5 text-gray-500"}`}
-                  style={element === el ? { backgroundColor: ELEMENT_TASTE[el].color } : {}}>
-                  {el}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 일간 보너스 추천 */}
-        {ilganTaste && hasSaju && (
+        {ilganTaste && (
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 mb-5">
             <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-2">{ilgan}일간 맞춤 추천</p>
             <p className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400 inline-block mb-2">#{ilganTaste.tag}</p>

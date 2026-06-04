@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useRef, type CSSProperties, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties, type ReactNode, memo } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
@@ -336,7 +336,14 @@ function ohaengRel(a:string,b:string):'상생'|'상극'|'중립'{
    입력/상태
 ═══════════════════════════════════════════════════════════════ */
 interface PI{name:string;gender:'male'|'female';year:string;month:string;day:string;birthTime:BirthTimeValue;birthPlace:string;}
-const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',birthTime:{hour:null,minute:null,unknown:false,useJajasi:false},birthPlace:'서울'});
+const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',birthTime:{hour:null,minute:null,unknown:true,useJajasi:false},birthPlace:'서울'});
+
+// 한국어 IME 커서 튐 방지: uncontrolled name input
+const NameInput = memo(function NameInput({ defaultValue, onBlur, style }: { defaultValue: string; onBlur: (v: string) => void; style: CSSProperties }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (ref.current && ref.current.value !== defaultValue) ref.current.value = defaultValue; }, [defaultValue]);
+  return <input ref={ref} defaultValue={defaultValue} style={style} placeholder="이름 또는 별명" onBlur={e => onBlur(e.target.value)} />;
+});
 
 
 /* ─── 페이드인 유틸 ─── */
@@ -527,7 +534,7 @@ export default function GunghapPage(){
           </button>
         ))}
       </div>
-      <input style={{...inp(),marginBottom:8}} placeholder="이름 또는 별명" value={p.name} onChange={e=>setP({...p,name:e.target.value})}/>
+      <NameInput defaultValue={p.name} onBlur={v=>setP({...p,name:v})} style={{...inp(),marginBottom:8}} />
       {/* 양력/음력 토글 */}
       <div style={{display:'flex',marginBottom:8,gap:6}}>
         {(['solar','lunar'] as const).map(t=>(

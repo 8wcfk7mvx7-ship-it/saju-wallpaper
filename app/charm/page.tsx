@@ -389,7 +389,7 @@ export default function CharmPage() {
               <label className="text-sm font-medium text-gray-300">생년월일</label>
               <div className="flex overflow-hidden rounded-lg border border-white/10">
                 {(["solar","lunar"] as const).map(t => (
-                  <button key={t} type="button" onClick={() => { setCalendarType(t); setIsLeapMonth(false); setForm(f => ({ ...f, birthMonth: "", birthDay: "" })); }}
+                  <button key={t} type="button" onClick={() => { setCalendarType(t); setForm(f => ({ ...f, birthMonth: "", birthDay: "" })); }}
                     className={`px-4 py-1.5 text-sm font-medium transition ${calendarType === t ? "bg-violet-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
                     {t === "solar" ? "양력" : "음력"}
                   </button>
@@ -403,15 +403,9 @@ export default function CharmPage() {
               <DropdownPicker value={form.birthMonth} options={monthOpts} onChange={v => setForm({ ...form, birthMonth: v })} placeholder="월 선택" suffix="월" />
               <DropdownPicker value={form.birthDay} options={dayOpts} onChange={v => setForm({ ...form, birthDay: v })} placeholder="일 선택" suffix="일" />
             </div>
-            {calendarType === "lunar" && (
-              <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-violet-500" />
-                <span className="text-xs text-gray-400">윤달에 태어난 경우 체크</span>
-              </label>
-            )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">태어난 시간</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">태어난 시간 <span className="text-gray-600 font-normal text-xs">(선택사항)</span></label>
             <BirthTimePicker value={form.birthTime} onChange={bt => setForm({ ...form, birthTime: bt })} accent="violet" />
           </div>
           <div>

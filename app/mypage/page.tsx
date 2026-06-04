@@ -145,8 +145,8 @@ export default function MyPage() {
         {/* 탭 */}
         <div className="flex gap-2 mb-5">
           {([
-            { key: "saju", label: `📋 저장된 사주 ${savedSajus.length > 0 ? `(${savedSajus.length})` : ""}` },
-            { key: "reports", label: `📄 결제 내역 ${reports.length > 0 ? `(${reports.length})` : ""}` },
+            { key: "saju", label: "저장된 생년월일" },
+            { key: "reports", label: "저장된 보고서 (2종)" },
           ] as const).map(({ key, label }) => (
             <button key={key} onClick={() => setTab(key)}
               className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"

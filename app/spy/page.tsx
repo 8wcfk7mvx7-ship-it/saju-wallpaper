@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import AdultGate from "@/components/AdultGate";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 export const dynamic = "force-dynamic";
 
@@ -169,15 +170,21 @@ function getGrade(score: number) {
 }
 
 // ── 메인 ─────────────────────────────────────────────────────────────────────
+const defaultTime = (): BirthTimeValue => ({ hour: null, minute: null, unknown: true, useJajasi: false });
+
 function SpyContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [myYear,  setMyYear]  = useState("");
   const [myMonth, setMyMonth] = useState("");
   const [myDay,   setMyDay]   = useState("");
+  const [myTime,  setMyTime]  = useState<BirthTimeValue>(defaultTime);
+  const [myCalType, setMyCalType] = useState<"solar"|"lunar">("solar");
   const [year,    setYear]    = useState("");
   const [month,   setMonth]   = useState("");
   const [day,     setDay]     = useState("");
+  const [theirTime,  setTheirTime]  = useState<BirthTimeValue>(defaultTime);
+  const [theirCalType, setTheirCalType] = useState<"solar"|"lunar">("solar");
   const resultRef   = useRef<SajuResult | null>(null);
   const myResultRef = useRef<SajuResult | null>(null);
 
@@ -185,19 +192,39 @@ function SpyContent() {
   const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
-  function handleAnalyze() {
+  async function convertLunar(y: number, m: number, d: number): Promise<{year:number;month:number;day:number}> {
+    try {
+      // @ts-ignore
+      const KLC = (await import("korean-lunar-calendar")).default;
+      const cal = new KLC();
+      cal.setLunarDate(y, m, d, false);
+      const s = cal.getSolarCalendar();
+      if (s?.year) return { year: s.year, month: s.month, day: s.day };
+    } catch {}
+    return { year: y, month: m, day: d };
+  }
+
+  async function handleAnalyze() {
     if (!myYear || !myMonth || !myDay || !year || !month || !day) return;
+    let my = { year: parseInt(myYear), month: parseInt(myMonth), day: parseInt(myDay) };
+    let their = { year: parseInt(year), month: parseInt(month), day: parseInt(day) };
+    if (myCalType === "lunar") my = await convertLunar(my.year, my.month, my.day);
+    if (theirCalType === "lunar") their = await convertLunar(their.year, their.month, their.day);
+    const myH = myTime.unknown ? null : myTime.hour;
+    const myMin = myTime.unknown ? null : myTime.minute;
+    const theirH = theirTime.unknown ? null : theirTime.hour;
+    const theirMin = theirTime.unknown ? null : theirTime.minute;
     myResultRef.current = analyzeSaju({
-      birthYear: parseInt(myYear), birthMonth: parseInt(myMonth), birthDay: parseInt(myDay),
-      birthHour: null, birthMinute: null,
+      birthYear: my.year, birthMonth: my.month, birthDay: my.day,
+      birthHour: myH, birthMinute: myMin,
       name: "나", gender: "male",
-      birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+      birthPlace: "서울", style: "auto", productType: "report", useJajasi: myTime.useJajasi,
     });
     resultRef.current = analyzeSaju({
-      birthYear: parseInt(year), birthMonth: parseInt(month), birthDay: parseInt(day),
-      birthHour: null, birthMinute: null,
+      birthYear: their.year, birthMonth: their.month, birthDay: their.day,
+      birthHour: theirH, birthMinute: theirMin,
       name: "그 사람", gender: "male",
-      birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+      birthPlace: "서울", style: "auto", productType: "report", useJajasi: theirTime.useJajasi,
     });
     setStep("loading");
   }
@@ -276,18 +303,25 @@ function SpyContent() {
           </div>
 
           <div className="space-y-5">
-            {/* 나의 생년월일 */}
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-gray-400">
-                <span className="text-white font-black">나</span>의 생년월일
-              </label>
-              <div className="mb-3">
-                <DropPick value={myYear} opts={yearOpts} onChange={setMyYear} placeholder="연도 선택" suffix="년" />
+            {/* 나의 정보 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-400"><span className="text-white font-black">나</span>의 생년월일</label>
+                <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  {(["solar","lunar"] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setMyCalType(t); setMyMonth(""); setMyDay(""); }}
+                      className={`px-3 py-1 text-xs font-medium transition ${myCalType === t ? "bg-red-700 text-white" : "text-gray-500 hover:bg-white/5"}`}>
+                      {t === "solar" ? "양력" : "음력"}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <DropPick value={myYear} opts={yearOpts} onChange={setMyYear} placeholder="연도 선택" suffix="년" />
               <div className="grid grid-cols-2 gap-3">
                 <DropPick value={myMonth} opts={monthOpts} onChange={setMyMonth} placeholder="월" suffix="월" />
                 <DropPick value={myDay}   opts={dayOpts}   onChange={setMyDay}   placeholder="일" suffix="일" />
               </div>
+              <BirthTimePicker value={myTime} onChange={setMyTime} accent="indigo" />
             </div>
 
             <div className="flex items-center gap-3">
@@ -296,26 +330,28 @@ function SpyContent() {
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
-            {/* 그 사람의 생년월일 */}
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-gray-400">
-                <span className="text-red-300 font-black">그 사람</span>의 생년월일
-              </label>
-              <div className="mb-3">
-                <DropPick value={year}  opts={yearOpts}  onChange={setYear}  placeholder="연도 선택" suffix="년" />
+            {/* 그 사람 정보 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-400"><span className="text-red-300 font-black">그 사람</span>의 생년월일</label>
+                <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  {(["solar","lunar"] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setTheirCalType(t); setMonth(""); setDay(""); }}
+                      className={`px-3 py-1 text-xs font-medium transition ${theirCalType === t ? "bg-red-700 text-white" : "text-gray-500 hover:bg-white/5"}`}>
+                      {t === "solar" ? "양력" : "음력"}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <DropPick value={year}  opts={yearOpts}  onChange={setYear}  placeholder="연도 선택" suffix="년" />
               <div className="grid grid-cols-2 gap-3">
                 <DropPick value={month} opts={monthOpts} onChange={setMonth} placeholder="월" suffix="월" />
                 <DropPick value={day}   opts={dayOpts}   onChange={setDay}   placeholder="일" suffix="일" />
               </div>
+              <BirthTimePicker value={theirTime} onChange={setTheirTime} accent="indigo" />
             </div>
 
-            <div className="bg-red-950/20 border border-red-900/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-red-400/80 leading-relaxed">
-                시간은 받지 않습니다. 생년월일만으로 핵심 기운을 파악합니다.<br />
-                성별 무관 — 동성 커플도 동일하게 분석됩니다.
-              </p>
-            </div>
+            <p className="text-xs text-gray-600 text-center">성별 무관 — 동성 커플도 동일하게 분석됩니다.</p>
 
             <button onClick={handleAnalyze} disabled={!ready}
               className={`w-full py-4 rounded-2xl font-black text-lg tracking-tight transition-all active:scale-[0.98] ${
@@ -340,6 +376,20 @@ function SpyContent() {
   const result   = resultRef.current;
   const myResult = myResultRef.current;
   if (!result) return null;
+
+  // ── 십성별 연애 성향 ────────────────────────────────────────────────────────
+  const SIPSEONG_LOVE: Record<string, { keyword: string; desc: string; warning: string; color: string }> = {
+    비견: { keyword: "독립형", desc: "자존심이 강하고 파트너와 대등한 관계를 고집합니다. 쉽게 양보하지 않습니다.", warning: "경쟁 본능이 연애에도 나타남. 파트너를 이기려 할 수 있음.", color: "#60a5fa" },
+    겁재: { keyword: "욕망형", desc: "원하는 것은 반드시 쟁취하려 합니다. 감정 기복이 크고 질투심이 강합니다.", warning: "소유욕과 집착이 강해질 수 있음. 감정 폭발 주의.", color: "#818cf8" },
+    식신: { keyword: "여유형", desc: "상대를 따뜻하게 챙기고 표현도 풍부합니다. 연애에서 여유롭고 행복을 추구합니다.", warning: "자기 즐거움에 빠져 관계에 소홀해질 수 있음.", color: "#4ade80" },
+    상관: { keyword: "표현형", desc: "감정 표현이 과감하고 상대를 통제하려는 경향이 있습니다. 자유로운 연애를 추구합니다.", warning: "기존 관계에 쉽게 만족 못 함. 이탈·변심 가능성.", color: "#facc15" },
+    정재: { keyword: "안정형", desc: "성실하고 책임감 있는 파트너입니다. 현실적으로 안정된 관계를 추구합니다.", warning: "융통성 부족. 지나치게 계산적일 수 있음.", color: "#34d399" },
+    편재: { keyword: "자유형", desc: "다수 이성과 교류하며 매력적이고 자유분방합니다. 한 사람에게 오래 집중하기 어렵습니다.", warning: "바람기와 이중성 가능성. 가장 위험한 십성.", color: "#f97316" },
+    정관: { keyword: "원칙형", desc: "약속과 도리를 중시하는 파트너입니다. 책임감이 있고 관계를 지킵니다.", warning: "지나친 원칙으로 관계가 딱딱해질 수 있음.", color: "#38bdf8" },
+    편관: { keyword: "카리스마형", desc: "강한 의지와 추진력으로 상대를 압도합니다. 극과 극의 관계 패턴이 나타납니다.", warning: "강압적이거나 충동적일 수 있음. 다혈질 주의.", color: "#a78bfa" },
+    정인: { keyword: "포용형", desc: "상대를 아끼고 감싸줍니다. 어머니 같은 따뜻함으로 관계에서 헌신합니다.", warning: "의존성이 강해지거나 상대를 과보호할 수 있음.", color: "#f0abfc" },
+    편인: { keyword: "독립형", desc: "자유롭고 독창적입니다. 비밀주의적이며 서운함이 쌓이면 조용히 사라집니다.", warning: "감정을 쉽게 표현 안 해 상대가 답답해함. 잠수 주의.", color: "#94a3b8" },
+  };
 
   const hasSinsal = (name: string) => result.sinsalList.some(s => s.name === name);
   const has도화   = hasSinsal("도화살");
@@ -499,6 +549,63 @@ function SpyContent() {
             </div>
           </div>
         </div>
+
+        {/* 십성 분석 */}
+        {(() => {
+          const p = result.pillarsDetail;
+          const pillars = [
+            { label: "연주", cg: p.year.cg, jj: p.year.jj, ssCg: p.year.sipseongCg, ssJj: p.year.sipseongJj },
+            { label: "월주", cg: p.month.cg, jj: p.month.jj, ssCg: p.month.sipseongCg, ssJj: p.month.sipseongJj },
+            { label: "일주", cg: p.day.cg, jj: p.day.jj, ssCg: "일간", ssJj: p.day.sipseongJj },
+            ...(p.hour ? [{ label: "시주", cg: p.hour.cg, jj: p.hour.jj, ssCg: p.hour.sipseongCg, ssJj: p.hour.sipseongJj }] : []),
+          ];
+          const iljiSs = p.day.sipseongJj;
+          const loveData = SIPSEONG_LOVE[iljiSs];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4" style={{ animation: "fadeIn 0.7s ease-out 0.7s both" }}>
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">십성 분석 — 연애 DNA</p>
+
+              {/* 사주팔자 십성 그리드 */}
+              <div className={`grid gap-2 mb-5 ${pillars.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+                {pillars.map((p2, i) => (
+                  <div key={i} className={`rounded-xl p-3 text-center border ${p2.label === "일주" ? "border-red-800/40 bg-red-950/20" : "border-white/8 bg-white/[0.03]"}`}>
+                    <p className="text-[10px] text-gray-600 mb-1">{p2.label}</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{p2.ssCg || "–"}</p>
+                    <p className="text-base font-black text-white">{p2.cg}</p>
+                    <div className="h-px bg-white/10 my-1.5" />
+                    <p className="text-base font-black text-white">{p2.jj}</p>
+                    <p className="text-xs mt-0.5" style={{ color: p2.label === "일주" ? "#fca5a5" : "rgba(255,255,255,0.35)" }}>{p2.ssJj || "–"}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* 일지 십성 집중 분석 */}
+              {loveData && (
+                <div className="rounded-xl p-4 border" style={{ borderColor: loveData.color + "40", backgroundColor: loveData.color + "10" }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: loveData.color + "20", color: loveData.color }}>
+                      일지 {iljiSs}
+                    </span>
+                    <span className="text-xs font-bold" style={{ color: loveData.color }}>{loveData.keyword}</span>
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-2">{loveData.desc}</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-400 text-xs mt-0.5 shrink-0">⚠</span>
+                    <p className="text-xs text-gray-400">{loveData.warning}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* 편재/상관 경고 */}
+              {(p.year.sipseongJj === "편재" || p.month.sipseongJj === "편재" || (p.hour && p.hour.sipseongJj === "편재")) && (
+                <div className="mt-3 flex items-start gap-2 bg-orange-950/30 border border-orange-700/30 rounded-xl px-4 py-3">
+                  <span className="text-orange-400 text-sm mt-0.5">🔥</span>
+                  <p className="text-xs text-gray-400">편재(偏財)가 여러 곳에 있습니다. 이성 교류가 많고 다정다감한 만큼 집중도가 낮을 수 있습니다.</p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* 사주 기반 안심 포인트 */}
         {safePoints.length > 0 && (

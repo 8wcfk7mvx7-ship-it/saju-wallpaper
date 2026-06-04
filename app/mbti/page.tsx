@@ -7,26 +7,12 @@ import type { SajuResult } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 const CY_MB = new Date().getFullYear();
 const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
 const MONTHS_MB = Array.from({ length: 12 }, (_, i) => i + 1);
 const DAYS_MB = Array.from({ length: 31 }, (_, i) => i + 1);
-const SIJIN_MB = [
-  { v: "",   label: "모름 (시간 불명)" },
-  { v: "23", label: "자시(子時) 23:00 – 00:59" },
-  { v: "1",  label: "축시(丑時) 01:00 – 02:59" },
-  { v: "3",  label: "인시(寅時) 03:00 – 04:59" },
-  { v: "5",  label: "묘시(卯時) 05:00 – 06:59" },
-  { v: "7",  label: "진시(辰時) 07:00 – 08:59" },
-  { v: "9",  label: "사시(巳時) 09:00 – 10:59" },
-  { v: "11", label: "오시(午時) 11:00 – 12:59" },
-  { v: "13", label: "미시(未時) 13:00 – 14:59" },
-  { v: "15", label: "신시(申時) 15:00 – 16:59" },
-  { v: "17", label: "유시(酉時) 17:00 – 18:59" },
-  { v: "19", label: "술시(戌時) 19:00 – 20:59" },
-  { v: "21", label: "해시(亥時) 21:00 – 22:59" },
-];
 
 function MbPicker({ value, options, onChange, placeholder, suffix }: {
   value: string; options: { v: string; label: string }[];
@@ -175,7 +161,7 @@ export default function MbtiPage() {
   const [birthYear, setBirthYear] = useState("1995");
   const [birthMonth, setBirthMonth] = useState("6");
   const [birthDay, setBirthDay] = useState("2");
-  const [birthHour, setBirthHour] = useState("11");
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
   const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
 
@@ -189,12 +175,18 @@ export default function MbtiPage() {
       if (saved.birthYear) setBirthYear(String(saved.birthYear));
       if (saved.birthMonth) setBirthMonth(String(saved.birthMonth));
       if (saved.birthDay) setBirthDay(String(saved.birthDay));
-      if (saved.birthHour != null) setBirthHour(String(saved.birthHour));
+      if (saved.birthHour != null && !saved.birthHourUnknown) {
+        setBirthTime({ hour: saved.birthHour, minute: (saved as any).birthMinute ?? 30, unknown: false, useJajasi: (saved as any).useJajasi || false });
+      }
     } catch {}
   }, []);
 
   async function handleConfirmSaju() {
     const y = parseInt(birthYear), mo = parseInt(birthMonth), d = parseInt(birthDay);
+    if (!name.trim()) {
+      alert("이름을 입력해주세요.");
+      return;
+    }
     if (isNaN(y) || isNaN(mo) || isNaN(d)) {
       alert("생년월일을 모두 선택해주세요.");
       return;
@@ -214,13 +206,14 @@ export default function MbtiPage() {
         return;
       }
     }
-    const h = birthHour === "" ? null : Number(birthHour);
-    saveSajuData({ name, gender, birthYear: sy, birthMonth: smo, birthDay: sd, birthHour: h, birthMinute: null, birthHourUnknown: h == null, birthPlace: "서울", style: "auto", useJajasi: false });
+    const h = birthTime.unknown ? null : birthTime.hour;
+    const min = birthTime.unknown ? null : birthTime.minute;
+    saveSajuData({ name, gender, birthYear: sy, birthMonth: smo, birthDay: sd, birthHour: h, birthMinute: min, birthHourUnknown: h == null, birthPlace: "서울", style: "auto", useJajasi: birthTime.useJajasi });
     try {
       const r = analyzeSaju({
         birthYear: sy, birthMonth: smo, birthDay: sd, birthHour: h,
-        birthMinute: null, name: name || "분석", gender, birthPlace: "서울",
-        style: "auto", productType: "mobile", useJajasi: false,
+        birthMinute: min, name: name || "분석", gender, birthPlace: "서울",
+        style: "auto", productType: "mobile", useJajasi: birthTime.useJajasi,
       });
       setSajuResult(r);
     } catch {
@@ -291,14 +284,18 @@ export default function MbtiPage() {
             setBirthYear(String(p.birthYear));
             setBirthMonth(String(p.birthMonth));
             setBirthDay(String(p.birthDay));
-            if (!p.birthHourUnknown && p.birthHour >= 0) setBirthHour(String(p.birthHour));
+            if (!p.birthHourUnknown && p.birthHour >= 0) {
+              setBirthTime({ hour: p.birthHour, minute: (p as any).birthMinute ?? 30, unknown: false, useJajasi: false });
+            } else {
+              setBirthTime({ hour: null, minute: null, unknown: true, useJajasi: false });
+            }
           }} />
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-6 space-y-4">
             <p className="text-sm font-bold text-gray-300">생년월일 입력</p>
 
             <div>
-              <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
+              <label className="text-xs text-gray-500 block mb-1">이름 <span className="text-red-400">*</span></label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동 (필수)"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition" />
             </div>
 
@@ -343,8 +340,8 @@ export default function MbtiPage() {
             </div>
 
             <div>
-              <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
-              <MbPicker value={birthHour} options={SIJIN_MB} onChange={setBirthHour} placeholder="출생시간 (선택)" />
+              <label className="text-xs text-gray-500 block mb-2">태어난 시간 <span className="text-gray-700 font-normal">(선택사항)</span></label>
+              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="violet" />
             </div>
 
             <button onClick={handleConfirmSaju}
@@ -422,8 +419,8 @@ export default function MbtiPage() {
             <SaveProfilePrompt
               name={name}
               birthYear={parseInt(birthYear)} birthMonth={parseInt(birthMonth)} birthDay={parseInt(birthDay)}
-              birthHour={birthHour === "" ? null : parseInt(birthHour)}
-              birthHourUnknown={birthHour === ""}
+              birthHour={birthTime.unknown ? null : birthTime.hour}
+              birthHourUnknown={birthTime.unknown}
               gender={gender}
             />
             {/* 오행 × MBTI 궁합 */}
