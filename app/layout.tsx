@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 const chosun = localFont({
-  src: "../public/fonts/ChosunilboMyungjo.woff",
+  src: "./fonts/ChosunilboMyungjo.woff",
   variable: "--font-chosun",
   display: "swap",
   preload: true,
