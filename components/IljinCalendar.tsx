@@ -38,10 +38,10 @@ export default function IljinCalendar() {
     <div className="max-w-lg mx-auto px-4">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-sm font-black" style={{ color: "rgba(255,255,255,0.65)" }}>
-            일진달력 <span className="text-[11px] font-normal" style={{ color: "rgba(255,255,255,0.2)" }}>日辰曆</span>
+          <h2 className="text-sm font-black" style={{ color: "rgba(255,255,255,0.85)" }}>
+            일진달력 <span className="text-[11px] font-normal" style={{ color: "rgba(255,255,255,0.5)" }}>日辰曆</span>
           </h2>
-          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.25)" }}>매일의 하늘과 땅의 기운</p>
+          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>매일의 하늘과 땅의 기운</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={prevMonth}
@@ -61,7 +61,7 @@ export default function IljinCalendar() {
       <div className="grid grid-cols-7 mb-1">
         {["일","월","화","수","목","금","토"].map((d, i) => (
           <div key={d} className="text-center text-[10px] font-bold py-1"
-            style={{ color: i === 0 ? "#f87171" : i === 6 ? "#60a5fa" : "rgba(255,255,255,0.28)" }}>
+            style={{ color: i === 0 ? "#f87171" : i === 6 ? "#60a5fa" : "rgba(255,255,255,0.55)" }}>
             {d}
           </div>
         ))}
@@ -85,8 +85,8 @@ export default function IljinCalendar() {
                 style={{ color: col === 0 ? "#f87171" : col === 6 ? "#60a5fa" : isToday ? "#c9a84c" : "rgba(255,255,255,0.7)" }}>
                 {day}
               </p>
-              <p className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.38)" }}>{cgH}{jjH}</p>
-              <p className="text-[8px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.18)" }}>{cg}{jj}</p>
+              <p className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.65)" }}>{cgH}{jjH}</p>
+              <p className="text-[8px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{cg}{jj}</p>
             </div>
           );
         })}

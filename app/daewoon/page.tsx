@@ -121,7 +121,7 @@ export default function DaewoonPage() {
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
-  const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 28000);
+  const [totalCount] = useState(() => Math.floor(Math.random() * 1500) + 7200);
 
   useEffect(() => {
     setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");

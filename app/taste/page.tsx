@@ -229,6 +229,10 @@ export default function TastePage() {
   }, []);
 
   async function handleAnalyze() {
+    if (!formName.trim()) {
+      alert("이름을 입력해주세요.");
+      return;
+    }
     if (!birthYear || !birthMonth || !birthDay) {
       alert("생년월일을 모두 선택해주세요.");
       return;
@@ -378,11 +382,11 @@ export default function TastePage() {
           <div className="space-y-5">
             {/* 이름 */}
             <div>
-              <label className="text-xs text-gray-500 block mb-1.5">이름 (선택사항)</label>
+              <label className="text-xs text-gray-500 block mb-1.5">이름 <span className="text-amber-400">*</span></label>
               <input
                 value={formName}
                 onChange={e => setFormName(e.target.value)}
-                placeholder="홍길동"
+                placeholder="홍길동 (필수)"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition"
               />
             </div>

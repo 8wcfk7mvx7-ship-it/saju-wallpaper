@@ -88,6 +88,54 @@ const REVIEWS = [
   { name: "최○○", region: "인천", age: "26세", text: "MBTI랑 사주 조합 분석이 진짜 신선했어요. INFJ-갑목 조합이 이렇게 맞을 수가 없어요.", service: "MBTI×사주", stars: 5 },
   { name: "정○○", region: "광주", age: "38세", text: "주식투자 스타일 분석 보고 포트폴리오 바꿨는데 수익률이 좋아졌어요. 신기하네요.", service: "주식 분석", stars: 5 },
   { name: "한○○", region: "수원", age: "33세", text: "쓰레기 사주 극복법 읽고 진짜 울었어요. 내가 왜 힘들었는지 처음으로 이해가 됐습니다.", service: "신살 극복", stars: 5 },
+  { name: "윤○○", region: "서울", age: "29세", text: "도화살 있다고 나왔는데 진짜로 갑자기 연락 오는 사람 늘었어요. 우연이라 하기엔 너무 신기해서.", service: "신살 분석", stars: 5 },
+  { name: "오○○", region: "경기", age: "35세", text: "남자친구 사주 염탐했는데 바람기 위험도 B등급 나왔고 실제로 좀 자유분방한 편인데 맞더라고요.", service: "염탐하기", stars: 5 },
+  { name: "강○○", region: "대전", age: "41세", text: "취향 분석에서 나한테 맞는 영화 추천해줬는데 다 좋아하는 장르야. 어떻게 알았지 진짜.", service: "취향 분석", stars: 5 },
+  { name: "조○○", region: "서울", age: "24세", text: "임수일간이라 자유형이라고 했는데 너무 맞아요 ㅋㅋ 구속받으면 진짜 숨막혀.", service: "사주 분석", stars: 5 },
+  { name: "신○○", region: "부산", age: "37세", text: "대운 흐름 보고 이직 타이밍 잡았어요. 결과는... 지금까지 한 결정 중 제일 잘한 것 같아요.", service: "대운·세운", stars: 5 },
+  { name: "류○○", region: "울산", age: "31세", text: "홍염살이 있다고 했을 때 처음엔 뭔 소린가 했는데 설명 읽고 나니까 딱 내 얘기네요.", service: "신살 분석", stars: 5 },
+  { name: "임○○", region: "서울", age: "27세", text: "MBTI는 오래 했는데 사주랑 같이 보니까 훨씬 입체적으로 나를 이해하게 됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "황○○", region: "인천", age: "44세", text: "역마살 있다고 나왔는데 실제로 직장 세 번 옮기고 이사도 다섯 번 했거든요. 신기방기.", service: "신살 분석", stars: 5 },
+  { name: "문○○", region: "경기", age: "22세", text: "친구한테 강력 추천해서 같이 봤는데 둘 다 입 딱 벌리고 봤어요. 분석이 무서울 정도로 맞음.", service: "사주 분석", stars: 5 },
+  { name: "손○○", region: "대구", age: "39세", text: "궁합에서 비겁 관계라고 나왔는데 진짜 맨날 경쟁하고 자존심 싸움하는 커플이에요 ㅠ", service: "궁합 분석", stars: 5 },
+  { name: "배○○", region: "서울", age: "33세", text: "세운 분석에서 올해 금전 흐름 주의하라고 했는데 진짜 예상치 못한 지출이 많았어요.", service: "대운·세운", stars: 5 },
+  { name: "채○○", region: "광주", age: "26세", text: "경금일간이라고 원칙형이라는 게 뭔가 싫었는데 읽을수록 나맞다는 거 인정하게 됨 ㅋ", service: "사주 분석", stars: 5 },
+  { name: "서○○", region: "부산", age: "48세", text: "50대 진입하는 대운 분석이 그렇게 자세히 나올 줄 몰랐어요. 준비할 수 있어서 다행입니다.", service: "대운·세운", stars: 5 },
+  { name: "전○○", region: "수원", age: "30세", text: "배경화면 오행 분석 후 나무 기운 배경으로 바꿨더니 뭔가 마음이 차분해졌어요. 플라시보든 뭐든.", service: "오행 배경화면", stars: 5 },
+  { name: "마○○", region: "서울", age: "25세", text: "갑자기 좋아하는 사람이 생겼는데 염탐해봤어요. 도화살 있고 편재 강함. 그냥 포기해야겠다ㅠ", service: "염탐하기", stars: 5 },
+  { name: "홍○○", region: "경기", age: "36세", text: "쓰레기 사주라는 표현이 처음엔 충격이었는데 읽고 나니까 오히려 위로가 됐어요.", service: "신살 극복", stars: 5 },
+  { name: "권○○", region: "대전", age: "42세", text: "일진달력 보면서 오늘 하루가 왜 이렇게 피곤했는지 이해됐어요. 흙기운 강한 날이었네요.", service: "일진달력", stars: 5 },
+  { name: "안○○", region: "서울", age: "28세", text: "취향 분석이 신기한 게 진짜 내가 좋아하는 영화 장르랑 다 맞아요. 어떻게 이런 게 가능한지.", service: "취향 분석", stars: 5 },
+  { name: "양○○", region: "울산", age: "34세", text: "도시 추천에서 서울이 아닌 도시 나왔는데 실제로 거기서 일하게 됐어요. 진짜인지 의심스러울 정도.", service: "도시 추천", stars: 5 },
+  { name: "노○○", region: "서울", age: "23세", text: "처음엔 그냥 재미로 봤는데 일간 분석이 너무 나를 설명해서 오히려 소름이었어요.", service: "사주 분석", stars: 5 },
+  { name: "장○○", region: "경기", age: "38세", text: "주식 스타일이 코인보다 ETF가 맞는다고 나왔는데 실제로 코인에서 손해 많이 봤거든요 ㅠ", service: "주식 분석", stars: 5 },
+  { name: "고○○", region: "인천", age: "31세", text: "궁합에서 합이 잘 맞는다고 했는데 연애하면서도 진짜 싸우는 게 별로 없어요.", service: "궁합 분석", stars: 5 },
+  { name: "하○○", region: "대구", age: "27세", text: "사주 MBTI 조합 분석이 취업 준비할 때 방향 잡는 데 진짜 도움됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "탁○○", region: "서울", age: "46세", text: "홍염살 설명 보고 어릴 때 왜 그렇게 이성한테 인기가 있었는지 뒤늦게 이해가 됐습니다.", service: "신살 분석", stars: 5 },
+  { name: "변○○", region: "광주", age: "29세", text: "친구들이랑 각자 사주 보고 비교했는데 진짜 각자 성격이랑 너무 맞아서 다 놀랐어요.", service: "사주 분석", stars: 5 },
+  { name: "남○○", region: "부산", age: "40세", text: "40대 대운이 나쁘게 나와서 불안했는데 극복 방향도 같이 나와서 오히려 마음이 정해졌습니다.", service: "대운·세운", stars: 5 },
+  { name: "심○○", region: "수원", age: "26세", text: "기토일간이라 세심하고 실용적이라는 게 100% 나야요. 가족한테 보여줬더니 다들 웃었어요.", service: "사주 분석", stars: 5 },
+  { name: "엄○○", region: "서울", age: "35세", text: "역마살이랑 도화살 같이 있는 사람 분석 처음 봤는데 이게 나한테 이렇게 잘 맞을 수가.", service: "신살 분석", stars: 5 },
+  { name: "원○○", region: "경기", age: "32세", text: "염탐 기능이 좀 무서운 기능이긴 한데... 알고 싶은 게 있었고 답은 얻었습니다.", service: "염탐하기", stars: 5 },
+  { name: "천○○", region: "대전", age: "43세", text: "오행 배경화면 그냥 예뻐서 만들었는데 실제로 운이 좋아진 것 같은 느낌이에요. 믿거나 말거나.", service: "오행 배경화면", stars: 5 },
+  { name: "방○○", region: "서울", age: "24세", text: "일진달력 보면서 기운 좋은 날 면접 잡았어요. 결과는... 합격이었습니다 ㅎㅎ", service: "일진달력", stars: 5 },
+  { name: "공○○", region: "부산", age: "37세", text: "병화일간 설명에서 태양처럼 에너지 넘친다는 거 진짜예요. 주변이 다 알아요 ㅋㅋ", service: "사주 분석", stars: 5 },
+  { name: "현○○", region: "인천", age: "30세", text: "쓰레기 사주 극복법 결제하고 봤는데 솔직히 돈이 아깝지 않았어요. 필요했던 말들이었어요.", service: "신살 극복", stars: 5 },
+  { name: "나○○", region: "서울", age: "22세", text: "신금일간 완벽주의 성향 읽고 내가 왜 이렇게 스트레스를 받는지 이해가 됐어요ㅠㅠ", service: "사주 분석", stars: 5 },
+  { name: "봉○○", region: "경기", age: "49세", text: "50대 대운 진입 전에 미리 보게 돼서 다행입니다. 준비할 게 생겼어요.", service: "대운·세운", stars: 5 },
+  { name: "지○○", region: "대구", age: "27세", text: "수기운 많은 사주라 감수성 풍부하다는 게 완전 맞아요. 혼자 영화 보다가 우는 타입이거든요.", service: "사주 분석", stars: 5 },
+  { name: "석○○", region: "광주", age: "33세", text: "주식 분석에서 단타보다 중장기가 맞는다고 나왔는데 그 조언 따랐더니 수익률이 달라졌어요.", service: "주식 분석", stars: 5 },
+  { name: "민○○", region: "서울", age: "28세", text: "취향 분석 책 추천이 신기해요. 내가 좋아하는 책 종류랑 딱 맞는 장르로 추천해줘요.", service: "취향 분석", stars: 5 },
+  { name: "길○○", region: "수원", age: "36세", text: "무토일간 안정형 맞는데 주변에서도 항상 나더러 흔들리지 않는다고 하거든요.", service: "사주 분석", stars: 5 },
+  { name: "복○○", region: "부산", age: "44세", text: "궁합에서 원진살이 있는데도 지금 10년 넘게 잘 살고 있어요. 의지로 극복하는 중.", service: "궁합 분석", stars: 4 },
+  { name: "항○○", region: "경기", age: "25세", text: "처음엔 그냥 심심해서 해봤는데 지금은 거의 매일 일진달력 확인하고 있어요.", service: "일진달력", stars: 5 },
+  { name: "두○○", region: "인천", age: "31세", text: "을목일간이라 유연해 보여도 속은 강철이라는 표현이 진짜 나를 표현하는 최고의 문장이에요.", service: "사주 분석", stars: 5 },
+  { name: "라○○", region: "서울", age: "38세", text: "도시 추천 받아서 여행 가봤는데 진짜 맞는 에너지의 도시였어요. 충전이 됐달까.", service: "도시 추천", stars: 5 },
+  { name: "단○○", region: "대전", age: "29세", text: "MBTI INFP에 임수 일간이라는 조합 읽고 내가 왜 이렇게 자유로운 걸 좋아하는지 납득이 됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "결○○", region: "대구", age: "34세", text: "명리학을 이렇게 쉽게 풀어주는 곳이 없었어요. 어렵게 느껴졌던 게 재미있어졌습니다.", service: "사주 분석", stars: 5 },
+  { name: "미○○", region: "서울", age: "21세", text: "친구들이랑 서로 염탐 기능 써봤는데 다들 너무 맞아서 진짜냐고 물어봤어요 ㅋㅋ", service: "염탐하기", stars: 5 },
+  { name: "화○○", region: "경기", age: "40세", text: "갑목일간 리더십형이라는데 회사 팀장 맡고 있어요. 맞습니다 ㅎ 근데 고집도 맞아요.", service: "사주 분석", stars: 5 },
+  { name: "수○○", region: "부산", age: "26세", text: "극복법 보고 내 신살들이 단점이 아니라 특성이라는 걸 처음으로 받아들이게 됐어요.", service: "신살 극복", stars: 5 },
 ];
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
@@ -146,7 +194,7 @@ function ContactSection() {
     <section className="py-4">
       <div className="max-w-full">
         <div className="text-center mb-8">
-          <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "rgba(201,168,76,0.7)" }}>
+          <p className="text-xs tracking-[0.18em] uppercase mb-3 font-semibold" style={{ color: "#fbbf24" }}>
             Contact
           </p>
           <h2 className="text-2xl font-black text-white mb-2">문의하기</h2>
@@ -176,7 +224,7 @@ function ContactSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
-                  이름 <span className="text-amber-400/80">*</span>
+                  이름 <span className="text-amber-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -193,7 +241,7 @@ function ContactSection() {
               </div>
               <div>
                 <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
-                  이메일 <span className="text-amber-400/80">*</span>
+                  이메일 <span className="text-amber-400">*</span>
                 </label>
                 <input
                   type="email"
@@ -212,7 +260,7 @@ function ContactSection() {
 
             <div>
               <label className="block text-xs mb-1.5 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
-                문의 내용 <span className="text-amber-400/80">*</span>
+                문의 내용 <span className="text-amber-400">*</span>
               </label>
               <textarea
                 value={message}
@@ -241,9 +289,9 @@ function ContactSection() {
                 disabled={status === "sending" || !name.trim() || !email.trim() || !message.trim()}
                 className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-sm font-black transition-all active:scale-[0.98] disabled:opacity-40"
                 style={{
-                  background: "rgba(201,168,76,0.85)",
-                  color: "#06060e",
-                  boxShadow: "0 4px 20px rgba(201,168,76,0.25)",
+                  background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
+                  color: "#1a0f00",
+                  boxShadow: "0 4px 20px rgba(251,191,36,0.35)",
                 }}
               >
                 {status === "sending" ? "전송 중..." : "문의 보내기"}
@@ -255,7 +303,7 @@ function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors underline underline-offset-2"
-                  style={{ color: "rgba(254,229,0,0.75)" }}
+                  style={{ color: "#fde68a" }}
                 >
                   카카오 채널로 빠르게 문의
                 </a>
@@ -956,6 +1004,14 @@ export default function MainPage() {
 
         {/* ── 후기 게시판 ── */}
         <section className="mb-14">
+          <style>{`
+            @keyframes reviewTicker {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .review-ticker:hover { animation-play-state: paused; }
+          `}</style>
+
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>REVIEWS</p>
@@ -967,30 +1023,36 @@ export default function MainPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {REVIEWS.map((r, i) => (
-              <div key={i} className="rounded-2xl p-4 flex flex-col gap-3"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-white">{r.name}</p>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{r.region} · {r.age}</p>
+          {/* 무한 가로 스크롤 필름 */}
+          <div className="overflow-hidden -mx-4 sm:-mx-6">
+            <div
+              className="review-ticker flex gap-3 py-2"
+              style={{ animation: "reviewTicker 180s linear infinite", width: "max-content" }}
+            >
+              {[...REVIEWS, ...REVIEWS].map((r, i) => (
+                <div key={i} className="w-72 shrink-0 rounded-2xl p-4 flex flex-col gap-3"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-white">{r.name}</p>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{r.region} · {r.age}</p>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
+                      style={{ background: "rgba(201,168,76,0.1)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.2)" }}>
+                      {r.service}
+                    </span>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full"
-                    style={{ background: "rgba(201,168,76,0.1)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.2)" }}>
-                    {r.service}
-                  </span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: r.stars }).map((_, j) => (
+                      <span key={j} className="text-yellow-400 text-xs">★</span>
+                    ))}
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                    &ldquo;{r.text}&rdquo;
+                  </p>
                 </div>
-                <div className="flex gap-0.5">
-                  {Array.from({ length: r.stars }).map((_, j) => (
-                    <span key={j} className="text-yellow-400 text-xs">★</span>
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
-                  &ldquo;{r.text}&rdquo;
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
