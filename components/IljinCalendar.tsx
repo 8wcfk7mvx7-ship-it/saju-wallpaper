@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { getDayPillar } from "@/lib/saju";
+import { getDayPillar, getYearPillar, getMonthPillar } from "@/lib/saju";
 
 const CG_HANJA = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
 const JJ_HANJA = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
@@ -16,6 +16,12 @@ export default function IljinCalendar() {
   const today = getKST();
   const [year, setYear] = useState(today.year);
   const [month, setMonth] = useState(today.month);
+
+  // 오늘 연주·월주·일주
+  const todayYearPillar  = getYearPillar(today.year);
+  const todayMonthPillar = getMonthPillar(today.year, today.month, today.day);
+  const todayDayPillar   = getDayPillar(today.year, today.month, today.day);
+  const todayPillarLine = `${todayYearPillar.cg}${todayYearPillar.jj}년 ${todayMonthPillar.cg}${todayMonthPillar.jj}월 ${todayDayPillar.cg}${todayDayPillar.jj}일`;
 
   function prevMonth() {
     if (year === 1975 && month === 1) return;
@@ -44,6 +50,9 @@ export default function IljinCalendar() {
             일진달력
           </h2>
           <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
+          <p className="text-[11px] mt-1 font-medium tracking-wide" style={{ color: "rgba(255,215,100,0.75)" }}>
+            오늘 · {todayPillarLine}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={prevMonth} disabled={year === 1975 && month === 1}
