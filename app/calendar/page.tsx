@@ -198,6 +198,7 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<{ day: number; dp: { cg: string; jj: string }; score: number; uuns: string } | null>(null);
 
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
 
   // Compute 3 months upfront so handleUnlock can reference them
   const todayDate = new Date();
@@ -209,7 +210,9 @@ export default function CalendarPage() {
   useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2500); return () => clearTimeout(t); }, []);
 
   useEffect(() => {
-    setIsPaid(localStorage.getItem("sp_calendar_paid") === "true");
+    setIsPaid(localStorage.getItem("sp_admin") === "true" || localStorage.getItem("sp_calendar_paid") === "true");
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
 
     // Restore session after payment redirect
     const sess = sessionStorage.getItem("sp_calendar_session");
@@ -593,11 +596,26 @@ export default function CalendarPage() {
                     <div className="text-3xl mb-2">🔒</div>
                     <p className="text-sm font-black text-white mb-1">{month}월 길일·흉일</p>
                     <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>결제 후 즉시 확인 가능</p>
-                    <button onClick={handleUnlock}
-                      className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
-                      style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
-                      ₩990 결제 후 전체 보기
-                    </button>
+                    {blueberries >= 990 ? (
+                      <button
+                        onClick={() => {
+                          const next = blueberries - 990;
+                          localStorage.setItem("sp_blueberries", String(next));
+                          localStorage.setItem("sp_calendar_paid", "true");
+                          setBlueberries(next);
+                          setIsPaid(true);
+                        }}
+                        className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+                        style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
+                        🫐 블루베리 990개로 즉시 열기
+                      </button>
+                    ) : (
+                      <button onClick={handleUnlock}
+                        className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+                        style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
+                        ₩990 결제 후 전체 보기
+                      </button>
+                    )}
                     <p className="text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
                   </div>
                 </div>

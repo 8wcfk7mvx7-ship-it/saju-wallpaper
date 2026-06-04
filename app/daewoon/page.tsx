@@ -120,11 +120,15 @@ export default function DaewoonPage() {
   const [monthJj, setMonthJj] = useState("");
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
   const [totalCount] = useState(() => Math.floor(Math.random() * 1500) + 7200);
 
   useEffect(() => {
-    setIsPaid(sessionStorage.getItem("daewoonPaid") === "true");
+    const isAdmin = localStorage.getItem("sp_admin") === "true";
+    setIsPaid(isAdmin || sessionStorage.getItem("daewoonPaid") === "true");
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
     const saved = loadSajuData();
     if (saved) {
       // 이름은 placeholder로 표시 — 직접 입력하게
@@ -522,12 +526,27 @@ export default function DaewoonPage() {
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
             <div className="max-w-lg mx-auto">
-              <button
-                onClick={goPay}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
-              >
-                전체 보고서 + AI 해설 + PDF — ₩{PRICE.toLocaleString()}
-              </button>
+              {blueberries >= PRICE ? (
+                <button
+                  onClick={() => {
+                    const next = blueberries - PRICE;
+                    localStorage.setItem("sp_blueberries", String(next));
+                    sessionStorage.setItem("daewoonPaid", "true");
+                    setBlueberries(next);
+                    setIsPaid(true);
+                  }}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
+                >
+                  🫐 블루베리 {PRICE.toLocaleString()}개로 즉시 열기
+                </button>
+              ) : (
+                <button
+                  onClick={goPay}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
+                >
+                  전체 보고서 + AI 해설 + PDF — ₩{PRICE.toLocaleString()}
+                </button>
+              )}
               <p className="text-center text-xs text-gray-600 mt-2">교운기·대운 8개 전체·세운 14년치 완전 공개</p>
             </div>
           </div>
