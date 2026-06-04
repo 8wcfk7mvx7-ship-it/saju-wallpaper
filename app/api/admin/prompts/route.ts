@@ -4,7 +4,7 @@ import { DEFAULT_PROMPTS, clearPromptsCache } from "@/lib/prompts";
 
 function checkAdminAuth(req: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) return true; // env 미설정 시 개발 모드로 허용
+  if (!adminPassword) return false;
   const authHeader = req.headers.get("x-admin-password");
   return authHeader === adminPassword;
 }
