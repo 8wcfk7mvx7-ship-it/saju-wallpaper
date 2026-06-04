@@ -35,7 +35,8 @@ export default function IljinCalendar() {
   while (cells.length % 7 !== 0) cells.push(null);
 
   return (
-    <div className="max-w-lg mx-auto px-4">
+    <div className="w-full">
+      {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-black" style={{ color: "rgba(255,255,255,0.85)" }}>
@@ -48,7 +49,7 @@ export default function IljinCalendar() {
             disabled={year === 1975 && month === 1}
             className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition disabled:opacity-20"
             style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>‹</button>
-          <span className="text-sm font-bold min-w-[76px] text-center" style={{ color: "rgba(255,255,255,0.75)" }}>
+          <span className="text-sm font-bold min-w-[72px] text-center" style={{ color: "rgba(255,255,255,0.75)" }}>
             {year}년 {month}월
           </span>
           <button onClick={nextMonth}
@@ -58,35 +59,38 @@ export default function IljinCalendar() {
         </div>
       </div>
 
+      {/* 요일 헤더 */}
       <div className="grid grid-cols-7 mb-1">
         {["일","월","화","수","목","금","토"].map((d, i) => (
-          <div key={d} className="text-center text-[10px] font-bold py-1"
+          <div key={d} className="text-center text-[10px] font-bold py-1.5"
             style={{ color: i === 0 ? "#f87171" : i === 6 ? "#60a5fa" : "rgba(255,255,255,0.55)" }}>
             {d}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-px">
+      {/* 날짜 그리드 */}
+      <div className="grid grid-cols-7 gap-1">
         {cells.map((day, idx) => {
-          if (!day) return <div key={idx} className="py-2" />;
+          if (!day) return <div key={idx} className="aspect-[3/4]" />;
           const col = idx % 7;
           const isToday = year === today.year && month === today.month && day === today.day;
           const { cg, jj } = getDayPillar(year, month, day);
           const cgH = CG_HANJA[CG_KR.indexOf(cg)];
           const jjH = JJ_HANJA[JJ_KR.indexOf(jj)];
           return (
-            <div key={idx} className="text-center py-1.5 rounded-md"
+            <div key={idx}
+              className="aspect-[3/4] rounded-lg flex flex-col items-center justify-center gap-0.5"
               style={{
-                background: isToday ? "rgba(201,168,76,0.18)" : "transparent",
-                border: isToday ? "1px solid rgba(201,168,76,0.4)" : "1px solid transparent",
+                background: isToday ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.03)",
+                border: isToday ? "1px solid rgba(201,168,76,0.4)" : "1px solid rgba(255,255,255,0.06)",
               }}>
-              <p className="text-xs font-bold leading-none mb-0.5"
-                style={{ color: col === 0 ? "#f87171" : col === 6 ? "#60a5fa" : isToday ? "#c9a84c" : "rgba(255,255,255,0.7)" }}>
+              <p className="text-[11px] font-bold leading-none"
+                style={{ color: col === 0 ? "#f87171" : col === 6 ? "#60a5fa" : isToday ? "#c9a84c" : "rgba(255,255,255,0.75)" }}>
                 {day}
               </p>
-              <p className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.65)" }}>{cgH}{jjH}</p>
-              <p className="text-[8px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{cg}{jj}</p>
+              <p className="text-[10px] font-semibold leading-none" style={{ color: "rgba(255,255,255,0.7)" }}>{cgH}{jjH}</p>
+              <p className="text-[8px] leading-none" style={{ color: "rgba(255,255,255,0.4)" }}>{cg}{jj}</p>
             </div>
           );
         })}
