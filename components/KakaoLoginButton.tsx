@@ -52,7 +52,7 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
     return (
       <a
         href={`/api/auth/kakao?redirect=${encodeURIComponent(redirectTo)}`}
-        className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-[#1A1A1A] transition-all active:scale-[0.99]"
+        className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-[#1A1A1A] transition-all active:scale-[0.99] whitespace-nowrap overflow-hidden"
         style={{ background: "#FEE500", boxShadow: "0 4px 20px rgba(254,229,0,0.3)" }}
       >
         <KakaoIcon size={20} />

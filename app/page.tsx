@@ -682,8 +682,8 @@ export default function MainPage() {
         <div className="absolute top-[40%] left-[30%] w-[500px] h-[500px] rounded-full blur-[180px]" style={{ background: "rgba(201,168,76,0.03)" }} />
       </div>
 
-      {/* ── 상단 네비게이션 ── */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
+      {/* ── 상단 네비게이션 (모바일 숨김) ── */}
+      <nav className="hidden sm:block sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
         style={{ background: "rgba(6,6,14,0.85)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <button onClick={() => router.push("/")} className="flex items-center gap-2.5">
@@ -1147,7 +1147,7 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/saju" },
-            { icon: "👤", label: "마이페이지", href: "/mypage" },
+            { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
