@@ -101,9 +101,9 @@ function OvercomePayContent() {
             {agreed && <span className="text-white text-xs">✓</span>}
           </div>
           <span className="text-xs text-gray-400 leading-relaxed">
-            <button onClick={() => router.push("/terms")} className="text-red-400 underline">이용약관</button>과{" "}
-            <button onClick={() => router.push("/privacy")} className="text-red-400 underline">개인정보처리방침</button>에 동의합니다.
-            결제 후 환불은 <button onClick={() => router.push("/refund")} className="text-red-400 underline">환불규정</button>에 따릅니다.
+            <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-red-400 underline">이용약관</a>과{" "}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-red-400 underline">개인정보처리방침</a>에 동의합니다.
+            결제 후 환불은 <a href="/refund" target="_blank" rel="noopener noreferrer" className="text-red-400 underline">환불규정</a>에 따릅니다.
           </span>
         </label>
       </div>

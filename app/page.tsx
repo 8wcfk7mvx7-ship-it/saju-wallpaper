@@ -71,13 +71,13 @@ const UI: Record<Lang, {
 
 const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "전체",    icon: "☯",  desc: "전체 서비스" },
-  { key: "무료",    icon: "🆓",  desc: "무료 서비스" },
+  { key: "무료",    icon: "",   desc: "무료 서비스" },
   { key: "연애·궁합", icon: "💑", desc: "연애·궁합" },
   { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
   { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
   { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
-  { key: "Special", icon: "👑", desc: "프리미엄" },
   { key: "19금",    icon: "🔞",  desc: "성인 전용" },
+  { key: "Special", icon: "👑", desc: "프리미엄" },
 ];
 
 // ── 후기 데이터 ───────────────────────────────────────────────────────────────
@@ -578,11 +578,12 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 export default function MainPage() {
   const router = useRouter();
   const [counter] = useState(() => {
-    const base = new Date("2026-06-03T00:00:00+09:00");
-    const now = new Date();
-    const days = Math.max(0, Math.floor((now.getTime() - base.getTime()) / 86400000));
-    const minuteOfDay = now.getHours() * 60 + now.getMinutes();
-    return Math.min(21000 + days * 43 + Math.floor(minuteOfDay / 33) + Math.floor(Math.random() * 5), 30000);
+    if (typeof window === "undefined") return 12000;
+    const stored = parseInt(localStorage.getItem("sp_main_counter") ?? "0", 10);
+    const base = stored >= 10000 ? stored : 12000;
+    const next = Math.min(base + Math.floor(Math.random() * 3) + 1, 29800);
+    localStorage.setItem("sp_main_counter", String(next));
+    return next;
   });
   const [todayCounter] = useState(() => {
     const minuteOfDay = new Date().getHours() * 60 + new Date().getMinutes();
@@ -839,7 +840,7 @@ export default function MainPage() {
 
           {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
           <div className="mt-10 relative">
-            <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.25)" }}>카테고리로 찾기</p>
+            <p className="text-sm font-bold mb-3 tracking-wide" style={{ color: "rgba(255,255,255,0.55)" }}>카테고리로 찾기 ↓</p>
             <div className="flex gap-2 justify-center flex-wrap">
               {CATEGORIES.map(({ key, icon }) => (
                 <button
@@ -930,7 +931,7 @@ export default function MainPage() {
                           : key === "운명·대운" ? "rgba(202,138,4,0.2)"
                           : key === "라이프" ? "rgba(99,102,241,0.2)"
                           : "rgba(255,255,255,0.1)"
-                        : "rgba(255,255,255,0.04)",
+                        : key === "무료" ? "rgba(16,185,129,0.07)" : key === "Special" ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.04)",
                       border: isActive
                         ? key === "Special" ? "1px solid rgba(201,168,76,0.4)"
                           : key === "무료" ? "1px solid rgba(16,185,129,0.35)"
@@ -939,7 +940,7 @@ export default function MainPage() {
                           : key === "운명·대운" ? "1px solid rgba(202,138,4,0.35)"
                           : key === "라이프" ? "1px solid rgba(99,102,241,0.35)"
                           : "1px solid rgba(255,255,255,0.18)"
-                        : "1px solid rgba(255,255,255,0.07)",
+                        : key === "무료" ? "1px solid rgba(16,185,129,0.2)" : key === "Special" ? "1px solid rgba(201,168,76,0.2)" : "1px solid rgba(255,255,255,0.07)",
                       color: isActive
                         ? key === "Special" ? "#e8c97a"
                           : key === "무료" ? "#6ee7b7"
@@ -948,7 +949,7 @@ export default function MainPage() {
                           : key === "운명·대운" ? "#fbbf24"
                           : key === "라이프" ? "#a78bfa"
                           : "rgba(255,255,255,0.9)"
-                        : "rgba(255,255,255,0.38)",
+                        : key === "무료" ? "rgba(52,211,153,0.8)" : key === "Special" ? "rgba(232,201,122,0.7)" : "rgba(255,255,255,0.38)",
                     }}
                   >
                     <span>{icon}</span>
@@ -1072,13 +1073,11 @@ export default function MainPage() {
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
       <section className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-2 gap-10 items-start">
-          {/* 모바일: 일진달력 먼저 */}
-          <div className="order-1">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
             <IljinCalendar />
           </div>
-          {/* 모바일: 문의하기 아래 */}
-          <div className="order-2">
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
             <ContactSection />
           </div>
         </div>

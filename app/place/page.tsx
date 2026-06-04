@@ -160,6 +160,7 @@ export default function PlacePage() {
   const [calType, setCalType] = useState<CalType>("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [birthCity, setBirthCity] = useState("");
   const [currentCity, setCurrentCity] = useState("");
   const [yongshinEl, setYongshinEl] = useState("토");
   const [selectedEl, setSelectedEl] = useState("");
@@ -179,6 +180,10 @@ export default function PlacePage() {
   }, []);
 
   async function handleFormSubmit() {
+    if (!name.trim()) {
+      setFormError("이름을 입력해주세요.");
+      return;
+    }
     if (!birthYear || !birthMonth || !birthDay) {
       setFormError("생년월일을 모두 입력해주세요.");
       return;
@@ -349,10 +354,20 @@ export default function PlacePage() {
           <div className="space-y-5">
             {/* 이름 */}
             <div>
-              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 (선택)</label>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-amber-400">*</span></label>
               <input
                 type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder="이름을 입력하세요"
+                placeholder="홍길동 (필수)"
+                className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
+              />
+            </div>
+
+            {/* 태어난 도시 */}
+            <div>
+              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 도시 <span className="text-white/25 font-normal normal-case tracking-normal">(선택)</span></label>
+              <input
+                type="text" value={birthCity} onChange={e => setBirthCity(e.target.value)}
+                placeholder="예: 서울, 부산, 대구..."
                 className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
               />
             </div>
@@ -442,6 +457,24 @@ export default function PlacePage() {
             </div>
             <button onClick={() => setStep("form")} className="text-xs text-white/30 hover:text-white/60 transition">다시 입력</button>
           </div>
+
+          {/* 태어난 도시 분석 */}
+          {birthCity && (() => {
+            const birthEl = findCityElement(birthCity);
+            const isMatch = birthEl === displayEl;
+            return (
+              <div className={`rounded-2xl p-4 mb-4 border ${isMatch ? "bg-amber-500/8 border-amber-500/20" : "bg-white/[0.03] border-white/10"}`}>
+                <p className="text-sm font-bold mb-1">
+                  {isMatch ? `🌱 고향(${birthCity})과 사주가 잘 맞습니다` : `🚀 고향(${birthCity})을 벗어난 곳에서 운이 열립니다`}
+                </p>
+                <p className="text-xs text-white/45 leading-relaxed">
+                  {isMatch
+                    ? `태어난 곳의 기운이 용신과 일치합니다. 고향 근처에서도 좋은 기운을 받을 수 있지만, 아래 추천 도시에서 더욱 크게 꽃피울 수 있어요.`
+                    : `태어난 곳의 기운과 용신이 다릅니다. 고향에서 멀어질수록 새로운 기운 안에서 더 크게 성장하는 사주입니다. 아래 추천 도시로의 이동을 고려해보세요.`}
+                </p>
+              </div>
+            );
+          })()}
 
           {/* 현재 도시 궁합 */}
           {currentCity && (

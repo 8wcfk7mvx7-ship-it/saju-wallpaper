@@ -1,580 +1,585 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  getDayPillar, getMonthPillar, getYearPillar,
-  CHEONGAN_ELEMENT, JIJI_BONGI, SOLAR_TERM_DAYS,
-  getSipseong, getUunseong,
+  getDayPillar, analyzeSaju, getUunseong,
+  CHEONGAN_ELEMENT, JIJI_BONGI,
 } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
-import { analyzeSaju } from "@/lib/saju";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 export const dynamic = "force-dynamic";
 
-const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }> = {
-  목: { bg: "#14532d", text: "#4ade80", border: "#166534" },
-  화: { bg: "#7f1d1d", text: "#f87171", border: "#991b1b" },
-  토: { bg: "#78350f", text: "#fbbf24", border: "#92400e" },
-  금: { bg: "#1e1b4b", text: "#a5b4fc", border: "#312e81" },
-  수: { bg: "#0c2a4a", text: "#60a5fa", border: "#1e3a5f" },
-};
+type Step = "splash" | "input" | "result";
+type CalType = "solar" | "lunar";
 
-const ELEMENT_DOT: Record<string, string> = {
-  목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#a5b4fc", 수: "#60a5fa",
-};
+const EVENT_TYPES = [
+  { id: "이사", label: "이사일", icon: "🏠", desc: "새 집으로 이동하는 날" },
+  { id: "결혼", label: "결혼·혼인신고", icon: "💍", desc: "인생 최고의 날 선택" },
+  { id: "시험", label: "시험·면접", icon: "📝", desc: "중요한 시험·면접일" },
+  { id: "개업", label: "개업·창업", icon: "🏪", desc: "사업 시작일" },
+  { id: "계약", label: "계약·서류", icon: "📋", desc: "중요 계약·서명일" },
+  { id: "수술", label: "수술·시술", icon: "🏥", desc: "수술·의료 시술일" },
+  { id: "여행", label: "여행 출발", icon: "✈️", desc: "여행·출장 출발일" },
+  { id: "투자", label: "투자·거래", icon: "💰", desc: "주식·부동산 계약일" },
+  { id: "연애", label: "연애 시작", icon: "💑", desc: "고백·첫 만남일" },
+  { id: "임신", label: "임신 준비", icon: "🌱", desc: "임신·출산 준비 시작일" },
+];
 
-const UUNSEONG_LABEL: Record<string, string> = {
-  장생:"장생", 목욕:"목욕", 관대:"관대", 건록:"건록", 제왕:"제왕",
-  쇠:"쇠", 병:"병", 사:"사", 묘:"묘", 절:"절", 태:"태", 양:"양",
-};
-
-const UUNSEONG_COLOR: Record<string, string> = {
-  장생:"#4ade80", 목욕:"#34d399", 관대:"#60a5fa", 건록:"#818cf8", 제왕:"#c084fc",
-  쇠:"#94a3b8", 병:"#f87171", 사:"#ef4444", 묘:"#dc2626", 절:"#9333ea",
-  태:"#fb923c", 양:"#fbbf24",
-};
-
-const SOLAR_TERM_NAME: Record<number, string> = {
-  1:"소한", 2:"입춘", 3:"경칩", 4:"청명", 5:"입하",
-  6:"망종", 7:"소서", 8:"입추", 9:"백로", 10:"한로",
-  11:"입동", 12:"대설",
-};
-
-const MONTH_NAMES = ["", "1월", "2월", "3월", "4월", "5월", "6월",
-  "7월", "8월", "9월", "10월", "11월", "12월"];
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
-function daysInMonth(year: number, month: number): number {
-  return new Date(year, month, 0).getDate();
-}
-function firstDayOfWeek(year: number, month: number): number {
-  return new Date(year, month - 1, 1).getDay();
-}
-
-interface DayInfo {
-  day: number;
-  ilju: { cg: string; jj: string };
-  wolju: { cg: string; jj: string };
-  cgEl: string; jjEl: string;
-  isSolarTerm: boolean;
-}
+const DAYS_LABEL = ["일", "월", "화", "수", "목", "금", "토"];
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
   useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
   return (
-    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
       {children}
     </div>
   );
 }
 
+function DropPick({ value, opts, onChange, placeholder, suffix, accentColor = "#a78bfa" }: {
+  value: string; opts: { v: string; label: string }[];
+  onChange: (v: string) => void; placeholder: string; suffix?: string; accentColor?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, []);
+  useEffect(() => {
+    if (open && list.current && value) {
+      const el = list.current.querySelector(`[data-v="${value}"]`);
+      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
+    }
+  }, [open, value]);
+  const display = opts.find(o => o.v === value)?.label ?? "";
+  return (
+    <div ref={ref} className="relative w-full">
+      <div onClick={() => setOpen(o => !o)}
+        className="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm"
+        style={{ borderColor: open ? accentColor : "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
+        <span className={display ? "text-white" : "text-gray-500"}>
+          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
+        </span>
+        <span className="text-gray-500 text-xs" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+      </div>
+      {open && (
+        <div ref={list} className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220, background: "#12121e", border: "1px solid rgba(255,255,255,0.2)" }}>
+          {opts.map(o => (
+            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
+              className="px-4 py-2.5 text-sm cursor-pointer transition-colors"
+              style={{ color: value === o.v ? accentColor : "rgba(255,255,255,0.65)", background: value === o.v ? "rgba(167,139,250,0.12)" : "transparent", fontWeight: value === o.v ? 600 : 400 }}>
+              {o.label}{suffix ? ` ${suffix}` : ""}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const UUNS_SCORE: Record<string, number> = {
+  제왕: 3, 건록: 2, 장생: 2, 관대: 1, 양: 1,
+  목욕: 0, 태: 0, 쇠: -1,
+  병: -1, 사: -3, 묘: -2, 절: -2,
+};
+
+function scoreDay(userIlgan: string, dp: { cg: string; jj: string }, eventId: string): number {
+  const uuns = getUunseong(userIlgan, dp.jj);
+  let score = UUNS_SCORE[uuns] ?? 0;
+  const cgEl = CHEONGAN_ELEMENT[dp.cg] ?? "토";
+  const jjEl = CHEONGAN_ELEMENT[JIJI_BONGI[dp.jj] ?? ""] ?? "토";
+
+  switch (eventId) {
+    case "이사":
+      if (cgEl === "목" || jjEl === "목") score += 1;
+      if (cgEl === "토" || jjEl === "토") score -= 1;
+      if (["인", "묘"].includes(dp.jj)) score += 1;
+      if (["진", "술", "축", "미"].includes(dp.jj)) score -= 1;
+      break;
+    case "결혼":
+      if (["자", "오", "묘", "유"].includes(dp.jj)) score += 1;
+      if (cgEl === "화") score += 1;
+      if (["사", "묘", "절"].includes(uuns)) score -= 1;
+      break;
+    case "시험":
+      if (cgEl === "화" || cgEl === "수") score += 1;
+      if (cgEl === "토") score -= 1;
+      if (uuns === "건록" || uuns === "제왕") score += 1;
+      break;
+    case "개업":
+      if (["장생", "건록", "제왕"].includes(uuns)) score += 1;
+      if (["사", "묘", "절"].includes(uuns)) score -= 1;
+      if (cgEl === "목" || cgEl === "화") score += 1;
+      break;
+    case "계약":
+      if (cgEl === "금") score += 1;
+      if (uuns === "절") score -= 1;
+      if (["건록", "제왕"].includes(uuns)) score += 1;
+      break;
+    case "수술":
+      if (["사", "묘", "절"].includes(uuns)) score -= 2;
+      if (["장생", "건록"].includes(uuns)) score += 1;
+      if (jjEl === "금") score += 1;
+      break;
+    case "여행":
+      if (["인", "신", "사", "해"].includes(dp.jj)) score += 1; // 역마 지지
+      if (cgEl === "수") score += 1;
+      if (["묘", "절"].includes(uuns)) score -= 1;
+      break;
+    case "투자":
+      if (cgEl === "금" || cgEl === "수") score += 1;
+      if (["사", "묘", "절"].includes(uuns)) score -= 1;
+      if (["건록", "제왕"].includes(uuns)) score += 1;
+      break;
+    case "연애":
+      if (["자", "오", "묘", "유"].includes(dp.jj)) score += 2; // 도화
+      if (cgEl === "화") score += 1;
+      if (["절", "사"].includes(uuns)) score -= 1;
+      break;
+    case "임신":
+      if (cgEl === "목" || cgEl === "수") score += 1;
+      if (["장생", "양"].includes(uuns)) score += 1;
+      if (["사", "절"].includes(uuns)) score -= 2;
+      break;
+  }
+  return score;
+}
+
+function classify(score: number): "길" | "보통" | "흉" {
+  if (score >= 2) return "길";
+  if (score <= -2) return "흉";
+  return "보통";
+}
+
+const DAY_COLOR: Record<string, { bg: string; text: string; dot: string; ring: string }> = {
+  길: { bg: "rgba(16,185,129,0.15)", text: "#34d399", dot: "#10b981", ring: "rgba(16,185,129,0.4)" },
+  보통: { bg: "rgba(255,255,255,0.03)", text: "rgba(255,255,255,0.6)", dot: "rgba(255,255,255,0.15)", ring: "rgba(255,255,255,0.1)" },
+  흉: { bg: "rgba(239,68,68,0.1)", text: "#f87171", dot: "#ef4444", ring: "rgba(239,68,68,0.3)" },
+};
+
+function daysInMonth(y: number, m: number) { return new Date(y, m, 0).getDate(); }
+function firstDow(y: number, m: number) { return new Date(y, m - 1, 1).getDay(); }
+
+const CURRENT_YEAR = 2026;
+const YEAR_OPTS = Array.from({ length: CURRENT_YEAR - 1929 }, (_, i) => CURRENT_YEAR - i);
+const MONTH_OPTS = Array.from({ length: 12 }, (_, i) => i + 1);
+
 export default function CalendarPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"splash" | "main">("splash");
-  const [counter] = useState(() => Math.floor(Math.random() * 300) + 1200);
+  const [step, setStep] = useState<Step>("splash");
   const [showBtn, setShowBtn] = useState(false);
-  const today = new Date();
+  const [counter] = useState(() => Math.floor(Math.random() * 500) + 1400);
 
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1);
-  const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
+  // form state
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState<"male" | "female">("female");
+  const [calType, setCalType] = useState<CalType>("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
+  const [birthYear, setBirthYear] = useState(0);
+  const [birthMonth, setBirthMonth] = useState(0);
+  const [birthDay, setBirthDay] = useState(0);
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [selectedEvent, setSelectedEvent] = useState("");
+  const [formError, setFormError] = useState("");
+
+  // result state
   const [userIlgan, setUserIlgan] = useState<string | null>(null);
-  const [userName, setUserName] = useState("나");
-  const [showIlganInput, setShowIlganInput] = useState(false);
-  const [inputYear, setInputYear] = useState("1990");
-  const [inputMonth, setInputMonth] = useState("1");
-  const [inputDay, setInputDay] = useState("1");
-  const [inputGender, setInputGender] = useState<"male" | "female">("female");
+  const [viewYear, setViewYear] = useState(CURRENT_YEAR);
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth() + 1);
+  const [selectedDay, setSelectedDay] = useState<{ day: number; dp: { cg: string; jj: string }; score: number; uuns: string } | null>(null);
+
+  useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2500); return () => clearTimeout(t); }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => setShowBtn(true), 2500);
-    return () => clearTimeout(t);
+    const saved = loadSajuData();
+    if (saved && saved.birthYear) {
+      if (saved.name) setName(saved.name);
+      if (saved.gender) setGender(saved.gender as "male" | "female");
+      setBirthYear(saved.birthYear);
+      if (saved.birthMonth) setBirthMonth(saved.birthMonth);
+      if (saved.birthDay) setBirthDay(saved.birthDay);
+    }
   }, []);
 
-  useEffect(() => {
-    // sessionStorage에 "진짜" 저장된 사주 데이터가 있고, 이름이 "테스트"가 아닌 경우만 로드
-    const saved = loadSajuData();
-    if (saved && saved.name && saved.name !== "테스트" && saved.birthYear) {
-      setUserName(saved.name);
+  async function handleAnalyze() {
+    if (!birthYear || !birthMonth || !birthDay) { setFormError("생년월일을 모두 입력해주세요."); return; }
+    if (!selectedEvent) { setFormError("궁금한 날짜 종류를 선택해주세요."); return; }
+    setFormError("");
+
+    let fy = birthYear, fm = birthMonth, fd = birthDay;
+    if (calType === "lunar") {
       try {
-        const r = analyzeSaju({
-          birthYear: saved.birthYear, birthMonth: saved.birthMonth, birthDay: saved.birthDay,
-          birthHour: saved.birthHour ?? null, birthMinute: saved.birthMinute ?? null,
-          name: saved.name, gender: saved.gender || "female",
-          birthPlace: saved.birthPlace || "서울",
-          style: "auto", productType: "report", useJajasi: false,
-        });
-        setUserIlgan(r.pillarsDetail.day.cg);
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(fy, fm, fd, isLeapMonth);
+        const sol = cal.getSolarCalendar();
+        if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
       } catch {}
     }
-  }, []);
 
-  function applyIlgan() {
     try {
       const r = analyzeSaju({
-        birthYear: parseInt(inputYear), birthMonth: parseInt(inputMonth), birthDay: parseInt(inputDay),
-        birthHour: null, birthMinute: null, name: "나", gender: inputGender,
-        birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+        birthYear: fy, birthMonth: fm, birthDay: fd,
+        birthHour: birthTime.unknown ? null : birthTime.hour,
+        birthMinute: birthTime.unknown ? null : birthTime.minute,
+        name: name || "나", gender, birthPlace: "서울",
+        style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
       });
       setUserIlgan(r.pillarsDetail.day.cg);
-      setUserName("나");
-      setShowIlganInput(false);
-    } catch {}
-  }
-
-  const yearPillar = useMemo(() => getYearPillar(year), [year]);
-
-  const days = useMemo<DayInfo[]>(() => {
-    const total = daysInMonth(year, month);
-    return Array.from({ length: total }, (_, i) => {
-      const d = i + 1;
-      const ilju = getDayPillar(year, month, d);
-      const wolju = getMonthPillar(year, month, d);
-      const cgEl = CHEONGAN_ELEMENT[ilju.cg];
-      const jjEl = CHEONGAN_ELEMENT[JIJI_BONGI[ilju.jj]] ?? "토";
-      return {
-        day: d, ilju, wolju, cgEl, jjEl,
-        isSolarTerm: d === SOLAR_TERM_DAYS[month],
-      };
-    });
-  }, [year, month]);
-
-  const firstDow = firstDayOfWeek(year, month);
-
-  function prevMonth() {
-    if (month === 1) { if (year > 1975) { setYear(y => y - 1); setMonth(12); } }
-    else setMonth(m => m - 1);
-    setSelectedDay(null);
-  }
-  function nextMonth() {
-    if (month === 12) { if (year < 2030) { setYear(y => y + 1); setMonth(1); } }
-    else setMonth(m => m + 1);
-    setSelectedDay(null);
-  }
-
-  const prevMonthWolju = useMemo(() => getMonthPillar(year, month, 1), [year, month]);
-  const postTermWolju = useMemo(() => {
-    const termDay = SOLAR_TERM_DAYS[month];
-    if (termDay > 0 && termDay <= daysInMonth(year, month)) {
-      return getMonthPillar(year, month, termDay);
+      const now = new Date();
+      setViewYear(now.getFullYear());
+      setViewMonth(now.getMonth() + 1);
+      setSelectedDay(null);
+      setStep("result");
+    } catch {
+      setFormError("분석 오류. 날짜를 확인해주세요.");
     }
-    return null;
-  }, [year, month]);
+  }
 
-  const isWoljuChange = postTermWolju &&
-    (postTermWolju.cg !== prevMonthWolju.cg || postTermWolju.jj !== prevMonthWolju.jj);
+  const eventInfo = EVENT_TYPES.find(e => e.id === selectedEvent);
 
-  // ── 스플래시 ────────────────────────────────────────────────────────────────
+  // ── SPLASH ───────────────────────────────────────────────────────────────────
   if (step === "splash") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
-
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[160px]" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-900/15 blur-[130px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-900/15 blur-[160px]" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/15 blur-[130px]" />
       </div>
 
       <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-      <div className="relative z-10 max-w-md w-full text-center space-y-0">
-
-        {/* 배지 + 아이콘 */}
+      <div className="relative z-10 max-w-md w-full text-center">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
-            <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5">
-              <span className="pulse w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
-              <span className="text-xs font-bold text-violet-300 tracking-widest uppercase">Summer Palace · 일진달력</span>
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
+              <span className="pulse w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+              <span className="text-xs font-bold text-emerald-300 tracking-widest uppercase">Summer Palace · 길일 선택</span>
             </div>
-            <div className="text-5xl drop-shadow-[0_0_40px_rgba(139,92,246,0.5)]">📅</div>
+            <div className="text-5xl drop-shadow-[0_0_40px_rgba(16,185,129,0.4)]">📅</div>
           </div>
         </FadeIn>
 
-        {/* 실시간 카운터 */}
-        <FadeIn delay={100} className="mb-10">
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 pulse" />
-            <span className="text-indigo-200 text-sm font-semibold">
-              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 오늘 일진 확인 중
+        <FadeIn delay={100} className="mb-8">
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse" />
+            <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
+              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 길일을 확인 중
             </span>
           </div>
         </FadeIn>
 
-        {/* 카피 */}
         <div className="space-y-4 mb-12">
           {[
-            { text: "오늘 일진이 어떤지", big: false, delay: 200 },
-            { text: "모르고 움직이면", big: false, delay: 700 },
-            { text: "손해입니다.", big: true, delay: 1200 },
-            { text: "하루의 에너지가 다 다릅니다.", big: true, delay: 1800 },
+            { text: "이사·결혼·수술…", big: false, delay: 200 },
+            { text: "날짜가 결과를 바꿉니다.", big: true, delay: 700 },
+            { text: "사주에 맞는 날을 골라야", big: false, delay: 1200 },
+            { text: "기운이 따릅니다.", big: true, delay: 1700 },
           ].map((line, i) => (
             <FadeIn key={i} delay={line.delay}>
               <p className={`leading-snug ${line.big
-                ? "text-3xl font-black bg-gradient-to-r from-violet-300 via-indigo-200 to-violet-300 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(139,92,246,0.3)]"
-                : "text-xl text-gray-400 font-medium"
-              }`}>
+                ? "text-3xl font-black bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent"
+                : "text-xl text-gray-400 font-medium"}`}>
                 {line.text}
               </p>
             </FadeIn>
           ))}
         </div>
 
-        {/* 피처 카드 */}
-        <FadeIn delay={2200} className="mb-10">
+        <FadeIn delay={2100} className="mb-8">
           <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-            {[
-              { icon: "📅", title: "일주 오행", desc: "매일 다른 기운" },
-              { icon: "🌿", title: "절기 확인", desc: "월주 바뀌는 날" },
-              { icon: "⭐", title: "12운성", desc: "길일·흉일 판별" },
-              { icon: "🔮", title: "맞춤 분석", desc: "내 일간 기준" },
-            ].map((f, i) => (
-              <div key={i} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <span className="text-xl">{f.icon}</span>
-                <p className="text-xs font-bold text-white mt-1">{f.title}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{f.desc}</p>
+            {EVENT_TYPES.slice(0, 4).map(e => (
+              <div key={e.id} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <span className="text-xl">{e.icon}</span>
+                <p className="text-xs font-bold text-white mt-1">{e.label}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{e.desc}</p>
               </div>
             ))}
           </div>
         </FadeIn>
 
-        {/* CTA */}
-        <div style={{
-          opacity: showBtn ? 1 : 0,
-          transform: showBtn ? "translateY(0) scale(1)" : "translateY(20px) scale(0.96)",
-          transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
-        }}>
-          <button
-            onClick={() => setStep("main")}
+        <div style={{ opacity: showBtn ? 1 : 0, transform: showBtn ? "none" : "translateY(20px) scale(0.96)", transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)" }}>
+          <button onClick={() => setStep("input")}
             className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
-              color: "#fff",
-              boxShadow: "0 8px 32px -4px rgba(124,58,237,0.4)",
-            }}
-          >
-            오늘 일진 확인하기 →
+            style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
+            내 길일 찾기 →
           </button>
-          <p className="text-xs text-gray-700 mt-4">무료 · 매월 1975~2030년</p>
+          <p className="text-xs text-gray-700 mt-4">무료 · 생년월일 입력 후 바로 확인</p>
         </div>
       </div>
     </main>
   );
 
-  // ── 캘린더 본편 ─────────────────────────────────────────────────────────────
+  // ── INPUT ─────────────────────────────────────────────────────────────────────
+  if (step === "input") return (
+    <main className="min-h-screen bg-[#06060e] text-white pb-20">
+      <style>{`select option{background:#0d0d1a;color:#fff}`}</style>
+      <div className="max-w-lg mx-auto px-5 pt-8">
+        <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
+        <h2 className="text-2xl font-black text-white mb-1">길일 선택</h2>
+        <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
+
+        <div className="space-y-5">
+          {/* 이름 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-[10px] font-normal normal-case text-white/25">(선택)</span></label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
+              className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50" />
+          </div>
+
+          {/* 양력/음력 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
+            <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              {(["solar", "lunar"] as CalType[]).map(t => (
+                <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
+                  className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-emerald-700 text-white" : "text-white/40 hover:text-white/70"}`}>
+                  {t === "solar" ? "양력" : "음력"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 생년월일 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일 <span className="text-emerald-400">*</span></label>
+            <div className="space-y-2">
+              <DropPick value={birthYear ? String(birthYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setBirthYear(Number(v))} placeholder="출생 연도" suffix="년" />
+              <div className="grid grid-cols-2 gap-2">
+                <DropPick value={birthMonth ? String(birthMonth) : ""} opts={MONTH_OPTS.map(m => ({ v: String(m), label: String(m) }))} onChange={v => setBirthMonth(Number(v))} placeholder="월" suffix="월" />
+                <DropPick value={birthDay ? String(birthDay) : ""} opts={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ v: String(d), label: String(d) }))} onChange={v => setBirthDay(Number(v))} placeholder="일" suffix="일" />
+              </div>
+              {calType === "lunar" && (
+                <button type="button" onClick={() => setIsLeapMonth(v => !v)}
+                  className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${isLeapMonth ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
+                  <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isLeapMonth ? "border-emerald-400" : "border-gray-600"}`}>
+                    {isLeapMonth && <span className="text-[10px] font-black">✓</span>}
+                  </span>
+                  윤달
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 태어난 시간 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간</label>
+            <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="emerald" />
+          </div>
+
+          {/* 성별 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">성별</label>
+            <div className="grid grid-cols-2 gap-3">
+              {(["female", "male"] as const).map(g => (
+                <button key={g} onClick={() => setGender(g)}
+                  className={`py-3 rounded-xl text-sm font-bold transition border ${gender === g ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/15 bg-white/5 text-gray-400 hover:border-emerald-500/50"}`}>
+                  {g === "female" ? "여성" : "남성"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 날짜 종류 */}
+          <div>
+            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">궁금한 날짜 <span className="text-emerald-400">*</span></label>
+            <p className="text-[11px] text-white/25 mb-3">출생일은 선택할 수 없습니다</p>
+            <div className="grid grid-cols-2 gap-2">
+              {EVENT_TYPES.map(e => (
+                <button key={e.id} onClick={() => setSelectedEvent(e.id)}
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl border text-sm font-semibold text-left transition"
+                  style={{
+                    borderColor: selectedEvent === e.id ? "#10b981" : "rgba(255,255,255,0.1)",
+                    background: selectedEvent === e.id ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)",
+                    color: selectedEvent === e.id ? "#34d399" : "rgba(255,255,255,0.55)",
+                  }}>
+                  <span className="text-lg shrink-0">{e.icon}</span>
+                  <span className="leading-tight text-xs">{e.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {formError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{formError}</p>}
+
+          <button onClick={handleAnalyze}
+            className="w-full py-5 rounded-2xl font-black text-lg text-white transition-all active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg, #059669, #0d9488)", boxShadow: "0 8px 32px rgba(5,150,105,0.4)" }}>
+            길일 찾기 →
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+
+  // ── RESULT ────────────────────────────────────────────────────────────────────
+  const today = new Date();
+  const months: { year: number; month: number }[] = [];
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() + 1 });
+  }
+
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("splash")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 뒤로</button>
+          <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 다시 입력</button>
           <div className="flex-1">
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-1">
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest">Summer Palace</span>
-            </div>
-            <h1 className="text-xl font-black text-white">일진 달력</h1>
-            <p className="text-xs text-gray-600 mt-0.5">매일의 일주·오행·12운성</p>
+            <h1 className="text-xl font-black text-white">
+              {name ? `${name}의 ` : ""}{eventInfo?.icon} {eventInfo?.label} 길일
+            </h1>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+              일간 <strong className="text-white">{userIlgan}</strong> 기준 · 향후 3개월
+            </p>
           </div>
         </div>
-
-        {/* 월 네비게이션 */}
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} disabled={year === 1975 && month === 1}
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition">‹</button>
-
-          <div className="text-center">
-            <div className="flex items-center gap-2 justify-center">
-              <select value={year} onChange={e => { setYear(Number(e.target.value)); setSelectedDay(null); }}
-                className="bg-transparent text-white font-bold text-lg focus:outline-none cursor-pointer">
-                {Array.from({ length: 56 }, (_, i) => 1975 + i).map(y => (
-                  <option key={y} value={y} className="bg-[#0d0d1a]">{y}년</option>
-                ))}
-              </select>
-              <span className="text-white font-bold text-lg">{MONTH_NAMES[month]}</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 mt-1">
-              <span className="text-xs text-gray-500">
-                연주 <span className="text-white font-semibold">{yearPillar.cg}{yearPillar.jj}</span>
-              </span>
-              <span className="text-xs text-gray-500">
-                월주{" "}
-                {isWoljuChange ? (
-                  <span>
-                    <span className="text-white font-semibold">{prevMonthWolju.cg}{prevMonthWolju.jj}</span>
-                    <span className="text-gray-600 mx-1">→</span>
-                    <span className="text-violet-300 font-semibold">{postTermWolju!.cg}{postTermWolju!.jj}</span>
-                    <span className="text-gray-600 ml-1 text-[10px]">({SOLAR_TERM_DAYS[month]}일 {SOLAR_TERM_NAME[month]})</span>
-                  </span>
-                ) : (
-                  <span className="text-white font-semibold">{prevMonthWolju.cg}{prevMonthWolju.jj}</span>
-                )}
-              </span>
-            </div>
-          </div>
-
-          <button onClick={nextMonth} disabled={year === 2030 && month === 12}
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30 transition">›</button>
-        </div>
-
-        {/* 내 일간 설정 */}
-        {userIlgan ? (
-          <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl px-3 py-2 mb-4 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base">✨</span>
-              <p className="text-xs text-violet-300 leading-relaxed">
-                일간 <strong className="text-white">{userIlgan}</strong> 기준 — 각 날짜의 12운성이 표시됩니다.
-                <span className="text-violet-400/60 ml-1">진초록=왕성 / 진빨강=흉일</span>
-              </p>
-            </div>
-            <button
-              onClick={() => { setUserIlgan(null); setShowIlganInput(false); }}
-              className="text-[10px] text-gray-600 hover:text-gray-400 transition shrink-0"
-            >✕ 초기화</button>
-          </div>
-        ) : showIlganInput ? (
-          <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-4 space-y-3">
-            <p className="text-xs font-semibold text-gray-300">내 생년월일 입력 — 일간 자동 계산</p>
-            <div className="grid grid-cols-3 gap-2">
-              <input
-                type="number" value={inputYear} onChange={e => setInputYear(e.target.value)}
-                placeholder="출생연도" min={1940} max={2010}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
-              />
-              <input
-                type="number" value={inputMonth} onChange={e => setInputMonth(e.target.value)}
-                placeholder="월" min={1} max={12}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
-              />
-              <input
-                type="number" value={inputDay} onChange={e => setInputDay(e.target.value)}
-                placeholder="일" min={1} max={31}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 text-center"
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setInputGender("female")}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${inputGender === "female" ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400"}`}
-              >여성</button>
-              <button
-                onClick={() => setInputGender("male")}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${inputGender === "male" ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400"}`}
-              >남성</button>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={applyIlgan}
-                className="flex-1 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-sm font-bold text-white transition"
-              >적용하기</button>
-              <button
-                onClick={() => setShowIlganInput(false)}
-                className="px-4 py-2.5 rounded-xl bg-white/5 text-sm text-gray-500 transition"
-              >취소</button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowIlganInput(true)}
-            className="w-full mb-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
-            style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", color: "rgba(167,139,250,0.8)" }}
-          >
-            ✨ 내 생년월일 입력 — 맞춤 12운성 보기
-          </button>
-        )}
-
-        {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 mb-2">
-          {DAY_NAMES.map((d, i) => (
-            <div key={d} className={`text-center text-xs font-semibold py-1 ${i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-500"}`}>
-              {d}
-            </div>
-          ))}
-        </div>
-
-        {/* 달력 그리드 */}
-        <div className="grid grid-cols-7 gap-0.5">
-          {Array.from({ length: firstDow }).map((_, i) => (
-            <div key={`empty-${i}`} className="h-[70px]" />
-          ))}
-
-          {days.map(info => {
-            const dow = (firstDow + info.day - 1) % 7;
-            const isToday = year === today.getFullYear() && month === today.getMonth() + 1 && info.day === today.getDate();
-            const cgEl = info.cgEl as keyof typeof ELEMENT_COLOR;
-            const elStyle = ELEMENT_COLOR[cgEl] || ELEMENT_COLOR["토"];
-            const uuns = userIlgan ? getUunseong(userIlgan, info.ilju.jj) : null;
-            const uunsColor = uuns ? UUNSEONG_COLOR[uuns] : null;
-            const isSelected = selectedDay?.day === info.day;
-            const isLucky = uuns && ["제왕","건록","장생"].includes(uuns);
-            const isUnlucky = uuns && ["사","묘","절"].includes(uuns);
-
-            return (
-              <div key={info.day} onClick={() => setSelectedDay(isSelected ? null : info)}
-                className={`h-[70px] rounded-lg cursor-pointer transition-all relative overflow-hidden
-                  ${isSelected ? "ring-2 ring-violet-400" : ""}
-                  ${isToday ? "ring-2 ring-yellow-400/60" : ""}
-                  ${isLucky ? "ring-1 ring-green-500/50" : ""}
-                  ${isUnlucky ? "ring-1 ring-red-500/30" : ""}
-                  hover:ring-1 hover:ring-white/20
-                `}
-                style={{ background: `${elStyle.bg}33` }}
-              >
-                {info.isSolarTerm && (
-                  <div className="absolute top-0 right-0 bg-violet-500/60 text-[8px] text-white px-1 rounded-bl-md leading-4">
-                    {SOLAR_TERM_NAME[month]}
-                  </div>
-                )}
-                <div className="p-1 flex flex-col items-center justify-center h-full gap-0.5">
-                  <span className={`text-[11px] font-bold ${dow === 0 ? "text-red-400" : dow === 6 ? "text-blue-400" : "text-gray-400"} ${isToday ? "bg-yellow-400/20 rounded-full w-5 h-5 flex items-center justify-center" : ""}`}>
-                    {info.day}
-                  </span>
-                  <span className="text-sm font-black leading-none" style={{ color: elStyle.text }}>
-                    {info.ilju.cg}{info.ilju.jj}
-                  </span>
-                  <div className="flex gap-0.5 mt-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: ELEMENT_DOT[info.cgEl] }} />
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: ELEMENT_DOT[info.jjEl] }} />
-                  </div>
-                  {uuns && (
-                    <span className="text-[9px] font-semibold" style={{ color: uunsColor || "#94a3b8" }}>
-                      {uuns}
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 선택된 날 상세 패널 */}
-        {selectedDay && (
-          <DetailPanel info={selectedDay} year={year} month={month} userIlgan={userIlgan} userName={userName} />
-        )}
 
         {/* 범례 */}
-        <div className="mt-6 bg-white/[0.03] border border-white/10 rounded-xl p-4">
-          <p className="text-xs text-gray-500 font-semibold mb-3">오행 범례</p>
-          <div className="flex flex-wrap gap-2">
-            {(["목","화","토","금","수"] as const).map(el => (
-              <div key={el} className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ background: ELEMENT_DOT[el] }} />
-                <span className="text-xs text-gray-400">{el}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-gray-600 mt-3 leading-relaxed">
-            왼쪽 점 = 일간(天干) 오행 · 오른쪽 점 = 일지(地支) 오행<br />
-            {SOLAR_TERM_NAME[month] && (
-              <>
-                <span className="text-violet-400">{SOLAR_TERM_NAME[month]}({SOLAR_TERM_DAYS[month]}일)</span> 이후 월주가 바뀝니다
-              </>
-            )}
-          </p>
+        <div className="flex items-center gap-4 mb-5 px-4 py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          {[
+            { label: "길일", color: "#34d399", dot: "#10b981" },
+            { label: "보통", color: "rgba(255,255,255,0.5)", dot: "rgba(255,255,255,0.2)" },
+            { label: "흉일", color: "#f87171", dot: "#ef4444" },
+          ].map(l => (
+            <div key={l.label} className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
+              <span className="text-xs font-semibold" style={{ color: l.color }}>{l.label}</span>
+            </div>
+          ))}
+          <span className="ml-auto text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>클릭 → 상세</span>
         </div>
 
-        {/* 오늘로 이동 버튼 */}
-        {(year !== today.getFullYear() || month !== today.getMonth() + 1) && (
-          <button onClick={() => { setYear(today.getFullYear()); setMonth(today.getMonth() + 1); setSelectedDay(null); }}
-            className="mt-4 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition">
-            오늘로 돌아가기
-          </button>
-        )}
+        {/* 3개월 캘린더 */}
+        {months.map(({ year, month }) => {
+          const dim = daysInMonth(year, month);
+          const fdow = firstDow(year, month);
+          const cells: (number | null)[] = [...Array(fdow).fill(null), ...Array.from({ length: dim }, (_, i) => i + 1)];
+          while (cells.length % 7 !== 0) cells.push(null);
+
+          return (
+            <div key={`${year}-${month}`} className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-black text-white">{year}년 {month}월</h2>
+                <span className="text-[10px] px-2 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.1)", color: "#34d399", border: "1px solid rgba(16,185,129,0.2)" }}>
+                  {eventInfo?.icon} {eventInfo?.label}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-7 mb-1">
+                {DAYS_LABEL.map((d, i) => (
+                  <div key={d} className="text-center text-[10px] font-bold py-1"
+                    style={{ color: i === 0 ? "#f87171" : i === 6 ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-0.5">
+                {cells.map((day, idx) => {
+                  if (!day) return <div key={idx} className="h-16" />;
+                  const dow = idx % 7;
+                  const dp = getDayPillar(year, month, day);
+                  const score = userIlgan ? scoreDay(userIlgan, dp, selectedEvent) : 0;
+                  const cls = userIlgan ? classify(score) : "보통";
+                  const clr = DAY_COLOR[cls];
+                  const uuns = userIlgan ? getUunseong(userIlgan, dp.jj) : "";
+                  const isToday = year === today.getFullYear() && month === today.getMonth() + 1 && day === today.getDate();
+                  const isPast = new Date(year, month - 1, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                  const isSelected = selectedDay?.day === day && viewYear === year && viewMonth === month;
+
+                  return (
+                    <div key={idx}
+                      onClick={() => {
+                        if (isPast) return;
+                        setSelectedDay(isSelected ? null : { day, dp, score, uuns });
+                        setViewYear(year); setViewMonth(month);
+                      }}
+                      className={`h-16 rounded-lg relative overflow-hidden transition-all ${isPast ? "opacity-30 cursor-default" : "cursor-pointer"}`}
+                      style={{
+                        background: isSelected ? `${clr.bg}` : isPast ? "rgba(255,255,255,0.02)" : cls === "길" ? clr.bg : cls === "흉" ? clr.bg : "rgba(255,255,255,0.03)",
+                        border: isSelected ? `1px solid ${clr.ring}` : isToday ? "1px solid rgba(201,168,76,0.5)" : "1px solid transparent",
+                        boxShadow: cls === "길" && !isPast ? `0 0 8px rgba(16,185,129,0.2)` : "none",
+                      }}>
+                      <div className="p-1.5 flex flex-col items-center justify-center h-full gap-0.5">
+                        <span className="text-[11px] font-bold leading-none"
+                          style={{ color: dow === 0 ? "#f87171" : dow === 6 ? "#60a5fa" : isToday ? "#e8c97a" : "rgba(255,255,255,0.7)" }}>
+                          {day}
+                        </span>
+                        {!isPast && (
+                          <>
+                            <span className="text-[10px] font-black leading-none" style={{ color: clr.text }}>
+                              {dp.cg}{dp.jj}
+                            </span>
+                            <div className="w-2 h-2 rounded-full" style={{ background: clr.dot }} />
+                            {uuns && cls !== "보통" && (
+                              <span className="text-[8px] leading-none" style={{ color: clr.text }}>{uuns}</span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 선택된 날 상세 */}
+              {selectedDay && viewYear === year && viewMonth === month && (
+                <div className="mt-3 rounded-2xl p-5"
+                  style={{
+                    background: selectedDay.score >= 2 ? "rgba(16,185,129,0.1)" : selectedDay.score <= -2 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${selectedDay.score >= 2 ? "rgba(16,185,129,0.3)" : selectedDay.score <= -2 ? "rgba(239,68,68,0.25)" : "rgba(255,255,255,0.1)"}`,
+                  }}>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{year}년 {month}월 {selectedDay.day}일</p>
+                      <p className="text-2xl font-black mt-1" style={{ color: classify(selectedDay.score) === "길" ? "#34d399" : classify(selectedDay.score) === "흉" ? "#f87171" : "rgba(255,255,255,0.8)" }}>
+                        {classify(selectedDay.score) === "길" ? "✨ 길일" : classify(selectedDay.score) === "흉" ? "⚠️ 흉일" : "☁️ 보통"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>일주</p>
+                      <p className="text-xl font-black text-white">{selectedDay.dp.cg}{selectedDay.dp.jj}</p>
+                      {selectedDay.uuns && <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{selectedDay.uuns}</p>}
+                    </div>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                    {classify(selectedDay.score) === "길"
+                      ? `${eventInfo?.label}에 유리한 날입니다. 12운성 ${selectedDay.uuns}의 기운이 강하게 작용합니다. 오전~오후 초를 활용하세요.`
+                      : classify(selectedDay.score) === "흉"
+                      ? `${eventInfo?.label}에 불리한 날입니다. ${selectedDay.uuns ? `12운성 ${selectedDay.uuns}` : "기운"}이 약해져 있어 중요한 결정을 피하는 것이 좋습니다.`
+                      : `무난한 날입니다. 큰 길흉은 없으나 특별히 유리하지도 않습니다. 길일을 기다릴 여유가 있다면 녹색 날을 선택하세요.`}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* 안내 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+          <p className="text-xs font-semibold mb-2 text-white">📌 길일 선택 안내</p>
+          <ul className="space-y-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+            <li>• 일간 <strong className="text-white">{userIlgan}</strong>을 기준으로 12운성·오행을 종합 분석했습니다</li>
+            <li>• 길일이라도 음력 손 없는 날과 함께 확인하면 더욱 좋습니다</li>
+            <li>• 흉일은 가급적 피하되, 불가피하다면 오전 시간을 활용하세요</li>
+            <li>• 본 결과는 사주 이론 기반 참고용입니다</li>
+          </ul>
+        </div>
+
+        <button onClick={() => setStep("input")}
+          className="w-full py-3 rounded-xl text-sm font-semibold transition"
+          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
+          다른 날짜 종류로 다시 보기
+        </button>
       </div>
     </main>
-  );
-}
-
-function DetailPanel({ info, year, month, userIlgan, userName }: {
-  info: DayInfo; year: number; month: number; userIlgan: string | null; userName: string;
-}) {
-  const uuns = userIlgan ? getUunseong(userIlgan, info.ilju.jj) : null;
-  const sipseongCg = userIlgan ? getSipseong(userIlgan, info.ilju.cg) : null;
-  const sipseongJj = userIlgan ? getSipseong(userIlgan, JIJI_BONGI[info.ilju.jj] || "") : null;
-  const cgEl = info.cgEl as keyof typeof ELEMENT_COLOR;
-  const elStyle = ELEMENT_COLOR[cgEl] || ELEMENT_COLOR["토"];
-
-  const UUNSEONG_DESC: Record<string, string> = {
-    장생: "새로운 시작, 생기 있는 날. 뭔가를 시작하기 좋은 에너지.",
-    목욕: "유혹과 풍류의 기운. 감각적이지만 판단력이 흐려질 수 있어요.",
-    관대: "배움과 성장의 날. 새로운 기술이나 인맥을 쌓기에 좋아요.",
-    건록: "가장 안정적이고 건실한 날. 중요한 계약·결정에 좋습니다.",
-    제왕: "에너지가 최고조. 리더십과 추진력이 빛나는 날입니다.",
-    쇠: "기운이 조금 꺾이는 날. 무리하지 말고 내실을 다지세요.",
-    병: "몸과 마음이 지치기 쉬운 날. 건강에 신경 쓰세요.",
-    사: "에너지가 소진되는 날. 새 일 시작보다 마무리·정리를 하세요.",
-    묘: "정체와 답답함이 있는 날. 참고 기다리는 것이 유리합니다.",
-    절: "단절과 전환의 기운. 끝내야 할 것을 끝내는 날.",
-    태: "새로운 씨앗이 잉태되는 날. 계획과 구상에 좋습니다.",
-    양: "서서히 자라나는 기운. 꾸준한 노력이 결실을 맺는 날.",
-  };
-
-  return (
-    <div className="mt-4 rounded-2xl border p-5" style={{ background: `${elStyle.bg}55`, borderColor: `${elStyle.border}80` }}>
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <p className="text-xs text-gray-500 mb-1">{year}년 {month}월 {info.day}일</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black" style={{ color: elStyle.text }}>{info.ilju.cg}{info.ilju.jj}</span>
-            <span className="text-sm text-gray-500">일주</span>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-500">월주</p>
-          <p className="text-sm font-bold text-white">{info.wolju.cg}{info.wolju.jj}</p>
-        </div>
-      </div>
-
-      <div className="flex gap-3 mb-4">
-        <div className="flex-1 bg-white/5 rounded-xl p-3 text-center">
-          <p className="text-xs text-gray-600 mb-1">일간 오행</p>
-          <div className="flex items-center justify-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ background: ELEMENT_DOT[info.cgEl] }} />
-            <span className="text-sm font-bold" style={{ color: ELEMENT_DOT[info.cgEl] }}>{info.cgEl}({info.ilju.cg})</span>
-          </div>
-        </div>
-        <div className="flex-1 bg-white/5 rounded-xl p-3 text-center">
-          <p className="text-xs text-gray-600 mb-1">일지 오행</p>
-          <div className="flex items-center justify-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ background: ELEMENT_DOT[info.jjEl] }} />
-            <span className="text-sm font-bold" style={{ color: ELEMENT_DOT[info.jjEl] }}>{info.jjEl}({info.ilju.jj})</span>
-          </div>
-        </div>
-      </div>
-
-      {userIlgan && (
-        <div className="bg-white/5 rounded-xl p-4 space-y-3">
-          <p className="text-xs text-gray-400 font-semibold">{userName}님({userIlgan}일간) 기준 오늘 에너지</p>
-          {sipseongCg && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">일간 관계</span>
-              <span className="text-sm font-bold text-white">{sipseongCg}</span>
-            </div>
-          )}
-          {sipseongJj && sipseongJj !== sipseongCg && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">일지 관계</span>
-              <span className="text-sm font-bold text-white">{sipseongJj}</span>
-            </div>
-          )}
-          {uuns && (
-            <>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">12운성</span>
-                <span className="text-sm font-bold" style={{ color: UUNSEONG_COLOR[uuns] || "#94a3b8" }}>{UUNSEONG_LABEL[uuns] || uuns}</span>
-              </div>
-              <p className="text-xs text-gray-400 leading-relaxed border-t border-white/10 pt-3">{UUNSEONG_DESC[uuns] || ""}</p>
-            </>
-          )}
-        </div>
-      )}
-
-      {info.isSolarTerm && (
-        <div className="mt-3 bg-violet-500/15 border border-violet-500/25 rounded-xl px-3 py-2">
-          <p className="text-xs text-violet-300">
-            🌿 오늘은 <strong>{SOLAR_TERM_NAME[month]}</strong> — 월주가 바뀌는 절기일입니다.
-            이날부터 {info.wolju.cg}{info.wolju.jj}월이 시작됩니다.
-          </p>
-        </div>
-      )}
-    </div>
   );
 }

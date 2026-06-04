@@ -42,13 +42,14 @@ function isJajaRange(h: number | null) {
 
 // ─── 스크롤 드롭다운 피커 ─────────────────────────────────────────────────────
 function ScrollPicker({
-  value, options, onChange, placeholder, accentBorder,
+  value, options, onChange, placeholder, accentBorder, disabled = false,
 }: {
   value: string;
   options: Array<{ v: string; label: string }>;
   onChange: (v: string) => void;
   placeholder: string;
   accentBorder: string;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -74,18 +75,22 @@ function ScrollPicker({
   return (
     <div ref={ref} className="relative w-full">
       <div
-        onClick={() => setOpen(!open)}
-        className={`flex items-center justify-between bg-white/5 border rounded-xl px-4 py-3 cursor-pointer transition select-none hover:border-white/25 ${
-          open ? `${accentBorder}` : "border-white/10"
+        onClick={() => { if (!disabled) setOpen(!open); }}
+        className={`flex items-center justify-between bg-white/5 border rounded-xl px-4 py-3 transition select-none ${
+          disabled
+            ? "opacity-35 cursor-default border-white/10"
+            : `cursor-pointer hover:border-white/25 ${open ? accentBorder : "border-white/10"}`
         }`}
       >
         <span className={display ? "text-white text-base" : "text-gray-600 text-base"}>
           {display || placeholder}
         </span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+        {!disabled && (
+          <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+        )}
       </div>
 
-      {open && (
+      {open && !disabled && (
         <div
           ref={listRef}
           className="absolute z-50 w-full mt-1 bg-[#12121e] border border-white/20 rounded-xl overflow-y-auto shadow-2xl shadow-black/60"
@@ -116,14 +121,20 @@ interface Props {
   value: BirthTimeValue;
   onChange: (v: BirthTimeValue) => void;
   accent?: "indigo" | "emerald" | "violet";
-  simplified?: boolean; // charm용: 시간 1개 드롭다운만, 야자시·모름 없음
+  simplified?: boolean; // charm용: 시간 1개 드롭다운만
 }
 
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => {
+const HOUR_OPTIONS_BASE = Array.from({ length: 24 }, (_, i) => {
   const sijinIdx = hourToSijinIdx(i);
   const sijin = SIJIN_LIST[sijinIdx];
   return { v: String(i), label: `${i}시  (${sijin.name} ${sijin.hanja})` };
 });
+
+// "모름" 옵션을 맨 앞에 추가
+const HOUR_OPTIONS_WITH_UNKNOWN = [
+  { v: "unknown", label: "시간 모름" },
+  ...HOUR_OPTIONS_BASE,
+];
 
 const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({
   v: String(i),
@@ -154,7 +165,7 @@ export default function BirthTimePicker({ value, onChange, accent = "indigo", si
       <div className="space-y-2">
         <ScrollPicker
           value={value.hour !== null ? String(value.hour) : ""}
-          options={HOUR_OPTIONS}
+          options={HOUR_OPTIONS_BASE}
           onChange={v => onChange({ ...value, hour: Number(v), minute: 30, unknown: false })}
           placeholder="시 선택 (선택사항)"
           accentBorder={accentBorder}
@@ -168,56 +179,47 @@ export default function BirthTimePicker({ value, onChange, accent = "indigo", si
     );
   }
 
-  if (value.unknown) {
-    return (
-      <div>
-        <ScrollPicker
-          value=""
-          options={HOUR_OPTIONS}
-          onChange={v => onChange({ ...value, unknown: false, hour: Number(v), minute: 30 })}
-          placeholder="시 선택"
-          accentBorder={accentBorder}
-        />
-        <button
-          type="button"
-          onClick={() => onChange({ hour: null, minute: null, unknown: true, useJajasi: false })}
-          className="mt-2 w-full py-2.5 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition bg-white/[0.02]"
-        >
-          태어난 시간 모름
-        </button>
-      </div>
-    );
+  // 시 피커 값: unknown=true면 "unknown", 아니면 String(hour)
+  const hourPickerValue = value.unknown ? "unknown" : (value.hour !== null ? String(value.hour) : "");
+
+  function handleHourChange(v: string) {
+    if (v === "unknown") {
+      onChange({ hour: null, minute: null, unknown: true, useJajasi: false });
+    } else {
+      onChange({ ...value, hour: Number(v), minute: value.minute ?? 30, unknown: false });
+    }
   }
 
   return (
     <div className="space-y-3">
-      {/* 시 / 분 스크롤 선택 */}
+      {/* 시 / 분 나란히 */}
       <div className="grid grid-cols-2 gap-3">
         <ScrollPicker
-          value={value.hour !== null ? String(value.hour) : ""}
-          options={HOUR_OPTIONS}
-          onChange={v => onChange({ ...value, hour: Number(v), unknown: false })}
+          value={hourPickerValue}
+          options={HOUR_OPTIONS_WITH_UNKNOWN}
+          onChange={handleHourChange}
           placeholder="시 선택"
           accentBorder={accentBorder}
         />
         <ScrollPicker
-          value={value.minute !== null ? String(value.minute) : ""}
+          value={!value.unknown && value.minute !== null ? String(value.minute) : ""}
           options={MINUTE_OPTIONS}
           onChange={v => onChange({ ...value, minute: Number(v) })}
           placeholder="분 선택"
           accentBorder={accentBorder}
+          disabled={value.unknown}
         />
       </div>
 
-      {/* 선택된 시진 힌트 */}
-      {sijin && (
+      {/* 시진 힌트 */}
+      {sijin && !value.unknown && (
         <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
           {sijin.name}({sijin.hanja}) · {sijin.range}
         </p>
       )}
 
-      {/* 야자시/조자시 */}
-      {isJajaRange(value.hour) && (
+      {/* 야자시·조자시 체크박스 */}
+      {!value.unknown && isJajaRange(value.hour) && (
         <button
           type="button"
           onClick={() => onChange({ ...value, useJajasi: !value.useJajasi })}
@@ -230,21 +232,9 @@ export default function BirthTimePicker({ value, onChange, accent = "indigo", si
           }`}>
             {value.useJajasi && <span className="text-[10px] font-black">✓</span>}
           </span>
-          <span>
-            야자시/조자시 적용
-            <span className="text-gray-600 font-normal ml-1">(23:30~01:30 출생)</span>
-          </span>
+          야자시·조자시 적용
         </button>
       )}
-
-      {/* 시간 모름 */}
-      <button
-        type="button"
-        onClick={() => onChange({ hour: null, minute: null, unknown: true, useJajasi: false })}
-        className="w-full py-2.5 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition bg-white/[0.02]"
-      >
-        태어난 시간 모름
-      </button>
     </div>
   );
 }

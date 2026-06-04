@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
+import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ function DropPick({ value, opts, onChange, placeholder, suffix }: {
 }
 
 type Step = "splash" | "input";
+type CalType = "solar" | "lunar";
 
 export default function OvercomePage() {
   const router = useRouter();
@@ -62,21 +64,37 @@ export default function OvercomePage() {
   const [year,  setYear]  = useState("");
   const [month, setMonth] = useState("");
   const [day,   setDay]   = useState("");
+  const [calType, setCalType] = useState<CalType>("solar");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [gender, setGender] = useState<"male"|"female">("female");
+  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 2800);
 
-  function handleAnalyze() {
+  async function handleAnalyze() {
     if (!year || !month || !day) { setError("생년월일을 모두 선택해주세요."); return; }
     setError("");
     setLoading(true);
     try {
+      let fy = Number(year), fm = Number(month), fd = Number(day);
+      if (calType === "lunar") {
+        try {
+          // @ts-ignore
+          const KLC = (await import("korean-lunar-calendar")).default;
+          const cal = new KLC();
+          cal.setLunarDate(fy, fm, fd, isLeapMonth);
+          const sol = cal.getSolarCalendar();
+          if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
+        } catch {}
+      }
+      const h = birthTime.unknown ? null : birthTime.hour;
+      const min = birthTime.unknown ? null : birthTime.minute;
       const result = analyzeSaju({
-        birthYear: Number(year), birthMonth: Number(month), birthDay: Number(day),
-        birthHour: null, birthMinute: null,
+        birthYear: fy, birthMonth: fm, birthDay: fd,
+        birthHour: h, birthMinute: min,
         name: "", gender, birthPlace: "서울", style: "auto",
-        productType: "report", useJajasi: false,
+        productType: "report", useJajasi: birthTime.useJajasi,
       });
       const orderId = `overcome_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       sessionStorage.setItem("overcomeData", JSON.stringify({
@@ -173,6 +191,16 @@ export default function OvercomePage() {
         </div>
 
         <div className="space-y-4 mb-6">
+          {/* 양력/음력 */}
+          <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+            {(["solar", "lunar"] as CalType[]).map(t => (
+              <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
+                className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-red-700 text-white" : "text-white/40 hover:text-white/70"}`}>
+                {t === "solar" ? "양력" : "음력"}
+              </button>
+            ))}
+          </div>
+
           <DropPick
             value={year}
             opts={YEARS.map(y => ({ v: String(y), label: String(y) }))}
@@ -195,6 +223,23 @@ export default function OvercomePage() {
               placeholder="일"
               suffix="일"
             />
+          </div>
+
+          {/* 윤달 (음력 시) */}
+          {calType === "lunar" && (
+            <button type="button" onClick={() => setIsLeapMonth(v => !v)}
+              className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${isLeapMonth ? "border-red-500 bg-red-950/30 text-red-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
+              <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isLeapMonth ? "border-red-400" : "border-gray-600"}`}>
+                {isLeapMonth && <span className="text-[10px] font-black">✓</span>}
+              </span>
+              윤달
+            </button>
+          )}
+
+          {/* 태어난 시간 */}
+          <div>
+            <p className="text-xs text-white/40 mb-2 font-semibold">태어난 시간</p>
+            <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
           </div>
 
           {/* 성별 */}
