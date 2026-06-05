@@ -88,11 +88,43 @@ const UUNS_SCORE: Record<string, number> = {
   병: -1, 사: -3, 묘: -2, 절: -2,
 };
 
-function scoreDay(userIlgan: string, dp: { cg: string; jj: string }, eventId: string): number {
+// 조후(調候)용신 보정 — 태어난 월의 계절에 따라 필요한 오행 판단
+function johuBonus(birthMonthJj: string, dp: { cg: string; jj: string }): number {
+  const cgEl = CHEONGAN_ELEMENT[dp.cg] ?? "";
+  const jjEl = CHEONGAN_ELEMENT[JIJI_BONGI[dp.jj] ?? ""] ?? "";
+  const hasEl = (el: string) => cgEl === el || jjEl === el;
+
+  // 봄(인·묘·진): 화(火) 용신 — 아직 춥고 목화 기운 필요
+  if (["인", "묘", "진"].includes(birthMonthJj)) {
+    if (hasEl("화")) return 1;
+    if (hasEl("수")) return -1;
+  }
+  // 여름(사·오·미): 수(水) 용신 — 열기를 식힐 수·금 필요
+  if (["사", "오", "미"].includes(birthMonthJj)) {
+    if (hasEl("수")) return 1;
+    if (hasEl("화")) return -1;
+  }
+  // 가을(신·유·술): 화(火) 용신 — 금기가 강해 화로 균형
+  if (["신", "유", "술"].includes(birthMonthJj)) {
+    if (hasEl("화")) return 1;
+    if (hasEl("금")) return -1;
+  }
+  // 겨울(해·자·축): 화(火) 필수 — 혹한기, 화기 있는 날이 매우 길
+  if (["해", "자", "축"].includes(birthMonthJj)) {
+    if (hasEl("화")) return 2;
+    if (hasEl("수")) return -1;
+  }
+  return 0;
+}
+
+function scoreDay(userIlgan: string, dp: { cg: string; jj: string }, eventId: string, birthMonthJj?: string): number {
   const uuns = getUunseong(userIlgan, dp.jj);
   let score = UUNS_SCORE[uuns] ?? 0;
   const cgEl = CHEONGAN_ELEMENT[dp.cg] ?? "토";
   const jjEl = CHEONGAN_ELEMENT[JIJI_BONGI[dp.jj] ?? ""] ?? "토";
+
+  // 조후용신 보정 적용
+  if (birthMonthJj) score += johuBonus(birthMonthJj, dp);
 
   switch (eventId) {
     case "이사":
@@ -176,7 +208,7 @@ export default function CalendarPage() {
   const [counter] = useState(() => {
     const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
     const isNight = kstH >= 23 || kstH < 7;
-    return isNight ? 28 + Math.floor(Math.random() * 11) : 92 + Math.floor(Math.random() * 17);
+    return isNight ? 52 + Math.floor(Math.random() * 29) : 170 + Math.floor(Math.random() * 61);
   });
 
   // form state
@@ -193,6 +225,7 @@ export default function CalendarPage() {
 
   // result state
   const [userIlgan, setUserIlgan] = useState<string | null>(null);
+  const [userMonthJj, setUserMonthJj] = useState<string | null>(null);
   const [viewYear, setViewYear] = useState(CURRENT_YEAR);
   const [viewMonth, setViewMonth] = useState(new Date().getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState<{ day: number; dp: { cg: string; jj: string }; score: number; uuns: string } | null>(null);
@@ -230,6 +263,7 @@ export default function CalendarPage() {
         if (d.selectedEvent) setSelectedEvent(d.selectedEvent);
         if (d.userIlgan) {
           setUserIlgan(d.userIlgan);
+          if (d.userMonthJj) setUserMonthJj(d.userMonthJj);
           const now = new Date();
           setViewYear(now.getFullYear());
           setViewMonth(now.getMonth() + 1);
@@ -275,6 +309,7 @@ export default function CalendarPage() {
         style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
       });
       setUserIlgan(r.pillarsDetail.day.cg);
+      setUserMonthJj(r.pillarsDetail.month.jj);
       const now = new Date();
       setViewYear(now.getFullYear());
       setViewMonth(now.getMonth() + 1);
@@ -288,7 +323,7 @@ export default function CalendarPage() {
   function handleUnlock() {
     sessionStorage.setItem("sp_calendar_session", JSON.stringify({
       name, gender, calType, isLeapMonth, birthYear, birthMonth, birthDay,
-      birthTime, selectedEvent, userIlgan,
+      birthTime, selectedEvent, userIlgan, userMonthJj,
     }));
     const orderId = `cal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     router.push(`/calendar/pay?orderId=${orderId}`);
@@ -322,7 +357,7 @@ export default function CalendarPage() {
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse" />
             <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
-              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 길일을 확인 중
+              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 길일·흉일 확인 중
             </span>
           </div>
         </FadeIn>
@@ -360,7 +395,7 @@ export default function CalendarPage() {
           <button onClick={() => setStep("input")}
             className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
             style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
-            내 길일 찾기 →
+            길일·흉일 확인하기 →
           </button>
           <p className="text-xs text-gray-600 mt-4">이번 달 무료 · 다음 2개월은 ₩990</p>
         </div>
@@ -374,7 +409,7 @@ export default function CalendarPage() {
       <style>{`select option{background:#0d0d1a;color:#fff}`}</style>
       <div className="max-w-lg mx-auto px-5 pt-8">
         <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
-        <h2 className="text-2xl font-black text-white mb-1">길일 선택</h2>
+        <h2 className="text-2xl font-black text-white mb-1">길일·흉일 확인</h2>
         <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
 
         <div className="space-y-5">
@@ -463,7 +498,7 @@ export default function CalendarPage() {
           <button onClick={handleAnalyze}
             className="w-full py-5 rounded-2xl font-black text-lg text-white transition-all active:scale-[0.98]"
             style={{ background: "linear-gradient(135deg, #059669, #0d9488)", boxShadow: "0 8px 32px rgba(5,150,105,0.4)" }}>
-            길일 찾기 →
+            길일·흉일 확인 →
           </button>
         </div>
       </div>
@@ -545,7 +580,7 @@ export default function CalendarPage() {
                   if (!day) return <div key={idx} className="h-16" />;
                   const dow = idx % 7;
                   const dp = getDayPillar(year, month, day);
-                  const score = userIlgan ? scoreDay(userIlgan, dp, selectedEvent) : 0;
+                  const score = userIlgan ? scoreDay(userIlgan, dp, selectedEvent, userMonthJj ?? undefined) : 0;
                   const cls = userIlgan ? classify(score) : "보통";
                   const clr = DAY_COLOR[cls];
                   const uuns = userIlgan ? getUunseong(userIlgan, dp.jj) : "";
@@ -658,7 +693,8 @@ export default function CalendarPage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs font-semibold mb-2 text-white">📌 길일 선택 안내</p>
           <ul className="space-y-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-            <li>• 일간 <strong className="text-white">{userIlgan}</strong>을 기준으로 12운성·오행을 종합 분석했습니다</li>
+            <li>• 일간 <strong className="text-white">{userIlgan}</strong> · 월지 <strong className="text-white">{userMonthJj}</strong> 기준 12운성·조후용신·오행을 종합 분석했습니다</li>
+            <li>• 조후(調候)용신 — 태어난 계절에 필요한 오행이 있는 날을 우선 추천합니다</li>
             <li>• 길일이라도 음력 손 없는 날과 함께 확인하면 더욱 좋습니다</li>
             <li>• 흉일은 가급적 피하되, 불가피하다면 오전 시간을 활용하세요</li>
             <li>• 본 결과는 사주 이론 기반 참고용입니다</li>
