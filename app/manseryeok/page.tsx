@@ -4,12 +4,13 @@ import Link from "next/link";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
+  detectSamhapBanghap, analyzeSiksang, MYUNGRI_PHILOSOPHY,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
-  type SajuResult, type Element, type DaewoonPillar,
+  type SajuResult, type Element,
 } from "@/lib/saju";
 
 function jijiElement(jj: string): Element {
@@ -301,6 +302,8 @@ function ResultView({
   const coreWorry = OHAENG_CORE_WORRY[domEl as Element];
 
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
+  const samhapResults = detectSamhapBanghap(pd);
+  const siksangInfo = analyzeSiksang(pd);
 
   return (
     <div className="space-y-5">
@@ -547,6 +550,67 @@ function ResultView({
             </p>
           </div>
         )}
+      </Section>
+
+      {/* 삼합 · 방합 */}
+      {samhapResults.length > 0 && (
+        <Section title="삼합(三合) · 방합(方合) — 사주의 에너지 방향" accent="#a78bfa">
+          <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+            삼합·방합은 지지 에너지가 응축된 구조. 성격·인생 방향의 강력한 기반이 됩니다.
+          </p>
+          <div className="space-y-4">
+            {samhapResults.map(s => (
+              <div key={s.name} className="rounded-xl p-4" style={{ background: `${s.color}0d`, border: `1px solid ${s.color}30` }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-full" style={{ background: s.type === "삼합" ? "rgba(239,68,68,0.15)" : "rgba(99,102,241,0.15)", color: s.type === "삼합" ? "#f87171" : "#818cf8" }}>{s.type}</span>
+                  <span className="font-black text-sm text-white">{s.name}</span>
+                  <span className="text-xs font-bold" style={{ color: s.color }}>{s.title}</span>
+                </div>
+                <p className="text-xs font-bold mb-2" style={{ color: s.color }}>{s.core}</p>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.6)" }}>{s.detail}</p>
+                <div className="grid grid-cols-1 gap-2">
+                  {s.career && (
+                    <div className="rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <p className="text-[10px] font-bold mb-1" style={{ color: "#34d399" }}>커리어 성향</p>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>{s.career}</p>
+                    </div>
+                  )}
+                  {(s.love || s.loveStyle) && (
+                    <div className="rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <p className="text-[10px] font-bold mb-1" style={{ color: "#f472b6" }}>연애 스타일</p>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>{s.loveStyle || s.love}</p>
+                    </div>
+                  )}
+                  <div className="rounded-lg px-3 py-2" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.12)" }}>
+                    <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{s.caution}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* 식상(食傷) 분석 + 명리철학 */}
+      <Section title="식상(食傷) 분석 · 에너지 발산 구조" accent="#f472b6">
+        <div className={`rounded-xl px-4 py-3 mb-4 ${siksangInfo.hasSiksang ? "" : ""}`}
+          style={{ background: siksangInfo.hasSiksang ? "rgba(52,211,153,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${siksangInfo.hasSiksang ? "rgba(52,211,153,0.2)" : "rgba(239,68,68,0.2)"}` }}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: siksangInfo.hasSiksang ? "rgba(52,211,153,0.15)" : "rgba(239,68,68,0.15)", color: siksangInfo.hasSiksang ? "#34d399" : "#f87171" }}>
+              {siksangInfo.hasSiksang ? "식상 있음" : "무식상(無食傷)"}
+            </span>
+            {siksangInfo.siksangList.length > 0 && (
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{siksangInfo.siksangList.join(" · ")}</span>
+            )}
+          </div>
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{siksangInfo.advice}</p>
+        </div>
+        <div className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-[10px] font-bold mb-2" style={{ color: "#a78bfa" }}>명리학이 말하는 개인 맞춤 조언의 원칙</p>
+          <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.55)" }}>{MYUNGRI_PHILOSOPHY.core}</p>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{MYUNGRI_PHILOSOPHY.naturalLaw}</p>
+        </div>
       </Section>
 
       {/* ⑦ 건강 분석 */}

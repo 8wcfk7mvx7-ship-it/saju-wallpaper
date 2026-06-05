@@ -2715,3 +2715,143 @@ export const BIGYEOK_INSIGHT = {
 
   mingliEqualityView: `명리와 남녀 구별: 명리학은 남녀평등이 아닌 남녀 구별·차별을 전제로 함. 인간 각자의 쓰임새(用)를 정확히 구별해야 개인의 역할과 삶의 의미를 찾을 수 있다는 관점. 음양론의 핵심 — 낮은 밤이 있어야 존재하고, 밤은 낮으로 인해 의미를 가짐. 한쪽의 자유는 반드시 다른 쪽의 희생을 전제함. 이 상호 의존성을 인식할 때 상대에 대한 소중함과 애틋함이 생김. 비겁의 고정관념(역할 의식)은 이 음양 구별론의 인간적 발현.`,
 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 삼합(三合) · 방합(方合) 분석
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface SamhapResult {
+  type: "삼합" | "방합";
+  name: string; jiji: string[];
+  element: Element; color: string;
+  title: string; core: string; detail: string;
+  career?: string; love?: string; loveStyle?: string; caution: string;
+}
+
+const SAMHAP_SETS: Array<{ jiji: string[]; name: string; element: Element; color: string; title: string; core: string; detail: string; career: string; love: string; caution: string }> = [
+  {
+    jiji: ["해","묘","미"], name:"해묘미 삼합", element:"목", color:"#4ade80",
+    title:"의미 탐구형 선지자",
+    core:"인생의 '왜'를 끊임없이 묻는다. 목표보다 의미가 먼저다.",
+    detail:"봄의 기운(목)이 응축된 삼합. 방향보다 이유를 먼저 찾는다. 세상 돌아가는 원리를 직관적으로 파악하고, 남들이 보지 못하는 구조를 읽는다. 가족보다 세상에 흔적을 남기고 싶다는 욕구가 강하다. 선지자·철학자·예술가 기질.",
+    career:"창작·연구·철학·교육·종교·심리 분야. 남들이 정답이라 믿는 것에 의문을 던지는 역할.",
+    love:"상대의 내면 세계와 가치관에 끌린다. 감각적 매력보다 대화의 깊이가 연애의 시작. 이상이 높아 오랜 탐색 후 선택한다.",
+    caution:"의미를 찾다가 행동이 늦어진다. '왜'에 집착하다 '어떻게'를 놓친다. 독립성이 강해 팀 협력에서 마찰이 생긴다.",
+  },
+  {
+    jiji: ["인","오","술"], name:"인오술 삼합", element:"화", color:"#f87171",
+    title:"성과 실행형 혁명가",
+    core:"달리는 것이 본능이다. 업적을 직접 만들어야 직성이 풀린다.",
+    detail:"여름의 기운(화)이 응축된 삼합. 생각보다 행동이 먼저다. 삶의 고달픔을 알면서도 멈추지 않는다. 자기 힘으로 역사에 이름을 남기고 싶어 한다. 내 가족만 잘 살면 된다는 코드보다 세상을 바꾸고 싶다는 코드가 강하다.",
+    career:"리더십이 필요한 모든 분야. 스타트업·사업·군사·스포츠·정치. 내가 직접 만들어야 직성이 풀린다.",
+    love:"열정적이고 주도적인 연애. 상대를 위해 온몸으로 뛴다. 단 쉬지 않고 달리다 번아웃이 오면 관계가 위태로워진다.",
+    caution:"과로·번아웃이 최대 리스크. 가족을 성과로만 평가하는 실수. 속도를 늦추는 것이 더 큰 성과를 만든다.",
+  },
+  {
+    jiji: ["사","유","축"], name:"사유축 삼합", element:"금", color:"#d1d5db",
+    title:"결과 설계형 전략가",
+    core:"어떻게 하면 결과가 최적으로 나오는가. '어떻게'가 삶의 중심이다.",
+    detail:"가을의 기운(금)이 응축된 삼합. 감정보다 공정함을 앞세운다. 과정보다 결론, 의리보다 성과. 이기적인 사람을 극도로 싫어하며, 공정한 분배를 강하게 추구한다. 결과를 위해 모두가 역할을 다해야 한다는 신념이 강하다.",
+    career:"법·금융·회계·전략·컨설팅·의학·공학. 최적화와 시스템 설계에 탁월하다.",
+    love:"감정 표현보다 신뢰와 안정을 중시한다. 연애도 명확한 목적이 있을 때 움직인다. 이성에게 능력·성실함으로 어필하는 것이 가장 효과적이다.",
+    caution:"차갑게 보인다. 감정을 무시한다는 오해를 받는다. 완벽주의로 인해 관계에서 지나친 기대를 건다.",
+  },
+  {
+    jiji: ["신","자","진"], name:"신자진 삼합", element:"수", color:"#60a5fa",
+    title:"자기 판단 중심의 독자",
+    core:"내 기준이 곧 법이다. 내면의 귀족이다.",
+    detail:"겨울의 기운(수)이 응축된 가장 강력한 삼합. 자기 판단이 절대적이며 외부 기준보다 내면의 확신이 먼저다. 배타적 성향이 강하고, 공상·전략적 사고가 뛰어나다. 삼합 중 에너지가 가장 강하게 응축된다.",
+    career:"독립 연구·철학·전략·첩보·심리·IT. 혼자 깊게 파고드는 작업에서 진가를 발휘한다.",
+    love:"상대를 오래 관찰한 후 선택한다. 한번 선택하면 깊이 헌신한다. 단 자기 기준에 맞지 않으면 빠르게 끊어낸다.",
+    caution:"배타성이 과하면 고립된다. 자기 판단이 옳다는 과신이 실수를 만든다. 타인의 다른 기준도 인정하는 연습이 필요하다.",
+  },
+];
+
+const BANGHAP_SETS: Array<{ jiji: string[]; name: string; element: Element; color: string; title: string; core: string; detail: string; loveStyle: string; caution: string }> = [
+  { jiji:["해","자","축"], name:"해자축 방합", element:"수", color:"#60a5fa",
+    title:"겨울형 — 의리 중심 관계자",
+    core:"내 편인지 아닌지가 판단의 첫 기준이다. 친분이 확인되면 무한 신뢰를 준다.",
+    detail:"수의 기운이 한 방향으로 응축된 방합. 내향적으로 오래 관찰한 뒤 관계를 결정한다. 한번 내 울타리 안에 들어온 사람에게는 오랜 시간 기회를 부여하며 쉽게 포기하지 않는다. 객관적 사실보다 친밀감이 판단 기준이 된다. 고지식해 보이는 면이 있으나 그 고지식함이 의리로 이어진다. 이득과 무관하게 내 사람 곁을 지키는 에너지.",
+    loveStyle:"관계가 깊어지는 데 시간이 걸리지만 한번 결심하면 흔들리지 않는다. 상대의 결점이 보여도 쉽게 손을 놓지 않고 반복적으로 기회를 준다.",
+    caution:"친분을 앞세워 객관적 판단이 흐려지면 손해를 본다. 내 편과 남의 편 구분이 지나치게 강해지면 관계의 폭이 좁아진다." },
+  { jiji:["인","묘","진"], name:"인묘진 방합", element:"목", color:"#4ade80",
+    title:"봄형 — 정(情) 중심 관계자",
+    core:"내 주변 사람들과 함께 사는 것이 삶의 핵심이다. 관계가 에너지원이다.",
+    detail:"목의 기운이 한 방향으로 응축된 방합. 새로운 시작·성장의 에너지가 강하다. 친밀감이 판단 기준이 되며, 내 사람에게는 넓은 포용력을 보인다. 배타적이지만 울타리 안에 들어온 이에게는 따뜻하다. '이렇게 해야 해'라는 고정된 원칙이 있으며, 삼합이 성과·기능 중심이라면 방합은 관계·정(情) 중심이다.",
+    loveStyle:"연인에게 헌신적이며, 상대가 반복적으로 실수해도 관계를 쉽게 끊지 않는다. 내 편이라는 확신이 흔들리면 관계 자체를 의심하기 시작한다.",
+    caution:"유연하지 않은 사고방식이 갈등을 일으킬 수 있다. 고정된 가치관이 상대에게 부담으로 작용하는 경우가 있다." },
+  { jiji:["사","오","미"], name:"사오미 방합", element:"화", color:"#f87171",
+    title:"여름형 — 열정 기반 관계자",
+    core:"내 사람에게 전력으로 헌신한다. 감정이 판단의 출발점이다.",
+    detail:"화의 기운이 한 방향으로 응축된 방합. 감정 표현이 솔직하고 뜨겁다. 친밀감이 형성되면 경계 없이 에너지를 쏟는다. 내 편이면 어떤 상황에서도 같은 편에 선다. 고지식한 면이 있어 한번 결정한 가치관을 쉽게 바꾸지 않으며, 삼합의 기능·성과 중심과 달리 감정·관계 중심으로 움직인다.",
+    loveStyle:"연애에서 전력투구한다. 상대를 위해 아낌없이 헌신한다. 단 배신감을 느끼면 감정이 격하게 반응하며 회복이 어렵다.",
+    caution:"감정이 앞서 객관적 판단이 흐려진다. 과도한 헌신이 상대에게 부담이 될 수 있다." },
+  { jiji:["신","유","술"], name:"신유술 방합", element:"금", color:"#d1d5db",
+    title:"가을형 — 신뢰 기반 의리형",
+    core:"한번 맺은 관계는 끝까지 지킨다. 신뢰가 모든 판단의 기준이다.",
+    detail:"금의 기운이 한 방향으로 응축된 방합. 결실과 완성의 에너지. 신뢰가 확인된 관계에는 깊은 의리를 보이며, 이득 여부와 관계없이 내 사람을 지킨다. 객관적 팩트보다 그 사람과의 신뢰 관계를 우선시한다. 고지식한 원칙이 있어 '이것은 무조건 이렇게 해야 해'라는 기준이 뚜렷하다.",
+    loveStyle:"안정적이고 믿음직스러운 연애를 한다. 상대에게 충성스럽다. 단 신뢰가 한번 깨지면 관계 회복이 매우 어렵다.",
+    caution:"고지식함이 새로운 가능성을 막을 수 있다. 내 편이 아닌 사람에게는 벽이 높아 기회를 놓치는 경우가 있다." },
+];
+
+export function detectSamhapBanghap(pillarsDetail: SajuResult["pillarsDetail"]): SamhapResult[] {
+  const jijis = [
+    pillarsDetail.year.jj,
+    pillarsDetail.month.jj,
+    pillarsDetail.day.jj,
+    ...(pillarsDetail.hour ? [pillarsDetail.hour.jj] : []),
+  ];
+
+  const results: SamhapResult[] = [];
+
+  for (const s of SAMHAP_SETS) {
+    if (s.jiji.every(j => jijis.includes(j))) {
+      results.push({ type: "삼합", ...s });
+    }
+  }
+
+  for (const b of BANGHAP_SETS) {
+    const matched = b.jiji.filter(j => jijis.includes(j));
+    if (matched.length >= 2) {
+      results.push({ type: "방합", ...b });
+    }
+  }
+
+  return results;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 명리철학 — 개인 맞춤형 조언 원칙
+// ══════════════════════════════════════════════════════════════════════════════
+
+export const MYUNGRI_PHILOSOPHY = {
+  core: "명리학은 사람마다 다른 에너지 구조(사주)를 전제로 한다. 같은 조언이 모든 사람에게 맞지 않는다. 현대사회가 획일적 기준을 강요하는 것과 달리, 명리는 각자의 오행 구조에 맞는 방향을 제시한다.",
+  naturalLaw: "명리의 근거는 자연 순환 법칙이다. 봄이 지나면 여름이 오고, 여름은 가을로 이어진다. 이 순환은 지구 어디서든, 몇 억 년 전에도 동일했다. 사주는 이 자연의 흐름이 사람 몸에 기록된 것이다.",
+  siksangWarning: "식상(食傷)이 없는 사주는 에너지를 밖으로 발산하는 출구가 부족하다. 몸을 극도로 혹사하는 직업은 피해야 한다. 에너지를 내보내는 방식(표현·창작·봉사)을 찾는 것이 건강과 성취 모두에 중요하다.",
+  yinYangLove: "음양론의 핵심은 구별이다. 양(陽)은 확장·소유·주도 에너지, 음(陰)은 수용·관찰·유연 에너지다. 연애에서 양간 일간은 주도적으로 움직이고 책임감으로 관계를 유지한다. 음간 일간은 관찰 후 깊이 헌신하며 감정이입이 강하다. 이 차이를 알면 상대를 이해하는 방식이 달라진다.",
+  destiny: "운명에 순응한다는 것은 체념이 아니다. 내 사주가 가진 에너지의 방향을 파악하고, 그 방향으로 담대하게 나아가는 것이다. 내 기운에 맞는 길로 갈 때 재능과 운이 동시에 열린다.",
+};
+
+// 식상(食傷) 분석
+export function analyzeSiksang(pillarsDetail: SajuResult["pillarsDetail"]): {
+  hasSiksang: boolean; siksangList: string[]; advice: string;
+} {
+  const siksangSet = new Set(["식신","상관"]);
+  const allSipseong = [
+    pillarsDetail.year.sipseongCg, pillarsDetail.year.sipseongJj,
+    pillarsDetail.month.sipseongCg, pillarsDetail.month.sipseongJj,
+    pillarsDetail.day.sipseongCg, pillarsDetail.day.sipseongJj,
+    ...(pillarsDetail.hour ? [pillarsDetail.hour.sipseongCg, pillarsDetail.hour.sipseongJj] : []),
+  ].filter(Boolean);
+
+  const siksangList = allSipseong.filter(s => siksangSet.has(s));
+  const hasSiksang = siksangList.length > 0;
+
+  return {
+    hasSiksang,
+    siksangList: [...new Set(siksangList)],
+    advice: hasSiksang
+      ? `식상(${[...new Set(siksangList)].join("·")})이 있어 에너지 발산 통로가 열려 있다. 표현·창작·가르침 활동이 몸과 마음 모두에 활력을 준다.`
+      : "식상이 없는 사주다. 에너지가 내부에 집중되는 구조로, 몸을 극도로 혹사하는 직업·활동은 장기적으로 체력을 소진시킨다. 표현과 발산의 통로(글·말·예술·봉사)를 의도적으로 만드는 것이 중요하다.",
+  };
+}

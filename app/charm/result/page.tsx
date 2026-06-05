@@ -38,6 +38,64 @@ const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
   수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
 };
 
+// ── 格局 패턴 감지 ───────────────────────────────────────────────────────────
+interface GagukPattern {
+  name: string; hanja: string; color: string;
+  desc: string; charmDesc: string;
+}
+function detectGagukPatterns(result: SajuResult): GagukPattern[] {
+  const ilgan = result.pillarsDetail.day.cg;
+  const sc = result.scores;
+  const dom = result.dominant;
+  const lacking = result.lacking;
+  const patterns: GagukPattern[] = [];
+
+  // 금수쌍청: 경·신 일간 + 수 기운 강함
+  if (["경","신"].includes(ilgan) && (dom.includes("수") || sc.수 >= 2)) {
+    patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
+      desc:"금(金)과 수(水)가 맑고 순수하게 배치된 사주. 지적 명석함과 냉철한 카리스마가 타고납니다.",
+      charmDesc:"두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
+  }
+  // 목화통명: 갑·을 일간 + 화 기운 강함
+  if (["갑","을"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
+    patterns.push({ name:"목화통명", hanja:"木火通明", color:"#fbbf24",
+      desc:"목(木)이 화(火)를 품어 빛이 사방으로 통하는 사주. 지혜와 화려함이 동시에 발산됩니다.",
+      charmDesc:"눈빛이 빛나고 말할 때 에너지가 강하게 뿜어나옵니다. 처음 만난 이성이 '이 사람 특별하다'를 직감합니다." });
+  }
+  // 화토동궁: 병·정 일간 + 토 기운 강함
+  if (["병","정"].includes(ilgan) && (dom.includes("토") || sc.토 >= 2)) {
+    patterns.push({ name:"화토동궁", hanja:"火土同宮", color:"#fb923c",
+      desc:"화(火)와 토(土)가 같은 궁에 함께하는 사주. 따뜻하고 든든한 보호자적 매력이 강합니다.",
+      charmDesc:"곁에 있으면 마음이 편안해지는 타입. 이성이 '이 사람 옆에 있고 싶다'는 안도감을 느낍니다." });
+  }
+  // 수목청기: 임·계 일간 + 목 기운 강함
+  if (["임","계"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
+    patterns.push({ name:"수목청기", hanja:"水木淸氣", color:"#4ade80",
+      desc:"수(水)가 목(木)을 맑게 생해주는 사주. 지혜로움과 생기가 동시에 발산됩니다.",
+      charmDesc:"신선하고 생동감 넘치는 에너지. 이성은 '저 사람 보면 기분이 좋아진다'고 느낍니다." });
+  }
+  // 토금상생: 무·기 일간 + 금 기운 강함
+  if (["무","기"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
+    patterns.push({ name:"토금상생", hanja:"土金相生", color:"#e2e8f0",
+      desc:"토(土)가 금(金)을 생해주는 사주. 안정적이면서도 날카로운 이중 매력이 발현됩니다.",
+      charmDesc:"믿음직스럽고 세련된 분위기. '이 사람이라면 믿을 수 있겠다'는 신뢰 매력이 핵심입니다." });
+  }
+  // 금목교전: 경·신 일간 + 목 기운 강함 → 강렬한 갈등의 카리스마
+  if (["경","신"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
+    patterns.push({ name:"금목교전", hanja:"金木交戰", color:"#f87171",
+      desc:"금(金)과 목(木)이 상극하는 긴장감 넘치는 사주. 강렬하고 도발적인 카리스마가 흘러나옵니다.",
+      charmDesc:"'무서운데 눈을 못 뗀다'는 반응을 자주 듣는 타입. 강한 자기 주관이 이성의 호기심을 폭발시킵니다." });
+  }
+  // 수화기제: 임·계 일간 + 화 기운 강함 → 지혜+열정의 균형
+  if (["임","계"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
+    patterns.push({ name:"수화기제", hanja:"水火旣濟", color:"#c084fc",
+      desc:"수(水)와 화(火)가 이미 완성에 이른 균형. 냉철함과 열정이 공존하는 희귀한 매력 구조입니다.",
+      charmDesc:"차가운 듯 따뜻한 반전 매력. 이성이 '도무지 파악이 안 된다'며 계속 신경 쓰게 됩니다." });
+  }
+
+  return patterns;
+}
+
 const CHARM_PRICE = 4900;
 
 function CharmResultContent() {
@@ -93,6 +151,7 @@ function CharmResultContent() {
   const idata = ILGAN_CHARM_DB[ilgan];
   const jijiData = JIJI_CHARM_DB[ilji];
   const dominantEl = result.dominant[0] || "토";
+  const gagukPatterns = detectGagukPatterns(result);
   const olook = OHAENG_LOOK[dominantEl];
   const gaewun = GAEWUN_DB[dominantEl];
   const uunseong = result.pillarsDetail.day.uunseong;
@@ -247,6 +306,28 @@ function CharmResultContent() {
           )}
 
         </div>
+
+        {/* ═══ 格局 매력 패턴 ═══ */}
+        {gagukPatterns.length > 0 && (
+          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-4">格局 매력 패턴 — 사주 구조에서 오는 타고난 에너지</p>
+            <div className="space-y-3">
+              {gagukPatterns.map(p => (
+                <div key={p.name} className="rounded-xl p-4" style={{ background: `${p.color}0d`, border: `1px solid ${p.color}33` }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-base font-black" style={{ color: p.color }}>{p.name}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${p.color}18`, color: p.color }}>{p.hanja}</span>
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed mb-2">{p.desc}</p>
+                  <div className="rounded-lg px-3 py-2" style={{ background: "rgba(0,0,0,0.25)" }}>
+                    <p className="text-[10px] font-bold mb-1" style={{ color: p.color }}>이성 눈에 보이는 것</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{p.charmDesc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ═══ 지지 매력 타입 ═══ */}
         {jijiData && (

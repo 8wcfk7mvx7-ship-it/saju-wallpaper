@@ -24,9 +24,9 @@ const UI: Record<Lang, {
   charging: string;
 }> = {
   ko: {
-    h1: ["쟤는 생긴 것도 그냥 그런데", "왜 저렇게", "인기가 많을까..."],
-    heroSub: "타고난 거 맞습니다. 사주에 있어요. 당신 사주에도 분명히 있습니다.",
-    heroCta: "내 사주에 뭐가 있는지 보기",
+    h1: ["지금 쓰는 배경화면이", "기운을 막고", "있을 수 있어요"],
+    heroSub: "내 사주에 맞는 오행 에너지. 배경화면 하나로 시작됩니다.",
+    heroCta: "내 사주 오행 배경화면 만들기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
@@ -35,7 +35,7 @@ const UI: Record<Lang, {
     charging: "블루베리 충전",
   },
   en: {
-    h1: ["Your Saju", "is speaking to you", "right now"],
+    h1: ["Your current wallpaper", "might be blocking", "your energy"],
     heroSub: "Everyone else has already checked. You're the only one still in the dark.",
     heroCta: "Uncover My Full Destiny",
     servicesHeading: "Explore Services",
@@ -46,7 +46,7 @@ const UI: Record<Lang, {
     charging: "Top Up",
   },
   id: {
-    h1: ["Saju Anda", "sedang berbicara", "kepada Anda sekarang"],
+    h1: ["Wallpaper Anda saat ini", "mungkin memblokir", "energi Anda"],
     heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum mengetahuinya.",
     heroCta: "Ungkap Seluruh Takdir Saya",
     servicesHeading: "Jelajahi Sekarang",
@@ -57,7 +57,7 @@ const UI: Record<Lang, {
     charging: "Isi Ulang",
   },
   ta: {
-    h1: ["உங்கள் சாஜு,", "இப்போதும்", "பேசுகிறது"],
+    h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
     heroSub: "மற்றவர்கள் ஏற்கனவே சரிபார்த்தனர். நீங்கள் மட்டும் இன்னும் தெரியாமல் இருக்கிறீர்கள்.",
     heroCta: "என் சாஜுவை முழுமையாக அறிக",
     servicesHeading: "இப்போதே பார்க்கவும்",
@@ -852,85 +852,91 @@ export default function MainPage() {
         {/* ── 히어로 섹션 ── */}
         <section className="py-16 sm:py-24 text-center relative">
           {/* 플로팅 장식 별 */}
-          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#3b82f6" }}>✦</span>
-          <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#f5c518" }}>★</span>
-          <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#8b5cf6" }}>◆</span>
-          <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#06b6d4" }}>✦</span>
+          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ec4899" }}>✦</span>
+          <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#a78bfa" }}>✦</span>
+          <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#f472b6" }}>◆</span>
+          <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#818cf8" }}>✦</span>
 
-          {/* 실시간 활동 알림 */}
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium"
-              style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "rgba(255,255,255,0.6)" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#3b82f6", boxShadow: "0 0 6px #3b82f6" }} />
+          {/* 서비스 배지 */}
+          <div className="flex justify-center mb-5">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold tracking-widest uppercase"
+              style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", color: "rgba(255,255,255,0.5)" }}>
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#ec4899" }} />
+              SUMMER PALACE · 무료 사주 분석
+            </div>
+          </div>
+
+          {/* 스파클 아이콘 */}
+          <div className="flex justify-center mb-5">
+            <div className="relative">
+              <span className="text-4xl" style={{ filter: "drop-shadow(0 0 20px rgba(236,72,153,0.5))" }}>✦</span>
+              <span className="text-2xl absolute -top-2 -right-4" style={{ filter: "drop-shadow(0 0 12px rgba(167,139,250,0.6))" }}>✦</span>
+            </div>
+          </div>
+
+          {/* 실시간 카운터 */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
               <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
                 {ACTIVITIES[activityIndex]}
               </span>
             </div>
           </div>
 
-          {/* 메인 타이틀 */}
-          <div className="mb-6">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
-              <span className="grad-text-main block">{t.h1[0]}</span>
-              <span className="block" style={{ color: "#3b82f6", textShadow: "0 0 40px rgba(59,130,246,0.4)" }}>{t.h1[1]}</span>
-              <span className="grad-text-main block">{t.h1[2]}</span>
+          {/* 메인 헤드라인 */}
+          <div className="mb-3 max-w-md mx-auto px-2">
+            <h1 className="text-4xl sm:text-5xl font-black leading-tight mb-4 text-white" style={{ letterSpacing: "-0.02em" }}>
+              {t.h1[0]}<br />
+              <span style={{ color: "#f472b6" }}>{t.h1[1]}</span><br />
+              {t.h1[2]}
             </h1>
+            <p className="text-base font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+              {t.heroSub}
+            </p>
           </div>
 
-          <p className="text-base sm:text-lg max-w-lg mx-auto mb-8 leading-relaxed font-medium"
-            style={{ color: "rgba(255,255,255,0.65)" }}>
-            {t.heroSub}
-          </p>
-
-          {/* 강렬한 바이럴 카피 3줄 */}
-          <div className="max-w-2xl mx-auto mb-10 grid sm:grid-cols-3 gap-2.5">
-            {[
-              { icon: "🔮", text: "지금 쓰는 배경화면이 기운을 막고 있을 수 있어요" },
-              { icon: "💑", text: "인오술 삼합도 자오충 앞에선 무너집니다" },
-              { icon: "⏳", text: "내 대운이 터지는 나이, 지금 확인하세요" },
-            ].map((item, i) => (
-              <div key={i} className="text-left rounded-2xl px-4 py-3 flex items-start gap-2.5 cursor-pointer transition-all hover:scale-[1.02]"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                onClick={() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" })}>
-                <span className="text-xl shrink-0">{item.icon}</span>
-                <span className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{item.text}</span>
-              </div>
+          {/* 피처 태그 */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
+            {["격국·용신 분석", "60갑자 일주론", "신살 발견", "대운·세운표", "경도 보정", "무료"].map(tag => (
+              <span key={tag} className="text-xs px-3 py-1.5 rounded-full font-semibold"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.5)" }}>
+                {tag}
+              </span>
             ))}
           </div>
 
-          {/* CTA 버튼 */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+          {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
+          <div className="max-w-sm mx-auto px-4 mb-4">
             <button
-              onClick={() => router.push("/manseryeok")}
-              className="cta-btn inline-flex items-center gap-2.5 font-black text-base px-10 py-4 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+              onClick={() => router.push("/saju")}
+              className="cta-btn w-full font-black text-lg py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
               style={{
-                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                background: "linear-gradient(135deg, #db2777, #9333ea)",
                 color: "#fff",
+                boxShadow: "0 0 40px rgba(219,39,119,0.35), 0 0 80px rgba(147,51,234,0.2)",
               }}
             >
               {t.heroCta}
-              <span className="text-lg">✦</span>
-            </button>
-            <button
-              onClick={() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="inline-flex items-center gap-2 font-bold text-sm px-7 py-4 rounded-2xl transition-all hover:scale-105"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.75)" }}
-            >
-              서비스 보기 ↓
             </button>
           </div>
 
-          {/* ── 누적 분석 + 별점 ── */}
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+          {/* 소셜 프루프 한 줄 */}
+          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+            무료 · 1분 완성 · 친구한테 공유 필수
+          </p>
+
+          {/* 별점 + 누적 */}
+          <div className="flex items-center justify-center gap-4 flex-wrap mt-4">
             <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
               style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.18)", color: "rgba(255,255,255,0.55)" }}>
-              <span style={{ color: "#f5c518" }}>★</span>
+              <span style={{ color: "#f5c518" }}>★★★★★</span>
               <span className="font-bold" style={{ color: "#f5c518" }}>4.7</span>
-              <span>실제 이용 후기</span>
+              <span>실제 후기</span>
             </div>
             <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
-              <span>🔮</span>
               <span>누적 분석 <strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>건</span>
             </div>
           </div>
