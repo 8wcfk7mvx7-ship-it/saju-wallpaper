@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
+import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -430,6 +430,23 @@ export default function DaewoonPage() {
             이후 10년마다 대운이 바뀌며 인생의 큰 흐름이 전환됩니다.
           </p>
         </div>
+
+        {/* 일간 성격 */}
+        {(() => {
+          const info = ILGAN_PERSONALITY[ilgan];
+          if (!info) return null;
+          return (
+            <div className="mb-6 rounded-2xl p-4 border" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.08)" }}>
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-2">일간 기질 — {info.short}</p>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {info.keyword.split("·").map(k => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>{k}</span>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{info.detail}</p>
+            </div>
+          );
+        })()}
 
         <div className="mb-6">
           <h2 className="text-sm font-bold text-gray-300 mb-3">대운 흐름 (80년)</h2>

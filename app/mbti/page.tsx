@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -509,6 +509,46 @@ export default function MbtiPage() {
                 </div>
               </div>
             </div>
+
+            {/* 일간 성격 심층 분석 */}
+            {(() => {
+              const info = ILGAN_PERSONALITY[result.ilgan];
+              if (!info) return null;
+              return (
+                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+                  <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">일간 성격 심층 분석</p>
+                  <p className="text-sm font-bold text-violet-300 mb-2">{info.short}</p>
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {info.keyword.split("·").map(k => (
+                      <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30">{k}</span>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">{info.detail}</p>
+                </div>
+              );
+            })()}
+
+            {/* 겉모습 vs 속마음 */}
+            {(() => {
+              const io = ILGAN_INNER_OUTER[result.ilgan];
+              if (!io) return null;
+              return (
+                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+                  <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">겉모습 vs 속마음 — {result.ilgan}일간</p>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="bg-violet-500/10 border border-violet-500/25 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-violet-300 mb-1">타인이 보는 나</p>
+                      <p className="text-sm font-bold text-white">{io.outer}</p>
+                    </div>
+                    <div className="bg-indigo-500/10 border border-indigo-500/25 rounded-xl p-3">
+                      <p className="text-[10px] font-bold text-indigo-300 mb-1">내면의 진짜 욕구</p>
+                      <p className="text-sm font-bold text-white">{io.inner}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 leading-relaxed">{io.synthesis}</p>
+                </div>
+              );
+            })()}
 
             <div className="text-center pt-2">
               <p className="text-xs text-gray-700">본 분석은 사주·MBTI 이론 기반 오락용 콘텐츠입니다. summerpalace.ai.kr</p>

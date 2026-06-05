@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
@@ -583,6 +583,45 @@ export default function TastePage() {
             </div>
           </div>
         )}
+
+        {/* 겉모습 vs 속마음 */}
+        {(() => {
+          const io = ILGAN_INNER_OUTER[ilgan];
+          if (!io) return null;
+          return (
+            <div className="mt-6 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">{ilgan}일간 — 겉모습 vs 속마음</p>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="rounded-xl p-3" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>타인이 보는 나</p>
+                  <p className="text-sm font-bold text-white">{io.outer}</p>
+                </div>
+                <div className="rounded-xl p-3" style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fb923c" }}>내면의 진짜 욕구</p>
+                  <p className="text-sm font-bold text-white">{io.inner}</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">{io.synthesis}</p>
+            </div>
+          );
+        })()}
+
+        {/* 오행별 에너지 표현 방향 */}
+        {(() => {
+          const el = element as "목"|"화"|"토"|"금"|"수";
+          const sd = SIKSANG_DIRECTION[el];
+          if (!sd) return null;
+          return (
+            <div className="mt-4 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">{element} 오행 — 에너지 표현 방향</p>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs px-3 py-1 rounded-full font-bold" style={{ background: `${taste.color}22`, color: taste.color, border: `1px solid ${taste.color}44` }}>{element} → {sd.siksangEl}</span>
+                <span className="text-xs text-gray-400">{sd.direction}의 방향</span>
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">{sd.desc}</p>
+            </div>
+          );
+        })()}
 
         {/* 매력 분석 CTA */}
         <div className="mt-8 bg-gradient-to-br from-pink-600/10 to-violet-600/10 border border-pink-500/20 rounded-2xl p-5 text-center">
