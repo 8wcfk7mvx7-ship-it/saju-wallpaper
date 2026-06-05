@@ -36,7 +36,7 @@ export default function GyeokgukPage() {
 
       {/* 격국 취용법 */}
       <div className="rounded-2xl p-5 mb-8" style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.2)" }}>
-        <p className="text-sm font-black mb-3" style={{ color: "#60a5fa" }}>🔮 격국 취용법 (格局 取用法)</p>
+        <p className="text-sm font-black mb-3" style={{ color: "#60a5fa" }}>격국 취용법 (格局 取用法)</p>
         <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>
           월지(月支)에서 일간과의 십성(十星) 관계로 格을 정한다.
           월지 지장간 중 가장 강한 기운을 취용신(取用神)으로 삼아 格의 이름을 붙인다.
