@@ -42,6 +42,13 @@ const GUIDES = [
     desc: "10년 단위 대운과 1년 단위 세운이 무엇인지, 내 인생의 흐름을 어떻게 파악하는지 알아봅니다.",
     time: "약 5분",
   },
+  {
+    href: "/guide/gyeokguk",
+    emoji: "⚖️",
+    title: "격국(格局) — 내 사주의 格은 무엇인가",
+    desc: "월지 기준으로 사주의 본질적 성향을 분류하는 格局. 내격 10종·성격·파격·외격을 완전 정리합니다.",
+    time: "약 8분",
+  },
 ];
 
 export default function GuidePage() {

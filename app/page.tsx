@@ -733,22 +733,22 @@ export default function MainPage() {
 
 
   return (
-    <main className="min-h-screen text-white overflow-x-hidden" style={{ background: "#07001a" }}>
+    <main className="min-h-screen text-white overflow-x-hidden" style={{ background: "#020c1b" }}>
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* 핑크 좌상단 */}
         <div className="absolute top-[-15%] left-[-5%] w-[700px] h-[700px] rounded-full blur-[200px]"
-          style={{ background: "rgba(255,45,120,0.12)" }} />
+          style={{ background: "rgba(59,130,246,0.15)" }} />
         {/* 퍼플 중앙 */}
         <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[220px]"
-          style={{ background: "rgba(139,92,246,0.1)" }} />
+          style={{ background: "rgba(30,64,175,0.12)" }} />
         {/* 골드 하단 */}
         <div className="absolute bottom-[-10%] left-[20%] w-[700px] h-[700px] rounded-full blur-[200px]"
-          style={{ background: "rgba(245,197,24,0.07)" }} />
+          style={{ background: "rgba(6,182,212,0.08)" }} />
         {/* 사이언 우하단 */}
         <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] rounded-full blur-[160px]"
-          style={{ background: "rgba(6,182,212,0.06)" }} />
+          style={{ background: "rgba(245,197,24,0.05)" }} />
         {/* 미세 그리드 패턴 */}
         <div className="absolute inset-0 opacity-[0.025]"
           style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
@@ -756,13 +756,13 @@ export default function MainPage() {
 
       {/* ── 상단 네비게이션 (모바일 숨김) ── */}
       <nav className="hidden sm:block sticky top-0 z-50 border-b backdrop-blur-xl"
-        style={{ background: "rgba(7,0,26,0.88)", borderColor: "rgba(255,45,120,0.12)" }}>
+        style={{ background: "rgba(7,0,26,0.88)", borderColor: "rgba(59,130,246,0.15)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <button onClick={() => router.push("/")} className="flex items-center gap-2.5">
-            <span className="text-xl star-1" style={{ color: "#ff2d78" }}>☯</span>
+            <span className="text-xl star-1" style={{ color: "#3b82f6" }}>☯</span>
             <span className="font-black text-base tracking-tight text-white">Summer Palace</span>
             <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full font-black"
-              style={{ background: "rgba(255,45,120,0.12)", color: "#ff2d78", border: "1px solid rgba(255,45,120,0.25)" }}>
+              style={{ background: "rgba(59,130,246,0.15)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.25)" }}>
               AI 사주
             </span>
           </button>
@@ -852,7 +852,7 @@ export default function MainPage() {
         {/* ── 히어로 섹션 ── */}
         <section className="py-16 sm:py-24 text-center relative">
           {/* 플로팅 장식 별 */}
-          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ff2d78" }}>✦</span>
+          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#3b82f6" }}>✦</span>
           <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#f5c518" }}>★</span>
           <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#8b5cf6" }}>◆</span>
           <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#06b6d4" }}>✦</span>
@@ -860,8 +860,8 @@ export default function MainPage() {
           {/* 실시간 활동 알림 */}
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium"
-              style={{ background: "rgba(255,45,120,0.08)", border: "1px solid rgba(255,45,120,0.2)", color: "rgba(255,255,255,0.6)" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#ff2d78", boxShadow: "0 0 6px #ff2d78" }} />
+              style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "rgba(255,255,255,0.6)" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#3b82f6", boxShadow: "0 0 6px #3b82f6" }} />
               <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
                 {ACTIVITIES[activityIndex]}
               </span>
@@ -870,13 +870,10 @@ export default function MainPage() {
 
           {/* 메인 타이틀 */}
           <div className="mb-6">
-            <div className="inline-block text-xs font-black tracking-[0.25em] uppercase px-3 py-1.5 rounded-full mb-4"
-              style={{ background: "rgba(255,45,120,0.1)", border: "1px solid rgba(255,45,120,0.25)", color: "#ff2d78" }}>
-              ☯ AI 사주명리 · Summer Palace
             </div>
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
               <span className="grad-text-main block">{t.h1[0]}</span>
-              <span className="block" style={{ color: "#ff2d78", textShadow: "0 0 40px rgba(255,45,120,0.4)" }}>{t.h1[1]}</span>
+              <span className="block" style={{ color: "#3b82f6", textShadow: "0 0 40px rgba(59,130,246,0.4)" }}>{t.h1[1]}</span>
               <span className="grad-text-main block">{t.h1[2]}</span>
             </h1>
           </div>
@@ -908,7 +905,7 @@ export default function MainPage() {
               onClick={() => router.push("/saju")}
               className="cta-btn inline-flex items-center gap-2.5 font-black text-base px-10 py-4 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
               style={{
-                background: "linear-gradient(135deg, #ff2d78, #8b5cf6)",
+                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
                 color: "#fff",
               }}
             >
@@ -952,10 +949,10 @@ export default function MainPage() {
                   }}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-105"
                   style={{
-                    background: activeCategory === key ? "rgba(255,45,120,0.15)" : "rgba(255,255,255,0.04)",
-                    border: activeCategory === key ? "1px solid rgba(255,45,120,0.35)" : "1px solid rgba(255,255,255,0.07)",
-                    color: activeCategory === key ? "#ff2d78" : "rgba(255,255,255,0.4)",
-                    boxShadow: activeCategory === key ? "0 0 12px rgba(255,45,120,0.2)" : "none",
+                    background: activeCategory === key ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.04)",
+                    border: activeCategory === key ? "1px solid rgba(59,130,246,0.35)" : "1px solid rgba(255,255,255,0.07)",
+                    color: activeCategory === key ? "#3b82f6" : "rgba(255,255,255,0.4)",
+                    boxShadow: activeCategory === key ? "0 0 12px rgba(59,130,246,0.2)" : "none",
                   }}
                 >
                   <span>{icon}</span>
@@ -970,7 +967,7 @@ export default function MainPage() {
         <section className="mb-10">
           <div
             className="flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-[1.01]"
-            style={{ background: "rgba(255,45,120,0.05)", border: "1px solid rgba(255,45,120,0.15)" }}
+            style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.15)" }}
             onClick={() => router.push("/notice")}
           >
             <span className="text-xs font-bold shrink-0" style={{ color: "#fbbf24" }}>📢</span>
@@ -1012,7 +1009,7 @@ export default function MainPage() {
               <h2 className="text-2xl sm:text-3xl font-black text-white">{t.servicesHeading}</h2>
             </div>
             <span className="text-xs px-3 py-1 rounded-full font-bold"
-              style={{ background: "rgba(255,45,120,0.08)", border: "1px solid rgba(255,45,120,0.2)", color: "#ff2d78" }}>
+              style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
               {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지
             </span>
           </div>
@@ -1022,7 +1019,7 @@ export default function MainPage() {
             const CAT_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
               "전체":    { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.2)",  text: "#ffffff",  glow: "rgba(255,255,255,0.1)" },
               "무료":    { bg: "rgba(16,185,129,0.18)",  border: "rgba(16,185,129,0.4)",   text: "#6ee7b7",  glow: "rgba(16,185,129,0.2)" },
-              "연애·궁합":{ bg: "rgba(255,45,120,0.15)", border: "rgba(255,45,120,0.4)",   text: "#ff2d78",  glow: "rgba(255,45,120,0.2)" },
+              "연애·궁합":{ bg: "rgba(59,130,246,0.15)", border: "rgba(59,130,246,0.4)",   text: "#3b82f6",  glow: "rgba(59,130,246,0.2)" },
               "금전·투자":{ bg: "rgba(16,185,129,0.15)", border: "rgba(16,185,129,0.35)",  text: "#34d399",  glow: "rgba(16,185,129,0.15)" },
               "운명·대운":{ bg: "rgba(245,197,24,0.12)", border: "rgba(245,197,24,0.35)",  text: "#f5c518",  glow: "rgba(245,197,24,0.15)" },
               "라이프":  { bg: "rgba(139,92,246,0.15)",  border: "rgba(139,92,246,0.4)",   text: "#a78bfa",  glow: "rgba(139,92,246,0.2)" },
@@ -1062,7 +1059,7 @@ export default function MainPage() {
                   })}
                 </div>
                 <div className="absolute right-0 top-0 bottom-1 w-10 pointer-events-none"
-                  style={{ background: "linear-gradient(to right, transparent, #07001a)" }} />
+                  style={{ background: "linear-gradient(to right, transparent, #020c1b)" }} />
               </div>
             );
           })()}
@@ -1117,101 +1114,25 @@ export default function MainPage() {
           </button>
         </section>
 
-        {/* ── 格局(격국) 정보 섹션 ── */}
-        <section className="mb-16">
-          <div className="mb-6">
-            <p className="text-xs font-black tracking-widest uppercase mb-1.5 shimmer-text">✦ 사주 격국(格局) 가이드</p>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">내 사주의 格은 무엇인가?</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-              격국(格局)은 사주의 월지(月支)를 기준으로 삼아 일간의 본질적 성향과 운명의 방향성을 분류하는 틀입니다.
-              월령은 사주에서 가장 핵심적인 기운 — 일부 학파는 월지 하나가 사주 전체의 50% 이상을 결정한다고 봅니다.
-            </p>
-          </div>
-
-          {/* 내격 10종 */}
-          <div className="mb-5">
-            <p className="text-xs font-bold mb-3 px-3 py-1.5 rounded-full inline-block"
-              style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa" }}>
-              内格 (내격) — 10종
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-              {[
-                { name: "식신격", hanja: "食神格", color: "#f5c518", desc: "끊임없는 노력·투자, 가시적 성과 추구. 안정적 실력파." },
-                { name: "상관격", hanja: "傷官格", color: "#f87171", desc: "창의성·정의감 강함. 좌절하면 냉소로 전환 가능." },
-                { name: "정재격", hanja: "正財格", color: "#34d399", desc: "낭비 없음, 안정 추구. 가정적·헌신적 성향." },
-                { name: "편재격", hanja: "偏財格", color: "#06b6d4", desc: "활동 범위 무제한. 다양한 분야 도전, 확장 지향." },
-                { name: "정관격", hanja: "正官格", color: "#a78bfa", desc: "원칙·규칙 안에서 최고 추구. 조직 친화적." },
-                { name: "편관격", hanja: "偏官格", color: "#fb7185", desc: "조직 질서 확립. 권위·계층 명확. 극복 시 강한 리더십." },
-                { name: "정인격", hanja: "正印格", color: "#fbbf24", desc: "선량하고 학문·직관 발달. 관성 있으면 청렴·자비." },
-                { name: "편인격", hanja: "偏印格", color: "#e879f9", desc: "독창성·예술성 강함. 비정형적 사고, 전문 기술 발달." },
-                { name: "비견격", hanja: "比肩格", color: "#ff2d78", desc: "독립심·자존심 극강. 경쟁 속에서 빛나는 유형." },
-                { name: "겁재격", hanja: "劫財格", color: "#f97316", desc: "강인한 의지로 역경 극복. 재물 기복 주의." },
-              ].map((g) => (
-                <div key={g.name} className="rounded-xl p-3 flex flex-col gap-1.5"
-                  style={{ background: "rgba(255,255,255,0.03)", border: `1px solid rgba(255,255,255,0.07)`, borderLeft: `3px solid ${g.color}` }}>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-black" style={{ color: g.color }}>{g.name}</span>
-                    <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{g.hanja}</span>
-                  </div>
-                  <p className="text-[11px] leading-snug" style={{ color: "rgba(255,255,255,0.5)" }}>{g.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 성격 vs 파격 + 외격 */}
-          <div className="grid sm:grid-cols-3 gap-3 mb-4">
-            <div className="rounded-2xl p-4" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
-              <p className="text-sm font-black mb-1.5" style={{ color: "#34d399" }}>成格 (성격)</p>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-                格이 완전히 갖춰진 상태. 소명을 지키며 희생이 따르는 대신, 운의 흐름이 일관적이고 삶의 방향성이 명확하다.
-              </p>
-            </div>
-            <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
-              <p className="text-sm font-black mb-1.5" style={{ color: "#f87171" }}>破格 (파격)</p>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-                格이 완성되지 못한 상태. 자기 만족 추구 경향이 강하고 운의 기복이 크다. 단, 파격 사주도 방향만 맞으면 성공할 수 있다.
-              </p>
-            </div>
-            <div className="rounded-2xl p-4" style={{ background: "rgba(245,197,24,0.06)", border: "1px solid rgba(245,197,24,0.2)" }}>
-              <p className="text-sm font-black mb-1.5" style={{ color: "#f5c518" }}>外格 (외격)</p>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-                종격·화격 등 매우 특이한 사주. 한 오행·십성이 압도적으로 강할 때 그 기운에 순응하는 구조. 종재격·종관격·종살격·화격 5종 등이 있다.
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-2xl p-4 flex items-start gap-3"
-            style={{ background: "rgba(255,45,120,0.05)", border: "1px solid rgba(255,45,120,0.15)" }}>
-            <span className="text-xl shrink-0">🔮</span>
-            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-              <strong style={{ color: "#ff2d78" }}>격국 취용법:</strong> 월지(月支)에서 일간과의 십성(十星) 관계로 格을 정한다.
-              월지 지장간 중 가장 강한 기운을 취용신(取用神)으로 삼아 格의 이름을 붙인다.
-              예) 일간 甲木, 월지 酉金 → 酉 본기가 庚金(편관) → <strong style={{ color: "#fbbf24" }}>편관격(칠살격)</strong>.
-              신강·신약 판단 후 용신을 확정하면 격국 분석이 완성된다.
-            </p>
-          </div>
-        </section>
-
         {/* ── 바이럴 띠 배너 ── */}
         <section className="mb-16 -mx-4 sm:-mx-6">
           <div className="relative py-12 sm:py-16 px-6 sm:px-12 text-center overflow-hidden"
             style={{
-              background: "linear-gradient(135deg, rgba(255,45,120,0.12) 0%, rgba(7,0,26,0.95) 45%, rgba(139,92,246,0.1) 100%)",
-              borderTop: "1px solid rgba(255,45,120,0.2)",
+              background: "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(7,0,26,0.95) 45%, rgba(30,64,175,0.12) 100%)",
+              borderTop: "1px solid rgba(59,130,246,0.2)",
               borderBottom: "1px solid rgba(139,92,246,0.2)",
             }}>
             {/* 배경 큰 기호 */}
             <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
-              style={{ fontSize: 280, opacity: 0.018, fontWeight: 900, color: "#ff2d78" }}>命</div>
+              style={{ fontSize: 280, opacity: 0.018, fontWeight: 900, color: "#3b82f6" }}>命</div>
             {/* 장식 별 */}
-            <span className="absolute top-6 left-[10%] text-2xl star-1" style={{ color: "#ff2d78", opacity: 0.6 }}>✦</span>
+            <span className="absolute top-6 left-[10%] text-2xl star-1" style={{ color: "#3b82f6", opacity: 0.6 }}>✦</span>
             <span className="absolute bottom-6 right-[8%] text-xl star-3" style={{ color: "#f5c518", opacity: 0.6 }}>★</span>
 
-            <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(255,45,120,0.7)" }}>✦ Before & After ✦</p>
+            <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(59,130,246,0.7)" }}>✦ Before & After ✦</p>
             <h3 className="text-2xl sm:text-4xl font-black text-white mb-5 leading-snug">
               &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
-              <span style={{ color: "#ff2d78", textShadow: "0 0 30px rgba(255,45,120,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
+              <span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
             <p className="text-sm sm:text-base max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
@@ -1245,7 +1166,7 @@ export default function MainPage() {
                   style={{
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.08)",
-                    borderTop: "2px solid rgba(255,45,120,0.3)",
+                    borderTop: "2px solid rgba(59,130,246,0.3)",
                   }}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -1253,7 +1174,7 @@ export default function MainPage() {
                       <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{r.region} · {r.age}</p>
                     </div>
                     <span className="text-[10px] px-2 py-1 rounded-full shrink-0 font-bold"
-                      style={{ background: "rgba(255,45,120,0.1)", color: "#ff2d78", border: "1px solid rgba(255,45,120,0.2)" }}>
+                      style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.2)" }}>
                       {r.service}
                     </span>
                   </div>
@@ -1286,7 +1207,7 @@ export default function MainPage() {
       </div>
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
-      <section className="border-t" style={{ borderColor: "rgba(255,45,120,0.1)" }}>
+      <section className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <IljinCalendar />
@@ -1304,7 +1225,7 @@ export default function MainPage() {
             style={{ color: "rgba(255,255,255,0.35)" }}>
             <button onClick={() => router.push("/terms")} className="hover:text-amber-400/70 transition-colors">이용약관</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-            <button onClick={() => router.push("/privacy")} className="hover:text-amber-400/70 transition-colors font-semibold" style={{ color: "rgba(255,255,255,0.55)" }}>개인정보처리방침</button>
+            <button onClick={() => router.push("/privacy")} className="hover:text-amber-400/70 transition-colors" style={{ color: "rgba(255,255,255,0.35)" }}>개인정보처리방침</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors">환불규정</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
@@ -1336,7 +1257,7 @@ export default function MainPage() {
 
       {/* ── 모바일 하단 네비게이션 ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"
-        style={{ background: "rgba(7,0,26,0.97)", borderColor: "rgba(255,45,120,0.12)", backdropFilter: "blur(20px)" }}>
+        style={{ background: "rgba(7,0,26,0.97)", borderColor: "rgba(59,130,246,0.15)", backdropFilter: "blur(20px)" }}>
         <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
