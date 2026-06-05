@@ -1,6 +1,20 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import {
+  analyzeSaju, calcDaewoon,
+  ILGAN_PERSONALITY, ILJU_60,
+  OHAENG_HEALTH, OHAENG_CAREER,
+  WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
+  JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition,
+  YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
+  type SajuResult, type Element,
+} from "@/lib/saju";
+
+function jijiElement(jj: string): Element {
+  return (CHEONGAN_ELEMENT[JIJI_BONGI[jj] || ""] || "토") as Element;
+}
 
 type CalendarType = "solar" | "lunar";
 
@@ -9,74 +23,58 @@ const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEA
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
 
-// ─── 드롭다운 피커 ─────────────────────────────────────────────────────────────
-function DropdownPicker({
-  value, options, onChange, placeholder, suffix, disabled,
-}: {
-  value: string;
-  options: Array<{ v: string; label: string }>;
-  onChange: (v: string) => void;
-  placeholder: string;
-  suffix?: string;
-  disabled?: boolean;
+// ─── 오행 스타일 ───────────────────────────────────────────────────────────────
+const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge: string }> = {
+  목: { bg: "rgba(34,197,94,0.10)",  text: "#4ade80", border: "rgba(34,197,94,0.25)",  badge: "rgba(34,197,94,0.15)" },
+  화: { bg: "rgba(239,68,68,0.10)",  text: "#f87171", border: "rgba(239,68,68,0.25)",  badge: "rgba(239,68,68,0.15)" },
+  토: { bg: "rgba(245,158,11,0.10)", text: "#fbbf24", border: "rgba(245,158,11,0.25)", badge: "rgba(245,158,11,0.15)" },
+  금: { bg: "rgba(209,213,219,0.10)",text: "#d1d5db", border: "rgba(209,213,219,0.25)",badge: "rgba(209,213,219,0.15)" },
+  수: { bg: "rgba(59,130,246,0.10)", text: "#60a5fa", border: "rgba(59,130,246,0.25)",  badge: "rgba(59,130,246,0.15)" },
+};
+const SIPSEONG_COLOR: Record<string, string> = {
+  비견:"#a78bfa", 겁재:"#c084fc", 식신:"#34d399", 상관:"#6ee7b7",
+  편재:"#fbbf24", 정재:"#fde68a", 편관:"#f87171", 정관:"#fca5a5",
+  편인:"#60a5fa", 정인:"#93c5fd",
+};
+function sipseongColor(s: string) { return SIPSEONG_COLOR[s] || "#9ca3af"; }
+
+// ─── 드롭다운 ──────────────────────────────────────────────────────────────────
+function Dropdown({ value, options, onChange, placeholder, suffix, disabled }: {
+  value: string; options: Array<{ v: string; label: string }>;
+  onChange: (v: string) => void; placeholder: string; suffix?: string; disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    function h(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); }
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
   }, []);
-
   useEffect(() => {
     if (open && listRef.current && value) {
-      const el = listRef.current.querySelector(`[data-value="${value}"]`);
+      const el = listRef.current.querySelector(`[data-v="${value}"]`);
       if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
     }
   }, [open, value]);
-
   const display = options.find(o => o.v === value)?.label ?? "";
-
   return (
     <div ref={ref} className="relative w-full">
-      <div
-        onClick={() => !disabled && setOpen(!open)}
-        className={`flex items-center justify-between rounded-xl px-4 py-3 cursor-pointer transition select-none ${
-          disabled ? "opacity-30 cursor-not-allowed" : ""
-        } ${open ? "border-blue-500" : "border-white/10"}`}
-        style={{
-          background: "rgba(255,255,255,0.05)",
-          border: open ? "1px solid rgba(59,130,246,0.6)" : "1px solid rgba(255,255,255,0.1)",
-        }}
-      >
-        <span className={display ? "text-white text-sm" : "text-sm"} style={{ color: display ? "#fff" : "rgba(255,255,255,0.3)" }}>
+      <div onClick={() => !disabled && setOpen(!open)}
+        className={`flex items-center justify-between rounded-xl px-4 py-3 cursor-pointer transition select-none ${disabled ? "opacity-30" : ""}`}
+        style={{ background: "rgba(255,255,255,0.05)", border: open ? "1px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.1)" }}>
+        <span className="text-sm" style={{ color: display ? "#fff" : "rgba(255,255,255,0.3)" }}>
           {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
         </span>
         <span className={`text-xs transition-transform ${open ? "rotate-180" : ""}`} style={{ color: "rgba(255,255,255,0.3)" }}>▼</span>
       </div>
-
       {open && (
-        <div
-          ref={listRef}
-          className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl"
-          style={{ maxHeight: "220px", background: "#0d1b2e", border: "1px solid rgba(59,130,246,0.2)" }}
-        >
+        <div ref={listRef} className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl"
+          style={{ maxHeight: "220px", background: "#0d1b2e", border: "1px solid rgba(59,130,246,0.2)" }}>
           {options.map(opt => (
-            <div
-              key={opt.v}
-              data-value={opt.v}
-              onClick={() => { onChange(opt.v); setOpen(false); }}
-              className="px-4 py-2.5 text-sm cursor-pointer transition-colors"
-              style={{
-                color: value === opt.v ? "#60a5fa" : "rgba(255,255,255,0.7)",
-                background: value === opt.v ? "rgba(59,130,246,0.12)" : "transparent",
-                fontWeight: value === opt.v ? 600 : 400,
-              }}
-            >
+            <div key={opt.v} data-v={opt.v} onClick={() => { onChange(opt.v); setOpen(false); }}
+              className="px-4 py-2.5 text-sm cursor-pointer"
+              style={{ color: value === opt.v ? "#60a5fa" : "rgba(255,255,255,0.7)", background: value === opt.v ? "rgba(59,130,246,0.12)" : "transparent", fontWeight: value === opt.v ? 600 : 400 }}>
               {opt.label}{suffix ? ` ${suffix}` : ""}
             </div>
           ))}
@@ -86,124 +84,439 @@ function DropdownPicker({
   );
 }
 
-// ─── 사주 계산 ──────────────────────────────────────────────────────────────────
-const CHEONGAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-const JIJI     = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-const CHEONGAN_KO = ["갑","을","병","정","무","기","경","신","임","계"];
-const JIJI_KO    = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
-const JIJI_ANIMAL = ["쥐","소","호랑이","토끼","용","뱀","말","양","원숭이","닭","개","돼지"];
-const OHAENG_CHEONGAN = ["木","木","火","火","土","土","金","金","水","水"];
-const OHAENG_JIJI     = ["水","土","木","木","土","火","火","土","金","金","土","水"];
-
-function getGanjiYear(year: number) {
-  const g = ((year - 4) % 10 + 10) % 10;
-  const j = ((year - 4) % 12 + 12) % 12;
-  return { gan: g, ji: j, hanja: CHEONGAN[g] + JIJI[j], ko: CHEONGAN_KO[g] + JIJI_KO[j] };
+// ─── 섹션 카드 ─────────────────────────────────────────────────────────────────
+function Section({ title, accent = "#60a5fa", children }: { title: string; accent?: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="px-5 py-3 flex items-center gap-2" style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="w-1 h-4 rounded-full shrink-0" style={{ background: accent }} />
+        <span className="text-sm font-bold text-white">{title}</span>
+      </div>
+      <div className="p-5" style={{ background: "rgba(255,255,255,0.02)" }}>{children}</div>
+    </div>
+  );
 }
 
-// 월주 계산 (절기 기반 간략 버전 — 양력 월 기준)
-function getGanjiMonth(year: number, month: number) {
-  const monthJi = (month + 1) % 12; // 인월=1월→index 2
-  const yearGanIdx = ((year - 4) % 10 + 10) % 10;
-  // 연간 기준 월간표: 갑기년=갑인월 시작(index 2,3,4...)
-  const monthGanBase = [2, 4, 6, 8, 0][yearGanIdx % 5];
-  const monthGanIdx = (monthGanBase + month - 1) % 10;
-  const jiIdx = ((month + 1) % 12);
-  return { gan: monthGanIdx, ji: jiIdx, hanja: CHEONGAN[monthGanIdx] + JIJI[jiIdx], ko: CHEONGAN_KO[monthGanIdx] + JIJI_KO[jiIdx] };
+// ─── 결과 뷰 ──────────────────────────────────────────────────────────────────
+function ResultView({
+  result, form, birthTime, birthYear, birthMonth, birthDay, onReset,
+}: {
+  result: SajuResult;
+  form: { name: string; gender: string; birthPlace: string };
+  birthTime: BirthTimeValue;
+  birthYear: number; birthMonth: number; birthDay: number;
+  onReset: () => void;
+}) {
+  const pd = result.pillarsDetail;
+  const pillars = [
+    { label: "년주", d: pd.year },
+    { label: "월주", d: pd.month },
+    { label: "일주", d: pd.day },
+    ...(pd.hour ? [{ label: "시주", d: pd.hour }] : []),
+  ];
+
+  const ilgan = pd.day.cg;
+  const monthJj = pd.month.jj;
+  const ilganInfo = ILGAN_PERSONALITY[ilgan];
+  const iljuKey = ilgan + pd.day.jj;
+  const iljuInfo = ILJU_60[iljuKey];
+  const weolji = WEOLJI_PSYCHOLOGY[monthJj];
+  const singang = result.yongshin.strength;
+  const singangTrait = SINGANG_TRAITS[singang];
+  const jaeseongPos = analyzeJaeseongPosition(ilgan, pd);
+  const jaeseongInfo = JAESEONG_POSITION_INSIGHT[jaeseongPos];
+  const isYang = ["갑","병","무","경","임"].includes(ilgan);
+  const yangYin = isYang ? YANG_YIN_TENDENCY.yang : YANG_YIN_TENDENCY.yin;
+  const yangYinLove = isYang ? YANG_YIN_TENDENCY.yangInLove : YANG_YIN_TENDENCY.yinInLove;
+
+  // 대운 계산
+  const daewoon = calcDaewoon(
+    birthYear, birthMonth, birthDay,
+    form.gender as "male" | "female",
+    ilgan,
+    { cg: pd.month.cg, jj: pd.month.jj },
+  );
+
+  // 지배/부족 오행 건강/직업
+  const domEl = result.dominant[0] || result.lacking[0] || "목";
+  const domHealth = OHAENG_HEALTH[domEl as Element];
+  const domCareer = OHAENG_CAREER[domEl as Element];
+  const lackEl = result.lacking[0];
+  const lackHealth = lackEl ? OHAENG_HEALTH[lackEl as Element] : null;
+  const coreWorry = OHAENG_CORE_WORRY[domEl as Element];
+
+  const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
+
+  const DAEWOON_LABEL = ["유아기","아동기","청소년기","청년기","장년기","중년기","중장년기","노년기"];
+
+  return (
+    <div className="space-y-5">
+      {/* 헤더 */}
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#60a5fa" }}>무료 만세력 · 사주팔자 완전분석</p>
+          <h1 className="text-2xl font-black text-white">{form.name || "사주"}님의 팔자</h1>
+          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+            {birthYear}년 {birthMonth}월 {birthDay}일 {birthTime.unknown ? "시간 모름" : `${birthTime.hour}시`}
+            {form.birthPlace ? ` · ${form.birthPlace}` : ""}
+          </p>
+        </div>
+        <button onClick={onReset} className="text-xs px-4 py-2 rounded-xl shrink-0" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
+          다시 입력
+        </button>
+      </div>
+
+      {/* 경도 보정 노트 */}
+      {result.localTimeNote && (
+        <div className="px-4 py-3 rounded-xl text-xs" style={{ background: "rgba(59,130,246,0.07)", border: "1px solid rgba(59,130,246,0.15)", color: "#93c5fd" }}>
+          {result.localTimeNote}
+        </div>
+      )}
+
+      {/* ① 사주팔자 4주 그리드 */}
+      <Section title="사주팔자 (四柱八字)" accent="#818cf8">
+        <div className={`grid gap-2.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3"}`}>
+          {pillars.map(({ label, d }) => {
+            const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
+            const jiEl = jijiElement(d.jj);
+            const cgStyle = EL_STYLE[cgEl];
+            const jiStyle = EL_STYLE[jiEl];
+            return (
+              <div key={label} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div className="text-center py-1.5 text-[11px] font-bold" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)" }}>{label}</div>
+                {/* 천간 */}
+                <div className="py-4 flex flex-col items-center gap-1" style={{ background: cgStyle.bg, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span className="text-2xl font-black" style={{ color: cgStyle.text }}>{d.cg}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: cgStyle.text }}>{cgEl}</span>
+                  {d.sipseongCg && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColor(d.sipseongCg) }}>
+                      {d.sipseongCg}
+                    </span>
+                  )}
+                </div>
+                {/* 지지 */}
+                <div className="py-4 flex flex-col items-center gap-1" style={{ background: jiStyle.bg }}>
+                  <span className="text-2xl font-black" style={{ color: jiStyle.text }}>{d.jj}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: jiStyle.text }}>{jiEl}</span>
+                  {d.sipseongJj && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColor(d.sipseongJj) }}>
+                      {d.sipseongJj}
+                    </span>
+                  )}
+                </div>
+                {/* 12운성 */}
+                {d.uunseong && (
+                  <div className="text-center py-2 text-[10px]" style={{ background: "rgba(0,0,0,0.2)", color: "rgba(255,255,255,0.4)" }}>
+                    {d.uunseong}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-3 text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+          일간(日干): <span className="font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{ilgan}({CHEONGAN_ELEMENT[ilgan]})</span>
+          &nbsp;·&nbsp;일지 12운성: <span className="font-bold text-white">{pd.day.uunseong}</span>
+        </div>
+      </Section>
+
+      {/* ② 격국 · 용신 */}
+      <Section title="격국 · 용신 · 조후 (格局用神)" accent="#a78bfa">
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {[
+            { label: "신강/신약", value: result.yongshin.strength, color: result.yongshin.strength === "신강" ? "#f87171" : result.yongshin.strength === "신약" ? "#60a5fa" : "#4ade80" },
+            { label: "용신(用神)", value: result.yongshin.yongshin, color: EL_STYLE[result.yongshin.yongshin]?.text || "#fff" },
+            { label: "희신(喜神)", value: result.yongshin.heeshin, color: EL_STYLE[result.yongshin.heeshin]?.text || "#fff" },
+          ].map(item => (
+            <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
+              <p className="text-lg font-black" style={{ color: item.color }}>{item.value}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.65)" }}>{result.yongshin.desc}</p>
+        <div className="space-y-3">
+          {(["mindset","boundary","mental","style"] as const).map((key, i) => {
+            const labels = { mindset:"사고방식", boundary:"대인관계", mental:"멘탈구조", style:"행동스타일" };
+            return (
+              <div key={key} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{labels[key]}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{singangTrait[key]}</p>
+              </div>
+            );
+          })}
+          <div className="rounded-xl px-4 py-3" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
+            <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{singangTrait.caution}</p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ③ 일간 성격 */}
+      {ilganInfo && (
+        <Section title={`일간(日干) 심층분석 · ${ilganInfo.short}`} accent="#34d399">
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {ilganInfo.keyword.split("·").map(k => (
+              <span key={k} className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }}>{k}</span>
+            ))}
+          </div>
+          <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.7)" }}>{ilganInfo.detail}</p>
+          <div className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold mb-2" style={{ color: "#6ee7b7" }}>{isYang ? "양간(陽干)" : "음간(陰干)"} 기질</p>
+            <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>{yangYin.split(":")[1]?.trim() || yangYin}</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{yangYinLove}</p>
+          </div>
+          <div className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
+            <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>핵심 내면 걱정</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{coreWorry}</p>
+          </div>
+        </Section>
+      )}
+
+      {/* ④ 60갑자 일주론 */}
+      {iljuInfo && (
+        <Section title={`일주론 (日柱論) · ${iljuKey}일주 · ${iljuInfo.image}`} accent="#fbbf24">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0" style={{ background: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].bg, border: `1px solid ${EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].border}` }}>
+              <span className="text-xl font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{iljuKey[0]}</span>
+              <span className="text-xl font-black" style={{ color: EL_STYLE[jijiElement(pd.day.jj)]?.text }}>{iljuKey[1]}</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold mb-1" style={{ color: "#fbbf24" }}>{iljuInfo.uunseong} · {iljuInfo.keyword}</p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{iljuInfo.personality}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-2.5">
+            {[
+              { label: "연애 스타일", text: iljuInfo.love, color: "#f472b6" },
+              { label: "적합 직업·커리어", text: iljuInfo.career, color: "#34d399" },
+              { label: "주의할 점", text: iljuInfo.caution, color: "#f87171" },
+            ].map(item => (
+              <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: item.color }}>{item.label}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* ⑤ 월지 심리 */}
+      {weolji && (
+        <Section title="월지(月支) 심리 프로파일" accent="#06b6d4">
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{weolji}</p>
+        </Section>
+      )}
+
+      {/* ⑥ 오행 분포 */}
+      <Section title="오행 분포 · 균형 분석" accent="#4ade80">
+        <div className="space-y-3 mb-4">
+          {(["목","화","토","금","수"] as Element[]).map(el => {
+            const score = result.scores[el] || 0;
+            const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+            const style = EL_STYLE[el];
+            const isDom = result.dominant.includes(el);
+            const isLack = result.lacking.includes(el);
+            return (
+              <div key={el} className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 w-20 shrink-0">
+                  <span className="text-sm font-black" style={{ color: style.text }}>{el}</span>
+                  {isDom && <span className="text-[9px] px-1 rounded font-bold" style={{ background: style.badge, color: style.text }}>과다</span>}
+                  {isLack && <span className="text-[9px] px-1 rounded font-bold" style={{ background: "rgba(239,68,68,0.1)", color: "#f87171" }}>부족</span>}
+                </div>
+                <div className="flex-1 rounded-full h-2.5" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div className="h-2.5 rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: style.text, boxShadow: `0 0 8px ${style.text}60` }} />
+                </div>
+                <span className="text-xs w-10 text-right font-bold" style={{ color: style.text }}>{pct}%</span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality}</p>
+        {result.dominant.length > 0 && (
+          <div className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold mb-1" style={{ color: "#4ade80" }}>보완 조언</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+              용신 <strong style={{ color: EL_STYLE[result.yongshin.yongshin]?.text }}>{result.yongshin.yongshin}</strong> 기운을 일상에서 보강하세요.
+              {result.lacking.length > 0 && ` ${result.lacking.join("·")} 기운이 부족하여 보완이 필요합니다.`}
+            </p>
+          </div>
+        )}
+      </Section>
+
+      {/* ⑦ 건강 분석 */}
+      <Section title="오행 건강 분석" accent="#f87171">
+        <div className="space-y-4">
+          {[domEl, lackEl].filter(Boolean).slice(0, 2).map(el => {
+            const h = OHAENG_HEALTH[el as Element];
+            const style = EL_STYLE[el as string];
+            const isDom = result.dominant.includes(el as Element);
+            return (
+              <div key={el}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-black text-base" style={{ color: style.text }}>{el}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: isDom ? style.badge : "rgba(239,68,68,0.1)", color: isDom ? style.text : "#f87171", border: `1px solid ${isDom ? style.border : "rgba(239,68,68,0.2)"}` }}>
+                    {isDom ? "과다" : "부족"} → {h.organs}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {h.symptoms.map(s => (
+                    <span key={s} className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.08)", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.15)" }}>{s}</span>
+                  ))}
+                </div>
+                <p className="text-xs leading-relaxed mb-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>{h.caution}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{h.lifestyle}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ⑧ 직업 적성 */}
+      <Section title="직업 적성 · 커리어 분석" accent="#34d399">
+        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>지배 오행({domEl}) 기준 적성 분석</p>
+        <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>{domCareer.strengths}</p>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {domCareer.suited.map(s => (
+            <span key={s} className="text-xs px-3 py-1 rounded-full font-semibold" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }}>{s}</span>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {domCareer.industries.map(s => (
+            <span key={s} className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>{s}</span>
+          ))}
+        </div>
+        <div className="rounded-xl px-4 py-3" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.12)" }}>
+          <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>커리어 주의사항</p>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{domCareer.caution}</p>
+        </div>
+      </Section>
+
+      {/* ⑨ 재성 위치 */}
+      <Section title="재성(財星) 위치 · 재물 스타일" accent="#fbbf24">
+        <div className="mb-3">
+          <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>{jaeseongPos}에 위치</span>
+        </div>
+        <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.65)" }}>{jaeseongInfo.desc}</p>
+        <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.65)" }}>{jaeseongInfo.style}</p>
+        <p className="text-xs px-4 py-2.5 rounded-xl" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", color: "rgba(255,255,255,0.55)" }}>
+          재물 방식: {jaeseongInfo.wealth}
+        </p>
+      </Section>
+
+      {/* ⑩ 신살 */}
+      {result.sinsalList.length > 0 && (
+        <Section title={`신살(神殺) · 총 ${result.sinsalList.length}개 발견`} accent="#c084fc">
+          <div className="space-y-2.5">
+            {result.sinsalList.map(s => (
+              <div key={s.name} className="rounded-xl px-4 py-3" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.05)" : s.category === "unlucky" ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.03)", border: s.category === "lucky" ? "1px solid rgba(52,211,153,0.15)" : s.category === "unlucky" ? "1px solid rgba(239,68,68,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-bold text-sm text-white">{s.name}</span>
+                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.hanja}</span>
+                  <span className="text-[9px] px-1.5 rounded font-bold" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.12)" : s.category === "unlucky" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)", color: s.category === "lucky" ? "#34d399" : s.category === "unlucky" ? "#f87171" : "#9ca3af" }}>
+                    {s.category === "lucky" ? "길신" : s.category === "unlucky" ? "흉살" : "중립"}
+                  </span>
+                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{s.pillars.join("·")}주</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* ⑪ 대운 흐름 */}
+      <Section title={`대운(大運) 흐름 · 교운 ${daewoon.startAge}세 · ${daewoon.direction}`} accent="#818cf8">
+        <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>각 대운은 10년 단위로 운명의 큰 흐름을 나타냅니다.</p>
+        <div className="space-y-2.5">
+          {daewoon.pillars.map((p, i) => {
+            const isCurrent = i === daewoon.currentIdx;
+            const cgEl = CHEONGAN_ELEMENT[p.cg] || "토";
+            const style = EL_STYLE[cgEl];
+            return (
+              <div key={i} className="rounded-xl px-4 py-3" style={{ background: isCurrent ? "rgba(129,140,248,0.08)" : "rgba(255,255,255,0.02)", border: isCurrent ? "1.5px solid rgba(129,140,248,0.35)" : "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="text-center shrink-0 w-16">
+                    <p className="text-[10px] mb-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{DAEWOON_LABEL[i] || ""}</p>
+                    <p className="font-black text-base" style={{ color: style.text }}>{p.cg}{p.jj}</p>
+                    <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>{p.age}세~</p>
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(167,139,250,0.1)", color: "#a78bfa" }}>{p.sipseongCg}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(167,139,250,0.1)", color: "#c084fc" }}>{p.sipseongJj}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>{p.uunseong}</span>
+                    </div>
+                    <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>{p.yearStart}년경 시작</p>
+                  </div>
+                  {isCurrent && (
+                    <span className="text-[10px] px-2 py-1 rounded-lg font-black shrink-0" style={{ background: "rgba(129,140,248,0.2)", color: "#818cf8" }}>현재</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ⑫ 유료 서비스 CTA */}
+      <div className="rounded-2xl p-5 space-y-4" style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.12))", border: "1px solid rgba(139,92,246,0.2)" }}>
+        <div>
+          <p className="text-base font-black text-white mb-1">더 깊은 분석이 궁금하신가요?</p>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>만세력은 기초 데이터입니다. 실제 삶에 어떻게 적용되는지는 심화 서비스에서 확인하세요.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { href: "/daewoon", label: "대운 심층분석", desc: "10년 단위 운명 흐름", color: "#818cf8" },
+            { href: "/gunghap", label: "궁합 분석", desc: "연인·배우자와의 궁합", color: "#f472b6" },
+            { href: "/saju", label: "사주 오행 배경화면", desc: "사주로 만드는 나만의 배경화면", color: "#34d399" },
+            { href: "/guide", label: "명리학 가이드", desc: "사주 공부 무료 가이드", color: "#fbbf24" },
+          ].map(item => (
+            <Link key={item.href} href={item.href} className="rounded-xl p-3 block transition hover:scale-[1.02] active:scale-[0.98]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-sm font-bold mb-0.5" style={{ color: item.color }}>{item.label}</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>{item.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* 면책 */}
+      <p className="text-[10px] text-center pb-6" style={{ color: "rgba(255,255,255,0.2)" }}>
+        본 서비스는 명리학 기반 참고용 엔터테인먼트 콘텐츠입니다.
+      </p>
+    </div>
+  );
 }
 
-function getGanjiDay(year: number, month: number, day: number) {
-  // 율리우스 일수 기반 일주 계산
-  const a = Math.floor((14 - month) / 12);
-  const y = year - a;
-  const m = month + 12 * a - 2;
-  const jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-  const g = ((jd - 11) % 10 + 10) % 10;
-  const j = ((jd - 11) % 12 + 12) % 12;
-  return { gan: g, ji: j, hanja: CHEONGAN[g] + JIJI[j], ko: CHEONGAN_KO[g] + JIJI_KO[j] };
-}
-
-function getGanjiHour(hour: number, dayGanIdx: number) {
-  const ji = Math.floor(((hour + 1) % 24) / 2);
-  const base = [0, 2, 4, 6, 8][dayGanIdx % 5];
-  const gan = (base + ji) % 10;
-  return { gan, ji, hanja: CHEONGAN[gan] + JIJI[ji], ko: CHEONGAN_KO[gan] + JIJI_KO[ji] };
-}
-
-function calcOhaeng(pillars: Array<{ gan: number; ji: number }>) {
-  const score = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
-  for (const p of pillars) {
-    const g = OHAENG_CHEONGAN[p.gan] as keyof typeof score;
-    const j = OHAENG_JIJI[p.ji] as keyof typeof score;
-    score[g] += 1;
-    score[j] += 1;
-  }
-  return score;
-}
-
-interface SajuResult {
-  year: { gan: number; ji: number; hanja: string; ko: string };
-  month: { gan: number; ji: number; hanja: string; ko: string };
-  day: { gan: number; ji: number; hanja: string; ko: string };
-  hour: { gan: number; ji: number; hanja: string; ko: string } | null;
-  ohaeng: Record<string, number>;
-  animal: string;
-}
-
-function calcSaju(year: number, month: number, day: number, hour: number | null): SajuResult {
-  const yp = getGanjiYear(year);
-  const mp = getGanjiMonth(year, month);
-  const dp = getGanjiDay(year, month, day);
-  const hp = hour !== null ? getGanjiHour(hour, dp.gan) : null;
-
-  const pillars = hp ? [yp, mp, dp, hp] : [yp, mp, dp];
-  const ohaeng = calcOhaeng(pillars);
-
-  return {
-    year: yp,
-    month: mp,
-    day: dp,
-    hour: hp,
-    ohaeng,
-    animal: JIJI_ANIMAL[yp.ji],
-  };
-}
-
-// ─── 오행 색상 ─────────────────────────────────────────────────────────────────
-const OHAENG_COLOR: Record<string, { bg: string; text: string; border: string }> = {
-  木: { bg: "rgba(34,197,94,0.12)",  text: "#4ade80",  border: "rgba(34,197,94,0.3)" },
-  火: { bg: "rgba(239,68,68,0.12)",  text: "#f87171",  border: "rgba(239,68,68,0.3)" },
-  土: { bg: "rgba(245,197,24,0.12)", text: "#fbbf24",  border: "rgba(245,197,24,0.3)" },
-  金: { bg: "rgba(255,255,255,0.08)",text: "#e5e7eb",  border: "rgba(255,255,255,0.2)" },
-  水: { bg: "rgba(59,130,246,0.12)", text: "#60a5fa",  border: "rgba(59,130,246,0.3)" },
-};
-
-// ─── 메인 컴포넌트 ──────────────────────────────────────────────────────────────
+// ─── 메인 페이지 ──────────────────────────────────────────────────────────────
 export default function ManseryeokPage() {
-  const [form, setForm] = useState({ name: "", gender: "female", birthYear: "", birthMonth: "", birthDay: "", birthPlace: "" });
+  const [form, setForm] = useState({ name: "", gender: "female", birthPlace: "" });
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
   const [calendarType, setCalendarType] = useState<CalendarType>("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: 12, minute: 30, unknown: false, useJajasi: false });
   const [result, setResult] = useState<SajuResult | null>(null);
+  const [calcInput, setCalcInput] = useState<{ year: number; month: number; day: number } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const yearOptions  = YEARS.map(y  => ({ v: String(y),  label: String(y) }));
-  const monthOptions = MONTHS.map(m => ({ v: String(m),  label: String(m) }));
-  const dayOptions   = DAYS.map(d   => ({ v: String(d),  label: String(d) }));
+  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
+  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
+  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.birthYear || !form.birthMonth || !form.birthDay) {
+    if (!birthYear || !birthMonth || !birthDay) {
       alert("생년월일을 모두 선택해주세요.");
       return;
     }
     setLoading(true);
+    await new Promise(r => setTimeout(r, 1400));
 
-    await new Promise(r => setTimeout(r, 1200));
-
-    let year  = parseInt(form.birthYear);
-    let month = parseInt(form.birthMonth);
-    let day   = parseInt(form.birthDay);
+    let year  = parseInt(birthYear);
+    let month = parseInt(birthMonth);
+    let day   = parseInt(birthDay);
 
     if (calendarType === "lunar") {
       try {
@@ -221,264 +534,153 @@ export default function ManseryeokPage() {
       }
     }
 
-    const hour = birthTime.unknown ? null : birthTime.hour;
-    const r = calcSaju(year, month, day, hour);
+    const r = analyzeSaju({
+      birthYear: year, birthMonth: month, birthDay: day,
+      birthHour: birthTime.unknown ? null : (birthTime.hour ?? null),
+      birthMinute: birthTime.unknown ? null : (birthTime.minute ?? null),
+      name: form.name || "사주",
+      gender: form.gender as "male" | "female",
+      birthPlace: form.birthPlace || "서울",
+      style: "auto",
+      productType: "report",
+      useJajasi: birthTime.useJajasi,
+    });
+
+    setCalcInput({ year, month, day });
     setResult(r);
     setLoading(false);
   };
 
-  const reset = () => { setResult(null); setLoading(false); };
+  const reset = () => { setResult(null); setCalcInput(null); };
 
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
         <div className="relative w-20 h-20">
-          <div className="absolute inset-0 rounded-full animate-spin" style={{ border: "2px solid rgba(59,130,246,0.15)", borderTopColor: "#3b82f6" }} />
-          <div className="absolute inset-3 rounded-full animate-spin" style={{ border: "2px solid rgba(6,182,212,0.15)", borderTopColor: "#06b6d4", animationDirection: "reverse", animationDuration: "0.8s" }} />
+          <div className="absolute inset-0 rounded-full animate-spin" style={{ border: "2px solid rgba(99,102,241,0.15)", borderTopColor: "#6366f1" }} />
+          <div className="absolute inset-3 rounded-full animate-spin" style={{ border: "2px solid rgba(139,92,246,0.15)", borderTopColor: "#8b5cf6", animationDirection: "reverse", animationDuration: "0.8s" }} />
           <div className="absolute inset-0 flex items-center justify-center text-2xl">☯</div>
         </div>
         <div className="text-center">
-          <p className="text-white font-bold mb-1">사주 분석 중...</p>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>천간지지 계산 중</p>
+          <p className="text-white font-bold text-lg mb-2">사주 완전 분석 중...</p>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>격국·용신·일주론·신살·대운 계산 중</p>
         </div>
       </div>
     );
   }
 
-  if (result) {
-    const PILLARS = [
-      { label: "년주", pillar: result.year },
-      { label: "월주", pillar: result.month },
-      { label: "일주", pillar: result.day },
-      ...(result.hour ? [{ label: "시주", pillar: result.hour }] : []),
-    ];
-    const total = Object.values(result.ohaeng).reduce((a, b) => a + b, 0);
-
+  if (result && calcInput) {
     return (
-      <div className="space-y-6">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold mb-1 tracking-widest uppercase" style={{ color: "#60a5fa" }}>만세력 결과</p>
-            <h1 className="text-2xl font-black text-white">{form.name || "사주"} 사주팔자</h1>
-          </div>
-          <button onClick={reset} className="text-xs px-4 py-2 rounded-xl transition" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)" }}>
-            다시 입력
-          </button>
-        </div>
-
-        {/* 사주 4주 */}
-        <div className="grid grid-cols-4 gap-2.5">
-          {PILLARS.map(({ label, pillar }) => {
-            const ganColor = OHAENG_COLOR[OHAENG_CHEONGAN[pillar.gan]];
-            const jiColor  = OHAENG_COLOR[OHAENG_JIJI[pillar.ji]];
-            return (
-              <div key={label} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="py-1.5 text-center text-xs font-bold" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.45)" }}>
-                  {label}
-                </div>
-                {/* 천간 */}
-                <div className="py-4 flex flex-col items-center gap-1 border-b" style={{ background: ganColor.bg, borderColor: "rgba(255,255,255,0.06)" }}>
-                  <span className="text-2xl font-black" style={{ color: ganColor.text }}>{pillar.hanja[0]}</span>
-                  <span className="text-xs font-bold" style={{ color: ganColor.text }}>{pillar.ko[0]}</span>
-                  <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{OHAENG_CHEONGAN[pillar.gan]}</span>
-                </div>
-                {/* 지지 */}
-                <div className="py-4 flex flex-col items-center gap-1" style={{ background: jiColor.bg }}>
-                  <span className="text-2xl font-black" style={{ color: jiColor.text }}>{pillar.hanja[1]}</span>
-                  <span className="text-xs font-bold" style={{ color: jiColor.text }}>{pillar.ko[1]}</span>
-                  <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{OHAENG_JIJI[pillar.ji]}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 기본 정보 */}
-        <div className="rounded-2xl p-4 space-y-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <div className="flex justify-between items-center">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>띠</span>
-            <span className="text-sm font-bold text-white">{result.animal}띠 ({result.year.ko}년)</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>일간</span>
-            <span className="text-sm font-bold" style={{ color: OHAENG_COLOR[OHAENG_CHEONGAN[result.day.gan]].text }}>
-              {CHEONGAN_KO[result.day.gan]}({CHEONGAN[result.day.gan]}) · {OHAENG_CHEONGAN[result.day.gan]}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>성별</span>
-            <span className="text-sm font-bold text-white">{form.gender === "female" ? "여성" : "남성"}</span>
-          </div>
-          {birthTime.useJajasi && (
-            <div className="flex justify-between items-center">
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>야자시 적용</span>
-              <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(59,130,246,0.12)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.25)" }}>적용됨</span>
-            </div>
-          )}
-        </div>
-
-        {/* 오행 분포 */}
-        <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <p className="text-xs font-bold mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>오행 분포</p>
-          <div className="space-y-2.5">
-            {(["木","火","土","金","水"] as const).map(el => {
-              const cnt = result.ohaeng[el] || 0;
-              const pct = total > 0 ? Math.round((cnt / total) * 100) : 0;
-              const c = OHAENG_COLOR[el];
-              return (
-                <div key={el} className="flex items-center gap-3">
-                  <span className="text-sm font-black w-5 shrink-0" style={{ color: c.text }}>{el}</span>
-                  <div className="flex-1 rounded-full h-2" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div className="h-2 rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: c.text, boxShadow: `0 0 8px ${c.text}60` }} />
-                  </div>
-                  <span className="text-xs w-8 text-right font-bold" style={{ color: c.text }}>{cnt}개</span>
-                </div>
-              );
-            })}
-          </div>
-          {total > 0 && (
-            <p className="mt-3 text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
-              {(() => {
-                const max = Math.max(...Object.values(result.ohaeng));
-                const min = Math.min(...Object.values(result.ohaeng));
-                const maxEl = Object.entries(result.ohaeng).find(([, v]) => v === max)?.[0] || "";
-                const minEl = Object.entries(result.ohaeng).find(([, v]) => v === min)?.[0] || "";
-                return `${maxEl} 과다 · ${minEl} 부족`;
-              })()}
-            </p>
-          )}
-        </div>
-
-        {/* 안내 */}
-        <div className="rounded-2xl p-4" style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.15)" }}>
-          <p className="text-xs font-bold mb-1" style={{ color: "#60a5fa" }}>심화 분석이 필요하신가요?</p>
-          <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>격국 분석, 대운·세운, 신살 등 상세 사주 풀이를 확인해보세요.</p>
-          <a href="/guide" className="text-xs font-bold" style={{ color: "#60a5fa" }}>명리학 가이드 보기 →</a>
-        </div>
-      </div>
+      <main className="max-w-lg mx-auto px-4 py-8">
+        <ResultView
+          result={result}
+          form={form}
+          birthTime={birthTime}
+          birthYear={calcInput.year}
+          birthMonth={calcInput.month}
+          birthDay={calcInput.day}
+          onReset={reset}
+        />
+      </main>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div>
-        <p className="text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: "#60a5fa" }}>Summer Palace · 만세력</p>
-        <h1 className="text-3xl font-black text-white mb-2">사주 만세력</h1>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-          생년월일시를 입력하면 사주팔자(연·월·일·시주)와 오행 분포를 계산합니다.
-        </p>
-      </div>
-
-      {/* 폼 */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-
-        {/* 이름 */}
+    <main className="max-w-lg mx-auto px-4 py-8">
+      <div className="space-y-6">
+        {/* 헤더 */}
         <div>
-          <label className="block text-sm font-semibold mb-2 text-white">이름</label>
-          <input
-            type="text"
-            placeholder="홍길동 (선택)"
-            value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-xl px-4 py-3 text-white text-sm transition placeholder:text-white/20 focus:outline-none"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
-          />
-        </div>
-
-        {/* 성별 */}
-        <div>
-          <label className="block text-sm font-semibold mb-2 text-white">성별</label>
-          <div className="flex gap-3">
-            {[{ v: "female", l: "여성" }, { v: "male", l: "남성" }].map(g => (
-              <button
-                key={g.v}
-                type="button"
-                onClick={() => setForm({ ...form, gender: g.v })}
-                className="flex-1 py-3 rounded-xl text-sm font-bold transition"
-                style={{
-                  background: form.gender === g.v ? "rgba(59,130,246,0.18)" : "rgba(255,255,255,0.04)",
-                  border: form.gender === g.v ? "1.5px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.09)",
-                  color: form.gender === g.v ? "#60a5fa" : "rgba(255,255,255,0.45)",
-                }}
-              >
-                {g.l}
-              </button>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#6366f1" }}>Summer Palace · 무료 만세력</p>
+          <h1 className="text-3xl font-black text-white mb-2">내 사주팔자<br />완전 무료 분석</h1>
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+            생년월일시·도시를 입력하면 격국·용신·일주론·신살·대운까지 한 번에 분석해 드립니다.
+          </p>
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {["격국·용신","60갑자 일주론","오행 건강","직업 적성","재성 위치","신살","대운 흐름","경도 보정"].map(t => (
+              <span key={t} className="text-[10px] px-2.5 py-1 rounded-full font-semibold" style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.2)" }}>{t}</span>
             ))}
           </div>
         </div>
 
-        {/* 생년월일 */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-white">생년월일</label>
-            <div className="flex rounded-lg overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              {(["solar","lunar"] as CalendarType[]).map(type => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => { setCalendarType(type); setIsLeapMonth(false); setForm(f => ({ ...f, birthMonth: "", birthDay: "" })); }}
-                  className="px-4 py-1.5 text-xs font-bold transition"
-                  style={{
-                    background: calendarType === type ? "rgba(59,130,246,0.25)" : "transparent",
-                    color: calendarType === type ? "#60a5fa" : "rgba(255,255,255,0.4)",
-                  }}
-                >
-                  {type === "solar" ? "양력" : "음력"}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* 이름 */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-white">이름 <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>(선택)</span></label>
+            <input type="text" placeholder="홍길동" value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              className="w-full rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none transition"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }} />
+          </div>
+
+          {/* 성별 */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-white">성별</label>
+            <div className="flex gap-3">
+              {[{ v: "female", l: "여성" }, { v: "male", l: "남성" }].map(g => (
+                <button key={g.v} type="button" onClick={() => setForm({ ...form, gender: g.v })}
+                  className="flex-1 py-3 rounded-xl text-sm font-bold transition"
+                  style={{ background: form.gender === g.v ? "rgba(99,102,241,0.18)" : "rgba(255,255,255,0.04)", border: form.gender === g.v ? "1.5px solid rgba(99,102,241,0.5)" : "1px solid rgba(255,255,255,0.09)", color: form.gender === g.v ? "#818cf8" : "rgba(255,255,255,0.45)" }}>
+                  {g.l}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="mb-3">
-            <DropdownPicker value={form.birthYear} options={yearOptions} onChange={v => setForm({ ...form, birthYear: v })} placeholder="연도 선택" suffix="년" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <DropdownPicker value={form.birthMonth} options={monthOptions} onChange={v => setForm({ ...form, birthMonth: v })} placeholder="월 선택" suffix="월" />
-            <DropdownPicker value={form.birthDay}   options={dayOptions}   onChange={v => setForm({ ...form, birthDay: v })}   placeholder="일 선택" suffix="일" />
+          {/* 생년월일 */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-semibold text-white">생년월일</label>
+              <div className="flex rounded-lg overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                {(["solar","lunar"] as CalendarType[]).map(type => (
+                  <button key={type} type="button"
+                    onClick={() => { setCalendarType(type); setIsLeapMonth(false); setBirthMonth(""); setBirthDay(""); }}
+                    className="px-4 py-1.5 text-xs font-bold transition"
+                    style={{ background: calendarType === type ? "rgba(99,102,241,0.25)" : "transparent", color: calendarType === type ? "#818cf8" : "rgba(255,255,255,0.4)" }}>
+                    {type === "solar" ? "양력" : "음력"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mb-3">
+              <Dropdown value={birthYear} options={yearOpts} onChange={setBirthYear} placeholder="연도 선택" suffix="년" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Dropdown value={birthMonth} options={monthOpts} onChange={setBirthMonth} placeholder="월 선택" suffix="월" />
+              <Dropdown value={birthDay}   options={dayOpts}   onChange={setBirthDay}   placeholder="일 선택" suffix="일" />
+            </div>
+            {calendarType === "lunar" && (
+              <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-indigo-500" />
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>윤달에 태어난 경우 체크</span>
+              </label>
+            )}
           </div>
 
-          {calendarType === "lunar" && (
-            <label className="flex items-center gap-2 mt-3 cursor-pointer">
-              <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-blue-500" />
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>윤달에 태어난 경우 체크</span>
+          {/* 태어난 시간 */}
+          <div>
+            <label className="block text-sm font-semibold mb-3 text-white">태어난 시간</label>
+            <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
+          </div>
+
+          {/* 태어난 도시 */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-white">
+              태어난 도시
+              <span className="ml-2 text-xs font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>경도 보정에 사용됩니다</span>
             </label>
-          )}
-        </div>
+            <input type="text" placeholder="서울 / 부산 / 대구 / 뉴욕..." value={form.birthPlace}
+              onChange={e => setForm({ ...form, birthPlace: e.target.value })}
+              className="w-full rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none transition"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }} />
+          </div>
 
-        {/* 태어난 시간 */}
-        <div>
-          <label className="block text-sm font-semibold mb-3 text-white">태어난 시간</label>
-          <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
-        </div>
-
-        {/* 태어난 도시 */}
-        <div>
-          <label className="block text-sm font-semibold mb-2 text-white">태어난 도시 <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>(선택)</span></label>
-          <input
-            type="text"
-            placeholder="서울 / 부산 / 대구 등"
-            value={form.birthPlace}
-            onChange={e => setForm({ ...form, birthPlace: e.target.value })}
-            className="w-full rounded-xl px-4 py-3 text-white text-sm transition placeholder:text-white/20 focus:outline-none"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
-          />
-        </div>
-
-        {/* 제출 */}
-        <button
-          type="submit"
-          className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, #1d4ed8, #0369a1)",
-            color: "#fff",
-            boxShadow: "0 0 24px rgba(59,130,246,0.3)",
-          }}
-        >
-          사주팔자 계산하기
-        </button>
-      </form>
-    </div>
+          <button type="submit"
+            className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg, #4f46e5, #7c3aed)", color: "#fff", boxShadow: "0 0 30px rgba(99,102,241,0.35)" }}>
+            사주팔자 완전 분석하기
+          </button>
+        </form>
+      </div>
+    </main>
   );
 }

@@ -24,9 +24,9 @@ const UI: Record<Lang, {
   charging: string;
 }> = {
   ko: {
-    h1: ["당신의 사주,", "지금 이 순간도", "말하고 있습니다"],
-    heroSub: "남들은 이미 확인했습니다. 당신만 아직 모르고 있었어요.",
-    heroCta: "내 사주의 모든 것 파악하기",
+    h1: ["쟤는 생긴 것도 그냥 그런데", "왜 저렇게", "인기가 많을까..."],
+    heroSub: "타고난 거 맞습니다. 사주에 있어요. 당신 사주에도 분명히 있습니다.",
+    heroCta: "내 사주에 뭐가 있는지 보기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
@@ -901,7 +901,7 @@ export default function MainPage() {
           {/* CTA 버튼 */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
             <button
-              onClick={() => router.push("/saju")}
+              onClick={() => router.push("/manseryeok")}
               className="cta-btn inline-flex items-center gap-2.5 font-black text-base px-10 py-4 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
               style={{
                 background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
