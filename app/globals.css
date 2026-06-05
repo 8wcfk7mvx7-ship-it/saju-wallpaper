@@ -8,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-serif-kr), "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+  --font-sans: var(--font-myeongjo), "Nanum Myeongjo", "KoPubBatang", Georgia, serif;
   --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
 }
 
@@ -22,5 +22,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-serif-kr), "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+  font-family: var(--font-myeongjo), "Nanum Myeongjo", "KoPubBatang", Georgia, serif;
 }
