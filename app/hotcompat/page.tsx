@@ -211,6 +211,7 @@ function HotCompatContent() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [p1, setP1] = useState<PersonForm>({ gender: "female", year: "", month: "", day: "" });
   const [p2, setP2] = useState<PersonForm>({ gender: "male",   year: "", month: "", day: "" });
+  const [isPaid, setIsPaid] = useState(false);
   const chemRef = useRef<ChemResult | null>(null);
   const r1Ref   = useRef<SajuResult | null>(null);
   const r2Ref   = useRef<SajuResult | null>(null);
@@ -218,6 +219,10 @@ function HotCompatContent() {
   const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
   const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
+
+  useEffect(() => {
+    setIsPaid(localStorage.getItem("sp_hotcompat_paid") === "true");
+  }, []);
 
   function handleAnalyze() {
     if (!p1.year || !p1.month || !p1.day || !p2.year || !p2.month || !p2.day) return;
@@ -385,44 +390,67 @@ function HotCompatContent() {
           <p className="text-sm font-bold" style={{ color: grade.color }}>→ {grade.verdict}</p>
         </div>
 
-        {/* 케미 분석 결과 */}
-        {chem.highlights.length > 0 && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">발견된 성적 케미 요소</p>
-            <div className="space-y-3">
-              {chem.highlights.map((h, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-xl px-4 py-3 border"
-                  style={{ backgroundColor: h.color + "12", borderColor: h.color + "30" }}>
-                  <span className="font-black text-xs shrink-0 mt-0.5" style={{ color: h.color }}>#{i + 1}</span>
-                  <div>
-                    <p className="text-sm font-bold mb-0.5" style={{ color: h.color }}>{h.title}</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">{h.desc}</p>
-                  </div>
+        {/* 케미 분석 결과 — 페이월 */}
+        <div className="relative mb-4">
+          <div className={isPaid ? "" : "blur-sm select-none pointer-events-none"}>
+            {chem.highlights.length > 0 ? (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">발견된 성적 케미 요소</p>
+                <div className="space-y-3">
+                  {chem.highlights.map((h, i) => (
+                    <div key={i} className="flex items-start gap-3 rounded-xl px-4 py-3 border"
+                      style={{ backgroundColor: h.color + "12", borderColor: h.color + "30" }}>
+                      <span className="font-black text-xs shrink-0 mt-0.5" style={{ color: h.color }}>#{i + 1}</span>
+                      <div>
+                        <p className="text-sm font-bold mb-0.5" style={{ color: h.color }}>{h.title}</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">{h.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">분석 결과</p>
+                <p className="text-sm text-gray-400 leading-relaxed">두 사람의 사주에서 강한 성적 케미 요소가 발견되지 않았습니다. 개인의 노력과 감성적 교감이 더 중요한 관계입니다.</p>
+              </div>
+            )}
+
+            {/* 일주 정보 */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              {[{ r: r1, label: "첫 번째 사람" }, { r: r2, label: "두 번째 사람" }].map(({ r, label }) => (
+                <div key={label} className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
+                  <p className="text-xs text-gray-500 mb-1">{label}</p>
+                  <p className="text-lg font-black">{r.pillarsDetail.day.cg}{r.pillarsDetail.day.jj}일주</p>
+                  <p className="text-xs text-gray-600">{r.pillarsDetail.day.uunseong}</p>
+                  {r.sinsalList.some(s => ["도화살","홍염살","진도화"].includes(s.name)) && (
+                    <p className="text-xs text-rose-400 mt-1">도화 기운 있음</p>
+                  )}
                 </div>
               ))}
             </div>
           </div>
-        )}
 
-        {chem.highlights.length === 0 && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">분석 결과</p>
-            <p className="text-sm text-gray-400 leading-relaxed">두 사람의 사주에서 강한 성적 케미 요소가 발견되지 않았습니다. 개인의 노력과 감성적 교감이 더 중요한 관계입니다.</p>
-          </div>
-        )}
-
-        {/* 일주 정보 */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {[{ r: r1, label: "첫 번째 사람" }, { r: r2, label: "두 번째 사람" }].map(({ r, label }) => (
-            <div key={label} className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
-              <p className="text-xs text-gray-500 mb-1">{label}</p>
-              <p className="text-lg font-black">{r.pillarsDetail.day.cg}{r.pillarsDetail.day.jj}일주</p>
-              <p className="text-xs text-gray-600">{r.pillarsDetail.day.uunseong}</p>
-              {r.sinsalList.some(s => ["도화살","홍염살","진도화"].includes(s.name)) && (
-                <p className="text-xs text-rose-400 mt-1">도화 기운 있음</p>
-              )}
+          {/* 잠금 오버레이 */}
+          {!isPaid && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl"
+              style={{ background: "rgba(8,1,15,0.75)", backdropFilter: "blur(2px)" }}>
+              <p className="text-sm font-black text-white mb-1">🔒 상세 분석 잠김</p>
+              <p className="text-xs mb-4 text-center px-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+                성적 케미 요소·일주 상세를 보려면 결제하세요
+              </p>
+              <button
+                onClick={() => {
+                  const orderId = `hc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                  router.push(`/hotcompat/pay?orderId=${orderId}`);
+                }}
+                className="px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
+                style={{ background: "linear-gradient(135deg, #be123c, #f43f5e)", color: "#fff", boxShadow: "0 4px 16px rgba(244,63,94,0.4)" }}
+              >
+                전체 보기 — ₩4,900 / 🫐 4,900
+              </button>
             </div>
-          ))}
+          )}
         </div>
 
         {/* 면책 */}
