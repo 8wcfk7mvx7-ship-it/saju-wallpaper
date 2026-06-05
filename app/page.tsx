@@ -870,7 +870,6 @@ export default function MainPage() {
 
           {/* 메인 타이틀 */}
           <div className="mb-6">
-            </div>
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
               <span className="grad-text-main block">{t.h1[0]}</span>
               <span className="block" style={{ color: "#3b82f6", textShadow: "0 0 40px rgba(59,130,246,0.4)" }}>{t.h1[1]}</span>
@@ -936,31 +935,6 @@ export default function MainPage() {
             </div>
           </div>
 
-          {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
-          <div className="mt-12">
-            <p className="text-xs font-bold mb-4 tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>카테고리 바로가기</p>
-            <div className="flex gap-2 justify-center flex-wrap">
-              {CATEGORIES.map(({ key, icon }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveCategory(key);
-                    document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-105"
-                  style={{
-                    background: activeCategory === key ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.04)",
-                    border: activeCategory === key ? "1px solid rgba(59,130,246,0.35)" : "1px solid rgba(255,255,255,0.07)",
-                    color: activeCategory === key ? "#3b82f6" : "rgba(255,255,255,0.4)",
-                    boxShadow: activeCategory === key ? "0 0 12px rgba(59,130,246,0.2)" : "none",
-                  }}
-                >
-                  <span>{icon}</span>
-                  <span>{t.catLabel[key]}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* ── 공지사항 (1줄 롤링) ── */}

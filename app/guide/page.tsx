@@ -9,42 +9,36 @@ export const metadata: Metadata = {
 const GUIDES = [
   {
     href: "/guide/saju-basics",
-    emoji: "🔮",
     title: "사주팔자란 무엇인가",
     desc: "연·월·일·시 네 기둥과 여덟 글자가 어떻게 사람의 기운을 표현하는지 기초부터 설명합니다.",
     time: "약 5분",
   },
   {
     href: "/guide/ohaeng",
-    emoji: "☯",
     title: "오행이란 — 목·화·토·금·수",
     desc: "동아시아 사상의 근간인 다섯 가지 기운. 상생·상극 관계와 사주에서 오행 균형을 읽는 법을 알아봅니다.",
     time: "약 6분",
   },
   {
     href: "/guide/cheongan-jiji",
-    emoji: "📜",
     title: "천간·지지 — 22글자의 의미",
     desc: "사주를 구성하는 10천간과 12지지, 그리고 60갑자 순환 체계를 정리합니다.",
     time: "약 7분",
   },
   {
     href: "/guide/sinsal",
-    emoji: "⚡",
     title: "신살이란 — 역마·도화·귀문 등",
     desc: "역마살·도화살·귀문관살 등 주요 신살의 종류와 실제 삶에서 나타나는 의미를 설명합니다.",
     time: "약 6분",
   },
   {
     href: "/guide/daewoon",
-    emoji: "⏳",
     title: "대운·세운 — 인생 타임라인 읽기",
     desc: "10년 단위 대운과 1년 단위 세운이 무엇인지, 내 인생의 흐름을 어떻게 파악하는지 알아봅니다.",
     time: "약 5분",
   },
   {
     href: "/guide/gyeokguk",
-    emoji: "⚖️",
     title: "격국(格局) — 내 사주의 格은 무엇인가",
     desc: "월지 기준으로 사주의 본질적 성향을 분류하는 格局. 내격 10종·성격·파격·외격을 완전 정리합니다.",
     time: "약 8분",
@@ -65,7 +59,7 @@ export default function GuidePage() {
       </div>
 
       <div className="space-y-3">
-        {GUIDES.map(({ href, emoji, title, desc, time }) => (
+        {GUIDES.map(({ href, title, desc, time }) => (
           <Link
             key={href}
             href={href}
@@ -76,7 +70,6 @@ export default function GuidePage() {
             }}
           >
             <div className="flex items-start gap-4">
-              <span className="text-2xl shrink-0 mt-0.5">{emoji}</span>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base font-bold text-white mb-1">{title}</h2>
                 <p className="text-sm leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>{desc}</p>
