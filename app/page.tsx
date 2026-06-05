@@ -76,6 +76,7 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
   { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
   { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
+  { key: "19금",    icon: "🔞",  desc: "성인 전용" },
   { key: "Special", icon: "👑", desc: "프리미엄" },
 ];
 
@@ -438,6 +439,28 @@ const SERVICES: {
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
+  },
+  {
+    id: "eros", emoji: "🌹",
+    title: "나의 성적 매력은?",
+    viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
+    desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
+    tags: ["홍염살", "도화살", "이성 매력"],
+    href: "/eros", badge: "완전 무료",
+    color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
+    border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
+    categories: ["전체", "무료", "연애·궁합", "19금"],
+  },
+  {
+    id: "hotcompat", emoji: "🔥",
+    title: "19금 사주 궁합",
+    viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
+    desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
+    tags: ["정임합", "자오충", "성적 케미"],
+    href: "/hotcompat", badge: "",
+    color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
+    border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
+    categories: ["전체", "연애·궁합", "19금"],
   },
   {
     id: "charm", emoji: "✨",
