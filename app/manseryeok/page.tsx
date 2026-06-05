@@ -3,17 +3,173 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import {
-  analyzeSaju, calcDaewoon,
+  analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
-  type SajuResult, type Element,
+  type SajuResult, type Element, type DaewoonPillar,
 } from "@/lib/saju";
 
 function jijiElement(jj: string): Element {
   return (CHEONGAN_ELEMENT[JIJI_BONGI[jj] || ""] || "토") as Element;
+}
+
+// ─── 궁성론 (宮星論) ──────────────────────────────────────────────────────────
+const GUNG_DESC: Record<"년주"|"월주"|"일주"|"시주", { cg: string; jj: string; period: string; color: string }> = {
+  년주: { cg: "조상·사회적 체면, 초년(~15세) 환경", jj: "조부모·가문 배경, 초년 건강·복덕",        period: "초년기 (~15세)", color: "#fbbf24" },
+  월주: { cg: "부친·직업 환경, 청년(16~30세) 사회 진출", jj: "어머니·청년기 직장·사회 기반",      period: "청년기 (16~30세)", color: "#34d399" },
+  일주: { cg: "나 자신(일간), 내면적 자아·본성",          jj: "배우자 자리 (남=아내 궁, 여=남편 궁)", period: "장년기 (31~55세)", color: "#818cf8" },
+  시주: { cg: "자녀(특히 딸)·사업·말년 투자",            jj: "자녀(특히 아들)·말년운·노후 복덕",    period: "말년기 (56세~)", color: "#f472b6" },
+};
+
+// ─── 세운 계산 (특정 대운 10년치) ─────────────────────────────────────────────
+function calcSewoonForDaewoon(ilgan: string, yearStart: number) {
+  const nowYear = new Date().getFullYear();
+  return Array.from({ length: 10 }, (_, i) => {
+    const year = yearStart + i;
+    const p = getYearPillar(year);
+    const bongi = JIJI_BONGI[p.jj] || "";
+    return {
+      year,
+      cg: p.cg, jj: p.jj,
+      sipseongCg: getSipseong(ilgan, p.cg),
+      sipseongJj: getSipseong(ilgan, bongi),
+      uunseong: getUunseong(ilgan, p.jj),
+      isCurrent: year === nowYear,
+    };
+  });
+}
+
+// ─── 대운표 + 세운표 컴포넌트 ─────────────────────────────────────────────────
+function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
+  daewoon: ReturnType<typeof calcDaewoon>;
+  ilgan: string;
+  birthYear: number;
+}) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const DAEWOON_LABEL = ["유아기","아동기","청소년기","청년기","장년기","중년기","중장년기","노년기"];
+  const nowYear = new Date().getFullYear();
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-3 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+        <span>교운 <strong className="text-white">{daewoon.startAge}세</strong></span>
+        <span>·</span>
+        <span><strong className="text-white">{daewoon.direction}</strong></span>
+        <span>·</span>
+        <span>대운 클릭 시 세운표 펼침</span>
+      </div>
+
+      {/* 대운 8개 */}
+      <div className="space-y-2">
+        {daewoon.pillars.map((p, i) => {
+          const isCurrent = i === daewoon.currentIdx;
+          const isOpen = openIdx === i;
+          const cgEl = CHEONGAN_ELEMENT[p.cg] || "토";
+          const jiEl = jijiElement(p.jj);
+          const cgStyle = EL_STYLE[cgEl];
+          const jiStyle = EL_STYLE[jiEl];
+          const sewoon = isOpen ? calcSewoonForDaewoon(ilgan, p.yearStart) : [];
+
+          return (
+            <div key={i}>
+              {/* 대운 행 */}
+              <button
+                type="button"
+                onClick={() => setOpenIdx(isOpen ? null : i)}
+                className="w-full text-left rounded-xl px-4 py-3 transition-all"
+                style={{
+                  background: isCurrent ? "rgba(129,140,248,0.09)" : isOpen ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)",
+                  border: isCurrent ? "1.5px solid rgba(129,140,248,0.35)" : isOpen ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  {/* 나이/연도 */}
+                  <div className="text-center shrink-0 w-14">
+                    <p className="text-[9px] mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{DAEWOON_LABEL[i]}</p>
+                    <p className="text-xs font-bold text-white">{p.age}세~</p>
+                    <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{p.yearStart}년</p>
+                  </div>
+
+                  {/* 천간 */}
+                  <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: cgStyle.bg, border: `1px solid ${cgStyle.border}` }}>
+                    <span className="text-base font-black" style={{ color: cgStyle.text }}>{p.cg}</span>
+                    <span className="text-[8px]" style={{ color: cgStyle.text }}>{cgEl}</span>
+                  </div>
+
+                  {/* 지지 */}
+                  <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: jiStyle.bg, border: `1px solid ${jiStyle.border}` }}>
+                    <span className="text-base font-black" style={{ color: jiStyle.text }}>{p.jj}</span>
+                    <span className="text-[8px]" style={{ color: jiStyle.text }}>{jiEl}</span>
+                  </div>
+
+                  {/* 십성 + 운성 */}
+                  <div className="flex-1">
+                    <div className="flex flex-wrap gap-1 mb-1">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.12)", color: sipseongColor(p.sipseongCg) }}>{p.sipseongCg}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.08)", color: sipseongColor(p.sipseongJj) }}>{p.sipseongJj}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.45)" }}>{p.uunseong}</span>
+                    </div>
+                    <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{p.yearStart}~{p.yearStart + 9}년</p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {isCurrent && <span className="text-[9px] px-2 py-0.5 rounded font-black" style={{ background: "rgba(129,140,248,0.2)", color: "#818cf8" }}>현재</span>}
+                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{isOpen ? "▲" : "▼"}</span>
+                  </div>
+                </div>
+              </button>
+
+              {/* 세운 10개 펼침 */}
+              {isOpen && (
+                <div className="mt-1 ml-2 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div className="px-4 py-2 text-[10px] font-bold" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)" }}>
+                    세운(歲運) — {p.yearStart}년 ~ {p.yearStart + 9}년
+                  </div>
+                  <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+                    {sewoon.map(sw => {
+                      const swCgEl = CHEONGAN_ELEMENT[sw.cg] || "토";
+                      const swJiEl = jijiElement(sw.jj);
+                      const swCgStyle = EL_STYLE[swCgEl];
+                      const swJiStyle = EL_STYLE[swJiEl];
+                      return (
+                        <div key={sw.year} className="flex items-center gap-3 px-4 py-2.5"
+                          style={{ background: sw.isCurrent ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.01)" }}>
+                          {/* 연도 */}
+                          <div className="w-12 shrink-0 text-center">
+                            {sw.isCurrent && <span className="text-[8px] block font-black mb-0.5" style={{ color: "#fbbf24" }}>올해</span>}
+                            <span className="text-sm font-black" style={{ color: sw.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.6)" }}>{sw.year}</span>
+                          </div>
+                          {/* 천간 */}
+                          <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swCgStyle.bg, border: `1px solid ${swCgStyle.border}` }}>
+                            <span className="text-sm font-black" style={{ color: swCgStyle.text }}>{sw.cg}</span>
+                          </div>
+                          {/* 지지 */}
+                          <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swJiStyle.bg, border: `1px solid ${swJiStyle.border}` }}>
+                            <span className="text-sm font-black" style={{ color: swJiStyle.text }}>{sw.jj}</span>
+                          </div>
+                          {/* 십성 + 운성 */}
+                          <div className="flex-1 flex flex-wrap gap-1">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColor(sw.sipseongCg), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongCg}</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColor(sw.sipseongJj), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongJj}</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)" }}>{sw.uunseong}</span>
+                          </div>
+                          {/* 오행 */}
+                          <div className="text-[9px] shrink-0" style={{ color: swCgStyle.text }}>{swCgEl}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 type CalendarType = "solar" | "lunar";
@@ -85,7 +241,7 @@ function Dropdown({ value, options, onChange, placeholder, suffix, disabled }: {
 }
 
 // ─── 섹션 카드 ─────────────────────────────────────────────────────────────────
-function Section({ title, accent = "#60a5fa", children }: { title: string; accent?: string; children: React.ReactNode }) {
+function Section({ title, accent = "#60a5fa", children }: { title: string; accent?: string; children: import("react").ReactNode }) {
   return (
     <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
       <div className="px-5 py-3 flex items-center gap-2" style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
@@ -142,12 +298,9 @@ function ResultView({
   const domHealth = OHAENG_HEALTH[domEl as Element];
   const domCareer = OHAENG_CAREER[domEl as Element];
   const lackEl = result.lacking[0];
-  const lackHealth = lackEl ? OHAENG_HEALTH[lackEl as Element] : null;
   const coreWorry = OHAENG_CORE_WORRY[domEl as Element];
 
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
-
-  const DAEWOON_LABEL = ["유아기","아동기","청소년기","청년기","장년기","중년기","중장년기","노년기"];
 
   return (
     <div className="space-y-5">
@@ -218,7 +371,59 @@ function ResultView({
           일간(日干): <span className="font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{ilgan}({CHEONGAN_ELEMENT[ilgan]})</span>
           &nbsp;·&nbsp;일지 12운성: <span className="font-bold text-white">{pd.day.uunseong}</span>
         </div>
+
+        {/* 궁성론 — 각 기둥 의미 */}
+        <div className="mt-4 space-y-2">
+          <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>궁성론 (宮星論) — 각 기둥이 나타내는 영역</p>
+          {(["년주","월주","일주","시주"] as const).filter((k) => k !== "시주" || !!pd.hour).map(label => {
+            const d = label === "년주" ? pd.year : label === "월주" ? pd.month : label === "일주" ? pd.day : pd.hour!;
+            const g = GUNG_DESC[label];
+            const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
+            const jiEl = jijiElement(d.jj);
+            return (
+              <div key={label} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid rgba(255,255,255,0.06)` }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-black" style={{ color: g.color }}>{label}</span>
+                  <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{g.period}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="font-bold" style={{ color: EL_STYLE[cgEl].text }}>천간 {d.cg}</span>
+                    <span className="text-white/40"> — </span>
+                    <span style={{ color: "rgba(255,255,255,0.55)" }}>{g.cg}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold" style={{ color: EL_STYLE[jiEl].text }}>지지 {d.jj}</span>
+                    <span className="text-white/40"> — </span>
+                    <span style={{ color: "rgba(255,255,255,0.55)" }}>{g.jj}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </Section>
+
+      {/* 신살 — 사주 바로 아래 */}
+      {result.sinsalList.length > 0 && (
+        <Section title={`신살(神殺) · 총 ${result.sinsalList.length}개 발견`} accent="#c084fc">
+          <div className="space-y-2.5">
+            {result.sinsalList.map(s => (
+              <div key={s.name} className="rounded-xl px-4 py-3" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.05)" : s.category === "unlucky" ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.03)", border: s.category === "lucky" ? "1px solid rgba(52,211,153,0.15)" : s.category === "unlucky" ? "1px solid rgba(239,68,68,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-bold text-sm text-white">{s.name}</span>
+                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.hanja}</span>
+                  <span className="text-[9px] px-1.5 rounded font-bold" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.12)" : s.category === "unlucky" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)", color: s.category === "lucky" ? "#34d399" : s.category === "unlucky" ? "#f87171" : "#9ca3af" }}>
+                    {s.category === "lucky" ? "길신" : s.category === "unlucky" ? "흉살" : "중립"}
+                  </span>
+                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{s.pillars.join("·")}주</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* ② 격국 · 용신 */}
       <Section title="격국 · 용신 · 조후 (格局用神)" accent="#a78bfa">
@@ -404,59 +609,9 @@ function ResultView({
         </p>
       </Section>
 
-      {/* ⑩ 신살 */}
-      {result.sinsalList.length > 0 && (
-        <Section title={`신살(神殺) · 총 ${result.sinsalList.length}개 발견`} accent="#c084fc">
-          <div className="space-y-2.5">
-            {result.sinsalList.map(s => (
-              <div key={s.name} className="rounded-xl px-4 py-3" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.05)" : s.category === "unlucky" ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.03)", border: s.category === "lucky" ? "1px solid rgba(52,211,153,0.15)" : s.category === "unlucky" ? "1px solid rgba(239,68,68,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-sm text-white">{s.name}</span>
-                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.hanja}</span>
-                  <span className="text-[9px] px-1.5 rounded font-bold" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.12)" : s.category === "unlucky" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)", color: s.category === "lucky" ? "#34d399" : s.category === "unlucky" ? "#f87171" : "#9ca3af" }}>
-                    {s.category === "lucky" ? "길신" : s.category === "unlucky" ? "흉살" : "중립"}
-                  </span>
-                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{s.pillars.join("·")}주</span>
-                </div>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* ⑪ 대운 흐름 */}
-      <Section title={`대운(大運) 흐름 · 교운 ${daewoon.startAge}세 · ${daewoon.direction}`} accent="#818cf8">
-        <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>각 대운은 10년 단위로 운명의 큰 흐름을 나타냅니다.</p>
-        <div className="space-y-2.5">
-          {daewoon.pillars.map((p, i) => {
-            const isCurrent = i === daewoon.currentIdx;
-            const cgEl = CHEONGAN_ELEMENT[p.cg] || "토";
-            const style = EL_STYLE[cgEl];
-            return (
-              <div key={i} className="rounded-xl px-4 py-3" style={{ background: isCurrent ? "rgba(129,140,248,0.08)" : "rgba(255,255,255,0.02)", border: isCurrent ? "1.5px solid rgba(129,140,248,0.35)" : "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="flex items-center gap-3">
-                  <div className="text-center shrink-0 w-16">
-                    <p className="text-[10px] mb-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{DAEWOON_LABEL[i] || ""}</p>
-                    <p className="font-black text-base" style={{ color: style.text }}>{p.cg}{p.jj}</p>
-                    <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>{p.age}세~</p>
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex flex-wrap gap-1.5">
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(167,139,250,0.1)", color: "#a78bfa" }}>{p.sipseongCg}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(167,139,250,0.1)", color: "#c084fc" }}>{p.sipseongJj}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>{p.uunseong}</span>
-                    </div>
-                    <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>{p.yearStart}년경 시작</p>
-                  </div>
-                  {isCurrent && (
-                    <span className="text-[10px] px-2 py-1 rounded-lg font-black shrink-0" style={{ background: "rgba(129,140,248,0.2)", color: "#818cf8" }}>현재</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* ⑩⑪ 대운표 + 세운표 */}
+      <Section title="대운표 · 세운표 (大運歲運)" accent="#818cf8">
+        <DaewoonSewoonTable daewoon={daewoon} ilgan={ilgan} birthYear={birthYear} />
       </Section>
 
       {/* ⑫ 유료 서비스 CTA */}
@@ -505,7 +660,7 @@ export default function ManseryeokPage() {
   const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: import("react").FormEvent) => {
     e.preventDefault();
     if (!birthYear || !birthMonth || !birthDay) {
       alert("생년월일을 모두 선택해주세요.");
