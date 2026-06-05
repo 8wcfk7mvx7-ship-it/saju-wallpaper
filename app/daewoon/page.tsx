@@ -112,6 +112,8 @@ export default function DaewoonPage() {
   const [birthMonth, setBirthMonth] = useState(6);
   const [birthDay, setBirthDay] = useState(2);
   const [birthHour, setBirthHour] = useState<number | null>(11);
+  const [useJajasi, setUseJajasi] = useState(false);
+  const [birthPlace, setBirthPlace] = useState("서울");
   const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
@@ -165,7 +167,7 @@ export default function DaewoonPage() {
         birthYear: y, birthMonth: mo, birthDay: d,
         birthHour, birthMinute: 0,
         name: name || "분석", gender,
-        birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+        birthPlace: birthPlace || "서울", style: "auto", productType: "report", useJajasi,
       });
       const mp = r.pillarsDetail.month;
       const dw = calcDaewoon(y, mo, d, gender, r.pillarsDetail.day.cg, mp);
@@ -381,6 +383,38 @@ export default function DaewoonPage() {
                 placeholder="출생시간 선택 (선택)"
               />
             </div>
+          </div>
+
+          {/* 야자시/조자시 */}
+          {birthHour !== null && (
+            <button
+              type="button"
+              onClick={() => setUseJajasi(v => !v)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition w-full"
+              style={{
+                background: useJajasi ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)",
+                border: useJajasi ? "1px solid rgba(251,191,36,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                color: useJajasi ? "#fbbf24" : "rgba(255,255,255,0.4)",
+              }}
+            >
+              <span className="w-4 h-4 rounded border flex items-center justify-center shrink-0"
+                style={{ borderColor: useJajasi ? "#fbbf24" : "rgba(255,255,255,0.2)" }}>
+                {useJajasi && <span className="text-[10px] font-black">✓</span>}
+              </span>
+              야자시·조자시 적용 (23시~01시생)
+            </button>
+          )}
+
+          {/* 태어난 도시 */}
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">태어난 도시 (경도 보정)</label>
+            <input
+              type="text"
+              value={birthPlace}
+              onChange={e => setBirthPlace(e.target.value)}
+              placeholder="서울 / 부산 / 대구 등"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
+            />
           </div>
 
           <button

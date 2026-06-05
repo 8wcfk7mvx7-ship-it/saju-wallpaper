@@ -54,7 +54,7 @@ function DropPick({ value, opts, onChange, placeholder, suffix }: {
   );
 }
 
-interface PersonForm { gender: "male" | "female"; year: string; month: string; day: string; }
+interface PersonForm { gender: "male" | "female"; year: string; month: string; day: string; hour: string; useJajasi: boolean; birthPlace: string; }
 
 // ── 성적 케미 분석 로직 ───────────────────────────────────────────────────────
 
@@ -209,8 +209,8 @@ function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GR
 function HotCompatContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [p1, setP1] = useState<PersonForm>({ gender: "female", year: "", month: "", day: "" });
-  const [p2, setP2] = useState<PersonForm>({ gender: "male",   year: "", month: "", day: "" });
+  const [p1, setP1] = useState<PersonForm>({ gender: "female", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" });
+  const [p2, setP2] = useState<PersonForm>({ gender: "male",   year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" });
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
   const chemRef = useRef<ChemResult | null>(null);
@@ -230,8 +230,8 @@ function HotCompatContent() {
 
   function handleAnalyze() {
     if (!p1.year || !p1.month || !p1.day || !p2.year || !p2.month || !p2.day) return;
-    const r1 = analyzeSaju({ birthYear: +p1.year, birthMonth: +p1.month, birthDay: +p1.day, birthHour: null, birthMinute: null, name: "나", gender: p1.gender, birthPlace: "서울", style: "auto", productType: "report", useJajasi: false });
-    const r2 = analyzeSaju({ birthYear: +p2.year, birthMonth: +p2.month, birthDay: +p2.day, birthHour: null, birthMinute: null, name: "상대", gender: p2.gender, birthPlace: "서울", style: "auto", productType: "report", useJajasi: false });
+    const r1 = analyzeSaju({ birthYear: +p1.year, birthMonth: +p1.month, birthDay: +p1.day, birthHour: p1.hour ? +p1.hour : null, birthMinute: p1.hour ? 30 : null, name: "나", gender: p1.gender, birthPlace: p1.birthPlace || "서울", style: "auto", productType: "report", useJajasi: p1.useJajasi });
+    const r2 = analyzeSaju({ birthYear: +p2.year, birthMonth: +p2.month, birthDay: +p2.day, birthHour: p2.hour ? +p2.hour : null, birthMinute: p2.hour ? 30 : null, name: "상대", gender: p2.gender, birthPlace: p2.birthPlace || "서울", style: "auto", productType: "report", useJajasi: p2.useJajasi });
     r1Ref.current  = r1;
     r2Ref.current  = r2;
     chemRef.current = calcChem(r1, r2);
@@ -257,6 +257,18 @@ function HotCompatContent() {
             <DropPick value={form.month} opts={monthOpts} onChange={v => setForm({ ...form, month: v })} placeholder="월" suffix="월" />
             <DropPick value={form.day}   opts={dayOpts}   onChange={v => setForm({ ...form, day: v })}   placeholder="일" suffix="일" />
           </div>
+          <DropPick value={form.hour} opts={[{ v: "", label: "시간 모름" }, ...Array.from({ length: 24 }, (_, i) => ({ v: String(i), label: `${i}시` }))]} onChange={v => setForm({ ...form, hour: v })} placeholder="출생 시간 (선택)" />
+          <button type="button" onClick={() => setForm({ ...form, useJajasi: !form.useJajasi })}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl border text-xs transition"
+            style={{ background: form.useJajasi ? "rgba(244,63,94,0.1)" : "rgba(255,255,255,0.03)", border: form.useJajasi ? "1px solid rgba(244,63,94,0.4)" : "1px solid rgba(255,255,255,0.1)", color: form.useJajasi ? "#f87171" : "rgba(255,255,255,0.4)" }}>
+            <span className="w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0" style={{ borderColor: form.useJajasi ? "#f87171" : "rgba(255,255,255,0.2)" }}>
+              {form.useJajasi && <span className="text-[9px] font-black">✓</span>}
+            </span>
+            야자시·조자시 적용
+          </button>
+          <input type="text" value={form.birthPlace} onChange={e => setForm({ ...form, birthPlace: e.target.value })}
+            placeholder="태어난 도시 (경도 보정)"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-rose-500 transition" />
         </div>
       </div>
     );
