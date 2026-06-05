@@ -24,8 +24,8 @@ const UI: Record<Lang, {
   charging: string;
 }> = {
   ko: {
-    h1: ["지금 쓰는 배경화면이", "기운을 막고", "있을 수 있어요"],
-    heroSub: "내 사주에 맞는 오행 에너지. 배경화면 하나로 시작됩니다.",
+    h1: ["올해 운이", "안 풀리는 데는", "이유가 있어요"],
+    heroSub: "사주에 다 나와있습니다. 내 오행 에너지, 지금 확인하세요.",
     heroCta: "내 사주 오행 배경화면 만들기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
