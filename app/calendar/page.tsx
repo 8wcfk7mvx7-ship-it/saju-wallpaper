@@ -60,18 +60,18 @@ function DropPick({ value, opts, onChange, placeholder, suffix, accentColor = "#
   return (
     <div ref={ref} className="relative w-full">
       <div onClick={() => setOpen(o => !o)}
-        className="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm"
+        className="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-lg"
         style={{ borderColor: open ? accentColor : "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
         <span className={display ? "text-white" : "text-gray-500"}>
           {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
         </span>
-        <span className="text-gray-500 text-xs" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+        <span className="text-gray-500 text-base" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
       </div>
       {open && (
         <div ref={list} className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220, background: "#12121e", border: "1px solid rgba(255,255,255,0.2)" }}>
           {opts.map(o => (
             <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className="px-4 py-2.5 text-sm cursor-pointer transition-colors"
+              className="px-4 py-2.5 text-lg cursor-pointer transition-colors"
               style={{ color: value === o.v ? accentColor : "rgba(255,255,255,0.65)", background: value === o.v ? "rgba(167,139,250,0.12)" : "transparent", fontWeight: value === o.v ? 600 : 400 }}>
               {o.label}{suffix ? ` ${suffix}` : ""}
             </div>
@@ -340,23 +340,23 @@ export default function CalendarPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/15 blur-[130px]" />
       </div>
 
-      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-base text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
       <div className="relative z-10 max-w-md w-full text-center">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
               <span className="pulse w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-              <span className="text-xs font-bold text-emerald-300 tracking-widest uppercase">Summer Palace · 길일 선택</span>
+              <span className="text-base font-bold text-emerald-300 tracking-widest uppercase">Summer Palace · 길일 선택</span>
             </div>
-            <div className="text-5xl drop-shadow-[0_0_40px_rgba(16,185,129,0.4)]">📅</div>
+            <div className="text-7xl drop-shadow-[0_0_40px_rgba(16,185,129,0.4)]">📅</div>
           </div>
         </FadeIn>
 
         <FadeIn delay={100} className="mb-8">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse" />
-            <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <span className="text-lg font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
               지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 길일·흉일 확인 중
             </span>
           </div>
@@ -371,8 +371,8 @@ export default function CalendarPage() {
           ].map((line, i) => (
             <FadeIn key={i} delay={line.delay}>
               <p className={`leading-snug ${line.big
-                ? "text-3xl font-black bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent"
-                : "text-xl text-gray-400 font-medium"}`}>
+                ? "text-5xl font-black bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent"
+                : "text-3xl text-gray-400 font-medium"}`}>
                 {line.text}
               </p>
             </FadeIn>
@@ -383,9 +383,9 @@ export default function CalendarPage() {
           <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
             {EVENT_TYPES.slice(0, 4).map(e => (
               <div key={e.id} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <span className="text-xl">{e.icon}</span>
-                <p className="text-xs font-bold text-white mt-1">{e.label}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{e.desc}</p>
+                <span className="text-2xl">{e.icon}</span>
+                <p className="text-base font-bold text-white mt-1">{e.label}</p>
+                <p className="text-[14px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{e.desc}</p>
               </div>
             ))}
           </div>
@@ -393,11 +393,11 @@ export default function CalendarPage() {
 
         <div style={{ opacity: showBtn ? 1 : 0, transform: showBtn ? "none" : "translateY(20px) scale(0.96)", transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)" }}>
           <button onClick={() => setStep("input")}
-            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
+            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-2xl shadow-2xl transition-all active:scale-[0.97]"
             style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
             길일·흉일 확인하기 →
           </button>
-          <p className="text-xs text-gray-600 mt-4">이번 달 무료 · 다음 2개월은 ₩990</p>
+          <p className="text-base text-gray-600 mt-4">이번 달 무료 · 다음 2개월은 ₩990</p>
         </div>
       </div>
     </main>
@@ -408,25 +408,25 @@ export default function CalendarPage() {
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
       <style>{`select option{background:#0d0d1a;color:#fff}`}</style>
       <div className="max-w-lg mx-auto px-5 pt-8">
-        <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
-        <h2 className="text-2xl font-black text-white mb-1">길일·흉일 확인</h2>
-        <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
+        <button onClick={() => setStep("splash")} className="text-base text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
+        <h2 className="text-4xl font-black text-white mb-1">길일·흉일 확인</h2>
+        <p className="text-lg mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
 
         <div className="space-y-5">
           {/* 이름 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-[10px] font-normal normal-case text-white/25">(선택)</span></label>
+            <label className="block text-base text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-[14px] font-normal normal-case text-white/25">(선택)</span></label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
-              className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50" />
+              className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-base placeholder-white/20 focus:outline-none focus:border-emerald-500/50" />
           </div>
 
           {/* 양력/음력 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
+            <label className="block text-base text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
             <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
               {(["solar", "lunar"] as CalType[]).map(t => (
                 <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
-                  className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-emerald-700 text-white" : "text-white/40 hover:text-white/70"}`}>
+                  className={`flex-1 py-2.5 text-base font-bold transition ${calType === t ? "bg-emerald-700 text-white" : "text-white/40 hover:text-white/70"}`}>
                   {t === "solar" ? "양력" : "음력"}
                 </button>
               ))}
@@ -435,7 +435,7 @@ export default function CalendarPage() {
 
           {/* 생년월일 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일 <span className="text-emerald-400">*</span></label>
+            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일 <span className="text-emerald-400">*</span></label>
             <div className="space-y-2">
               <DropPick value={birthYear ? String(birthYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setBirthYear(Number(v))} placeholder="출생 연도" suffix="년" />
               <div className="grid grid-cols-2 gap-2">
@@ -444,9 +444,9 @@ export default function CalendarPage() {
               </div>
               {calType === "lunar" && (
                 <button type="button" onClick={() => setIsLeapMonth(v => !v)}
-                  className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${isLeapMonth ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
+                  className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-base transition ${isLeapMonth ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
                   <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isLeapMonth ? "border-emerald-400" : "border-gray-600"}`}>
-                    {isLeapMonth && <span className="text-[10px] font-black">✓</span>}
+                    {isLeapMonth && <span className="text-[12px] font-black">✓</span>}
                   </span>
                   윤달
                 </button>
@@ -456,17 +456,17 @@ export default function CalendarPage() {
 
           {/* 태어난 시간 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간</label>
+            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간</label>
             <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="emerald" />
           </div>
 
           {/* 성별 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">성별</label>
+            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">성별</label>
             <div className="grid grid-cols-2 gap-3">
               {(["female", "male"] as const).map(g => (
                 <button key={g} onClick={() => setGender(g)}
-                  className={`py-3 rounded-xl text-sm font-bold transition border ${gender === g ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/15 bg-white/5 text-gray-400 hover:border-emerald-500/50"}`}>
+                  className={`py-3 rounded-xl text-base font-bold transition border ${gender === g ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/15 bg-white/5 text-gray-400 hover:border-emerald-500/50"}`}>
                   {g === "female" ? "여성" : "남성"}
                 </button>
               ))}
@@ -475,28 +475,28 @@ export default function CalendarPage() {
 
           {/* 날짜 종류 */}
           <div>
-            <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">궁금한 날짜 <span className="text-emerald-400">*</span></label>
-            <p className="text-[11px] text-white/25 mb-3">출생일은 선택할 수 없습니다</p>
+            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">궁금한 날짜 <span className="text-emerald-400">*</span></label>
+            <p className="text-[13px] text-white/25 mb-3">출생일은 선택할 수 없습니다</p>
             <div className="grid grid-cols-2 gap-2">
               {EVENT_TYPES.map(e => (
                 <button key={e.id} onClick={() => setSelectedEvent(e.id)}
-                  className="flex items-center gap-2 px-3 py-3 rounded-xl border text-sm font-semibold text-left transition"
+                  className="flex items-center gap-2 px-3 py-3 rounded-xl border text-base font-semibold text-left transition"
                   style={{
                     borderColor: selectedEvent === e.id ? "#10b981" : "rgba(255,255,255,0.1)",
                     background: selectedEvent === e.id ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)",
                     color: selectedEvent === e.id ? "#34d399" : "rgba(255,255,255,0.55)",
                   }}>
-                  <span className="text-lg shrink-0">{e.icon}</span>
-                  <span className="leading-tight text-xs">{e.label}</span>
+                  <span className="text-xl shrink-0">{e.icon}</span>
+                  <span className="leading-tight text-sm">{e.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {formError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{formError}</p>}
+          {formError && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{formError}</p>}
 
           <button onClick={handleAnalyze}
-            className="w-full py-5 rounded-2xl font-black text-lg text-white transition-all active:scale-[0.98]"
+            className="w-full py-5 rounded-2xl font-black text-xl text-white transition-all active:scale-[0.98]"
             style={{ background: "linear-gradient(135deg, #059669, #0d9488)", boxShadow: "0 8px 32px rgba(5,150,105,0.4)" }}>
             길일·흉일 확인 →
           </button>
@@ -513,19 +513,19 @@ export default function CalendarPage() {
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 다시 입력</button>
+          <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-base">← 다시 입력</button>
           <div className="flex-1">
-            <h1 className="text-xl font-black text-white">
+            <h1 className="text-2xl font-black text-white">
               {name ? `${name}의 ` : ""}{eventInfo?.icon} {eventInfo?.label} 길일
             </h1>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
               일간 <strong className="text-white">{userIlgan}</strong> 기준 · 향후 3개월
             </p>
           </div>
         </div>
 
         {/* 3개월 분석 공지 */}
-        <div className="mb-5 px-4 py-3 rounded-xl text-xs flex items-start gap-2"
+        <div className="mb-5 px-4 py-3 rounded-xl text-sm flex items-start gap-2"
           style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
           <span style={{ color: "#e8c97a" }}>📌</span>
           <span style={{ color: "rgba(255,255,255,0.55)" }}>
@@ -543,10 +543,10 @@ export default function CalendarPage() {
           ].map(l => (
             <div key={l.label} className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
-              <span className="text-xs font-semibold" style={{ color: l.color }}>{l.label}</span>
+              <span className="text-sm font-semibold" style={{ color: l.color }}>{l.label}</span>
             </div>
           ))}
-          <span className="ml-auto text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>클릭 → 상세</span>
+          <span className="ml-auto text-[12px]" style={{ color: "rgba(255,255,255,0.3)" }}>클릭 → 상세</span>
         </div>
 
         {/* 3개월 캘린더 */}
@@ -560,15 +560,15 @@ export default function CalendarPage() {
           return (
             <div key={`${year}-${month}`} className="mb-8 relative">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-black text-white">{year}년 {month}월</h2>
-                <span className="text-[10px] px-2 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.1)", color: "#34d399", border: "1px solid rgba(16,185,129,0.2)" }}>
+                <h2 className="text-lg font-black text-white">{year}년 {month}월</h2>
+                <span className="text-[12px] px-2 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.1)", color: "#34d399", border: "1px solid rgba(16,185,129,0.2)" }}>
                   {eventInfo?.icon} {eventInfo?.label}
                 </span>
               </div>
 
               <div className="grid grid-cols-7 mb-1">
                 {DAYS_LABEL.map((d, i) => (
-                  <div key={d} className="text-center text-[10px] font-bold py-1"
+                  <div key={d} className="text-center text-[12px] font-bold py-1"
                     style={{ color: i === 0 ? "#f87171" : i === 6 ? "#60a5fa" : "rgba(255,255,255,0.4)" }}>
                     {d}
                   </div>
@@ -602,18 +602,18 @@ export default function CalendarPage() {
                         boxShadow: cls === "길" && !isPast ? `0 0 8px rgba(16,185,129,0.2)` : "none",
                       }}>
                       <div className="p-1.5 flex flex-col items-center justify-center h-full gap-0.5">
-                        <span className="text-[11px] font-bold leading-none"
+                        <span className="text-[13px] font-bold leading-none"
                           style={{ color: dow === 0 ? "#f87171" : dow === 6 ? "#60a5fa" : isToday ? "#e8c97a" : "rgba(255,255,255,0.7)" }}>
                           {day}
                         </span>
                         {!isPast && (
                           <>
-                            <span className="text-[10px] font-black leading-none" style={{ color: clr.text }}>
+                            <span className="text-[12px] font-black leading-none" style={{ color: clr.text }}>
                               {dp.cg}{dp.jj}
                             </span>
                             <div className="w-2 h-2 rounded-full" style={{ background: clr.dot }} />
                             {uuns && cls !== "보통" && (
-                              <span className="text-[8px] leading-none" style={{ color: clr.text }}>{uuns}</span>
+                              <span className="text-[10px] leading-none" style={{ color: clr.text }}>{uuns}</span>
                             )}
                           </>
                         )}
@@ -628,9 +628,9 @@ export default function CalendarPage() {
                 <div className="absolute inset-0 rounded-lg flex flex-col items-center justify-center z-10"
                   style={{ backdropFilter: "blur(6px)", background: "rgba(6,6,14,0.75)", border: "1px solid rgba(201,168,76,0.2)" }}>
                   <div className="text-center px-6">
-                    <div className="text-3xl mb-2">🔒</div>
-                    <p className="text-sm font-black text-white mb-1">{month}월 길일·흉일</p>
-                    <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>결제 후 즉시 확인 가능</p>
+                    <div className="text-4xl mb-2">🔒</div>
+                    <p className="text-base font-black text-white mb-1">{month}월 길일·흉일</p>
+                    <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>결제 후 즉시 확인 가능</p>
                     {blueberries >= 990 ? (
                       <button
                         onClick={() => {
@@ -640,18 +640,18 @@ export default function CalendarPage() {
                           setBlueberries(next);
                           setIsPaid(true);
                         }}
-                        className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+                        className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
                         🫐 블루베리 990개로 즉시 열기
                       </button>
                     ) : (
                       <button onClick={handleUnlock}
-                        className="px-6 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+                        className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
                         ₩990 결제 후 전체 보기
                       </button>
                     )}
-                    <p className="text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
+                    <p className="text-[12px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
                   </div>
                 </div>
               )}
@@ -665,18 +665,18 @@ export default function CalendarPage() {
                   }}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{year}년 {month}월 {selectedDay.day}일</p>
-                      <p className="text-2xl font-black mt-1" style={{ color: classify(selectedDay.score) === "길" ? "#34d399" : classify(selectedDay.score) === "흉" ? "#f87171" : "rgba(255,255,255,0.8)" }}>
+                      <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>{year}년 {month}월 {selectedDay.day}일</p>
+                      <p className="text-3xl font-black mt-1" style={{ color: classify(selectedDay.score) === "길" ? "#34d399" : classify(selectedDay.score) === "흉" ? "#f87171" : "rgba(255,255,255,0.8)" }}>
                         {classify(selectedDay.score) === "길" ? "✨ 길일" : classify(selectedDay.score) === "흉" ? "⚠️ 흉일" : "☁️ 보통"}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>일주</p>
-                      <p className="text-xl font-black text-white">{selectedDay.dp.cg}{selectedDay.dp.jj}</p>
-                      {selectedDay.uuns && <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{selectedDay.uuns}</p>}
+                      <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>일주</p>
+                      <p className="text-2xl font-black text-white">{selectedDay.dp.cg}{selectedDay.dp.jj}</p>
+                      {selectedDay.uuns && <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{selectedDay.uuns}</p>}
                     </div>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
                     {classify(selectedDay.score) === "길"
                       ? `${eventInfo?.label}에 유리한 날입니다. 12운성 ${selectedDay.uuns}의 기운이 강하게 작용합니다. 오전~오후 초를 활용하세요.`
                       : classify(selectedDay.score) === "흉"
@@ -691,8 +691,8 @@ export default function CalendarPage() {
 
         {/* 안내 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs font-semibold mb-2 text-white">📌 길일 선택 안내</p>
-          <ul className="space-y-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="text-sm font-semibold mb-2 text-white">📌 길일 선택 안내</p>
+          <ul className="space-y-1.5 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
             <li>• 일간 <strong className="text-white">{userIlgan}</strong> · 월지 <strong className="text-white">{userMonthJj}</strong> 기준 12운성·조후용신·오행을 종합 분석했습니다</li>
             <li>• 조후(調候)용신 — 태어난 계절에 필요한 오행이 있는 날을 우선 추천합니다</li>
             <li>• 길일이라도 음력 손 없는 날과 함께 확인하면 더욱 좋습니다</li>
@@ -702,7 +702,7 @@ export default function CalendarPage() {
         </div>
 
         <button onClick={() => setStep("input")}
-          className="w-full py-3 rounded-xl text-sm font-semibold transition"
+          className="w-full py-3 rounded-xl text-base font-semibold transition"
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
           다른 날짜 종류로 다시 보기
         </button>

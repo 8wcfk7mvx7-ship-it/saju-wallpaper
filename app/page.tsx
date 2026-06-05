@@ -82,11 +82,11 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
 
 // ── 후기 데이터 ───────────────────────────────────────────────────────────────
 const REVIEWS = [
+  // ★★★★★ 5점
   { name: "이○○", region: "서울", age: "32세", text: "배경화면 바꾸고 나서 진짜 기분인지 모르겠는데 취업됐어요. 믿기 싫었는데 신기합니다.", service: "오행 배경화면", stars: 5 },
   { name: "박○○", region: "부산", age: "28세", text: "궁합 봤는데 원진살이라고 나왔어요. 헤어지고 나니까 그게 맞더라고요. 좀 더 일찍 볼걸.", service: "궁합 분석", stars: 5 },
   { name: "김○○", region: "대구", age: "45세", text: "대운 분석이 너무 정확해서 소름 돋았습니다. 40대 중반에 큰 변화 온다고 했는데 딱 맞았어요.", service: "대운·세운", stars: 5 },
   { name: "최○○", region: "인천", age: "26세", text: "MBTI랑 사주 조합 분석이 진짜 신선했어요. INFJ-갑목 조합이 이렇게 맞을 수가 없어요.", service: "MBTI×사주", stars: 5 },
-  { name: "정○○", region: "광주", age: "38세", text: "주식투자 스타일 분석 보고 포트폴리오 바꿨는데 수익률이 좋아졌어요. 신기하네요.", service: "주식 분석", stars: 5 },
   { name: "한○○", region: "수원", age: "33세", text: "쓰레기 사주 극복법 읽고 진짜 울었어요. 내가 왜 힘들었는지 처음으로 이해가 됐습니다.", service: "신살 극복", stars: 5 },
   { name: "윤○○", region: "서울", age: "29세", text: "도화살 있다고 나왔는데 진짜로 갑자기 연락 오는 사람 늘었어요. 우연이라 하기엔 너무 신기해서.", service: "신살 분석", stars: 5 },
   { name: "오○○", region: "경기", age: "35세", text: "남자친구 사주 염탐했는데 바람기 위험도 B등급 나왔고 실제로 좀 자유분방한 편인데 맞더라고요.", service: "염탐하기", stars: 5 },
@@ -101,7 +101,6 @@ const REVIEWS = [
   { name: "배○○", region: "서울", age: "33세", text: "세운 분석에서 올해 금전 흐름 주의하라고 했는데 진짜 예상치 못한 지출이 많았어요.", service: "대운·세운", stars: 5 },
   { name: "채○○", region: "광주", age: "26세", text: "경금일간이라고 원칙형이라는 게 뭔가 싫었는데 읽을수록 나맞다는 거 인정하게 됨 ㅋ", service: "사주 분석", stars: 5 },
   { name: "서○○", region: "부산", age: "48세", text: "50대 진입하는 대운 분석이 그렇게 자세히 나올 줄 몰랐어요. 준비할 수 있어서 다행입니다.", service: "대운·세운", stars: 5 },
-  { name: "전○○", region: "수원", age: "30세", text: "배경화면 오행 분석 후 나무 기운 배경으로 바꿨더니 뭔가 마음이 차분해졌어요. 플라시보든 뭐든.", service: "오행 배경화면", stars: 5 },
   { name: "마○○", region: "서울", age: "25세", text: "갑자기 좋아하는 사람이 생겼는데 염탐해봤어요. 도화살 있고 편재 강함. 그냥 포기해야겠다ㅠ", service: "염탐하기", stars: 5 },
   { name: "홍○○", region: "경기", age: "36세", text: "쓰레기 사주라는 표현이 처음엔 충격이었는데 읽고 나니까 오히려 위로가 됐어요.", service: "신살 극복", stars: 5 },
   { name: "권○○", region: "대전", age: "42세", text: "일진달력 보면서 오늘 하루가 왜 이렇게 피곤했는지 이해됐어요. 흙기운 강한 날이었네요.", service: "일진달력", stars: 5 },
@@ -116,8 +115,6 @@ const REVIEWS = [
   { name: "남○○", region: "부산", age: "40세", text: "40대 대운이 나쁘게 나와서 불안했는데 극복 방향도 같이 나와서 오히려 마음이 정해졌습니다.", service: "대운·세운", stars: 5 },
   { name: "심○○", region: "수원", age: "26세", text: "기토일간이라 세심하고 실용적이라는 게 100% 나야요. 가족한테 보여줬더니 다들 웃었어요.", service: "사주 분석", stars: 5 },
   { name: "엄○○", region: "서울", age: "35세", text: "역마살이랑 도화살 같이 있는 사람 분석 처음 봤는데 이게 나한테 이렇게 잘 맞을 수가.", service: "신살 분석", stars: 5 },
-  { name: "원○○", region: "경기", age: "32세", text: "염탐 기능이 좀 무서운 기능이긴 한데... 알고 싶은 게 있었고 답은 얻었습니다.", service: "염탐하기", stars: 5 },
-  { name: "천○○", region: "대전", age: "43세", text: "오행 배경화면 그냥 예뻐서 만들었는데 실제로 운이 좋아진 것 같은 느낌이에요. 믿거나 말거나.", service: "오행 배경화면", stars: 5 },
   { name: "방○○", region: "서울", age: "24세", text: "일진달력 보면서 기운 좋은 날 면접 잡았어요. 결과는... 합격이었습니다 ㅎㅎ", service: "일진달력", stars: 5 },
   { name: "공○○", region: "부산", age: "37세", text: "병화일간 설명에서 태양처럼 에너지 넘친다는 거 진짜예요. 주변이 다 알아요 ㅋㅋ", service: "사주 분석", stars: 5 },
   { name: "현○○", region: "인천", age: "30세", text: "쓰레기 사주 극복법 결제하고 봤는데 솔직히 돈이 아깝지 않았어요. 필요했던 말들이었어요.", service: "신살 극복", stars: 5 },
@@ -127,7 +124,6 @@ const REVIEWS = [
   { name: "석○○", region: "광주", age: "33세", text: "주식 분석에서 단타보다 중장기가 맞는다고 나왔는데 그 조언 따랐더니 수익률이 달라졌어요.", service: "주식 분석", stars: 5 },
   { name: "민○○", region: "서울", age: "28세", text: "취향 분석 책 추천이 신기해요. 내가 좋아하는 책 종류랑 딱 맞는 장르로 추천해줘요.", service: "취향 분석", stars: 5 },
   { name: "길○○", region: "수원", age: "36세", text: "무토일간 안정형 맞는데 주변에서도 항상 나더러 흔들리지 않는다고 하거든요.", service: "사주 분석", stars: 5 },
-  { name: "복○○", region: "부산", age: "44세", text: "궁합에서 원진살이 있는데도 지금 10년 넘게 잘 살고 있어요. 의지로 극복하는 중.", service: "궁합 분석", stars: 4 },
   { name: "항○○", region: "경기", age: "25세", text: "처음엔 그냥 심심해서 해봤는데 지금은 거의 매일 일진달력 확인하고 있어요.", service: "일진달력", stars: 5 },
   { name: "두○○", region: "인천", age: "31세", text: "을목일간이라 유연해 보여도 속은 강철이라는 표현이 진짜 나를 표현하는 최고의 문장이에요.", service: "사주 분석", stars: 5 },
   { name: "라○○", region: "서울", age: "38세", text: "도시 추천 받아서 여행 가봤는데 진짜 맞는 에너지의 도시였어요. 충전이 됐달까.", service: "도시 추천", stars: 5 },
@@ -136,6 +132,67 @@ const REVIEWS = [
   { name: "미○○", region: "서울", age: "21세", text: "친구들이랑 서로 염탐 기능 써봤는데 다들 너무 맞아서 진짜냐고 물어봤어요 ㅋㅋ", service: "염탐하기", stars: 5 },
   { name: "화○○", region: "경기", age: "40세", text: "갑목일간 리더십형이라는데 회사 팀장 맡고 있어요. 맞습니다 ㅎ 근데 고집도 맞아요.", service: "사주 분석", stars: 5 },
   { name: "수○○", region: "부산", age: "26세", text: "극복법 보고 내 신살들이 단점이 아니라 특성이라는 걸 처음으로 받아들이게 됐어요.", service: "신살 극복", stars: 5 },
+  { name: "감○○", region: "서울", age: "30세", text: "정화일간이라 집중력 강하다는 게 딱 맞아요. 뭔가 꽂히면 끝장을 보는 스타일이라.", service: "사주 분석", stars: 5 },
+  { name: "봄○○", region: "경기", age: "23세", text: "재회운 분석에서 지금 시기가 아니라고 나왔는데 그 사람한테 먼저 연락 안 했어요. 잘한 것 같아요.", service: "재회운", stars: 5 },
+  { name: "여○○", region: "대전", age: "41세", text: "길일 확인하고 계약서 쓴 날 진짜 문제없이 잘 됐어요. 우연이라 해도 이제 꼭 확인하게 됐습니다.", service: "길일·흉일", stars: 5 },
+  { name: "름○○", region: "부산", age: "33세", text: "ESTP-병화 조합이라는 거 읽고 내가 왜 이렇게 즉흥적이고 현장파인지 이해됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "겨○○", region: "서울", age: "47세", text: "대운 흐름에서 이 시기가 인생의 전환점이라고 나왔는데 실제로 큰 결정 앞에 있습니다. 도움이 됐어요.", service: "대운·세운", stars: 5 },
+  { name: "울○○", region: "인천", age: "29세", text: "짝사랑 공략법 보고 접근 방식 바꿨는데 상대방이 먼저 연락 오더라고요. 신기해요.", service: "짝사랑", stars: 5 },
+  { name: "눈○○", region: "광주", age: "35세", text: "계수일간이라 지략가 스타일이라는 게 너무 맞아요. 뭐든 혼자 다 계획하는 편이거든요.", service: "사주 분석", stars: 5 },
+  { name: "꽃○○", region: "수원", age: "22세", text: "취향 분석에서 추천한 영화 장르가 진짜 제가 즐겨보던 거랑 똑같아서 소름이었어요.", service: "취향 분석", stars: 5 },
+  { name: "달○○", region: "서울", age: "38세", text: "오행 배경화면 만들고 폰 배경으로 썼는데 색깔 조합이 진짜 예쁘고 기분 좋아요.", service: "오행 배경화면", stars: 5 },
+  { name: "빛○○", region: "경기", age: "44세", text: "남편 사주 분석해봤더니 성격 특성이 너무 딱 맞아서 웃음이 나왔어요. 오래 살아봐야 아는데 사주가 다 알더라고요.", service: "사주 분석", stars: 5 },
+  { name: "강○○", region: "제주", age: "31세", text: "제주 살다가 도시 추천에서 다른 지역 나왔는데 실제로 이사 고민 중이에요. 방향 잡는 데 도움됐습니다.", service: "도시 추천", stars: 5 },
+  { name: "해○○", region: "세종", age: "27세", text: "신살 분석에서 학당귀인 있다고 나왔는데 공부할 때마다 집중이 잘 되는 편이에요. 맞는 것 같아요.", service: "신살 분석", stars: 5 },
+  { name: "솔○○", region: "천안", age: "36세", text: "대운 분석 읽고 지금 시기를 왜 이렇게 버텨왔는지 이해됐어요. 힘들었던 이유가 있었구나 싶었습니다.", service: "대운·세운", stars: 5 },
+  { name: "산○○", region: "서울", age: "25세", text: "짝사랑 분석에서 상대 일간 분석이 너무 정확했어요. 그 사람한테 딱 맞는 접근법이라 감탄했어요.", service: "짝사랑", stars: 5 },
+  { name: "바○○", region: "전주", age: "42세", text: "무관살 있다고 나왔는데 실제로 법 관련 직종에서 일하고 있어요. 맞는 게 신기해요.", service: "신살 분석", stars: 5 },
+  { name: "람○○", region: "창원", age: "28세", text: "궁합 분석에서 두 사람 오행 보완 관계가 잘 설명돼 있어서 서로 이해하는 데 도움이 됐어요.", service: "궁합 분석", stars: 5 },
+  { name: "들○○", region: "청주", age: "33세", text: "을목일간 설명 보다가 내 전 남자친구가 딱 을목 유형이었다는 걸 깨달았어요. 왜 맞지 않았는지 이제 알겠어요.", service: "사주 분석", stars: 5 },
+  { name: "강○○", region: "서울", age: "19세", text: "수능 전에 길일 확인하고 그날 모의고사 봤는데 점수 잘 나왔어요. 긴장이 덜했던 것 같아요.", service: "길일·흉일", stars: 5 },
+  { name: "새○○", region: "울산", age: "46세", text: "정재성 분석에서 저축 성향 강하다는 게 딱 맞아요. 돈 쓰는 게 불안해서 통장에 그냥 넣어두는 타입이거든요.", service: "사주 분석", stars: 5 },
+  { name: "아○○", region: "경북", age: "30세", text: "재회운에서 가능성 있다고 나왔는데 실제로 그 사람이 먼저 연락 왔어요. 진짜인지 아직도 신기해요.", service: "재회운", stars: 5 },
+  { name: "침○○", region: "부산", age: "37세", text: "묘목일간이라 예술적 감성 강하다는 거 딱 맞아요. 주변에서 항상 감성적이라고 하거든요.", service: "사주 분석", stars: 5 },
+  { name: "구○○", region: "수원", age: "22세", text: "길일에 이사했는데 진짜 생활이 안정되는 느낌이에요. 이전 집이랑 분위기가 달라요.", service: "길일·흉일", stars: 5 },
+  { name: "름○○", region: "인천", age: "43세", text: "40대 중반 대운이 힘들 수 있다고 나왔는데 실제로 힘들었고, 극복 조언이 큰 위안이 됐습니다.", service: "대운·세운", stars: 5 },
+  { name: "터○○", region: "서울", age: "27세", text: "INTJ-경금 조합이라는 거 보고 왜 내가 이렇게 냉정하고 계획적인지 처음으로 설명이 됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "눈○○", region: "대전", age: "34세", text: "편인 강한 사주라서 독립적이고 독창적이라는 게 딱 맞아요. 혼자 하는 일이 항상 더 잘 돼요.", service: "사주 분석", stars: 5 },
+  { name: "서○○", region: "광주", age: "29세", text: "짝사랑 분석에서 절대 금물이라는 행동이 제가 하려던 거였어요. 안 했길 잘했다는 생각이 들어요.", service: "짝사랑", stars: 5 },
+  { name: "이○○", region: "경기", age: "50세", text: "50대 대운이 오히려 인생 전성기라고 나와서 희망이 생겼어요. 진짜 요즘 뭔가 풀리는 것 같아요.", service: "대운·세운", stars: 5 },
+  { name: "우○○", region: "전주", age: "24세", text: "취향 분석에서 여행 스타일이 계획보다 즉흥 여행이라는 게 맞아요. 계획 짜놓고 항상 바꾸거든요.", service: "취향 분석", stars: 5 },
+  { name: "주○○", region: "세종", age: "39세", text: "오행 배경화면 만들고 집 전체 컬러를 바꿔봤는데 진짜 집에 있는 시간이 좋아졌어요.", service: "오행 배경화면", stars: 5 },
+  { name: "만○○", region: "부산", age: "32세", text: "염탐 기능으로 부모님 사주 봤더니 두 분이 어떻게 수십 년을 함께했는지 이해가 됐어요.", service: "염탐하기", stars: 5 },
+  { name: "세○○", region: "대구", age: "46세", text: "갱년기 시기 대운 분석이 너무 정확했어요. 이 시기를 잘 이해하고 넘어갈 수 있었습니다.", service: "대운·세운", stars: 5 },
+  { name: "기○○", region: "서울", age: "20세", text: "사주 보기 전엔 그냥 미신 같은 거라 생각했는데 분석 읽고 나니 진짜 학문이구나 싶었어요.", service: "사주 분석", stars: 5 },
+  { name: "쁜○○", region: "수원", age: "35세", text: "길일에 계약서 쓰고 사업 시작했는데 첫 달부터 생각보다 잘 돼서 신기했어요.", service: "길일·흉일", stars: 5 },
+
+  // ★★★★☆ 4점 (~15%)
+  { name: "전○○", region: "수원", age: "30세", text: "배경화면 오행 분석 후 나무 기운으로 바꿨더니 뭔가 차분해졌어요. 플라시보인지 진짜인지는 모르겠지만 기분은 좋아요.", service: "오행 배경화면", stars: 4 },
+  { name: "원○○", region: "경기", age: "32세", text: "염탐 기능이 좀 독특한 기능이긴 한데... 알고 싶은 게 있었고 답은 얻었습니다. 전적으로 믿진 않지만 참고가 됐어요.", service: "염탐하기", stars: 4 },
+  { name: "복○○", region: "부산", age: "44세", text: "궁합에서 원진살이 있는데도 지금 10년 넘게 잘 살고 있어요. 의지로 극복하는 중이에요.", service: "궁합 분석", stars: 4 },
+  { name: "정○○", region: "광주", age: "38세", text: "주식투자 스타일 분석 보고 포트폴리오 바꿨는데 수익률이 조금 나아졌어요. 100% 믿긴 어렵지만 방향 잡는 데 참고됩니다.", service: "주식 분석", stars: 4 },
+  { name: "천○○", region: "대전", age: "43세", text: "오행 배경화면 예뻐서 만들었는데 운이 좋아진 것 같기도 하고 아닌 것 같기도 해요. 그냥 예쁜 건 확실해요.", service: "오행 배경화면", stars: 4 },
+  { name: "이○○", region: "부산", age: "36세", text: "아주 정확하진 않지만 재미있어요. 전반적인 성격 흐름은 맞는 것 같은데 세부적으론 좀 다른 부분도 있어요.", service: "사주 분석", stars: 4 },
+  { name: "권○○", region: "서울", age: "42세", text: "일부는 딱 맞고 일부는 좀 애매했어요. 그래도 100% 안 믿어도 나를 돌아보는 계기가 됐습니다.", service: "사주 분석", stars: 4 },
+  { name: "박○○", region: "인천", age: "25세", text: "처음 기대보다 살짝 덜했는데 시간 지나고 다시 보니 맞더라고요. 즉시가 아니라 나중에 공감이 오는 타입인 것 같아요.", service: "대운·세운", stars: 4 },
+  { name: "유○○", region: "경기", age: "33세", text: "전반적으로 재미있고 나를 돌아보게 됐어요. 모든 게 딱 맞지는 않지만 큰 흐름은 비슷해서 도움이 됐습니다.", service: "MBTI×사주", stars: 4 },
+  { name: "임○○", region: "대구", age: "28세", text: "취향 분석에서 음악 추천은 잘 맞는데 영화 쪽은 좀 달랐어요. 그래도 전체적으로 재미있게 봤어요.", service: "취향 분석", stars: 4 },
+  { name: "송○○", region: "광주", age: "45세", text: "길일에 이사하려고 했는데 일정이 안 맞아서 못 했어요. 그래도 참고용으로 좋은 서비스예요.", service: "길일·흉일", stars: 4 },
+  { name: "오○○", region: "서울", age: "31세", text: "궁합 분석이 전부 나쁘게만 나와서 좀 불안했는데, 극복 방법도 같이 있어서 다행이었어요. 조금 더 긍정적 메시지가 있으면 좋겠어요.", service: "궁합 분석", stars: 4 },
+  { name: "최○○", region: "세종", age: "37세", text: "도시 추천이 예상과 다르게 나왔어요. 근데 왜 그 도시인지 설명을 읽으니까 나름 납득이 됐습니다.", service: "도시 추천", stars: 4 },
+  { name: "윤○○", region: "전주", age: "29세", text: "사주 분석 전체는 재미있게 봤는데 직업 부분은 저한테 맞지 않는 것도 있었어요. 참고만 할게요.", service: "사주 분석", stars: 4 },
+  { name: "홍○○", region: "제주", age: "40세", text: "짝사랑 분석이 도움은 됐는데 너무 일반적인 것 같기도 해요. 상대방 일간별로 다르다는 건 신선했습니다.", service: "짝사랑", stars: 4 },
+  { name: "한○○", region: "청주", age: "23세", text: "재미로 보기 좋아요. 100% 믿기보다 자기 이해 도구로 쓰면 좋을 것 같습니다. 분석 자체는 꽤 상세해요.", service: "사주 분석", stars: 4 },
+  { name: "안○○", region: "수원", age: "48세", text: "MBTI 분석이랑 결합한 건 신선했는데 사주 쪽은 좀 더 자세하면 좋겠어요. 전체적으로 괜찮습니다.", service: "MBTI×사주", stars: 4 },
+  { name: "정○○", region: "대전", age: "34세", text: "신살 극복법이 위로가 됐어요. 모든 내용이 딱 들어맞지는 않았지만 힘들 때 읽기 좋았습니다.", service: "신살 극복", stars: 4 },
+
+  // ★★★☆☆ 3점 (~4%)
+  { name: "김○○", region: "서울", age: "27세", text: "재미로 보기엔 좋은데 너무 진지하게 받아들이긴 어려워요. 분석이 포괄적이라 어느 정도는 누구한테나 해당될 것 같기도 해요.", service: "사주 분석", stars: 3 },
+  { name: "이○○", region: "경기", age: "41세", text: "좀 더 구체적이고 세밀했으면 좋겠어요. 전반적인 방향은 이해가 됐는데 실제 삶에 적용하기엔 추상적인 부분이 있어요.", service: "대운·세운", stars: 3 },
+  { name: "박○○", region: "인천", age: "33세", text: "결과가 맞는 부분도 있고 다른 부분도 있어요. 완전히 믿기보다 여러 관점 중 하나로 참고하는 게 좋을 것 같아요.", service: "궁합 분석", stars: 3 },
+  { name: "최○○", region: "부산", age: "22세", text: "흥미롭긴 한데 과학적 근거가 없다는 점이 계속 걸려요. 재미는 있어요. 진지하게 결정에 활용하기엔 무리인 것 같아요.", service: "사주 분석", stars: 3 },
+  { name: "강○○", region: "대구", age: "38세", text: "일부 내용은 꽤 맞았는데 일부는 전혀 공감이 안 됐어요. 반반 정도 맞는 것 같아요. 참고용으로는 괜찮아요.", service: "신살 분석", stars: 3 },
+  { name: "정○○", region: "광주", age: "46세", text: "분석 내용 자체는 잘 정리돼 있어요. 결과를 어떻게 해석하느냐에 따라 다 달라지는 것 같아서 점수를 이렇게 줬습니다.", service: "사주 분석", stars: 3 },
 ];
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
@@ -161,29 +218,6 @@ const ACTIVITIES = [
   "계축일주 강○○님이 궁합 위험도를 확인했습니다",
 ];
 
-// ── 라이브 피드 ───────────────────────────────────────────────────────────────
-const LIVE_FEED_POOL = [
-  { name: "윤○현", desc: "석양 아래 귀갓길의 여행자", rarity: 37.9 },
-  { name: "최○우", desc: "봄바람에 흔들리는 버드나무", rarity: 31.3 },
-  { name: "오○진", desc: "심해의 진주조개", rarity: 6.6 },
-  { name: "이○민", desc: "사막을 건너는 낙타의 끈기", rarity: 5.1 },
-  { name: "김○혁", desc: "빈 들판의 마지막 씨앗", rarity: 2.1 },
-  { name: "강○빈", desc: "아침 안개 속 정원사", rarity: 23.0 },
-  { name: "홍○연", desc: "석양 아래 귀갓길의 여행자", rarity: 28.6 },
-  { name: "송○호", desc: "벼랑 끝의 독수리", rarity: 3.4 },
-  { name: "박○서", desc: "고요한 새벽의 등불", rarity: 44.2 },
-  { name: "정○아", desc: "태풍 전야의 고요함", rarity: 8.7 },
-  { name: "한○준", desc: "물 위에 떠가는 연잎", rarity: 17.5 },
-  { name: "임○하", desc: "달빛 아래 선인장", rarity: 1.8 },
-  { name: "조○현", desc: "바람을 가르는 화살", rarity: 62.3 },
-  { name: "신○영", desc: "여명의 첫 새소리", rarity: 12.4 },
-  { name: "황○찬", desc: "눈보라 속 홀로 선 소나무", rarity: 4.2 },
-  { name: "문○지", desc: "가을 강가의 갈대", rarity: 38.9 },
-  { name: "차○선", desc: "폭풍 속에 핀 야생화", rarity: 9.3 },
-  { name: "노○빈", desc: "사계절을 담은 호수", rarity: 51.7 },
-  { name: "유○현", desc: "새벽 이슬의 거울", rarity: 7.2 },
-  { name: "권○수", desc: "모래 위의 나침반", rarity: 3.1 },
-];
 
 function ContactSection() {
   const [name, setName] = useState("");
@@ -356,7 +390,7 @@ const SERVICES: {
     viral: "지금 배경화면이 에너지를 갉아먹고 있을 수 있습니다",
     desc: "내 사주에 부족한 오행을 채워주는 AI 맞춤 배경화면. 목·화·토·금·수 중 내가 보완해야 할 기운을 찾아드립니다.",
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
-    href: "/saju", badge: "분석 무료",
+    href: "/saju", badge: "완전 무료",
     color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
     categories: ["전체", "라이프"],
@@ -368,7 +402,7 @@ const SERVICES: {
     viral: "지금 만나는 사람, 내 에너지를 갉아먹는 사주일 수 있어요",
     desc: "원진살·귀문관살·합충 관계로 보는 깊은 궁합. 바람기 DNA부터 이별 위험도까지 전부 분석합니다.",
     tags: ["원진살", "합충", "바람기 분석"],
-    href: "/gunghap", badge: "무료",
+    href: "/gunghap", badge: "완전 무료",
     color: "#f9a8d4", badgeBg: "rgba(139,92,246,0.85)",
     border: "rgba(236,72,153,0.3)", glow: "rgba(236,72,153,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -379,7 +413,7 @@ const SERVICES: {
     viral: "이 사람, 내가 꼬실 수 있는 사주인지 확인해보세요",
     desc: "짝사랑하는 상대의 이상형·심리 패턴·공략 포인트를 사주로 완전 분석. 쟁재남인지, 어떻게 다가가야 심장이 흔들리는지 알려드립니다.",
     tags: ["이상형 분석", "공략법", "쟁재남 진단"],
-    href: "/crush", badge: "무료",
+    href: "/crush", badge: "완전 무료",
     color: "#fb7185", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -390,7 +424,7 @@ const SERVICES: {
     viral: "지금 그 사람, 다른 누군가와 함께하고 있을지도 모릅니다",
     desc: "헤어진 그 사람과 다시 이어질 수 있는지, 지금이 재회의 시기인지 사주로 완전 분석합니다. 망설이는 동안 기회의 문이 닫힙니다.",
     tags: ["재회 가능성", "경도 보정", "대운 분석"],
-    href: "/reunion", badge: "₩3,900",
+    href: "/reunion", badge: "",
     color: "#f97316", badgeBg: "rgba(234,88,12,0.85)",
     border: "rgba(249,115,22,0.3)", glow: "rgba(249,115,22,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -401,7 +435,7 @@ const SERVICES: {
     viral: "당신의 편은 들지 않습니다. 오직 사실만 말합니다.",
     desc: "바람기·도화살·불륜 가능성까지. 매운맛 분석입니다. 애인의 생년월일만 입력하세요.",
     tags: ["바람기", "도화살", "이성 관계"],
-    href: "/spy", badge: "무료",
+    href: "/spy", badge: "완전 무료",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "연애·궁합", "19금"],
@@ -412,7 +446,7 @@ const SERVICES: {
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
     desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
     tags: ["홍염살", "도화살", "이성 매력"],
-    href: "/eros", badge: "무료",
+    href: "/eros", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합", "19금"],
@@ -423,7 +457,7 @@ const SERVICES: {
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "₩4,900",
+    href: "/hotcompat", badge: "",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "연애·궁합", "19금"],
@@ -434,7 +468,7 @@ const SERVICES: {
     viral: "본인만 모르는 숨겨진 이성 매력이 있습니다",
     desc: "도화살·홍염살·12운성으로 보는 이성 매력. 나도 몰랐던 타고난 매력 포인트를 완전히 공개합니다.",
     tags: ["도화살", "홍염살", "이성운"],
-    href: "/charm", badge: "₩1,900",
+    href: "/charm", badge: "",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -445,7 +479,7 @@ const SERVICES: {
     viral: "MBTI만으로는 절반밖에 모릅니다",
     desc: "사주 오행 + MBTI 16유형의 시너지 분석. 타고난 나를 두 가지 렌즈로 완전 해석하고 최적 직업을 제안합니다.",
     tags: ["MBTI", "성격 분석", "직업 추천"],
-    href: "/mbti", badge: "무료",
+    href: "/mbti", badge: "완전 무료",
     color: "#e879f9", badgeBg: "rgba(162,28,175,0.9)",
     border: "rgba(217,70,239,0.3)", glow: "rgba(217,70,239,0.12)",
     categories: ["전체", "무료", "연애·궁합", "라이프"],
@@ -456,7 +490,7 @@ const SERVICES: {
     viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
     desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
     tags: ["주식", "코인", "ETF·레버리지"],
-    href: "/stock", badge: "무료",
+    href: "/stock", badge: "완전 무료",
     color: "#6ee7b7", badgeBg: "rgba(5,150,105,0.9)",
     border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -467,7 +501,7 @@ const SERVICES: {
     viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
     desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
     tags: ["대운", "세운", "교운기 전략"],
-    href: "/daewoon", badge: "₩15,000",
+    href: "/daewoon", badge: "",
     color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
     categories: ["전체", "금전·투자", "운명·대운", "Special"],
@@ -479,7 +513,7 @@ const SERVICES: {
     viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
     desc: "용신 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
     tags: ["거주지", "해외 추천", "용신 방위"],
-    href: "/place", badge: "₩990",
+    href: "/place", badge: "",
     color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
     categories: ["전체", "운명·대운", "라이프", "Special"],
@@ -491,7 +525,7 @@ const SERVICES: {
     viral: "역마살·귀문관살도 방향 맞으면 최강 무기입니다",
     desc: "내 신살과 오행 불균형을 제대로 알고 극복하는 완벽 가이드. 나쁜 사주도 방향 틀면 달라집니다.",
     tags: ["신살 극복", "오행 보완", "개운법"],
-    href: "/overcome", badge: "무료",
+    href: "/overcome", badge: "완전 무료",
     color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "운명·대운"],
@@ -502,7 +536,7 @@ const SERVICES: {
     viral: "결정의 날짜를 고르면 결과가 달라집니다",
     desc: "이사·결혼·시험·개업·계약·수술·여행·투자·연애·임신 — 내 사주와 맞는 최적의 날짜를 찾아드립니다.",
     tags: ["길일·흉일", "날짜 선택", "이사·결혼·시험"],
-    href: "/calendar", badge: "₩990",
+    href: "/calendar", badge: "",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
     categories: ["전체", "무료", "운명·대운", "라이프"],
@@ -513,7 +547,7 @@ const SERVICES: {
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
     desc: "오행별 영화·책·음악·여행 취향 완전 분석. 지금까지 좋아했던 것들이 사주로 다 설명됩니다.",
     tags: ["영화", "책", "여행 스타일"],
-    href: "/taste", badge: "무료",
+    href: "/taste", badge: "완전 무료",
     color: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -581,12 +615,14 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
           >
             {svc.emoji}
           </div>
-          <span
-            className="text-xs font-black px-2.5 py-1 rounded-full text-white"
-            style={{ background: svc.badgeBg }}
-          >
-            {svc.badge}
-          </span>
+          {svc.badge && (
+            <span
+              className="text-xs font-black px-2.5 py-1 rounded-full text-white"
+              style={{ background: svc.badgeBg }}
+            >
+              {svc.badge}
+            </span>
+          )}
         </div>
 
         <div>
@@ -594,7 +630,7 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
           <p className="text-xs font-semibold mb-2" style={{ color: svc.color }}>
             &ldquo;{svc.viral}&rdquo;
           </p>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.58)" }}>
             {svc.desc}
           </p>
         </div>
@@ -603,7 +639,7 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
           <div className="flex flex-wrap gap-1">
             {svc.tags.map(tag => (
               <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.52)", border: "1px solid rgba(255,255,255,0.1)" }}>
                 {tag}
               </span>
             ))}
@@ -642,9 +678,6 @@ export default function MainPage() {
   const [noticeIndex, setNoticeIndex] = useState(0);
   const [noticeVisible, setNoticeVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
-  const [feedOffset, setFeedOffset] = useState(0);
-  const [feedVisible, setFeedVisible] = useState(true);
-
   // 언어
   const [lang, setLang] = useState<Lang>("ko");
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -699,16 +732,6 @@ export default function MainPage() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFeedVisible(false);
-      setTimeout(() => {
-        setFeedOffset(i => (i + 1) % LIVE_FEED_POOL.length);
-        setFeedVisible(true);
-      }, 350);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white overflow-x-hidden">
@@ -846,7 +869,7 @@ export default function MainPage() {
           </h1>
 
           <p className="text-sm sm:text-base max-w-md mx-auto mb-3 leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.42)" }}>
+            style={{ color: "rgba(255,255,255,0.62)" }}>
             {t.heroSub}
           </p>
 
@@ -858,7 +881,7 @@ export default function MainPage() {
               "대운 터지는 나이가 정해져 있습니다 — 내가 몇 살에 운이 열리는지 알고 싶지 않으세요?",
             ].map((copy, i) => (
               <div key={i} className="text-xs text-left rounded-xl px-4 py-2.5 flex items-start gap-2"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.45)" }}>
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.58)" }}>
                 <span style={{ color: "#c9a84c" }} className="shrink-0 mt-0.5">✦</span>
                 <span>{copy}</span>
               </div>
@@ -884,69 +907,25 @@ export default function MainPage() {
             <div className="flex items-center justify-center gap-0 mb-5">
               <div className="text-center px-5">
                 <p className="text-2xl font-black" style={{ color: "#f97316" }}>{todayCounter}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>지금 열람 중</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>지금 열람 중</p>
               </div>
               <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
               <div className="text-center px-5">
                 <p className="text-2xl font-black text-white">{Math.floor(counter / 14).toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>오늘 열람</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>오늘 열람</p>
               </div>
               <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
               <div className="text-center px-5">
                 <p className="text-2xl font-black text-white">{counter.toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>누적 열람</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>누적 열람</p>
               </div>
             </div>
 
-            {/* 구분선 */}
-            <div className="w-full mb-4" style={{ height: 1, background: "rgba(255,255,255,0.07)" }} />
-
-            {/* 라이브 피드 헤더 */}
-            <div className="flex items-center gap-1.5 mb-3 justify-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>지금 사주를 열람 중인 분들</span>
-            </div>
-
-            {/* 라이브 피드 4행 */}
-            <div
-              className="space-y-2"
-              style={{ opacity: feedVisible ? 1 : 0, transition: "opacity 0.35s ease" }}
-            >
-              {Array.from({ length: 4 }).map((_, i) => {
-                const entry = LIVE_FEED_POOL[(feedOffset + i) % LIVE_FEED_POOL.length];
-                const isRare = entry.rarity < 10;
-                return (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {/* 아바타 */}
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black"
-                      style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                      {entry.name.slice(0, 2)}
-                    </div>
-                    {/* 이름 + 설명 */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-white">{entry.name}</p>
-                      <p className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)" }}>{entry.desc}</p>
-                    </div>
-                    {/* 희소성 */}
-                    <div className="text-right shrink-0">
-                      <p className="text-xs font-black" style={{ color: isRare ? "#f97316" : "rgba(255,255,255,0.5)" }}>
-                        희소성 {entry.rarity}%
-                      </p>
-                      <p className="text-[10px] flex items-center justify-end gap-1" style={{ color: "rgba(255,255,255,0.3)" }}>
-                        <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
-                        열람 중
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
           {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
           <div className="mt-10 relative">
-            <p className="text-sm font-bold mb-3 tracking-wide" style={{ color: "rgba(255,255,255,0.55)" }}>카테고리로 찾기 ↓</p>
+            <p className="text-sm font-bold mb-3 tracking-wide" style={{ color: "rgba(255,255,255,0.7)" }}>카테고리로 찾기 ↓</p>
             <div className="flex gap-2 justify-center flex-wrap">
               {CATEGORIES.map(({ key, icon }) => (
                 <button
@@ -1003,6 +982,11 @@ export default function MainPage() {
             <span className="text-gray-600 text-xs shrink-0">›</span>
           </div>
         </section>
+
+        {/* ── 면책 공지 ── */}
+        <p className="text-center mb-6" style={{ color: "rgba(255,255,255,0.18)", fontSize: 10 }}>
+          본 서비스는 오락·참고 목적의 AI 콘텐츠입니다. 실제 의사결정의 근거로 사용하지 마세요.
+        </p>
 
         {/* ── 서비스 섹션 ── */}
         <section id="services-section" className="mb-14">
@@ -1102,7 +1086,7 @@ export default function MainPage() {
               &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
               <span style={{ color: "#c9a84c" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
-            <p className="text-sm max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.6)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
               타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
             </p>
@@ -1126,7 +1110,7 @@ export default function MainPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-yellow-400 text-sm">★★★★★</span>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>4.9 / 5.0</span>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>4.7 / 5.0</span>
             </div>
           </div>
 
@@ -1134,7 +1118,7 @@ export default function MainPage() {
           <div className="overflow-hidden -mx-4 sm:-mx-6">
             <div
               className="review-ticker flex gap-3 py-2"
-              style={{ animation: "reviewTicker 180s linear infinite", width: "max-content" }}
+              style={{ animation: "reviewTicker 490s linear infinite", width: "max-content" }}
             >
               {[...REVIEWS, ...REVIEWS].map((r, i) => (
                 <div key={i} className="w-72 shrink-0 rounded-2xl p-4 flex flex-col gap-3"
@@ -1142,7 +1126,7 @@ export default function MainPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-bold text-white">{r.name}</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{r.region} · {r.age}</p>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{r.region} · {r.age}</p>
                     </div>
                     <span className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
                       style={{ background: "rgba(201,168,76,0.1)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.2)" }}>
@@ -1154,7 +1138,7 @@ export default function MainPage() {
                       <span key={j} className="text-yellow-400 text-xs">★</span>
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
                     &ldquo;{r.text}&rdquo;
                   </p>
                 </div>

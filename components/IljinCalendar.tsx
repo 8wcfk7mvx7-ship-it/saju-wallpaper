@@ -46,23 +46,23 @@ export default function IljinCalendar() {
       {/* 타이틀 + 월 네비 */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-black tracking-tight" style={{ color: "rgba(255,255,255,0.9)" }}>
+          <h2 className="text-lg font-black tracking-tight" style={{ color: "rgba(255,255,255,0.9)" }}>
             일진달력
           </h2>
-          <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
-          <p className="text-[11px] mt-1 font-medium tracking-wide" style={{ color: "rgba(255,215,100,0.75)" }}>
+          <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
+          <p className="text-[13px] mt-1 font-medium tracking-wide" style={{ color: "rgba(255,215,100,0.75)" }}>
             오늘 · {todayPillarLine}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={prevMonth} disabled={year === 1975 && month === 1}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-base font-bold transition disabled:opacity-20 hover:bg-white/10"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
             style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>‹</button>
-          <span className="text-base font-black min-w-[80px] text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
+          <span className="text-lg font-black min-w-[80px] text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
             {year}. {String(month).padStart(2, "0")}
           </span>
           <button onClick={nextMonth} disabled={year === 2030 && month === 12}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-base font-bold transition disabled:opacity-20 hover:bg-white/10"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
             style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>›</button>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function IljinCalendar() {
       {/* 요일 헤더 */}
       <div className="grid grid-cols-7 mb-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         {["일","월","화","수","목","금","토"].map((d, i) => (
-          <div key={d} className="text-center text-xs font-bold pb-2"
+          <div key={d} className="text-center text-sm font-bold pb-2"
             style={{ color: i === 0 ? "#f87171" : i === 6 ? "#93c5fd" : "rgba(255,255,255,0.45)" }}>
             {d}
           </div>
@@ -100,18 +100,18 @@ export default function IljinCalendar() {
                 background: isToday ? "rgba(201,168,76,0.12)" : "transparent",
               }}>
               {/* 날짜 숫자 */}
-              <span className="text-xl font-black leading-none mb-1" style={{ color: numColor,
+              <span className="text-2xl font-black leading-none mb-1" style={{ color: numColor,
                 fontVariantNumeric: "tabular-nums",
                 textShadow: isToday ? "0 0 12px rgba(201,168,76,0.5)" : "none",
               }}>
                 {day}
               </span>
               {/* 한자 일진 */}
-              <span className="text-[11px] font-bold leading-none" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <span className="text-[13px] font-bold leading-none" style={{ color: "rgba(255,255,255,0.6)" }}>
                 {cgH}{jjH}
               </span>
               {/* 한글 */}
-              <span className="text-[9px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <span className="text-[11px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
                 {cg}{jj}
               </span>
               {/* 오늘 표시 */}
