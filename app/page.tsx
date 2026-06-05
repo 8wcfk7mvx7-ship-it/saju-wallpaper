@@ -76,7 +76,6 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
   { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
   { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
-  { key: "19금",    icon: "🔞",  desc: "성인 전용" },
   { key: "Special", icon: "👑", desc: "프리미엄" },
 ];
 
@@ -438,29 +437,7 @@ const SERVICES: {
     href: "/spy", badge: "완전 무료",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
-  },
-  {
-    id: "eros", emoji: "🌹",
-    title: "나의 성적 매력은?",
-    viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
-    desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
-    tags: ["홍염살", "도화살", "이성 매력"],
-    href: "/eros", badge: "완전 무료",
-    color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
-    border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
-  },
-  {
-    id: "hotcompat", emoji: "🔥",
-    title: "19금 사주 궁합",
-    viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
-    desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
-    tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "",
-    color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
-    border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
-    categories: ["전체", "연애·궁합", "19금"],
+    categories: ["전체", "무료", "연애·궁합"],
   },
   {
     id: "charm", emoji: "✨",
@@ -667,11 +644,6 @@ export default function MainPage() {
     const next = Math.min(base + Math.floor(Math.random() * 3) + 1, 29800);
     localStorage.setItem("sp_main_counter", String(next));
     return next;
-  });
-  const [todayCounter] = useState(() => {
-    const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
-    const isNight = kstH >= 23 || kstH < 7;
-    return isNight ? 28 + Math.floor(Math.random() * 11) : 92 + Math.floor(Math.random() * 17);
   });
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
@@ -901,26 +873,11 @@ export default function MainPage() {
             <span>→</span>
           </button>
 
-          {/* ── 실시간 통계 + 라이브 피드 ── */}
-          <div className="mt-10 max-w-sm mx-auto">
-            {/* 3-col stats */}
-            <div className="flex items-center justify-center gap-0 mb-5">
-              <div className="text-center px-5">
-                <p className="text-2xl font-black" style={{ color: "#f97316" }}>{todayCounter}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>지금 열람 중</p>
-              </div>
-              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <div className="text-center px-5">
-                <p className="text-2xl font-black text-white">{Math.floor(counter / 14).toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>오늘 열람</p>
-              </div>
-              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <div className="text-center px-5">
-                <p className="text-2xl font-black text-white">{counter.toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>누적 열람</p>
-              </div>
-            </div>
-
+          {/* ── 누적 분석 ── */}
+          <div className="mt-10 max-w-sm mx-auto flex justify-center">
+            <p className="text-xs px-4 py-2 rounded-full" style={{ color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              누적 분석 {counter.toLocaleString()}건
+            </p>
           </div>
 
           {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
@@ -1073,6 +1030,40 @@ export default function MainPage() {
               준비 중인 서비스입니다
             </div>
           )}
+        </section>
+
+        {/* ── 정보성 가이드 배너 ── */}
+        <section className="mb-10">
+          <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+            style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
+            <div className="flex-1">
+              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>📚 사주 명리학 가이드</p>
+              <p className="text-sm font-bold text-white mb-1">사주가 처음이신가요?</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                오행·천간지지·신살·대운 등 기초를 광고 없이 설명합니다.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/guide")}
+              className="shrink-0 text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+              style={{ background: "rgba(201,168,76,0.15)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.3)" }}
+            >
+              가이드 보기 →
+            </button>
+          </div>
+        </section>
+
+        {/* ── 19금 서비스 링크 ── */}
+        <section className="mb-10">
+          <button
+            onClick={() => router.push("/19plus")}
+            className="w-full rounded-xl px-4 py-3 text-xs flex items-center justify-center gap-2 transition-all"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}
+          >
+            <span>🔞</span>
+            <span>성인 전용 서비스는 별도 페이지에서 확인하세요</span>
+            <span>→</span>
+          </button>
         </section>
 
         {/* ── 바이럴 띠 배너 ── */}
