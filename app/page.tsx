@@ -198,7 +198,7 @@ const REVIEWS = [
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
 const NOTICES = [
   { date: "2026.06.04", title: "짝사랑 성공 비결 서비스 오픈", badge: "NEW", color: "#fbbf24" },
-  { date: "2026.06.03", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
+  { date: "2026.06.03", title: "네이버 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.02", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.01", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
   { date: "2026.05.28", title: "일진 달력 1975~2030 신규 오픈", badge: "NEW", color: "#fbbf24" },

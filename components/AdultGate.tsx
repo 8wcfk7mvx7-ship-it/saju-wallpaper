@@ -60,14 +60,14 @@ export default function AdultGate({ children }: { children: React.ReactNode }) {
           </button>
 
           <a
-            href={`/api/auth/kakao?redirect=${encodeURIComponent(redirect)}`}
+            href={`/api/auth/naver?redirect=${encodeURIComponent(redirect)}`}
             className="w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            style={{ background: "#FEE500", color: "#1A1A1A" }}
+            style={{ background: "#03C75A", color: "#fff" }}
           >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M9 1.5C4.858 1.5 1.5 4.134 1.5 7.375c0 2.1 1.377 3.94 3.45 5.017l-.879 3.243a.281.281 0 00.432.3l3.87-2.565A8.9 8.9 0 009 13.25c4.142 0 7.5-2.634 7.5-5.875S13.142 1.5 9 1.5z" fill="#1A1A1A"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
             </svg>
-            카카오 로그인하면 자동 확인
+            네이버 로그인하면 자동 확인
           </a>
 
           <button

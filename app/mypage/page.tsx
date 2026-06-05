@@ -122,7 +122,7 @@ export default function MyPage() {
             )}
             <div>
               <p className="font-bold text-white text-sm">{user.nickname}님</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>카카오 로그인 완료</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>네이버 로그인 완료</p>
             </div>
             <button
               onClick={() => { document.cookie = "sp_user=; max-age=0; path=/"; router.refresh(); }}
@@ -133,14 +133,18 @@ export default function MyPage() {
           </div>
         ) : (
           <div className="mb-6 p-5 rounded-2xl text-center"
-            style={{ background: "rgba(254,229,0,0.05)", border: "1px solid rgba(254,229,0,0.15)" }}>
-            <p className="text-sm text-white mb-1 font-bold">카카오로 로그인하면</p>
+            style={{ background: "rgba(3,199,90,0.05)", border: "1px solid rgba(3,199,90,0.2)" }}>
+            <p className="text-sm text-white mb-1 font-bold">네이버로 로그인하면</p>
             <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
               저장한 사주와 결제 내역을 어디서든 볼 수 있어요
             </p>
-            <a href="/api/auth/kakao?redirect=/mypage"
-              className="inline-flex items-center gap-2 bg-[#FEE500] hover:bg-[#F5DC00] text-[#1A1A1A] font-bold text-sm px-5 py-2.5 rounded-xl transition-all">
-              카카오로 시작하기
+            <a href="/api/auth/naver?redirect=/mypage"
+              className="inline-flex items-center gap-2 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all"
+              style={{ background: "#03C75A" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
+              </svg>
+              네이버로 시작하기
             </a>
           </div>
         )}
