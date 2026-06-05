@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ILJU_60, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER } from "@/lib/saju";
 
 // ── 상수 및 타입 ────────────────────────────────────────────────────────────
 const CG_ELEMENT: Record<string, string> = {
@@ -333,6 +334,8 @@ export default function ReportPage() {
   const lacking = sorted.slice(0,2).filter(e=>(scores[e]||0)<=2.5);
   const excess = sorted.slice(-2).filter(e=>(scores[e]||0)>=3.5);
   const dayCg = det.day?.cg || "";
+  const dayJj = det.day?.jj || "";
+  const iljuInfo = ILJU_60[dayCg + dayJj] || null;
   const profile = ILGAN_PROFILE[dayCg] || null;
   const yong = sajuResult.yongshin;
   const sinsalList: any[] = sajuResult.sinsalList || [];
@@ -544,11 +547,39 @@ export default function ReportPage() {
         {/* 일주 설명 */}
         {profile && (
           <div style={{background:"rgba(99,102,241,0.08)",border:"1px solid rgba(99,102,241,0.2)",
-            borderRadius:12,padding:"14px 18px",marginBottom:16}}>
+            borderRadius:12,padding:"14px 18px",marginBottom:12}}>
             <div style={{fontWeight:700,color:"#a5b4fc",marginBottom:6,fontSize:14}}>
-              🌟 일주 — {dayCg}일간 ({profile.symbol})
+              🌟 일간 — {dayCg}({profile.symbol})
             </div>
             <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#cbd5e1"}}>{profile.personality}</p>
+          </div>
+        )}
+
+        {iljuInfo && (
+          <div style={{background:"rgba(139,92,246,0.08)",border:"1px solid rgba(139,92,246,0.25)",
+            borderRadius:12,padding:"14px 18px",marginBottom:12}}>
+            <div style={{fontWeight:700,color:"#c4b5fd",marginBottom:8,fontSize:14}}>
+              🔮 {dayCg}{dayJj}일주 60갑자 분석 — {iljuInfo.image}
+            </div>
+            <div style={{display:"flex",gap:8,marginBottom:8,flexWrap:"wrap"}}>
+              <span style={{background:"rgba(139,92,246,0.2)",borderRadius:99,padding:"3px 10px",fontSize:11,color:"#c4b5fd",fontWeight:600}}>{iljuInfo.uunseong}</span>
+              <span style={{background:"rgba(255,255,255,0.06)",borderRadius:99,padding:"3px 10px",fontSize:11,color:"#94a3b8"}}>{iljuInfo.keyword}</span>
+            </div>
+            <p style={{margin:"0 0 8px",fontSize:12,lineHeight:1.7,color:"#cbd5e1"}}>{iljuInfo.personality}</p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:11}}>
+              <div style={{background:"rgba(244,63,94,0.08)",borderRadius:8,padding:"8px 10px"}}>
+                <div style={{color:"#f87171",fontWeight:600,marginBottom:3}}>❤️ 연애</div>
+                <div style={{color:"#fca5a5",lineHeight:1.6}}>{iljuInfo.love}</div>
+              </div>
+              <div style={{background:"rgba(245,158,11,0.08)",borderRadius:8,padding:"8px 10px"}}>
+                <div style={{color:"#f59e0b",fontWeight:600,marginBottom:3}}>💼 직업</div>
+                <div style={{color:"#fde68a",lineHeight:1.6}}>{iljuInfo.career}</div>
+              </div>
+            </div>
+            <div style={{marginTop:8,background:"rgba(249,115,22,0.08)",borderRadius:8,padding:"8px 10px",fontSize:11}}>
+              <span style={{color:"#fb923c",fontWeight:600}}>⚠️ 주의: </span>
+              <span style={{color:"#fed7aa"}}>{iljuInfo.caution}</span>
+            </div>
           </div>
         )}
 
@@ -698,6 +729,33 @@ export default function ReportPage() {
                 💡 {ELEMENT_BOOST[yong.yongshin]?.tip}
               </div>
             </div>
+
+            {/* 신강/신약 심리 특성 */}
+            {(() => {
+              const st = yong.strength as "신강"|"신약"|"중화";
+              const traits = SINGANG_TRAITS[st];
+              if (!traits) return null;
+              return (
+                <div style={{marginTop:16,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:12,padding:"14px 18px"}}>
+                  <div style={{fontWeight:600,color:"#e2e8f0",marginBottom:10,fontSize:14}}>🧭 {st} 심리 특성</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:11}}>
+                    {[
+                      {label:"사고 방식",v:traits.mindset},{label:"대인 관계",v:traits.boundary},
+                      {label:"정신적 강점",v:traits.mental},{label:"삶의 스타일",v:traits.style},
+                    ].map((item,i)=>(
+                      <div key={i} style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"8px 10px"}}>
+                        <div style={{color:"#6366f1",fontWeight:600,marginBottom:3}}>{item.label}</div>
+                        <div style={{color:"#94a3b8",lineHeight:1.6}}>{item.v}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{marginTop:8,background:"rgba(249,115,22,0.08)",borderRadius:8,padding:"8px 10px",fontSize:11}}>
+                    <span style={{color:"#fb923c",fontWeight:600}}>주의: </span>
+                    <span style={{color:"#fed7aa"}}>{traits.caution}</span>
+                  </div>
+                </div>
+              );
+            })()}
           </>
         ) : (
           <p style={{color:"#64748b"}}>용신 데이터를 불러올 수 없습니다.</p>
@@ -954,12 +1012,21 @@ export default function ReportPage() {
             <p style={{margin:"0 0 6px",fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>
               {profile&&<><strong>일간 관련:</strong> {profile.health}</>}
             </p>
-            {lacking.length>0&&<p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>
-              <strong>부족 오행 관련:</strong> {lacking.map(el=>{
-                const h={목:"간·담·눈·근육",화:"심장·소장·혈압",토:"위장·비장·소화",금:"폐·대장·피부",수:"신장·방광·귀"};
-                return `${el}(${h[el as keyof typeof h]})`;
-              }).join(", ")} 관리에 신경 쓰세요.
-            </p>}
+            {lacking[0] && (() => {
+              const h = OHAENG_HEALTH[lacking[0] as "목"|"화"|"토"|"금"|"수"];
+              if (!h) return null;
+              return (
+                <div style={{marginTop:8}}>
+                  <p style={{margin:"0 0 4px",fontSize:11,color:"#f87171",fontWeight:600}}>부족 오행({lacking[0]}) 취약 장기: {h.organs}</p>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:4}}>
+                    {h.symptoms.map((s,i)=>(
+                      <span key={i} style={{fontSize:10,background:"rgba(248,113,113,0.15)",color:"#fca5a5",borderRadius:99,padding:"2px 7px"}}>{s}</span>
+                    ))}
+                  </div>
+                  <p style={{margin:0,fontSize:11,color:"#fca5a5",lineHeight:1.6}}>💡 {h.lifestyle}</p>
+                </div>
+              );
+            })()}
           </div>
           {/* 인간관계 */}
           <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"14px 16px"}}>
