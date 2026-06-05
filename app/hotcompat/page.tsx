@@ -493,7 +493,7 @@ function HotCompatContent() {
           </p>
         </div>
 
-        <button onClick={() => { setP1({ gender: "female", year: "", month: "", day: "" }); setP2({ gender: "male", year: "", month: "", day: "" }); setStep("form"); }}
+        <button onClick={() => { setP1({ gender: "female", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" }); setP2({ gender: "male", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" }); setStep("form"); }}
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>
