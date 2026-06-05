@@ -40,11 +40,14 @@ export default function MyPage() {
   const [savedSajus, setSavedSajus] = useState<SavedSaju[]>([]);
   const [reports, setReports] = useState<SavedReport[]>([]);
   const [tab, setTab] = useState<"saju" | "reports">("saju");
+  const [blueberries, setBlueberries] = useState(0);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
 
   useEffect(() => {
     setUser(parseUser());
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
     try {
       const raw = localStorage.getItem(SAJU_STORAGE_KEY);
       if (raw) setSavedSajus(JSON.parse(raw));
@@ -141,6 +144,25 @@ export default function MyPage() {
             </a>
           </div>
         )}
+
+        {/* 블루베리 잔액 카드 */}
+        <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
+          style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">🫐</span>
+            <div>
+              <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 블루베리</p>
+              <p className="text-lg font-black text-white">{blueberries.toLocaleString()} <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.4)" }}>개</span></p>
+            </div>
+          </div>
+          <button
+            onClick={() => router.push("/charge")}
+            className="px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-[0.97]"
+            style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff" }}
+          >
+            충전하기 →
+          </button>
+        </div>
 
         {/* 탭 */}
         <div className="flex gap-2 mb-5">

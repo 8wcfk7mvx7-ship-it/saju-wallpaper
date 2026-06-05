@@ -52,13 +52,11 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
     return (
       <a
         href={`/api/auth/kakao?redirect=${encodeURIComponent(redirectTo)}`}
-        className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl font-black text-[#1A1A1A] transition-all active:scale-[0.99]"
-        style={{ background: "#FEE500", boxShadow: "0 4px 24px rgba(254,229,0,0.35)" }}
+        className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-[#1A1A1A] transition-all active:scale-[0.99]"
+        style={{ background: "#FEE500", boxShadow: "0 4px 20px rgba(254,229,0,0.3)" }}
       >
-        <KakaoIcon size={22} />
-        <span className="text-[15px] leading-tight text-center">
-          카카오톡으로<br />시작하기
-        </span>
+        <KakaoIcon size={20} />
+        <span className="text-[14px]">카카오톡으로 시작하기</span>
       </a>
     );
   }

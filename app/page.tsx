@@ -705,10 +705,10 @@ export default function MainPage() {
               <span>📂</span>
               <span>보관함</span>
             </button>
-            {/* 블루베리 잔액/충전 */}
+            {/* 블루베리 잔액/충전 — PC only */}
             <button
               onClick={() => router.push("/charge")}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-indigo-500/20"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-indigo-500/20"
               style={{
                 background: blueberries > 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.04)",
                 border: blueberries > 0 ? "1px solid rgba(99,102,241,0.35)" : "1px solid rgba(255,255,255,0.08)",
@@ -716,12 +716,7 @@ export default function MainPage() {
               }}
             >
               <span>🫐</span>
-              <span className="hidden sm:inline">
-                {blueberries > 0 ? blueberries.toLocaleString() : t.charging}
-              </span>
-              <span className="sm:hidden">
-                {blueberries > 0 ? blueberries.toLocaleString() : "+"}
-              </span>
+              <span>{blueberries > 0 ? blueberries.toLocaleString() : t.charging}</span>
             </button>
 
             {/* 언어 선택기 */}
@@ -773,7 +768,9 @@ export default function MainPage() {
               )}
             </div>
 
-            <KakaoLoginButton redirectTo="/" />
+            <div className="hidden sm:block">
+              <KakaoLoginButton redirectTo="/" />
+            </div>
           </div>
         </div>
       </nav>
@@ -1139,7 +1136,7 @@ export default function MainPage() {
       </footer>
 
       {/* ── 모바일 카카오 플로팅 CTA ── */}
-      <div className="fixed bottom-[4.5rem] left-4 right-4 z-40 sm:hidden">
+      <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 sm:hidden px-4 pb-2">
         <KakaoLoginButton redirectTo="/" floating />
       </div>
 
@@ -1150,7 +1147,7 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/saju" },
-            { icon: "💰", label: "블루베리 충전", href: "/charge" },
+            { icon: "👤", label: "마이페이지", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
