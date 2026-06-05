@@ -398,10 +398,10 @@ const SERVICES: {
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "무료",
+    href: "/hotcompat", badge: "₩4,900",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
+    categories: ["전체", "연애·궁합", "19금"],
   },
   {
     id: "charm", emoji: "✨",
