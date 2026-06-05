@@ -47,6 +47,7 @@ function CharmResultContent() {
   const [gender, setGender] = useState<"male" | "female">("female");
   const [grade, setGrade] = useState<CharmGradeResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
   const [showPayCTA, setShowPayCTA] = useState(false);
   const [birthYear, setBirthYear] = useState(0);
   const [birthMonth, setBirthMonth] = useState(0);
@@ -68,8 +69,11 @@ function CharmResultContent() {
       setBirthDay(parseInt(form.birthDay) || 0);
       setBirthHour(form.birthHour ?? null);
       setBirthHourUnknown(form.birthTime?.unknown || form.birthHour == null);
+      const isAdmin = localStorage.getItem("sp_admin") === "true";
       const paid = sessionStorage.getItem("charmPaid") === "true";
-      setIsPaid(paid);
+      setIsPaid(isAdmin || paid);
+      const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+      setBlueberries(isNaN(bb) ? 0 : bb);
     } catch { router.replace("/charm"); }
 
     const t = setTimeout(() => setShowPayCTA(true), 3000);
@@ -345,12 +349,27 @@ function CharmResultContent() {
                     ))}
                   </div>
 
-                  <button
-                    onClick={handlePayment}
-                    className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
-                  >
-                    내 매력 극대화 보고서 ₩{CHARM_PRICE.toLocaleString()}
-                  </button>
+                  {blueberries >= CHARM_PRICE ? (
+                    <button
+                      onClick={() => {
+                        const next = blueberries - CHARM_PRICE;
+                        localStorage.setItem("sp_blueberries", String(next));
+                        sessionStorage.setItem("charmPaid", "true");
+                        setBlueberries(next);
+                        setIsPaid(true);
+                      }}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
+                    >
+                      🫐 블루베리 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handlePayment}
+                      className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
+                    >
+                      내 매력 극대화 보고서 ₩{CHARM_PRICE.toLocaleString()}
+                    </button>
+                  )}
                   <p className="text-xs text-center mt-2.5" style={{ color: "rgba(255,255,255,0.2)" }}>토스페이 · 카드 · PDF 저장 포함</p>
                 </div>
               </div>
@@ -408,12 +427,27 @@ function CharmResultContent() {
           className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3 bg-gradient-to-t from-[#080810] via-[#080810]/95 to-transparent"
         >
           <div className="max-w-lg mx-auto">
-            <button
-              onClick={handlePayment}
-              className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
-            >
-              {grade.emoji} 매력 등급 2단계 올리기 ₩{CHARM_PRICE.toLocaleString()}
-            </button>
+            {blueberries >= CHARM_PRICE ? (
+              <button
+                onClick={() => {
+                  const next = blueberries - CHARM_PRICE;
+                  localStorage.setItem("sp_blueberries", String(next));
+                  sessionStorage.setItem("charmPaid", "true");
+                  setBlueberries(next);
+                  setIsPaid(true);
+                }}
+                className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
+              >
+                🫐 블루베리 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+              </button>
+            ) : (
+              <button
+                onClick={handlePayment}
+                className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-pink-900/50 transition-all active:scale-[0.97]"
+              >
+                {grade.emoji} 매력 등급 2단계 올리기 ₩{CHARM_PRICE.toLocaleString()}
+              </button>
+            )}
             <p className="text-center text-xs text-gray-600 mt-2">이성이 먼저 다가오게 만드는 법이 여기 있습니다</p>
           </div>
         </div>

@@ -93,6 +93,7 @@ export default function AdminPage() {
       setDbConnected(!!data.dbConnected);
       setAuthed(true);
       sessionStorage.setItem("adminPw", pw);
+      localStorage.setItem("sp_admin", "true");
       setAuthError("");
     } catch {
       setAuthError("서버 오류가 발생했습니다.");
@@ -274,7 +275,7 @@ export default function AdminPage() {
           <p className="text-xs text-gray-500 mt-0.5">이용자에게 보이지 않는 관리자 전용 페이지</p>
         </div>
         <button
-          onClick={() => { setAuthed(false); sessionStorage.removeItem("adminPw"); }}
+          onClick={() => { setAuthed(false); sessionStorage.removeItem("adminPw"); localStorage.removeItem("sp_admin"); }}
           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
         >
           로그아웃

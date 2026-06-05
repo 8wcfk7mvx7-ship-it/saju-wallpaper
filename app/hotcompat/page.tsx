@@ -212,6 +212,7 @@ function HotCompatContent() {
   const [p1, setP1] = useState<PersonForm>({ gender: "female", year: "", month: "", day: "" });
   const [p2, setP2] = useState<PersonForm>({ gender: "male",   year: "", month: "", day: "" });
   const [isPaid, setIsPaid] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
   const chemRef = useRef<ChemResult | null>(null);
   const r1Ref   = useRef<SajuResult | null>(null);
   const r2Ref   = useRef<SajuResult | null>(null);
@@ -221,7 +222,10 @@ function HotCompatContent() {
   const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   useEffect(() => {
-    setIsPaid(localStorage.getItem("sp_hotcompat_paid") === "true");
+    const isAdmin = localStorage.getItem("sp_admin") === "true";
+    setIsPaid(isAdmin || localStorage.getItem("sp_hotcompat_paid") === "true");
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
   }, []);
 
   function handleAnalyze() {
@@ -433,22 +437,38 @@ function HotCompatContent() {
 
           {/* 잠금 오버레이 */}
           {!isPaid && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl"
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl px-5"
               style={{ background: "rgba(8,1,15,0.75)", backdropFilter: "blur(2px)" }}>
               <p className="text-sm font-black text-white mb-1">🔒 상세 분석 잠김</p>
-              <p className="text-xs mb-4 text-center px-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <p className="text-xs mb-4 text-center" style={{ color: "rgba(255,255,255,0.5)" }}>
                 성적 케미 요소·일주 상세를 보려면 결제하세요
               </p>
-              <button
-                onClick={() => {
-                  const orderId = `hc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-                  router.push(`/hotcompat/pay?orderId=${orderId}`);
-                }}
-                className="px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
-                style={{ background: "linear-gradient(135deg, #be123c, #f43f5e)", color: "#fff", boxShadow: "0 4px 16px rgba(244,63,94,0.4)" }}
-              >
-                전체 보기 — ₩4,900 / 🫐 4,900
-              </button>
+              {blueberries >= 4900 ? (
+                <button
+                  onClick={() => {
+                    const next = blueberries - 4900;
+                    localStorage.setItem("sp_blueberries", String(next));
+                    localStorage.setItem("sp_hotcompat_paid", "true");
+                    setBlueberries(next);
+                    setIsPaid(true);
+                  }}
+                  className="w-full px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98] mb-2"
+                  style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 16px rgba(99,102,241,0.4)" }}
+                >
+                  🫐 블루베리 4,900개로 즉시 열기
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    const orderId = `hc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                    router.push(`/hotcompat/pay?orderId=${orderId}`);
+                  }}
+                  className="w-full px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
+                  style={{ background: "linear-gradient(135deg, #be123c, #f43f5e)", color: "#fff", boxShadow: "0 4px 16px rgba(244,63,94,0.4)" }}
+                >
+                  전체 보기 — ₩4,900
+                </button>
+              )}
             </div>
           )}
         </div>
