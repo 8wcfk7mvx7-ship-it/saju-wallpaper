@@ -140,6 +140,7 @@ const REVIEWS = [
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
 const NOTICES = [
+  { date: "2026.06.04", title: "짝사랑 성공 비결 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.03", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.02", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.01", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
@@ -710,7 +711,7 @@ export default function MainPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#06060e] text-white">
+    <main className="min-h-screen bg-[#06060e] text-white overflow-x-hidden">
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -1220,7 +1221,7 @@ export default function MainPage() {
         </div>
       </footer>
 
-      {/* ── 모바일 카카오 플로팅 CTA ── */}
+      {/* ── 모바일 카카오 로그인 고정 플로팅 (하단 nav 위) ── */}
       <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 sm:hidden px-4 pb-2">
         <KakaoLoginButton redirectTo="/" floating />
       </div>

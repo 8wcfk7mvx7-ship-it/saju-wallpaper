@@ -1,13 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: 'ChosunilboMyungjo';
-  src: url('/fonts/ChosunilboMyungjo.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -16,7 +8,6 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'ChosunilboMyungjo', "조선일보명조", Georgia, serif;
   --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
 }
 
@@ -30,5 +21,4 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'ChosunilboMyungjo', "조선일보명조", Georgia, serif;
 }

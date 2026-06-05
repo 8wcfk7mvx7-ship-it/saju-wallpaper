@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const chosun = localFont({
+  src: "../public/fonts/ChosunilboMyungjo.woff",
+  variable: "--font-chosun",
+  display: "swap",
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: "여름궁전 사주 명리 분석",
@@ -12,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+    <html lang="ko" className={`h-full antialiased ${chosun.variable}`} suppressHydrationWarning>
+      <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
         {children}
       </body>
     </html>
