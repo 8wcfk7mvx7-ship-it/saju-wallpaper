@@ -572,24 +572,13 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 
   return (
     <div ref={ref} className="relative">
-      {/* 50% OFF 거친 테이프 스티커 */}
+      {/* 세일 스티커 */}
       {svc.saleSticker && (
-        <div className="absolute -top-3 -right-2 z-20 rotate-[8deg] pointer-events-none select-none" style={{ filter: "drop-shadow(0 2px 6px rgba(185,28,28,0.7))" }}>
-          <svg width="80" height="28" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* 왼쪽 거친 찢김 */}
-            <path d="M0 8 Q1 5 3 9 Q5 13 7 7 Q9 1 11 6 Q13 11 15 5 L15 23 Q13 27 11 22 Q9 17 7 21 Q5 25 3 19 Q1 13 0 18 Z" fill="#991b1b"/>
-            {/* 몸통 */}
-            <rect x="13" y="2" width="52" height="24" fill="#dc2626"/>
-            {/* 오른쪽 거친 찢김 */}
-            <path d="M65 2 L65 26 Q67 22 69 27 Q71 32 73 26 Q75 20 77 25 Q79 30 80 27 L80 7 Q79 3 77 7 Q75 11 73 5 Q71 -1 69 4 Q67 9 65 2 Z" fill="#991b1b"/>
-            {/* 테이프 반투명 광택 */}
-            <rect x="13" y="2" width="52" height="9" fill="rgba(255,255,255,0.10)"/>
-            {/* 가로줄 텍스처 */}
-            <rect x="13" y="13" width="52" height="1" fill="rgba(0,0,0,0.08)"/>
-            <text x="40" y="19" textAnchor="middle" fill="white" fontSize="10.5" fontWeight="900" fontFamily="Arial Black, Arial, sans-serif" letterSpacing="1">
-              {svc.saleSticker}
-            </text>
-          </svg>
+        <div className="absolute -top-3 -right-2 z-20 rotate-[10deg] pointer-events-none select-none">
+          <div className="px-3 py-1 rounded-full text-[11px] font-black text-white"
+            style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)", boxShadow: "0 2px 12px rgba(220,38,38,0.6)" }}>
+            {svc.saleSticker}
+          </div>
         </div>
       )}
 
@@ -597,60 +586,75 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
         onClick={() => router.push(svc.href)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        className="kitsch-card cursor-pointer rounded-2xl flex flex-col"
         style={{
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(24px)",
-          transition: `opacity 0.7s ease ${index * 60}ms, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${index * 60}ms`,
-          borderColor: hovered ? svc.border : "rgba(255,255,255,0.07)",
-          boxShadow: hovered ? `0 8px 40px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
-          background: hovered ? `radial-gradient(ellipse at top left, ${svc.glow} 0%, rgba(10,10,20,0.95) 60%)` : "rgba(10,10,20,0.6)",
+          transform: visible ? "translateY(0)" : "translateY(28px)",
+          transition: `opacity 0.6s ease ${index * 55}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${index * 55}ms`,
+          background: hovered
+            ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
+            : "rgba(11,4,28,0.85)",
+          border: `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
+          boxShadow: hovered
+            ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
+            : "inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
-        className="relative border rounded-2xl p-5 cursor-pointer transition-all duration-400 flex flex-col gap-3 backdrop-blur-sm"
       >
-        {/* 뱃지 */}
-        <div className="flex items-start justify-between">
-          <div
-            className="text-3xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0"
-            style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${svc.border}` }}
-          >
-            {svc.emoji}
-          </div>
-          {svc.badge && (
-            <span
-              className="text-xs font-black px-2.5 py-1 rounded-full text-white"
-              style={{ background: svc.badgeBg }}
-            >
-              {svc.badge}
-            </span>
-          )}
-        </div>
+        {/* 왼쪽 컬러 스트라이프 */}
+        <div className="flex flex-1">
+          <div className="w-1 rounded-l-2xl shrink-0" style={{ background: `linear-gradient(180deg, ${svc.color}, transparent)`, opacity: hovered ? 1 : 0.4, transition: "opacity 0.3s" }} />
 
-        <div>
-          <h3 className="text-base font-black text-white mb-1 leading-tight">{svc.title}</h3>
-          <p className="text-xs font-semibold mb-2" style={{ color: svc.color }}>
-            &ldquo;{svc.viral}&rdquo;
-          </p>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.58)" }}>
-            {svc.desc}
-          </p>
-        </div>
+          <div className="flex-1 p-5 flex flex-col gap-3.5">
+            {/* 헤더 */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl w-11 h-11 flex items-center justify-center rounded-xl shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${svc.glow.replace('0.12','0.25').replace('0.15','0.3')}, rgba(255,255,255,0.03))`,
+                    border: `1px solid ${svc.border}`,
+                    boxShadow: hovered ? `0 0 16px ${svc.glow}` : "none",
+                    transition: "box-shadow 0.3s",
+                  }}>
+                  {svc.emoji}
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-black text-white leading-tight">{svc.title}</h3>
+                  {svc.badge && (
+                    <span className="inline-block mt-0.5 text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                      style={{ background: svc.badgeBg }}>
+                      {svc.badge}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <span className="text-sm font-black shrink-0 transition-transform duration-200"
+                style={{ color: svc.color, transform: hovered ? "translateX(4px)" : "translateX(0)" }}>→</span>
+            </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-1">
-            {svc.tags.map(tag => (
-              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.52)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                {tag}
-              </span>
-            ))}
+            {/* 바이럴 카피 */}
+            <p className="text-[13px] font-bold leading-snug" style={{ color: svc.color }}>
+              &ldquo;{svc.viral}&rdquo;
+            </p>
+
+            {/* 설명 */}
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+              {svc.desc}
+            </p>
+
+            {/* 태그 */}
+            <div className="flex flex-wrap gap-1.5">
+              {svc.tags.map(tag => (
+                <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full font-medium"
+                  style={{
+                    background: `${svc.glow.replace('0.12','0.12').replace('0.15','0.12')}`,
+                    color: svc.color,
+                    border: `1px solid ${svc.border}`,
+                  }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
-          <span
-            className="text-xs font-bold flex items-center gap-1 shrink-0"
-            style={{ color: svc.color }}
-          >
-            {startLabel}
-            <span style={{ transform: hovered ? "translateX(4px)" : "translateX(0)", transition: "transform 0.2s ease", display: "inline-block" }}>→</span>
-          </span>
         </div>
       </div>
     </div>
@@ -729,24 +733,36 @@ export default function MainPage() {
 
 
   return (
-    <main className="min-h-screen bg-[#06060e] text-white overflow-x-hidden">
+    <main className="min-h-screen text-white overflow-x-hidden" style={{ background: "#07001a" }}>
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[900px] h-[900px] rounded-full bg-indigo-950/50 blur-[250px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-violet-950/40 blur-[220px]" />
-        <div className="absolute top-[40%] left-[30%] w-[500px] h-[500px] rounded-full blur-[180px]" style={{ background: "rgba(201,168,76,0.03)" }} />
+        {/* 핑크 좌상단 */}
+        <div className="absolute top-[-15%] left-[-5%] w-[700px] h-[700px] rounded-full blur-[200px]"
+          style={{ background: "rgba(255,45,120,0.12)" }} />
+        {/* 퍼플 중앙 */}
+        <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[220px]"
+          style={{ background: "rgba(139,92,246,0.1)" }} />
+        {/* 골드 하단 */}
+        <div className="absolute bottom-[-10%] left-[20%] w-[700px] h-[700px] rounded-full blur-[200px]"
+          style={{ background: "rgba(245,197,24,0.07)" }} />
+        {/* 사이언 우하단 */}
+        <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] rounded-full blur-[160px]"
+          style={{ background: "rgba(6,182,212,0.06)" }} />
+        {/* 미세 그리드 패턴 */}
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
       </div>
 
       {/* ── 상단 네비게이션 (모바일 숨김) ── */}
-      <nav className="hidden sm:block sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
-        style={{ background: "rgba(6,6,14,0.85)" }}>
+      <nav className="hidden sm:block sticky top-0 z-50 border-b backdrop-blur-xl"
+        style={{ background: "rgba(7,0,26,0.88)", borderColor: "rgba(255,45,120,0.12)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <button onClick={() => router.push("/")} className="flex items-center gap-2.5">
-            <span className="text-lg" style={{ color: "#c9a84c" }}>☯</span>
+            <span className="text-xl star-1" style={{ color: "#ff2d78" }}>☯</span>
             <span className="font-black text-base tracking-tight text-white">Summer Palace</span>
-            <span className="hidden sm:block text-xs px-2 py-0.5 rounded-full font-medium"
-              style={{ background: "rgba(201,168,76,0.12)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.25)" }}>
+            <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full font-black"
+              style={{ background: "rgba(255,45,120,0.12)", color: "#ff2d78", border: "1px solid rgba(255,45,120,0.25)" }}>
               AI 사주
             </span>
           </button>
@@ -755,8 +771,8 @@ export default function MainPage() {
             {/* 보관함 — PC only */}
             <button
               onClick={() => router.push("/mypage")}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-amber-500/15"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.45)" }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
             >
               <span>📂</span>
               <span>보관함</span>
@@ -764,11 +780,11 @@ export default function MainPage() {
             {/* 블루베리 잔액/충전 — PC only */}
             <button
               onClick={() => router.push("/charge")}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-indigo-500/20"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
               style={{
-                background: blueberries > 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.04)",
-                border: blueberries > 0 ? "1px solid rgba(99,102,241,0.35)" : "1px solid rgba(255,255,255,0.08)",
-                color: blueberries > 0 ? "#a78bfa" : "rgba(255,255,255,0.4)",
+                background: blueberries > 0 ? "rgba(139,92,246,0.18)" : "rgba(255,255,255,0.04)",
+                border: blueberries > 0 ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                color: blueberries > 0 ? "#c4b5fd" : "rgba(255,255,255,0.45)",
               }}
             >
               <span>🫐</span>
@@ -834,78 +850,98 @@ export default function MainPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
 
         {/* ── 히어로 섹션 ── */}
-        <section className="py-14 sm:py-20 text-center relative">
+        <section className="py-16 sm:py-24 text-center relative">
+          {/* 플로팅 장식 별 */}
+          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ff2d78" }}>✦</span>
+          <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#f5c518" }}>★</span>
+          <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#8b5cf6" }}>◆</span>
+          <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#06b6d4" }}>✦</span>
+
           {/* 실시간 활동 알림 */}
           <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span
-                style={{
-                  color: "rgba(255,255,255,0.5)",
-                  opacity: activityVisible ? 1 : 0,
-                  transition: "opacity 0.4s ease",
-                }}
-              >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium"
+              style={{ background: "rgba(255,45,120,0.08)", border: "1px solid rgba(255,45,120,0.2)", color: "rgba(255,255,255,0.6)" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#ff2d78", boxShadow: "0 0 6px #ff2d78" }} />
+              <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
                 {ACTIVITIES[activityIndex]}
               </span>
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.1] mb-5 tracking-tight"
-            style={{
-              background: "linear-gradient(160deg, #ffffff 0%, rgba(255,255,255,0.9) 40%, rgba(201,168,76,0.75) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
-            {t.h1[0]}<br />
-            <span style={{ WebkitTextFillColor: "#c9a84c" }}>{t.h1[1]}</span><br />
-            {t.h1[2]}
-          </h1>
+          {/* 메인 타이틀 */}
+          <div className="mb-6">
+            <div className="inline-block text-xs font-black tracking-[0.25em] uppercase px-3 py-1.5 rounded-full mb-4"
+              style={{ background: "rgba(255,45,120,0.1)", border: "1px solid rgba(255,45,120,0.25)", color: "#ff2d78" }}>
+              ☯ AI 사주명리 · Summer Palace
+            </div>
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
+              <span className="grad-text-main block">{t.h1[0]}</span>
+              <span className="block" style={{ color: "#ff2d78", textShadow: "0 0 40px rgba(255,45,120,0.4)" }}>{t.h1[1]}</span>
+              <span className="grad-text-main block">{t.h1[2]}</span>
+            </h1>
+          </div>
 
-          <p className="text-sm sm:text-base max-w-md mx-auto mb-3 leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.62)" }}>
+          <p className="text-base sm:text-lg max-w-lg mx-auto mb-8 leading-relaxed font-medium"
+            style={{ color: "rgba(255,255,255,0.65)" }}>
             {t.heroSub}
           </p>
 
-          {/* 강렬한 바이럴 카피 */}
-          <div className="max-w-xl mx-auto mb-8 space-y-2">
+          {/* 강렬한 바이럴 카피 3줄 */}
+          <div className="max-w-2xl mx-auto mb-10 grid sm:grid-cols-3 gap-2.5">
             {[
-              "내 사주에 맞는 배경화면이 따로 있습니다 — 지금 쓰는 배경화면이 기운을 막고 있을 수 있어요",
-              "인오술 삼합이라도 자오충 앞에서는 무너집니다 — 궁합, 가볍게 넘기지 마세요",
-              "대운 터지는 나이가 정해져 있습니다 — 내가 몇 살에 운이 열리는지 알고 싶지 않으세요?",
-            ].map((copy, i) => (
-              <div key={i} className="text-xs text-left rounded-xl px-4 py-2.5 flex items-start gap-2"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.58)" }}>
-                <span style={{ color: "#c9a84c" }} className="shrink-0 mt-0.5">✦</span>
-                <span>{copy}</span>
+              { icon: "🔮", text: "지금 쓰는 배경화면이 기운을 막고 있을 수 있어요" },
+              { icon: "💑", text: "인오술 삼합도 자오충 앞에선 무너집니다" },
+              { icon: "⏳", text: "내 대운이 터지는 나이, 지금 확인하세요" },
+            ].map((item, i) => (
+              <div key={i} className="text-left rounded-2xl px-4 py-3 flex items-start gap-2.5 cursor-pointer transition-all hover:scale-[1.02]"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                onClick={() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" })}>
+                <span className="text-xl shrink-0">{item.icon}</span>
+                <span className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{item.text}</span>
               </div>
             ))}
           </div>
 
-          <button
-            onClick={() => router.push("/saju")}
-            className="inline-flex items-center gap-2 font-black text-base px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #c9a84c)",
-              color: "#fff",
-              boxShadow: "0 8px 32px rgba(124,58,237,0.35)",
-            }}
-          >
-            {t.heroCta}
-            <span>→</span>
-          </button>
+          {/* CTA 버튼 */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+            <button
+              onClick={() => router.push("/saju")}
+              className="cta-btn inline-flex items-center gap-2.5 font-black text-base px-10 py-4 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #ff2d78, #8b5cf6)",
+                color: "#fff",
+              }}
+            >
+              {t.heroCta}
+              <span className="text-lg">✦</span>
+            </button>
+            <button
+              onClick={() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="inline-flex items-center gap-2 font-bold text-sm px-7 py-4 rounded-2xl transition-all hover:scale-105"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.75)" }}
+            >
+              서비스 보기 ↓
+            </button>
+          </div>
 
-          {/* ── 누적 분석 ── */}
-          <div className="mt-10 max-w-sm mx-auto flex justify-center">
-            <p className="text-xs px-4 py-2 rounded-full" style={{ color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              누적 분석 {counter.toLocaleString()}건
-            </p>
+          {/* ── 누적 분석 + 별점 ── */}
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
+              style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.18)", color: "rgba(255,255,255,0.55)" }}>
+              <span style={{ color: "#f5c518" }}>★</span>
+              <span className="font-bold" style={{ color: "#f5c518" }}>4.7</span>
+              <span>실제 이용 후기</span>
+            </div>
+            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
+              <span>🔮</span>
+              <span>누적 분석 <strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>건</span>
+            </div>
           </div>
 
           {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
-          <div className="mt-10 relative">
-            <p className="text-sm font-bold mb-3 tracking-wide" style={{ color: "rgba(255,255,255,0.7)" }}>카테고리로 찾기 ↓</p>
+          <div className="mt-12">
+            <p className="text-xs font-bold mb-4 tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>카테고리 바로가기</p>
             <div className="flex gap-2 justify-center flex-wrap">
               {CATEGORIES.map(({ key, icon }) => (
                 <button
@@ -914,16 +950,16 @@ export default function MainPage() {
                     setActiveCategory(key);
                     document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-105"
                   style={{
-                    background: activeCategory === key ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)",
-                    border: activeCategory === key ? "1px solid rgba(201,168,76,0.3)" : "1px solid rgba(255,255,255,0.07)",
-                    color: activeCategory === key ? "#e8c97a" : "rgba(255,255,255,0.4)",
+                    background: activeCategory === key ? "rgba(255,45,120,0.15)" : "rgba(255,255,255,0.04)",
+                    border: activeCategory === key ? "1px solid rgba(255,45,120,0.35)" : "1px solid rgba(255,255,255,0.07)",
+                    color: activeCategory === key ? "#ff2d78" : "rgba(255,255,255,0.4)",
+                    boxShadow: activeCategory === key ? "0 0 12px rgba(255,45,120,0.2)" : "none",
                   }}
                 >
                   <span>{icon}</span>
-                  <span className="hidden sm:inline">{t.catLabel[key]}</span>
-                  <span className="sm:hidden">{t.catLabel[key]}</span>
+                  <span>{t.catLabel[key]}</span>
                 </button>
               ))}
             </div>
@@ -933,8 +969,8 @@ export default function MainPage() {
         {/* ── 공지사항 (1줄 롤링) ── */}
         <section className="mb-10">
           <div
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer hover:bg-white/[0.03] transition-colors"
-            style={{ background: "rgba(10,10,20,0.5)", border: "1px solid rgba(255,255,255,0.07)" }}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-[1.01]"
+            style={{ background: "rgba(255,45,120,0.05)", border: "1px solid rgba(255,45,120,0.15)" }}
             onClick={() => router.push("/notice")}
           >
             <span className="text-xs font-bold shrink-0" style={{ color: "#fbbf24" }}>📢</span>
@@ -969,75 +1005,67 @@ export default function MainPage() {
         </p>
 
         {/* ── 서비스 섹션 ── */}
-        <section id="services-section" className="mb-14">
-          <div className="flex items-end justify-between mb-4">
+        <section id="services-section" className="mb-16">
+          <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>AI SERVICES</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">{t.servicesHeading}</h2>
+              <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ AI SERVICES</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.servicesHeading}</h2>
             </div>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지 서비스
+            <span className="text-xs px-3 py-1 rounded-full font-bold"
+              style={{ background: "rgba(255,45,120,0.08)", border: "1px solid rgba(255,45,120,0.2)", color: "#ff2d78" }}>
+              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지
             </span>
           </div>
 
           {/* ── 카테고리 필터 탭 ── */}
-          <div className="relative mb-5">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
-              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}>
-              {CATEGORIES.map(({ key, icon }) => {
-                const isActive = activeCategory === key;
-                const count = key === "전체" ? SERVICES.length : SERVICES.filter(s => s.categories.includes(key)).length;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setActiveCategory(key)}
-                    className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap"
-                    style={{
-                      background: isActive
-                        ? key === "Special" ? "linear-gradient(135deg, rgba(201,168,76,0.25), rgba(161,98,7,0.3))"
-                          : key === "무료" ? "rgba(16,185,129,0.2)"
-                          : key === "연애·궁합" ? "rgba(236,72,153,0.2)"
-                          : key === "금전·투자" ? "rgba(16,185,129,0.2)"
-                          : key === "운명·대운" ? "rgba(202,138,4,0.2)"
-                          : key === "라이프" ? "rgba(99,102,241,0.2)"
-                          : "rgba(255,255,255,0.1)"
-                        : key === "무료" ? "rgba(16,185,129,0.07)" : key === "Special" ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.04)",
-                      border: isActive
-                        ? key === "Special" ? "1px solid rgba(201,168,76,0.4)"
-                          : key === "무료" ? "1px solid rgba(16,185,129,0.35)"
-                          : key === "연애·궁합" ? "1px solid rgba(236,72,153,0.35)"
-                          : key === "금전·투자" ? "1px solid rgba(16,185,129,0.35)"
-                          : key === "운명·대운" ? "1px solid rgba(202,138,4,0.35)"
-                          : key === "라이프" ? "1px solid rgba(99,102,241,0.35)"
-                          : "1px solid rgba(255,255,255,0.18)"
-                        : key === "무료" ? "1px solid rgba(16,185,129,0.2)" : key === "Special" ? "1px solid rgba(201,168,76,0.2)" : "1px solid rgba(255,255,255,0.07)",
-                      color: isActive
-                        ? key === "Special" ? "#e8c97a"
-                          : key === "무료" ? "#6ee7b7"
-                          : key === "연애·궁합" ? "#f9a8d4"
-                          : key === "금전·투자" ? "#6ee7b7"
-                          : key === "운명·대운" ? "#fbbf24"
-                          : key === "라이프" ? "#a78bfa"
-                          : "rgba(255,255,255,0.9)"
-                        : key === "무료" ? "rgba(52,211,153,0.8)" : key === "Special" ? "rgba(232,201,122,0.7)" : "rgba(255,255,255,0.38)",
-                    }}
-                  >
-                    <span>{icon}</span>
-                    <span>{t.catLabel[key]}</span>
-                    {isActive && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
-                        style={{ background: "rgba(255,255,255,0.12)" }}>
-                        {count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {/* 오른쪽 페이드 */}
-            <div className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none"
-              style={{ background: "linear-gradient(to right, transparent, #06060e)" }} />
-          </div>
+          {(() => {
+            const CAT_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
+              "전체":    { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.2)",  text: "#ffffff",  glow: "rgba(255,255,255,0.1)" },
+              "무료":    { bg: "rgba(16,185,129,0.18)",  border: "rgba(16,185,129,0.4)",   text: "#6ee7b7",  glow: "rgba(16,185,129,0.2)" },
+              "연애·궁합":{ bg: "rgba(255,45,120,0.15)", border: "rgba(255,45,120,0.4)",   text: "#ff2d78",  glow: "rgba(255,45,120,0.2)" },
+              "금전·투자":{ bg: "rgba(16,185,129,0.15)", border: "rgba(16,185,129,0.35)",  text: "#34d399",  glow: "rgba(16,185,129,0.15)" },
+              "운명·대운":{ bg: "rgba(245,197,24,0.12)", border: "rgba(245,197,24,0.35)",  text: "#f5c518",  glow: "rgba(245,197,24,0.15)" },
+              "라이프":  { bg: "rgba(139,92,246,0.15)",  border: "rgba(139,92,246,0.4)",   text: "#a78bfa",  glow: "rgba(139,92,246,0.2)" },
+              "Special": { bg: "rgba(245,197,24,0.15)",  border: "rgba(245,197,24,0.45)",  text: "#fbbf24",  glow: "rgba(245,197,24,0.2)" },
+              "19금":    { bg: "rgba(239,68,68,0.15)",   border: "rgba(239,68,68,0.4)",    text: "#f87171",  glow: "rgba(239,68,68,0.2)" },
+            };
+            return (
+              <div className="relative mb-6">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {CATEGORIES.map(({ key, icon }) => {
+                    const isActive = activeCategory === key;
+                    const c = CAT_COLORS[key] || CAT_COLORS["전체"];
+                    const count = key === "전체" ? SERVICES.length : SERVICES.filter(s => s.categories.includes(key)).length;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setActiveCategory(key)}
+                        className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 whitespace-nowrap"
+                        style={{
+                          background: isActive ? c.bg : "rgba(255,255,255,0.03)",
+                          border: isActive ? `1.5px solid ${c.border}` : "1px solid rgba(255,255,255,0.07)",
+                          color: isActive ? c.text : "rgba(255,255,255,0.38)",
+                          boxShadow: isActive ? `0 0 16px ${c.glow}` : "none",
+                          transform: isActive ? "scale(1.05)" : "scale(1)",
+                        }}
+                      >
+                        <span>{icon}</span>
+                        <span>{t.catLabel[key]}</span>
+                        {isActive && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
+                            style={{ background: "rgba(255,255,255,0.15)" }}>
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="absolute right-0 top-0 bottom-1 w-10 pointer-events-none"
+                  style={{ background: "linear-gradient(to right, transparent, #07001a)" }} />
+              </div>
+            );
+          })()}
 
           {/* 데스크탑: 2컬럼, 모바일: 1컬럼 — 카드 overflow 허용으로 스티커 노출 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-visible">
@@ -1089,18 +1117,103 @@ export default function MainPage() {
           </button>
         </section>
 
+        {/* ── 格局(격국) 정보 섹션 ── */}
+        <section className="mb-16">
+          <div className="mb-6">
+            <p className="text-xs font-black tracking-widest uppercase mb-1.5 shimmer-text">✦ 사주 격국(格局) 가이드</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">내 사주의 格은 무엇인가?</h2>
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+              격국(格局)은 사주의 월지(月支)를 기준으로 삼아 일간의 본질적 성향과 운명의 방향성을 분류하는 틀입니다.
+              월령은 사주에서 가장 핵심적인 기운 — 일부 학파는 월지 하나가 사주 전체의 50% 이상을 결정한다고 봅니다.
+            </p>
+          </div>
+
+          {/* 내격 10종 */}
+          <div className="mb-5">
+            <p className="text-xs font-bold mb-3 px-3 py-1.5 rounded-full inline-block"
+              style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa" }}>
+              内格 (내격) — 10종
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              {[
+                { name: "식신격", hanja: "食神格", color: "#f5c518", desc: "끊임없는 노력·투자, 가시적 성과 추구. 안정적 실력파." },
+                { name: "상관격", hanja: "傷官格", color: "#f87171", desc: "창의성·정의감 강함. 좌절하면 냉소로 전환 가능." },
+                { name: "정재격", hanja: "正財格", color: "#34d399", desc: "낭비 없음, 안정 추구. 가정적·헌신적 성향." },
+                { name: "편재격", hanja: "偏財格", color: "#06b6d4", desc: "활동 범위 무제한. 다양한 분야 도전, 확장 지향." },
+                { name: "정관격", hanja: "正官格", color: "#a78bfa", desc: "원칙·규칙 안에서 최고 추구. 조직 친화적." },
+                { name: "편관격", hanja: "偏官格", color: "#fb7185", desc: "조직 질서 확립. 권위·계층 명확. 극복 시 강한 리더십." },
+                { name: "정인격", hanja: "正印格", color: "#fbbf24", desc: "선량하고 학문·직관 발달. 관성 있으면 청렴·자비." },
+                { name: "편인격", hanja: "偏印格", color: "#e879f9", desc: "독창성·예술성 강함. 비정형적 사고, 전문 기술 발달." },
+                { name: "비견격", hanja: "比肩格", color: "#ff2d78", desc: "독립심·자존심 극강. 경쟁 속에서 빛나는 유형." },
+                { name: "겁재격", hanja: "劫財格", color: "#f97316", desc: "강인한 의지로 역경 극복. 재물 기복 주의." },
+              ].map((g) => (
+                <div key={g.name} className="rounded-xl p-3 flex flex-col gap-1.5"
+                  style={{ background: "rgba(255,255,255,0.03)", border: `1px solid rgba(255,255,255,0.07)`, borderLeft: `3px solid ${g.color}` }}>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-black" style={{ color: g.color }}>{g.name}</span>
+                    <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{g.hanja}</span>
+                  </div>
+                  <p className="text-[11px] leading-snug" style={{ color: "rgba(255,255,255,0.5)" }}>{g.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 성격 vs 파격 + 외격 */}
+          <div className="grid sm:grid-cols-3 gap-3 mb-4">
+            <div className="rounded-2xl p-4" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
+              <p className="text-sm font-black mb-1.5" style={{ color: "#34d399" }}>成格 (성격)</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                格이 완전히 갖춰진 상태. 소명을 지키며 희생이 따르는 대신, 운의 흐름이 일관적이고 삶의 방향성이 명확하다.
+              </p>
+            </div>
+            <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
+              <p className="text-sm font-black mb-1.5" style={{ color: "#f87171" }}>破格 (파격)</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                格이 완성되지 못한 상태. 자기 만족 추구 경향이 강하고 운의 기복이 크다. 단, 파격 사주도 방향만 맞으면 성공할 수 있다.
+              </p>
+            </div>
+            <div className="rounded-2xl p-4" style={{ background: "rgba(245,197,24,0.06)", border: "1px solid rgba(245,197,24,0.2)" }}>
+              <p className="text-sm font-black mb-1.5" style={{ color: "#f5c518" }}>外格 (외격)</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                종격·화격 등 매우 특이한 사주. 한 오행·십성이 압도적으로 강할 때 그 기운에 순응하는 구조. 종재격·종관격·종살격·화격 5종 등이 있다.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl p-4 flex items-start gap-3"
+            style={{ background: "rgba(255,45,120,0.05)", border: "1px solid rgba(255,45,120,0.15)" }}>
+            <span className="text-xl shrink-0">🔮</span>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <strong style={{ color: "#ff2d78" }}>격국 취용법:</strong> 월지(月支)에서 일간과의 십성(十星) 관계로 格을 정한다.
+              월지 지장간 중 가장 강한 기운을 취용신(取用神)으로 삼아 格의 이름을 붙인다.
+              예) 일간 甲木, 월지 酉金 → 酉 본기가 庚金(편관) → <strong style={{ color: "#fbbf24" }}>편관격(칠살격)</strong>.
+              신강·신약 판단 후 용신을 확정하면 격국 분석이 완성된다.
+            </p>
+          </div>
+        </section>
+
         {/* ── 바이럴 띠 배너 ── */}
-        <section className="mb-14 -mx-4 sm:-mx-6">
-          <div className="relative py-10 sm:py-14 px-6 sm:px-12 text-center overflow-hidden"
-            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(10,10,20,0.9) 40%, rgba(201,168,76,0.12) 100%)", borderTop: "1px solid rgba(201,168,76,0.15)", borderBottom: "1px solid rgba(201,168,76,0.15)" }}>
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.025] text-[220px] font-black select-none pointer-events-none"
-              style={{ fontFamily: "'Noto Serif KR', serif" }}>☯</div>
-            <p className="text-xs font-semibold mb-3 tracking-widest uppercase" style={{ color: "rgba(201,168,76,0.65)" }}>Before & After</p>
-            <h3 className="text-xl sm:text-3xl font-black text-white mb-4 leading-snug">
+        <section className="mb-16 -mx-4 sm:-mx-6">
+          <div className="relative py-12 sm:py-16 px-6 sm:px-12 text-center overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,45,120,0.12) 0%, rgba(7,0,26,0.95) 45%, rgba(139,92,246,0.1) 100%)",
+              borderTop: "1px solid rgba(255,45,120,0.2)",
+              borderBottom: "1px solid rgba(139,92,246,0.2)",
+            }}>
+            {/* 배경 큰 기호 */}
+            <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
+              style={{ fontSize: 280, opacity: 0.018, fontWeight: 900, color: "#ff2d78" }}>命</div>
+            {/* 장식 별 */}
+            <span className="absolute top-6 left-[10%] text-2xl star-1" style={{ color: "#ff2d78", opacity: 0.6 }}>✦</span>
+            <span className="absolute bottom-6 right-[8%] text-xl star-3" style={{ color: "#f5c518", opacity: 0.6 }}>★</span>
+
+            <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(255,45,120,0.7)" }}>✦ Before & After ✦</p>
+            <h3 className="text-2xl sm:text-4xl font-black text-white mb-5 leading-snug">
               &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
-              <span style={{ color: "#c9a84c" }}>처음으로 방향이 보였습니다&rdquo;</span>
+              <span style={{ color: "#ff2d78", textShadow: "0 0 30px rgba(255,45,120,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
-            <p className="text-sm max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <p className="text-sm sm:text-base max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
               타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
             </p>
@@ -1108,51 +1221,48 @@ export default function MainPage() {
         </section>
 
         {/* ── 후기 게시판 ── */}
-        <section className="mb-14">
-          <style>{`
-            @keyframes reviewTicker {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            .review-ticker:hover { animation-play-state: paused; }
-          `}</style>
-
-          <div className="flex items-end justify-between mb-5">
+        <section className="mb-16">
+          <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>REVIEWS</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">{t.reviewsHeading}</h2>
+              <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ REVIEWS</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.reviewsHeading}</h2>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-yellow-400 text-sm">★★★★★</span>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>4.7 / 5.0</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.2)" }}>
+              <span style={{ color: "#f5c518" }}>★★★★★</span>
+              <span className="text-xs font-black" style={{ color: "#f5c518" }}>4.7</span>
             </div>
           </div>
 
           {/* 무한 가로 스크롤 필름 */}
           <div className="overflow-hidden -mx-4 sm:-mx-6">
             <div
-              className="review-ticker flex gap-3 py-2"
+              className="review-ticker flex gap-3 py-2 px-4 sm:px-6"
               style={{ animation: "reviewTicker 490s linear infinite", width: "max-content" }}
             >
               {[...REVIEWS, ...REVIEWS].map((r, i) => (
-                <div key={i} className="w-72 shrink-0 rounded-2xl p-4 flex flex-col gap-3"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={i} className="w-72 shrink-0 rounded-2xl p-5 flex flex-col gap-3"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderTop: "2px solid rgba(255,45,120,0.3)",
+                  }}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-bold text-white">{r.name}</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{r.region} · {r.age}</p>
+                      <p className="text-sm font-black text-white">{r.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{r.region} · {r.age}</p>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
-                      style={{ background: "rgba(201,168,76,0.1)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.2)" }}>
+                    <span className="text-[10px] px-2 py-1 rounded-full shrink-0 font-bold"
+                      style={{ background: "rgba(255,45,120,0.1)", color: "#ff2d78", border: "1px solid rgba(255,45,120,0.2)" }}>
                       {r.service}
                     </span>
                   </div>
                   <div className="flex gap-0.5">
                     {Array.from({ length: r.stars }).map((_, j) => (
-                      <span key={j} className="text-yellow-400 text-xs">★</span>
+                      <span key={j} style={{ color: "#f5c518" }}>★</span>
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
                     &ldquo;{r.text}&rdquo;
                   </p>
                 </div>
@@ -1176,12 +1286,12 @@ export default function MainPage() {
       </div>
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
-      <section className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
+      <section className="border-t" style={{ borderColor: "rgba(255,45,120,0.1)" }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <IljinCalendar />
           </div>
-          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <ContactSection />
           </div>
         </div>
@@ -1226,7 +1336,7 @@ export default function MainPage() {
 
       {/* ── 모바일 하단 네비게이션 ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"
-        style={{ background: "rgba(6,6,14,0.97)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}>
+        style={{ background: "rgba(7,0,26,0.97)", borderColor: "rgba(255,45,120,0.12)", backdropFilter: "blur(20px)" }}>
         <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
