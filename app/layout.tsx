@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import AutoLogout from "@/components/AutoLogout";
+import SiteHeader from "@/components/SiteHeader";
 
 const chosun = localFont({
   src: "./fonts/ChosunilboMyungjo.woff",
@@ -69,6 +70,7 @@ export default function RootLayout({
       </head>
       <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
         <AutoLogout />
+        <SiteHeader />
         {children}
       </body>
     </html>

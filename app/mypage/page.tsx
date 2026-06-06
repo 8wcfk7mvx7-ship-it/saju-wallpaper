@@ -124,15 +124,6 @@ export default function MyPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
-      {/* 헤더 */}
-      <div className="sticky top-0 z-40 border-b backdrop-blur-xl"
-        style={{ background: "rgba(6,6,14,0.9)", borderColor: "rgba(255,255,255,0.07)" }}>
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <button onClick={() => router.push("/")} className="text-gray-400 hover:text-white transition text-sm">←</button>
-          <h1 className="text-base font-black text-white">보관함</h1>
-        </div>
-      </div>
-
       <div className="max-w-lg mx-auto px-4 pt-6">
         {/* 유저 카드 */}
         {user ? (
