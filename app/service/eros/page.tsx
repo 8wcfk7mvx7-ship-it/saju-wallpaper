@@ -470,8 +470,8 @@ function ErosContent() {
   const targetGender = gender === "female" ? "남자" : "여자";
 
   // ── 암합·지지합·충 분석 ──────────────────────────────────────────────────
-  const cgList = [pd.year.cg, pd.month.cg, pd.day.cg, pd.time.cg].filter(Boolean);
-  const jjList = [pd.year.jj, pd.month.jj, pd.day.jj, pd.time.jj].filter(Boolean);
+  const cgList = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean);
+  const jjList = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean);
 
   const found천간합: typeof 천간합목록 = [];
   for (let i = 0; i < cgList.length; i++) {
