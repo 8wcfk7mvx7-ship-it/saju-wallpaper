@@ -540,6 +540,13 @@ const SERVICES: {
     categories: ["전체", "무료", "운명·대운", "라이프"],
   },
   {
+    id: "chat", emoji: "🔮", title: "사주 AI 역술사", viral: "사주 보는 AI가 생겼습니다",
+    desc: "현업 역술인 개발 · 모든 질문 가능 · 대화 1회 = 별조각 5개",
+    tags: ["AI", "채팅", "전체상담"], href: "/service/chat", badge: "NEW", color: "#7c3aed",
+    badgeBg: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)", glow: "rgba(124,58,237,0.15)",
+    categories: ["전체", "운명·대운", "라이프", "연애·궁합"],
+  },
+  {
     id: "taste", emoji: "🎬",
     title: "사주로 보는 취향 분석",
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
