@@ -836,7 +836,7 @@ export default function MainPage() {
               { label: "사주", onClick: () => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }) },
               { label: "가이드", onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
               { label: "일진달력", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "문의하기", onClick: () => window.open("http://pf.kakao.com/_cuksX", "_blank") },
+              { label: "문의하기", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
             ].map(item => (
               <button key={item.label} onClick={item.onClick}
                 className="px-3 py-1.5 rounded-full text-sm font-semibold transition-all hover:text-white"
