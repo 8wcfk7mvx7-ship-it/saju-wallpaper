@@ -149,26 +149,38 @@ export default function MyPage() {
           </div>
         )}
 
-        {/* 별조각 잔액 카드 */}
-        <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
-          style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
-          <div className="flex items-center gap-2.5">
-            <span className="text-2xl">✦</span>
-            <div>
-              <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 별조각</p>
-              <p className="text-lg font-black text-white">{blueberries.toLocaleString()} <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.4)" }}>개</span></p>
+        {/* 별조각 잔액 카드 — 로그인 시만 노출 */}
+        {user && (
+          <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
+            style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">✦</span>
+              <div>
+                <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 별조각</p>
+                <p className="text-lg font-black text-white">{blueberries.toLocaleString()} <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.4)" }}>개</span></p>
+              </div>
             </div>
+            <button
+              onClick={() => router.push("/charge")}
+              className="px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-[0.97]"
+              style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff" }}
+            >
+              충전하기 →
+            </button>
           </div>
-          <button
-            onClick={() => router.push("/charge")}
-            className="px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-[0.97]"
-            style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff" }}
-          >
-            충전하기 →
-          </button>
-        </div>
+        )}
 
-        {/* 탭 */}
+        {/* 탭 + 콘텐츠 — 로그인 시만 노출 */}
+        {!user && (
+          <div className="text-center py-12">
+            <p className="text-3xl mb-3">🔒</p>
+            <p className="text-sm font-bold text-white mb-1">로그인이 필요해요</p>
+            <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.4)" }}>저장된 사주와 결제 내역은 로그인 후 확인할 수 있어요</p>
+          </div>
+        )}
+
+        {/* 탭 + 콘텐츠 — 로그인 시만 */}
+        {user && <>
         <div className="flex gap-2 mb-5">
           {([
             { key: "saju", label: "저장된 생년월일" },
@@ -310,6 +322,7 @@ export default function MyPage() {
             )}
           </div>
         )}
+        </>}
       </div>
 
       {/* 모바일 하단 네비 */}
