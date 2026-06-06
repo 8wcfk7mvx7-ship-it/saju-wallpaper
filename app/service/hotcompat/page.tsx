@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -218,6 +219,7 @@ function HotCompatContent() {
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#08010f] text-white flex flex-col">
+        <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] left-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
@@ -252,7 +254,6 @@ function HotCompatContent() {
             className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
             성적 케미 분석하기
           </button>
-          <button onClick={() => router.push("/")} className="mt-4 text-xs text-gray-600 hover:text-gray-400 transition">돌아가기</button>
         </div>
       </main>
     );
@@ -263,14 +264,11 @@ function HotCompatContent() {
     const ready = p1.birthYear !== "" && p1.birthMonth !== "" && p1.birthDay !== "" && p2.birthYear !== "" && p2.birthMonth !== "" && p2.birthDay !== "";
     return (
       <main className="min-h-screen bg-[#08010f] text-white">
+        <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/35 blur-[140px]" />
         </div>
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
-            <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-          </div>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">두 사람 정보 입력</h2>
             <p className="text-gray-500 text-sm">생년월일만으로 성적 케미를 분석합니다</p>
@@ -306,15 +304,12 @@ function HotCompatContent() {
 
   return (
     <main className="min-h-screen bg-[#08010f] text-white">
+      <BackButton />
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
       </div>
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-        </div>
 
         {/* 헤더 */}
         <div className="text-center mb-6">

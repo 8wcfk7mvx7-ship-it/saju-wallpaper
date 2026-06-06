@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import AnalysisLoading from "@/components/AnalysisLoading";
@@ -246,6 +247,7 @@ export default function PlacePage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <BackButton />
       <style>{`
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
         select option{background:#0d0d1a;color:#fff}
@@ -346,7 +348,6 @@ export default function PlacePage() {
       {/* ══ FORM ══ */}
       {step === "form" && (
         <div className="max-w-lg mx-auto px-5 py-10 pb-20">
-          <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
           <h2 className="text-xl font-black text-white mb-1">생년월일 입력</h2>
           <p className="text-xs text-white/35 mb-8">사주를 분석해 내 기운과 맞는 도시를 찾습니다</p>

@@ -1,4 +1,5 @@
 "use client";
+import BackButton from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -156,6 +157,7 @@ export default function SajuChatPage() {
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", padding: "24px",
       }}>
+        <BackButton />
         {/* Background glow */}
         <div style={{
           position: "fixed", top: "20%", left: "50%", transform: "translateX(-50%)",
@@ -285,16 +287,9 @@ export default function SajuChatPage() {
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", padding: "24px",
       }}>
+        <BackButton />
         <div style={{ maxWidth: 420, width: "100%", zIndex: 1 }}>
-          <button
-            onClick={() => setStep("gate")}
-            style={{
-              background: "none", border: "none", color: "#8b7faa",
-              fontSize: 14, cursor: "pointer", marginBottom: 24, padding: 0,
-            }}
-          >
-            ← 돌아가기
-          </button>
+
 
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "#c4b5fd", margin: "0 0 6px" }}>
             사주 정보 입력

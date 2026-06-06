@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION, detectSamhapBanghap } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
@@ -284,12 +285,12 @@ export default function TastePage() {
   // ── 스플래시 ──────────────────────────────────────────────────────────────
   if (step === "splash") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <BackButton />
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-amber-900/15 blur-[160px]" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
       </div>
-      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
       <div className="relative z-10 max-w-md w-full text-center space-y-0">
         <FadeIn delay={0} className="mb-6">
@@ -365,15 +366,12 @@ export default function TastePage() {
     const ready = !!birthYear && !!birthMonth && !!birthDay;
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
+        <BackButton />
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-amber-900/15 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
         </div>
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
-            <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-          </div>
 
           <div className="text-center mb-8">
             <div className="text-4xl mb-3">🎬</div>
@@ -455,6 +453,7 @@ export default function TastePage() {
   // ── 결과 ─────────────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-[#06060e] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <BackButton />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}`}</style>
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: `${taste.color}30` }} />
@@ -464,7 +463,6 @@ export default function TastePage() {
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("input")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
           <span className="text-xs text-green-400/60 bg-green-500/10 border border-green-500/15 px-2 py-1 rounded-full">무료</span>
         </div>
 

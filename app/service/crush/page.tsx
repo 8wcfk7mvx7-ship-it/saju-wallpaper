@@ -25,6 +25,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
   );
 }
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult } from "@/lib/saju";
 
 // 일간별 짝사랑 성공 비결
@@ -258,6 +259,7 @@ export default function CrushPage() {
   // ── SPLASH ───────────────────────────────────────────────────────────────────
   if (step === "splash") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <BackButton />
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full blur-[150px]" style={{ background: "rgba(244,63,94,0.08)" }} />
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[130px]" style={{ background: "rgba(251,113,133,0.06)" }} />
@@ -323,8 +325,8 @@ export default function CrushPage() {
   // ── INPUT ─────────────────────────────────────────────────────────────────────
   if (step === "input") return (
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
+      <BackButton />
       <div className="max-w-lg mx-auto px-5 pt-8">
-        <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
         <div className="mb-8">
           <h2 className="text-2xl font-black text-white mb-1">그 사람 정보 입력</h2>
@@ -406,6 +408,7 @@ export default function CrushPage() {
   // ── LOADING ───────────────────────────────────────────────────────────────────
   if (step === "loading") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center gap-6 px-6">
+      <BackButton />
       <div className="text-5xl animate-pulse">💘</div>
       <div className="text-center">
         <p className="text-lg font-bold text-white mb-2">그 사람 사주 분석 중...</p>
@@ -430,11 +433,8 @@ export default function CrushPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
+      <BackButton />
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 다시 분석</button>
-          <button onClick={() => router.push("/")} className="ml-auto text-xs text-gray-700 hover:text-gray-500 transition">홈 →</button>
-        </div>
 
         {/* 헤더 */}
         <div className="text-center mb-8">

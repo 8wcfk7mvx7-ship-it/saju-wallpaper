@@ -25,6 +25,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
   );
 }
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
@@ -197,6 +198,7 @@ function SpyContent() {
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#0a0101] text-white flex flex-col">
+        <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-red-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-rose-950/30 blur-[120px]" />
@@ -239,9 +241,7 @@ function SpyContent() {
             className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
             염탐 시작하기
           </button>
-          <button onClick={() => router.push("/")} className="mt-4 text-xs text-gray-600 hover:text-gray-400 transition">
-            돌아가기
-          </button>
+
         </div>
       </main>
     );
@@ -253,14 +253,12 @@ function SpyContent() {
                   !!theirForm.birthYear && !!theirForm.birthMonth && !!theirForm.birthDay;
     return (
       <main className="min-h-screen bg-[#0a0101] text-white">
+        <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full bg-red-950/40 blur-[140px]" />
         </div>
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
-            <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-          </div>
+
 
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
@@ -376,6 +374,7 @@ function SpyContent() {
 
   return (
     <main className="min-h-screen bg-[#0a0101] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
+      <BackButton />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}`}</style>
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]"
@@ -384,11 +383,7 @@ function SpyContent() {
       </div>
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
 
-        {/* 네비 */}
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
-        </div>
+
 
         {/* 두 사람의 일주 */}
         {myResult && (

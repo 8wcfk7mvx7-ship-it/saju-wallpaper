@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju } from "@/lib/saju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -53,6 +54,7 @@ export default function OvercomePage() {
     return (
       <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden"
         style={{ animation: "fadeIn 0.45s ease-out" }}>
+        <BackButton />
         <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
 
         <div className="fixed inset-0 pointer-events-none">
@@ -61,8 +63,7 @@ export default function OvercomePage() {
         </div>
 
         <div className="relative z-10 flex items-center px-5 py-4">
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
-          <span className="ml-3 text-xs px-2 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/20">₩990</span>
+          <span className="text-xs px-2 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/20">₩990</span>
         </div>
 
         <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
@@ -114,15 +115,13 @@ export default function OvercomePage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden"
       style={{ animation: "fadeIn 0.35s ease-out" }}>
+      <BackButton />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}`}</style>
 
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background: "rgba(239,68,68,0.08)" }} />
       </div>
 
-      <div className="relative z-10 flex items-center px-5 py-4">
-        <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 뒤로</button>
-      </div>
 
       <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-16">
         <div className="mb-8">

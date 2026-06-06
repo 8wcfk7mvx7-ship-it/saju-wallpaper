@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -58,9 +59,7 @@ function DaewoonPayContent() {
 
   return (
     <main className="min-h-screen bg-[#0d0700] text-white flex flex-col items-center px-4 py-10">
-      <div className="w-full max-w-sm mb-6">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition text-sm">← 뒤로</button>
-      </div>
+      <BackButton />
 
       {/* 상품 카드 */}
       <div className="w-full max-w-sm bg-gradient-to-br from-amber-950/60 to-yellow-950/60 border border-yellow-700/30 rounded-3xl p-6 mb-6">

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
@@ -345,15 +346,13 @@ export default function DaewoonPage() {
   if (step === "splash") {
     return (
       <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden">
+        <BackButton />
         <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background: "rgba(251,191,36,0.12)" }} />
           <div className="absolute bottom-[-20%] right-[-20%] w-[500px] h-[500px] rounded-full blur-[140px]" style={{ background: "rgba(192,132,252,0.1)" }} />
         </div>
 
-        <div className="relative z-10 flex items-center px-5 py-4">
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
-        </div>
 
         <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
 
@@ -422,8 +421,8 @@ export default function DaewoonPage() {
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
+        <BackButton />
         <div className="max-w-lg mx-auto px-5 py-10 pb-24">
-          <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-3">
@@ -582,8 +581,8 @@ export default function DaewoonPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
+      <BackButton />
       <div className="max-w-lg mx-auto px-5 py-8 pb-32">
-        <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-2">

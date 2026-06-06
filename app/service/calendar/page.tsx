@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import {
   getDayPillar, analyzeSaju, getUunseong,
   CHEONGAN_ELEMENT, JIJI_BONGI,
@@ -279,6 +280,7 @@ export default function CalendarPage() {
   // ── SPLASH ───────────────────────────────────────────────────────────────────
   if (step === "splash") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <BackButton />
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-900/15 blur-[160px]" />
@@ -351,9 +353,9 @@ export default function CalendarPage() {
   // ── INPUT ─────────────────────────────────────────────────────────────────────
   if (step === "input") return (
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
+      <BackButton />
       <style>{`select option{background:#0d0d1a;color:#fff}`}</style>
       <div className="max-w-lg mx-auto px-5 pt-8">
-        <button onClick={() => setStep("splash")} className="text-base text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
         <h2 className="text-4xl font-black text-white mb-1">길일·흉일 확인</h2>
         <p className="text-lg mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
 
@@ -405,10 +407,10 @@ export default function CalendarPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
+      <BackButton />
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-base">← 다시 입력</button>
           <div className="flex-1">
             <h1 className="text-2xl font-black text-white">
               {name ? `${name}의 ` : ""}{eventInfo?.icon} {eventInfo?.label} 길일

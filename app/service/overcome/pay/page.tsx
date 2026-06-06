@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -54,9 +55,7 @@ function OvercomePayContent() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center px-4 py-10">
-      <div className="w-full max-w-sm mb-6 flex items-center gap-3">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition text-sm">← 뒤로</button>
-      </div>
+      <BackButton />
 
       <div className="w-full max-w-sm rounded-3xl p-6 mb-6"
         style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.1) 0%, rgba(124,58,237,0.1) 100%)", border: "1px solid rgba(220,38,38,0.25)" }}>

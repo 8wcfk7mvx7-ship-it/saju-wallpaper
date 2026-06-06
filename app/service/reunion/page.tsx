@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
@@ -118,6 +119,7 @@ export default function ReunionPage() {
   if (step === "splash") {
     return (
       <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10">
+        <BackButton />
         <div className="w-full max-w-sm space-y-6 text-center">
           <div className="text-5xl">🔥</div>
           <h1 className="text-3xl font-black text-white leading-tight">
@@ -182,8 +184,8 @@ export default function ReunionPage() {
     const err = validate(myData);
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
+        <BackButton />
         <div className="w-full max-w-sm mx-auto space-y-6">
-          <button onClick={() => setStep("splash")} className="text-gray-400 text-sm hover:text-white">← 뒤로</button>
 
           <div>
             <div className="flex gap-1 mb-4">
@@ -216,8 +218,8 @@ export default function ReunionPage() {
     const err = validate(theirData);
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
+        <BackButton />
         <div className="w-full max-w-sm mx-auto space-y-6">
-          <button onClick={() => setStep("my")} className="text-gray-400 text-sm hover:text-white">← 뒤로</button>
 
           <div>
             <div className="flex gap-1 mb-4">
@@ -253,6 +255,7 @@ export default function ReunionPage() {
   if (step === "loading") {
     return (
       <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5">
+        <BackButton />
         <div className="text-center space-y-4">
           <div className="text-5xl animate-pulse">🔥</div>
           <p className="text-white font-black text-xl">두 사람의 사주 분석 중...</p>
@@ -279,8 +282,8 @@ export default function ReunionPage() {
 
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
+        <BackButton />
         <div className="w-full max-w-sm mx-auto space-y-5">
-          <button onClick={() => setStep("their")} className="text-gray-400 text-sm hover:text-white">← 다시 입력</button>
 
           {/* 스코어 카드 */}
           <div className="rounded-2xl p-6 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
