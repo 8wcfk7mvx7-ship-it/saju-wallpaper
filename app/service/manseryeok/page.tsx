@@ -4,7 +4,8 @@ import Link from "next/link";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
-  detectSamhapBanghap, analyzeSiksang, MYUNGRI_PHILOSOPHY,
+  detectSamhapBanghap, analyzeSiksang, analyzeSipseongPatterns, detectChunganChung,
+  SINGANG_RESPONSE_STYLE, HAP_CHUNG_CHARACTER, MYUNGRI_PHILOSOPHY,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
@@ -406,6 +407,13 @@ function ResultView({
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
   const samhapResults = detectSamhapBanghap(pd);
   const siksangInfo = analyzeSiksang(pd);
+  const sipseongPatterns = analyzeSipseongPatterns(pd);
+  const chunganChung = detectChunganChung(pd);
+  const singangKey = result.singang === "신강" ? "신강" : "신약";
+  const singangStyle = SINGANG_RESPONSE_STYLE[singangKey];
+  const hapCount = samhapResults.filter(s => s.type === "삼합" || s.type === "반합").length;
+  const chungCount = (result.sinsalList || []).filter(s => s.name?.includes("충")).length;
+  const hapChungChar = hapCount > chungCount ? HAP_CHUNG_CHARACTER.합 : chungCount > 0 ? HAP_CHUNG_CHARACTER.충 : null;
 
   return (
     <div className="space-y-5">
@@ -764,6 +772,90 @@ function ResultView({
           </div>
         )}
       </Section>
+
+      {/* 십성 구조 패턴: 무비겁·무재·쟁재 */}
+      {sipseongPatterns.length > 0 && (
+        <Section title="십성 구조 분석 — 무비겁·무재·쟁재·무관" accent="#fb923c">
+          <div className="space-y-3">
+            {sipseongPatterns.map(p => (
+              <div key={p.name} className="rounded-xl px-4 py-3" style={{ background: "rgba(251,146,60,0.06)", border: "1px solid rgba(251,146,60,0.18)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(251,146,60,0.15)", color: "#fb923c" }}>{p.name}</span>
+                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{p.hanja}</span>
+                </div>
+                <p className="text-sm leading-relaxed mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>{p.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(251,146,60,0.8)" }}>{p.advice}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* 신약·신강 대응 방식 */}
+      {singangStyle && (
+        <Section title={`${result.singang} 사주 — 세상을 대하는 방식`} accent="#38bdf8">
+          <div className="space-y-3">
+            <div className="rounded-xl px-4 py-3" style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.18)" }}>
+              <p className="text-xs font-bold mb-1" style={{ color: "#38bdf8" }}>핵심 기질</p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{singangStyle.core}</p>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {[
+                { label: "사회적 스타일", val: singangStyle.socialStyle },
+                { label: "의사결정 방식", val: singangStyle.decisionStyle },
+                { label: "주의할 점", val: singangStyle.caution },
+              ].map(item => (
+                <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.val}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
+
+      {/* 합·충 성격 구조 */}
+      {hapChungChar && (
+        <Section title={`${hapChungChar.name} — 에너지 흐름 구조`} accent="#a78bfa">
+          <div className="space-y-2">
+            {[
+              { label: "핵심", val: hapChungChar.core },
+              { label: "강점", val: hapChungChar.strength },
+              { label: "약점", val: hapChungChar.weakness },
+              { label: "연애 스타일", val: hapChungChar.loveStyle },
+              { label: "궁합 방향", val: hapChungChar.compatible },
+            ].map(item => (
+              <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(167,139,250,0.05)", border: "1px solid rgba(167,139,250,0.12)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{item.label}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.val}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* 천간충 건강 경고 */}
+      {chunganChung.length > 0 && (
+        <Section title="천간충(天干沖) — 건강 주의 신호" accent="#f87171">
+          <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>
+            사주 천간 간 충이 발생하면 특정 신체 부위에 취약성이 나타납니다.
+          </p>
+          <div className="space-y-3">
+            {chunganChung.map(c => (
+              <div key={c.pair.join("")} className="rounded-xl px-4 py-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(248,113,113,0.15)", color: "#f87171" }}>
+                    {c.pair[0]}·{c.pair[1]} 충
+                  </span>
+                  <span className="text-xs font-bold" style={{ color: "rgba(248,113,113,0.8)" }}>→ {c.body}</span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* 삼합 · 방합 */}
       {samhapResults.length > 0 && (
