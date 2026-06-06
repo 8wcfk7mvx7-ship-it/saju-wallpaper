@@ -423,14 +423,15 @@ function ContactSection() {
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[]; featured?: boolean;
+  border: string; glow: string; categories: Category[];
 }[] = [
   {
-    id: "chat", emoji: "🔮", title: "월령도사 — 사주 AI 채팅", viral: "사주로 뭐든 물어보세요. AI가 전부 답합니다",
-    desc: "연애·재물·건강·대운·궁합·직업·전생까지. 월령도사가 당신의 사주를 보고 솔직하게 답해드려요. 대화 1회 = 별조각 5개",
-    tags: ["AI 채팅", "전체 상담", "무제한 질문"], href: "/service/chat", badge: "NEW", color: "#a78bfa",
-    badgeBg: "rgba(124,58,237,0.9)", border: "rgba(139,92,246,0.5)", glow: "rgba(124,58,237,0.25)",
-    categories: ["전체", "운명·대운", "라이프", "연애·궁합"], featured: true,
+    id: "chat", emoji: "🔮", title: "월령도사 — 사주 AI 채팅",
+    viral: "당신 사주에 숨겨진 진실, 아직도 모르세요?",
+    desc: "연애·재물·대운·궁합·직업·전생까지. 사주로 볼 수 있는 건 전부 답합니다. 질문 1회 = 500원 (별조각 5개)",
+    tags: ["AI 역술", "전체 상담", "무제한 질문"], href: "/service/chat", badge: "AI",
+    color: "#c4b5fd", badgeBg: "rgba(124,58,237,0.95)", border: "rgba(139,92,246,0.6)", glow: "rgba(124,58,237,0.3)",
+    categories: ["전체", "운명·대운", "라이프", "연애·궁합"],
   },
   {
     id: "saju", emoji: "🔮",
@@ -627,27 +628,27 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(28px)",
           transition: `opacity 0.6s ease ${index * 55}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${index * 55}ms`,
-          background: svc.featured
+          background: svc.id === "chat"
             ? hovered
-              ? "linear-gradient(135deg, #1a0533 0%, #0d0224 45%, #160840 100%)"
-              : "linear-gradient(135deg, rgba(99,32,180,0.22) 0%, rgba(6,4,20,0.97) 50%, rgba(79,70,229,0.15) 100%)"
+              ? "linear-gradient(145deg, #1c0545 0%, #0f0228 50%, #1a0a3d 100%)"
+              : "linear-gradient(145deg, rgba(109,40,217,0.28) 0%, rgba(6,4,20,0.97) 55%, rgba(91,33,182,0.18) 100%)"
             : hovered
               ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
               : "rgba(11,4,28,0.85)",
-          border: svc.featured
-            ? `1px solid ${hovered ? "rgba(167,139,250,0.8)" : "rgba(124,58,237,0.45)"}`
+          border: svc.id === "chat"
+            ? `1px solid ${hovered ? "rgba(196,181,253,0.7)" : "rgba(139,92,246,0.5)"}`
             : `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
-          boxShadow: svc.featured
+          boxShadow: svc.id === "chat"
             ? hovered
-              ? `0 0 0 1px rgba(124,58,237,0.5), 0 16px 60px rgba(124,58,237,0.35), 0 0 80px rgba(99,32,180,0.15), inset 0 1px 0 rgba(167,139,250,0.12)`
-              : `0 0 30px rgba(124,58,237,0.18), inset 0 1px 0 rgba(167,139,250,0.07)`
+              ? `0 0 0 1px rgba(139,92,246,0.4), 0 16px 56px rgba(124,58,237,0.4), inset 0 1px 0 rgba(196,181,253,0.1)`
+              : `0 0 24px rgba(124,58,237,0.2), inset 0 1px 0 rgba(196,181,253,0.06)`
             : hovered
               ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
               : "inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
-        {/* featured 오라 오버레이 */}
-        {svc.featured && (
+        {/* 월령도사 오라 오버레이 */}
+        {svc.id === "chat" && (
           <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden" aria-hidden>
             <div style={{
               position: "absolute", top: "-30%", right: "-10%", width: "55%", height: "130%",
@@ -1126,7 +1127,7 @@ export default function MainPage() {
             {SERVICES
               .filter(s => s.categories.includes(activeCategory))
               .map((svc, i) => (
-                <div key={svc.id} className={svc.featured ? "sm:col-span-2" : ""}>
+                <div key={svc.id}>
                   <ServiceCard svc={svc} index={i} startLabel={t.start} />
                 </div>
               ))}
