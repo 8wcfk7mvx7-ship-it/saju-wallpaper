@@ -808,7 +808,7 @@ export default function MainPage() {
           <div className="hidden sm:flex items-center gap-1">
             {[
               { label: "사주", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
-              { label: "가이드", onClick: () => router.push("/guide") },
+              { label: "가이드", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
               { label: "일진달력", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
               { label: "문의하기", onClick: () => window.open("http://pf.kakao.com/_cuksX", "_blank") },
             ].map(item => (
@@ -1113,7 +1113,7 @@ export default function MainPage() {
         </section>
 
         {/* ── 정보성 가이드 배너 ── */}
-        <section className="mb-10">
+        <section id="guide-section" className="mb-10">
           <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
             style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
             <div className="flex-1">

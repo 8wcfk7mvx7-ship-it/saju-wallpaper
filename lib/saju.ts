@@ -180,6 +180,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   지지파:   {hanja:"地支破",   category:"unlucky",  desc:"이별·손재·인연 파탄의 기운이에요. 재물 손실과 소중한 관계의 이별을 주의하세요. 계약·보증·동업에 신중을 기하세요"},
   // 지지해(地支害/穿) — 방해·배신의 기운
   지지해:   {hanja:"地支害",   category:"unlucky",  desc:"육해(六害). 방해·장애가 따르며 가까운 사람의 배신을 조심하세요. 각 쌍별 작용: 자미·축오·인유·묘신·진해·사술 — 해당 기운의 충돌로 인한 음성적 갈등이에요"},
+  현침살:   {hanja:"懸針殺",   category:"neutral",  desc:"말과 글로 상대의 핵심을 꿰뚫는 기운이에요. 독설도 위로도 평범하지 않고 속살을 건드려요. 잘 쓰면 탁월한 치유자, 잘못 쓰면 상처를 남겨요. 갑(甲)·신(辛)·묘(卯)·오(午)·미(未)·신(申)이 해당해요"},
 };
 
 // 양인살: 일간 기준 양인 지지
@@ -1429,6 +1430,14 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     else if (d.uunseong === '묘') addSinsal('묘지', [label]);
     else if (d.uunseong === '절') addSinsal('절지', [label]);
   }
+
+  // 현침살: 甲·辛(천간) 또는 卯·午·未·申(지지)에 해당하는 글자를 가진 기둥
+  const HYEONCHIM_CG = new Set(["갑", "신"]);
+  const HYEONCHIM_JJ = new Set(["묘", "오", "미", "신"]);
+  const hyeonchimHits = detailArr
+    .filter(p => HYEONCHIM_CG.has(p.d.cg) || HYEONCHIM_JJ.has(p.d.jj))
+    .map(p => p.label);
+  if (hyeonchimHits.length > 0) addSinsal("현침살", hyeonchimHits);
 
   // === 지지충(六沖) 신살 등록 ===
   const JIJI_CHUNG_SINSAL = [
@@ -2876,6 +2885,22 @@ export function detectSamhapBanghap(pillarsDetail: SajuResult["pillarsDetail"]):
 // ══════════════════════════════════════════════════════════════════════════════
 // 명리철학 — 개인 맞춤형 조언 원칙
 // ══════════════════════════════════════════════════════════════════════════════
+
+export const HYEONCHIMSAL_INSIGHT = {
+  hanja: "懸針殺",
+  triggers: ["갑", "신", "묘", "오", "미", "신(지지)"],
+  triggerHanja: ["甲", "辛", "卯", "午", "未", "申"],
+  howToCount: "사주 8글자(천간 4 + 지지 4) 중 甲·辛·卯·午·未·申에 해당하는 글자 수를 세어 현침살 개수로 본다.",
+  coreNature: "말과 글이 상대의 핵심부를 꿰뚫는 기운. 독설할 때도, 위로할 때도 표면이 아닌 속살에 닿는다. '힘내, 잘 될 거야' 같은 평범한 위로는 현침살의 방식이 아니다. 본질을 짚고, 핵심을 건드린다.",
+  dualNature: "같은 기운이 공격과 치유 모두로 작동한다. 현침살이 강한 사람의 한마디는 상대를 무너뜨릴 수도, 일으켜 세울 수도 있다. 방향의 문제다.",
+  countEffect: {
+    one: "현침살 1개: 말에 날카로움이 있고 직설적인 편이다.",
+    two: "현침살 2개: 언어 감각이 예리하고 상대의 아픈 곳을 본능적으로 안다.",
+    threeOrMore: "현침살 3개 이상: 최상급 수준의 언어 투과력. 상처를 주거나 깊은 위로를 건네는 양쪽 모두에서 강도가 극대화된다. 이 기운을 어떻게 쓰느냐가 삶의 방향을 가른다.",
+  },
+  bestUse: "현침살은 억누를 게 아니라 방향을 설정해야 한다. 상담·치유·글쓰기·강연·코칭 분야에서 다른 사람은 흉내 낼 수 없는 깊이를 만들어낸다. 이 기운을 좋은 방향으로 쓸수록 영향력이 커진다.",
+  caution: "감정이 격해진 상태에서 내뱉는 한마디가 상대에게 장기간 영향을 줄 수 있다. 화가 났을 때 말을 삼가는 훈련이 필요하다.",
+};
 
 export const MYUNGRI_PHILOSOPHY = {
   core: "명리학은 사람마다 다른 에너지 구조(사주)를 전제로 해요. 같은 조언이 모든 사람에게 맞지 않아요. 현대사회가 획일적 기준을 강요하는 것과 달리, 명리는 각자의 오행 구조에 맞는 방향을 제시해요.",
