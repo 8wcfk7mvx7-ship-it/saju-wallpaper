@@ -764,16 +764,24 @@ export default function MainPage() {
             </span>
           </button>
 
+          {/* 상단 네비 링크 */}
+          <div className="hidden sm:flex items-center gap-1">
+            {[
+              { label: "사주", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
+              { label: "가이드", onClick: () => router.push("/guide") },
+              { label: "일진달력", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
+              { label: "문의하기", onClick: () => window.open("http://pf.kakao.com/_cuksX", "_blank") },
+            ].map(item => (
+              <button key={item.label} onClick={item.onClick}
+                className="px-3 py-1.5 rounded-full text-sm font-semibold transition-all hover:text-white"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
           <div className="flex items-center gap-2">
-            {/* 가이드 */}
-            <button
-              onClick={() => router.push("/guide")}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
-            >
-              <span>📚</span>
-              <span>가이드</span>
-            </button>
             {/* 보관함 — PC only */}
             <button
               onClick={() => router.push("/mypage")}
@@ -1191,7 +1199,7 @@ export default function MainPage() {
       </div>
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
-      <section className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)" }}>
+      <section id="iljin-section" className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <IljinCalendar />
@@ -1249,7 +1257,6 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/service/saju" },
-            { icon: "📚", label: "가이드", href: "/guide" },
             { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
