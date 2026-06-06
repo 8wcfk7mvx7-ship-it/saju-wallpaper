@@ -96,6 +96,20 @@ const ILGAN_APPEARANCE: Record<string, { face: string; body: string; vibe: strin
   계: { face: "투명하고 촉촉한 피부. 안개처럼 부드러운 인상. 맑은 눈빛.", body: "가볍고 섬세한 체형. 안개처럼 부드러운 실루엣.", vibe: "청순하지만 신비로운 분위기. 가까이 있으면 이상하게 기대고 싶어짐.", celeb: "문채원·박신혜 / 임시완·도경수" },
 };
 
+// ── 낮져밤이/낮이밤져 (일간+성별) ──────────────────────────────────────────
+const ILGAN_DAYNIGHT: Record<string, { female: string; male: string }> = {
+  갑: { female: "낮이밤져형. 낮에는 주도적이고 당당하지만 밤에는 의외로 순해짐. 리드당하는 걸 좋아하는 반전이 있음.", male: "낮이밤져형. 대외적으로 강하고 주도적인 이미지지만 가까워지면 의외로 수동적이 됨." },
+  을: { female: "낮져밤이형. 낮에는 여리여리하고 순해 보이지만 밤에는 능동적으로 변하는 반전 타입.", male: "낮져밤이형. 평소엔 부드럽고 조용하지만 실제로는 리드하고 싶은 욕구가 강함." },
+  병: { female: "낮이밤이형. 낮에도 밤에도 에너지가 넘치고 주도적. 열정이 24시간 유지되는 타입.", male: "낮이밤이형. 항상 뜨겁고 적극적. 수동적인 상황을 못 견딤." },
+  정: { female: "낮져밤이형. 평소엔 조용하고 단아하지만 믿는 사람 앞에서는 완전히 달라짐. 불꽃처럼 타오름.", male: "낮져밤이형. 겉보기엔 차분하지만 감정이 개방되면 강렬해지는 타입." },
+  무: { female: "낮이밤이형. 낮에도 밤에도 편안하고 포용적. 상대를 완전히 받아주는 스타일.", male: "낮이밤이형. 언제나 안정적이고 흔들리지 않음. 느리지만 깊고 묵직함." },
+  기: { female: "낮져밤이형. 평소엔 섬세하고 조용하지만 신뢰가 쌓이면 전혀 다른 사람이 됨.", male: "낮져밤이형. 수줍어 보이지만 내면에 강한 욕구가 숨겨져 있음." },
+  경: { female: "낮이밤져형. 낮에는 강하고 도도하지만 밤에는 의외로 순해지는 반전 매력.", male: "낮이밤이형. 강인하고 주도적인 모습이 밤에도 유지됨. 절대 수동적이 되지 않음." },
+  신: { female: "낮이밤져형. 낮에는 완벽하고 차갑지만 밤에는 섬세하고 수동적으로 변하는 반전.", male: "낮이밤져형. 날카롭고 강한 이미지지만 신뢰하는 사람 앞에서 유순해짐." },
+  임: { female: "낮이밤이형. 논리적이고 냉정한 모습이 그대로 유지됨. 감성보다 선택과 직관이 지배.", male: "낮이밤이형. 깊고 강한 에너지가 일관됨. 깊어질수록 더 강해지는 타입." },
+  계: { female: "낮져밤이형. 청순하고 조용한 낮의 모습과 달리 밤에는 완전히 달라지는 반전 끝판왕.", male: "낮져밤이형. 소심해 보이지만 실제로는 섬세하고 집요하게 파고드는 타입." },
+};
+
 // ── 성적 능력/에너지 (일간+성별) ────────────────────────────────────────────
 const ILGAN_SEX: Record<string, { female: { power: string; energy: string; style: string }; male: { power: string; energy: string; style: string } }> = {
   갑: {
@@ -458,7 +472,7 @@ function ErosContent() {
   const sexData = gender === "female" ? sex.female : sex.male;
   const hidden = ILJI_HIDDEN_CHARM[ilji] ?? { charm: "알면 알수록 빠져드는 매력", weapon: "깊은 내면의 에너지" };
   const tips   = SEDUCTION_TIPS[ilgan] ?? SEDUCTION_TIPS["무"];
-  const tipList = gender === "female" ? tips.female : tips.male;
+  const tipList = gender === "female" ? tips.male : tips.female;
   const outerImage = WOLGGAN_OUTER[wolggan] ?? "사회적으로 안정적이고 신뢰감 있는 이미지.";
 
   const charmSinsals: { name: string; desc: string }[] = [];
@@ -526,7 +540,7 @@ function ErosContent() {
         <div className="text-center mb-6">
           <div className="inline-block px-2 py-0.5 rounded-full bg-rose-900/40 border border-rose-700/30 text-rose-400 text-[10px] font-bold tracking-wider mb-2">19금</div>
           <h2 className="text-3xl font-black mb-1">{ilgan}{ilji}일주</h2>
-          <p className="text-gray-600 text-xs">{result.fourPillars}</p>
+          <p className="text-gray-400 text-xs">{result.fourPillars}</p>
         </div>
 
         {/* ① 성적 매력 등급 */}
@@ -539,7 +553,7 @@ function ErosContent() {
             </div>
             <div className="text-right">
               <p className="text-2xl font-black" style={{ color: grade.color }}>{score}점</p>
-              <p className="text-xs text-gray-500">/ 100</p>
+              <p className="text-xs text-gray-300">/ 100</p>
             </div>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2.5 mb-3">
@@ -574,11 +588,9 @@ function ErosContent() {
 
         {/* ③ 나의 성적 능력·에너지 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">나의 성적 에너지 — {ilgan}{ilji}일주</p>
-          <p className="text-xs text-rose-400/70 mb-4">{gender === "female" ? "여성 기준 음기(陰氣) 분석" : "남성 기준 양기(陽氣) 분석"}</p>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">나의 성적 에너지 — {ilgan}{ilji}일주</p>
           <div className="space-y-3">
             <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
-              <p className="text-xs text-rose-400 font-semibold mb-1">{gender === "female" ? "음기 특성" : "양기 특성"}</p>
               <p className="text-sm text-gray-200">{sexData.power}</p>
             </div>
             <div className="bg-white/5 rounded-xl px-4 py-3">
@@ -589,23 +601,27 @@ function ErosContent() {
               <p className="text-xs text-gray-500 font-semibold mb-1">스타일</p>
               <p className="text-sm text-gray-200">{sexData.style}</p>
             </div>
+            <div className="bg-white/5 rounded-xl px-4 py-3">
+              <p className="text-xs text-rose-400 font-semibold mb-1">낮져밤이 vs 낮이밤져</p>
+              <p className="text-sm text-gray-200">{ILGAN_DAYNIGHT[ilgan]?.[gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입."}</p>
+            </div>
           </div>
           {hasMokYok && (
             <div className="mt-3 bg-rose-950/30 border border-rose-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-rose-300 font-bold mb-1">일지 목욕(沐浴) — 특별 분석</p>
-              <p className="text-xs text-gray-400">12운성 중 감각과 관능이 가장 강한 위치. {gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
+              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
             </div>
           )}
           {gender === "female" && has수기운강 && (
             <div className="mt-3 bg-blue-950/30 border border-blue-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-blue-300 font-bold mb-1">수기운(水氣運) — 명기력(命氣力) 강화</p>
-              <p className="text-xs text-gray-400">수(水)는 흡인·수용·생식의 기운입니다. 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있습니다. 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다.</p>
+              <p className="text-xs text-gray-200">수(水)는 흡인·수용·생식의 기운입니다. 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있습니다. 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다.</p>
             </div>
           )}
-          {gender === "female" && is음간 && (
+          {gender === "female" && is음간 && has수기운강 && (
             <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-purple-300 font-bold mb-1">음간(陰干) — 음기(陰氣) 집중형</p>
-              <p className="text-xs text-gray-400">음간 일간은 수용·집중·흡수의 기운이 강합니다. 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어, 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다.</p>
+              <p className="text-xs text-gray-200">음간 일간은 수용·집중·흡수의 기운이 강합니다. 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어, 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다.</p>
             </div>
           )}
         </div>
@@ -614,7 +630,7 @@ function ErosContent() {
         {(found천간합.length > 0 || found지지합.length > 0) && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
             <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">암합(暗合) · 지지합(地支合) 분석</p>
-            <p className="text-xs text-gray-600 mb-4">사주 기둥 사이에 숨겨진 합(合)의 에너지</p>
+            <p className="text-xs text-gray-400 mb-4">사주 기둥 사이에 숨겨진 합(合)의 에너지</p>
             {found천간합.length > 0 && (
               <div className="mb-3">
                 <p className="text-xs text-rose-400 font-semibold mb-2">천간합(天干合)</p>
@@ -622,7 +638,7 @@ function ErosContent() {
                   {found천간합.map((h) => (
                     <div key={h.a+h.b} className="bg-rose-950/20 border border-rose-900/25 rounded-xl px-4 py-3">
                       <p className="text-sm font-bold text-rose-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
-                      <p className="text-xs text-gray-400">{h.desc}</p>
+                      <p className="text-xs text-gray-200">{h.desc}</p>
                       {(h.a === "정" || h.b === "정") && (
                         <p className="text-xs text-purple-300 mt-1 font-semibold">★ 정임합이 사주에 숨어있으면 &quot;숨겨진 성적 매력&quot; — 겉으로 드러나지 않지만 가까워지면 폭발합니다.</p>
                       )}
@@ -638,8 +654,8 @@ function ErosContent() {
                   {found지지합.map((h) => (
                     <div key={h.a+h.b} className="bg-purple-950/20 border border-purple-900/25 rounded-xl px-4 py-3">
                       <p className="text-sm font-bold text-purple-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
-                      <p className="text-xs text-gray-400">{h.desc}</p>
-                      <p className="text-xs text-gray-500 mt-1">음양이 맞아 자연스럽게 끌리는 기운입니다.</p>
+                      <p className="text-xs text-gray-200">{h.desc}</p>
+                      <p className="text-xs text-gray-300 mt-1">음양이 맞아 자연스럽게 끌리는 기운입니다.</p>
                     </div>
                   ))}
                 </div>
@@ -657,7 +673,7 @@ function ErosContent() {
               {found충.map((c) => (
                 <div key={c.a+c.b} className="bg-amber-950/20 border border-amber-900/25 rounded-xl px-4 py-3">
                   <p className="text-sm font-bold text-amber-300 mb-0.5">{c.a}{c.b}충(沖)</p>
-                  <p className="text-xs text-gray-400">{c.desc}</p>
+                  <p className="text-xs text-gray-200">{c.desc}</p>
                 </div>
               ))}
             </div>
@@ -667,7 +683,7 @@ function ErosContent() {
         {/* ⑥ 배우자궁·조후 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">배우자궁(配偶者宮) 분석</p>
-          <p className="text-xs text-gray-600 mb-4">일지(日支) = 배우자궁. 나의 관계 에너지의 핵심.</p>
+          <p className="text-xs text-gray-400 mb-4">일지(日支) = 배우자궁. 나의 관계 에너지의 핵심.</p>
           <div className="space-y-3">
             <div className="bg-white/5 rounded-xl px-4 py-3">
               <p className="text-xs text-gray-500 font-semibold mb-1">배우자궁 — {ilji}</p>
@@ -706,7 +722,7 @@ function ErosContent() {
         {/* ⑨ 월주 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">월주 분석 — {result.pillarsDetail.month.cg}{result.pillarsDetail.month.jj}월주</p>
-          <p className="text-xs text-gray-600 mb-3">사회적으로 드러나는 외부 이미지</p>
+          <p className="text-xs text-gray-400 mb-3">사회적으로 드러나는 외부 이미지</p>
           <p className="text-sm text-gray-300 leading-relaxed">{outerImage}</p>
         </div>
 
@@ -720,7 +736,7 @@ function ErosContent() {
                   <span className="text-rose-400 text-sm mt-0.5 shrink-0">●</span>
                   <div>
                     <p className="text-sm font-bold text-rose-300">{name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                    <p className="text-xs text-gray-200 mt-0.5">{desc}</p>
                   </div>
                 </div>
               ))}
@@ -731,7 +747,7 @@ function ErosContent() {
         {/* ⑪ 꼬시는 팁 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">{targetGender}를 꼬시는 법</p>
-          <p className="text-xs text-gray-600 mb-4">{ilgan}일간 맞춤 공략법</p>
+          <p className="text-xs text-gray-400 mb-4">{ilgan}일간 맞춤 공략법</p>
           <div className="space-y-2">
             {tipList.map((tip, i) => (
               <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl px-4 py-3">
@@ -744,7 +760,7 @@ function ErosContent() {
 
         {/* 면책 */}
         <div className="bg-white/[0.02] border border-white/8 rounded-xl px-4 py-3 mb-6">
-          <p className="text-xs text-gray-600 leading-relaxed text-center">
+          <p className="text-xs text-gray-400 leading-relaxed text-center">
             본 분석은 사주 명리학 기반 19금 엔터테인먼트 콘텐츠입니다.<br />
             만 19세 이상만 이용하세요.
           </p>
