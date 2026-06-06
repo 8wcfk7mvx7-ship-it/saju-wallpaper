@@ -358,6 +358,53 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 }
 
 // ─── 결과 뷰 ──────────────────────────────────────────────────────────────────
+// ─── 오행 도넛 차트 ────────────────────────────────────────────────────────────
+function OhaengDonut({ scores, total }: { scores: Record<string, number>; total: number }) {
+  const EL_COLORS: Record<string, string> = { 목: "#22c55e", 화: "#ef4444", 토: "#f59e0b", 금: "#e2e8f0", 수: "#94a3b8" };
+  const els = ["목","화","토","금","수"];
+  let cumAngle = -90;
+  const R = 60, cx = 80, cy = 80, strokeW = 22;
+  const segments = els.map(el => {
+    const pct = total > 0 ? scores[el] / total : 0;
+    const angle = pct * 360;
+    const startAngle = cumAngle;
+    cumAngle += angle;
+    return { el, pct, startAngle, angle };
+  });
+  function arcPath(startDeg: number, angleDeg: number) {
+    if (angleDeg >= 359.9) angleDeg = 359.9;
+    const start = (startDeg * Math.PI) / 180;
+    const end = ((startDeg + angleDeg) * Math.PI) / 180;
+    const x1 = cx + R * Math.cos(start), y1 = cy + R * Math.sin(start);
+    const x2 = cx + R * Math.cos(end),   y2 = cy + R * Math.sin(end);
+    const large = angleDeg > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2}`;
+  }
+  return (
+    <div className="flex flex-col items-center">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        {segments.filter(s => s.pct > 0.01).map(s => (
+          <path key={s.el} d={arcPath(s.startAngle, s.angle)}
+            fill="none" stroke={EL_COLORS[s.el]} strokeWidth={strokeW}
+            strokeLinecap="butt" opacity={0.85} />
+        ))}
+        <circle cx={cx} cy={cy} r={R - strokeW/2 - 2} fill="#0a0a18" />
+        <text x={cx} y={cy - 6} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="9">오행</text>
+        <text x={cx} y={cy + 8} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="9">분포</text>
+      </svg>
+      <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
+        {segments.map(s => (
+          <span key={s.el} className="text-[10px] font-bold flex items-center gap-0.5">
+            <span style={{ color: EL_COLORS[s.el] }}>●</span>
+            <span style={{ color: EL_COLORS[s.el] }}>{s.el}</span>
+            <span style={{ color: "rgba(255,255,255,0.5)" }}>{Math.round(s.pct * 100)}%</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ResultView({
   result, form, birthTime, birthYear, birthMonth, birthDay, onReset,
 }: {
@@ -404,6 +451,7 @@ function ResultView({
   const lackEl = result.lacking[0];
   const coreWorry = OHAENG_CORE_WORRY[domEl as Element];
 
+  const [showRaw, setShowRaw] = useState(false);
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
   const samhapResults = detectSamhapBanghap(pd);
   const siksangInfo = analyzeSiksang(pd);
@@ -739,6 +787,24 @@ function ResultView({
 
       {/* ⑥ 오행 분포 */}
       <Section title="오행 분포 · 균형 분석" accent="#4ade80">
+        {/* 도넛 차트 + 보정 전/후 토글 */}
+        <div className="flex flex-col items-center mb-4">
+          <OhaengDonut scores={result.scores} total={total} />
+          <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showRaw}
+              onChange={e => setShowRaw(e.target.checked)}
+              className="w-3.5 h-3.5 accent-green-400"
+            />
+            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.5)" }}>보정 전 점수 보기</span>
+          </label>
+          {showRaw && (
+            <p className="text-[10px] mt-1.5 px-3 py-1.5 rounded-lg text-center" style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", color: "rgba(255,255,255,0.45)" }}>
+              현재 표시 점수는 <strong style={{ color: "#4ade80" }}>경도·합충 보정 포함</strong> 최종값입니다. 원본 입력(경도/합충 보정 없음) 기준 점수는 별도 저장되지 않습니다.
+            </p>
+          )}
+        </div>
         <div className="space-y-3 mb-4">
           {(["목","화","토","금","수"] as Element[]).map(el => {
             const score = result.scores[el] || 0;

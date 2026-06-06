@@ -75,6 +75,18 @@ export const dynamic = "force-dynamic";
 
 const PRICE = 15000;
 
+// ─── 월건 계산 ────────────────────────────────────────────────────────────────
+const _WOLJEON_BASE: Record<string, number> = { 갑:2, 기:2, 을:4, 경:4, 병:6, 신:6, 정:8, 임:8, 무:0, 계:0 };
+const _CG_LIST = ["갑","을","병","정","무","기","경","신","임","계"];
+const _JJ_LIST = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+const _MONTH_JJ_IDX = [2,3,4,5,6,7,8,9,10,11,0,1];
+function getMonthPillar(yearCg: string, month: number): { cg: string; jj: string } {
+  const base = _WOLJEON_BASE[yearCg] ?? 0;
+  const cgIdx = (base + (month - 1)) % 10;
+  const jjIdx = _MONTH_JJ_IDX[month - 1];
+  return { cg: _CG_LIST[cgIdx], jj: _JJ_LIST[jjIdx] };
+}
+
 const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }> = {
   목: { bg: "#052e16", text: "#4ade80", border: "#14532d" },
   화: { bg: "#450a0a", text: "#f87171", border: "#7f1d1d" },
@@ -258,6 +270,7 @@ export default function DaewoonPage() {
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [openSewoonYear, setOpenSewoonYear] = useState<number | null>(null);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
   const [totalCount] = useState(() => Math.floor(Math.random() * 1500) + 7200);
 
@@ -780,27 +793,50 @@ export default function DaewoonPage() {
                 const uunsF = UUNSEONG_FORTUNE[s.uunseong];
                 const isBlurredSw = !isPaid && i >= 4;
 
+                const isOpen = openSewoonYear === s.year;
                 return (
-                  <div key={s.year} className="rounded-xl border p-3 text-center relative" style={{
-                    minWidth: 76,
-                    background: s.isCurrent ? `${elStyle.bg}cc` : `${elStyle.bg}55`,
-                    borderColor: s.isCurrent ? "#fbbf24" : elStyle.border,
-                    borderWidth: s.isCurrent ? 2 : 1,
-                  }}>
-                    {isBlurredSw && (
-                      <div className="absolute inset-0 backdrop-blur-sm rounded-xl flex items-center justify-center z-10" style={{ background: "rgba(6,6,14,0.82)" }}>
-                        <p className="text-[10px] text-gray-600">🔒</p>
+                  <div key={s.year} className="flex flex-col" style={{ minWidth: 76 }}>
+                    <div
+                      className="rounded-xl border p-3 text-center relative cursor-pointer"
+                      style={{
+                        background: s.isCurrent ? `${elStyle.bg}cc` : `${elStyle.bg}55`,
+                        borderColor: isOpen ? elStyle.text : s.isCurrent ? "#fbbf24" : elStyle.border,
+                        borderWidth: s.isCurrent || isOpen ? 2 : 1,
+                      }}
+                      onClick={() => !isBlurredSw && setOpenSewoonYear(isOpen ? null : s.year)}
+                    >
+                      {isBlurredSw && (
+                        <div className="absolute inset-0 backdrop-blur-sm rounded-xl flex items-center justify-center z-10" style={{ background: "rgba(6,6,14,0.82)" }}>
+                          <p className="text-[10px] text-gray-600">🔒</p>
+                        </div>
+                      )}
+                      {s.isCurrent && (
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                          <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-full font-black whitespace-nowrap">올해</span>
+                        </div>
+                      )}
+                      <p className="text-[10px] text-gray-500 mb-1">{s.year}</p>
+                      <p className="text-lg font-black leading-none" style={{ color: elStyle.text }}>{s.cg}{s.jj}</p>
+                      <p className="text-[10px] text-gray-400 mt-1 font-semibold">{s.sipseongJj}</p>
+                      {uunsF && <p className="text-[9px] mt-0.5 font-bold" style={{ color: uunsF.color }}>{s.uunseong}</p>}
+                      <p className="text-[8px] mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>{isOpen ? "▲ 닫기" : "▼ 월별"}</p>
+                    </div>
+                    {isOpen && (
+                      <div className="mt-1.5 rounded-xl p-2" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${elStyle.border}` }}>
+                        <p className="text-[9px] font-bold text-center mb-1.5" style={{ color: elStyle.text }}>{s.year}년 월주</p>
+                        <div className="grid grid-cols-3 gap-1">
+                          {Array.from({ length: 12 }, (_, mi) => {
+                            const mp = getMonthPillar(s.cg, mi + 1);
+                            return (
+                              <div key={mi} className="rounded-lg p-1 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <p className="text-[8px] text-gray-600">{mi + 1}월</p>
+                                <p className="text-[11px] font-black" style={{ color: elStyle.text }}>{mp.cg}{mp.jj}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
-                    {s.isCurrent && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                        <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-full font-black whitespace-nowrap">올해</span>
-                      </div>
-                    )}
-                    <p className="text-[10px] text-gray-500 mb-1">{s.year}</p>
-                    <p className="text-lg font-black leading-none" style={{ color: elStyle.text }}>{s.cg}{s.jj}</p>
-                    <p className="text-[10px] text-gray-400 mt-1 font-semibold">{s.sipseongJj}</p>
-                    {uunsF && <p className="text-[9px] mt-0.5 font-bold" style={{ color: uunsF.color }}>{s.uunseong}</p>}
                   </div>
                 );
               })}
