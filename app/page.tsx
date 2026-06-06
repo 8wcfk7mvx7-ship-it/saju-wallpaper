@@ -807,9 +807,9 @@ export default function MainPage() {
           {/* 상단 네비 링크 */}
           <div className="hidden sm:flex items-center gap-1">
             {[
-              { label: "사주", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
-              { label: "가이드", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
-              { label: "일진달력", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
+              { label: "사주", onClick: () => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: "가이드", onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: "일진달력", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
               { label: "문의하기", onClick: () => window.open("http://pf.kakao.com/_cuksX", "_blank") },
             ].map(item => (
               <button key={item.label} onClick={item.onClick}
