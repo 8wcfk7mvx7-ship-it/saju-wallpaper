@@ -190,6 +190,59 @@ const SEDUCTION_TIPS: Record<string, { female: string[]; male: string[] }> = {
   },
 };
 
+// ── 천간합 목록 ──────────────────────────────────────────────────────────────
+const 천간합목록 = [
+  {a:"갑", b:"기", 합화:"토", desc:"안정감 있고 지속적인 매력. 오래 봐도 질리지 않는 깊은 끌림."},
+  {a:"을", b:"경", 합화:"금", desc:"긴장감 있고 날카로운 매력. 가까이 있으면 이상하게 끌리는 에너지."},
+  {a:"병", b:"신", 합화:"수", desc:"차갑고 신비로운 매력. 상대를 매혹하고 수수께끼 같은 분위기."},
+  {a:"정", b:"임", 합화:"목", desc:"감성 깊고 낭만적인 에너지. 마음이 연결될 때 폭발하는 성적 매력."},
+  {a:"무", b:"계", 합화:"화", desc:"불꽃 같은 만남. 처음 보는 순간 화학 반응이 일어나는 유형."},
+];
+const 지지합목록 = [
+  {a:"자", b:"축", 합화:"토", desc:"지속성과 안정. 오래 함께할수록 깊어지는 친밀감."},
+  {a:"인", b:"해", 합화:"목", desc:"자연스럽고 편안한 연결. 처음부터 편한 에너지."},
+  {a:"묘", b:"술", 합화:"화", desc:"불꽃 같은 끌림. 처음 만나면 강렬한 인상."},
+  {a:"진", b:"유", 합화:"금", desc:"완성된 매력. 서로가 완벽하게 맞는 느낌."},
+  {a:"사", b:"신", 합화:"수", desc:"신비롭고 복잡한 끌림. 설명하기 어려운 매력."},
+  {a:"오", b:"미", 합화:"화/토", desc:"열정적이고 강렬한 에너지. 한 번 만나면 잊을 수 없는 임팩트."},
+];
+const 충목록 = [
+  {a:"자", b:"오", desc:"자수와 오화의 충. 감성(수)과 열정(화)이 부딪히는 강렬한 에너지. 매우 자극적이고 극적인 성적 에너지."},
+  {a:"축", b:"미", desc:"축토와 미토의 충. 안정 속에 감춰진 강렬한 내면 충돌. 억눌린 욕망이 강합니다."},
+  {a:"인", b:"신", desc:"인목과 신금의 충. 자유로운 본능과 날카로운 감각의 충돌. 역동적이고 자극적인 에너지."},
+  {a:"묘", b:"유", desc:"묘목과 유금의 충. 부드러운 감성과 날카로운 감각의 충돌. 끌리면서도 긴장감 있는 관계."},
+  {a:"진", b:"술", desc:"진토와 술토의 충. 숨겨진 강렬한 에너지. 억압된 욕망이 폭발하는 에너지."},
+  {a:"사", b:"해", desc:"사화와 해수의 충. 불과 물의 충돌. 조절되지 않은 충동과 열정. 매우 강렬한 성적 기운."},
+];
+
+// ── 배우자궁 십성 분석 ────────────────────────────────────────────────────────
+const ILJI_SIPSEONG: Record<string, string> = {
+  정재: "배우자궁에 정재. 안정적이고 지속적인 파트너십. 성적으로도 신뢰와 책임감이 있습니다.",
+  편재: "배우자궁에 편재. 다양한 이성과 교류가 많고 자유로운 성적 에너지가 있습니다.",
+  정관: "배우자궁에 정관. 원칙과 도리를 중시. 성적으로 도덕적이고 진지합니다.",
+  편관: "배우자궁에 편관. 강한 자기주장과 카리스마. 관계에서 주도하거나 극적인 패턴.",
+  식신: "배우자궁에 식신. 풍요롭고 여유로운 성적 에너지. 상대를 잘 챙기고 즐겁게 해줍니다.",
+  상관: "배우자궁에 상관. 파격적이고 자유로운 성적 표현. 기존 틀을 벗어나는 에너지.",
+  비견: "배우자궁에 비견. 대등한 파트너십 추구. 상대와 경쟁하거나 독립적인 관계.",
+  겁재: "배우자궁에 겁재. 강한 소유욕과 집착. 관계에서 강렬한 에너지가 나옵니다.",
+  정인: "배우자궁에 정인. 모성/부성적 보호 에너지. 감싸고 보살피는 따뜻한 성적 관계.",
+  편인: "배우자궁에 편인. 신비롭고 독립적. 잡힐 듯 잡히지 않는 매력.",
+};
+const 월지_조후: Record<string, string> = {
+  사: "조열(燥熱) 사주. 열기가 강합니다. 여름 같이 뜨거운 성적 에너지. 단 과열되면 번아웃 주의.",
+  오: "조열(燥熱) 사주. 열기가 강합니다. 여름 같이 뜨거운 성적 에너지. 단 과열되면 번아웃 주의.",
+  미: "조열(燥熱) 사주. 열기가 강합니다. 여름 같이 뜨거운 성적 에너지. 단 과열되면 번아웃 주의.",
+  해: "한랭(寒冷) 사주. 차갑고 깊은 에너지. 쉽게 뜨겁지 않지만 일단 열리면 깊습니다.",
+  자: "한랭(寒冷) 사주. 차갑고 깊은 에너지. 쉽게 뜨겁지 않지만 일단 열리면 깊습니다.",
+  축: "한랭(寒冷) 사주. 차갑고 깊은 에너지. 쉽게 뜨겁지 않지만 일단 열리면 깊습니다.",
+  인: "온난(溫暖) 사주. 따뜻하고 자연스럽게 성장하는 에너지. 균형 잡힌 성적 기운.",
+  묘: "온난(溫暖) 사주. 따뜻하고 자연스럽게 성장하는 에너지. 균형 잡힌 성적 기운.",
+  진: "온난(溫暖) 사주. 따뜻하고 자연스럽게 성장하는 에너지. 균형 잡힌 성적 기운.",
+  신: "서늘(凉) 사주. 냉정하고 절제된 에너지. 깊이 파고들면 섬세하고 감각적.",
+  유: "서늘(凉) 사주. 냉정하고 절제된 에너지. 깊이 파고들면 섬세하고 감각적.",
+  술: "서늘(凉) 사주. 냉정하고 절제된 에너지. 깊이 파고들면 섬세하고 감각적.",
+};
+
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
   { min: 86, grade: "S", label: "본능형", color: "#f43f5e", bg: "rgba(244,63,94,0.15)", border: "rgba(244,63,94,0.35)", desc: "치명적인 도화 기운의 소유자. 의도하지 않아도 이성이 먼저 다가옵니다.", oneliner: "근처에 있기만 해도 주변 이성이 흔들립니다." },
@@ -392,6 +445,46 @@ function ErosContent() {
 
   const targetGender = gender === "female" ? "남자" : "여자";
 
+  // ── 암합·지지합·충 분석 ──────────────────────────────────────────────────
+  const cgList = [pd.year.cg, pd.month.cg, pd.day.cg, pd.time.cg].filter(Boolean);
+  const jjList = [pd.year.jj, pd.month.jj, pd.day.jj, pd.time.jj].filter(Boolean);
+
+  const found천간합: typeof 천간합목록 = [];
+  for (let i = 0; i < cgList.length; i++) {
+    for (let j = i + 1; j < cgList.length; j++) {
+      const match = 천간합목록.find(h =>
+        (h.a === cgList[i] && h.b === cgList[j]) ||
+        (h.a === cgList[j] && h.b === cgList[i])
+      );
+      if (match && !found천간합.includes(match)) found천간합.push(match);
+    }
+  }
+  const found지지합: typeof 지지합목록 = [];
+  for (let i = 0; i < jjList.length; i++) {
+    for (let j = i + 1; j < jjList.length; j++) {
+      const match = 지지합목록.find(h =>
+        (h.a === jjList[i] && h.b === jjList[j]) ||
+        (h.a === jjList[j] && h.b === jjList[i])
+      );
+      if (match && !found지지합.includes(match)) found지지합.push(match);
+    }
+  }
+  const found충: typeof 충목록 = [];
+  for (let i = 0; i < jjList.length; i++) {
+    for (let j = i + 1; j < jjList.length; j++) {
+      const match = 충목록.find(h =>
+        (h.a === jjList[i] && h.b === jjList[j]) ||
+        (h.a === jjList[j] && h.b === jjList[i])
+      );
+      if (match && !found충.includes(match)) found충.push(match);
+    }
+  }
+
+  // 배우자궁 십성 & 조후
+  const iljiSipseong = pd.day.sipseongJj ?? "";
+  const iljiSipseongDesc = ILJI_SIPSEONG[iljiSipseong] ?? null;
+  const woljiJohu = 월지_조후[pd.month.jj] ?? null;
+
   return (
     <main className="min-h-screen bg-[#08010f] text-white">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -493,7 +586,85 @@ function ErosContent() {
           )}
         </div>
 
-        {/* ④ 은근한 매력 (일지) */}
+        {/* ④ 암합·지지합 분석 */}
+        {(found천간합.length > 0 || found지지합.length > 0) && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">암합(暗合) · 지지합(地支合) 분석</p>
+            <p className="text-xs text-gray-600 mb-4">사주 기둥 사이에 숨겨진 합(合)의 에너지</p>
+            {found천간합.length > 0 && (
+              <div className="mb-3">
+                <p className="text-xs text-rose-400 font-semibold mb-2">천간합(天干合)</p>
+                <div className="space-y-2">
+                  {found천간합.map((h) => (
+                    <div key={h.a+h.b} className="bg-rose-950/20 border border-rose-900/25 rounded-xl px-4 py-3">
+                      <p className="text-sm font-bold text-rose-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
+                      <p className="text-xs text-gray-400">{h.desc}</p>
+                      {(h.a === "정" || h.b === "정") && (
+                        <p className="text-xs text-purple-300 mt-1 font-semibold">★ 정임합이 사주에 숨어있으면 &quot;숨겨진 성적 매력&quot; — 겉으로 드러나지 않지만 가까워지면 폭발합니다.</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {found지지합.length > 0 && (
+              <div>
+                <p className="text-xs text-purple-400 font-semibold mb-2">지지합(地支合)</p>
+                <div className="space-y-2">
+                  {found지지합.map((h) => (
+                    <div key={h.a+h.b} className="bg-purple-950/20 border border-purple-900/25 rounded-xl px-4 py-3">
+                      <p className="text-sm font-bold text-purple-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
+                      <p className="text-xs text-gray-400">{h.desc}</p>
+                      <p className="text-xs text-gray-500 mt-1">음양이 맞아 자연스럽게 끌리는 기운입니다.</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ⑤ 충 — 성적 긴장 */}
+        {found충.length > 0 && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">충(沖) — 성적 긴장 에너지</p>
+            <p className="text-xs text-amber-500/80 mb-3">충(沖)이 있는 사주는 긴장감과 자극이 강합니다. 정적인 관계보다 역동적이고 자극적인 관계에서 에너지가 살아납니다.</p>
+            <div className="space-y-2">
+              {found충.map((c) => (
+                <div key={c.a+c.b} className="bg-amber-950/20 border border-amber-900/25 rounded-xl px-4 py-3">
+                  <p className="text-sm font-bold text-amber-300 mb-0.5">{c.a}{c.b}충(沖)</p>
+                  <p className="text-xs text-gray-400">{c.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ⑥ 배우자궁·조후 분석 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">배우자궁(配偶者宮) 분석</p>
+          <p className="text-xs text-gray-600 mb-4">일지(日支) = 배우자궁. 나의 관계 에너지의 핵심.</p>
+          <div className="space-y-3">
+            <div className="bg-white/5 rounded-xl px-4 py-3">
+              <p className="text-xs text-gray-500 font-semibold mb-1">배우자궁 — {ilji}</p>
+              <p className="text-sm text-gray-200">{ILJI_HIDDEN_CHARM[ilji]?.charm ?? "알면 알수록 빠져드는 매력"}</p>
+            </div>
+            {iljiSipseongDesc && (
+              <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
+                <p className="text-xs text-rose-400 font-semibold mb-1">십성(十星) — {iljiSipseong}</p>
+                <p className="text-sm text-gray-300">{iljiSipseongDesc}</p>
+              </div>
+            )}
+            {woljiJohu && (
+              <div className="bg-blue-950/20 border border-blue-900/20 rounded-xl px-4 py-3">
+                <p className="text-xs text-blue-400 font-semibold mb-1">조후(調候) — 월지 {pd.month.jj}</p>
+                <p className="text-sm text-gray-300">{woljiJohu}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ⑧ 은근한 매력 (일지) */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">은근한 매력 — {ilji}일지</p>
           <div className="space-y-3">
@@ -508,14 +679,14 @@ function ErosContent() {
           </div>
         </div>
 
-        {/* ⑤ 월주 분석 */}
+        {/* ⑨ 월주 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">월주 분석 — {result.pillarsDetail.month.cg}{result.pillarsDetail.month.jj}월주</p>
           <p className="text-xs text-gray-600 mb-3">사회적으로 드러나는 외부 이미지</p>
           <p className="text-sm text-gray-300 leading-relaxed">{outerImage}</p>
         </div>
 
-        {/* ⑥ 도화 신살 */}
+        {/* ⑩ 도화 신살 */}
         {charmSinsals.length > 0 && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
             <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">사주 속 도화 기운</p>
@@ -533,7 +704,7 @@ function ErosContent() {
           </div>
         )}
 
-        {/* ⑦ 꼬시는 팁 */}
+        {/* ⑪ 꼬시는 팁 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">{targetGender}를 꼬시는 법</p>
           <p className="text-xs text-gray-600 mb-4">{ilgan}일간 맞춤 공략법</p>
