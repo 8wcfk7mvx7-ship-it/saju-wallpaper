@@ -107,6 +107,7 @@ const CRUSH_SUCCESS: Record<string, {
   },
 };
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import ProfileSaveModal from "@/components/ProfileSaveModal";
 export const dynamic = "force-dynamic";
 
 type Step = "splash" | "input" | "loading" | "result";
@@ -361,9 +362,38 @@ export default function CrushPage() {
 
           {/* 생년월일 */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-              그 사람 생년월일 <span style={{ color: "#f43f5e" }}>*</span>
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.5)" }}>
+                그 사람 생년월일 <span style={{ color: "#f43f5e" }}>*</span>
+              </label>
+              <ProfileSaveModal
+                onSelect={(prof) => {
+                  setTargetGender(prof.gender);
+                  setTargetYear(parseInt(prof.birthYear) || 0);
+                  setTargetMonth(parseInt(prof.birthMonth) || 0);
+                  setTargetDay(parseInt(prof.birthDay) || 0);
+                  setTargetTime({
+                    hour: prof.birthHour ? parseInt(prof.birthHour) : null,
+                    minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
+                    unknown: !prof.birthHour,
+                    useJajasi: prof.useJajasi,
+                  });
+                  setTargetBirthPlace(prof.birthPlace || '서울');
+                }}
+                currentData={{
+                  gender: targetGender,
+                  birthYear: String(targetYear || ''),
+                  birthMonth: String(targetMonth || ''),
+                  birthDay: String(targetDay || ''),
+                  birthHour: targetTime.hour != null ? String(targetTime.hour) : '',
+                  birthMinute: targetTime.minute != null ? String(targetTime.minute) : '',
+                  birthPlace: targetBirthPlace || '서울',
+                  calType: targetCalType,
+                  isLeapMonth: targetIsLeap,
+                  useJajasi: targetTime.useJajasi,
+                }}
+              />
+            </div>
             <div className="space-y-2">
               <DropPick value={targetYear ? String(targetYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setTargetYear(Number(v))} placeholder="출생 연도" suffix="년" />
               <div className="grid grid-cols-2 gap-2">

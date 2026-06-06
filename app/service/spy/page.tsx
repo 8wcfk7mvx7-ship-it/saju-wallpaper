@@ -29,6 +29,7 @@ import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import AdultGate from "@/components/AdultGate";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import ProfileSaveModal from "@/components/ProfileSaveModal";
 
 export const dynamic = "force-dynamic";
 
@@ -331,6 +332,32 @@ function SpyContent() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-gray-400"><span className="text-white font-black">나</span>의 생년월일</label>
+                <div className="flex items-center gap-2">
+                <ProfileSaveModal
+                  onSelect={(prof) => {
+                    setMyYear(prof.birthYear);
+                    setMyMonth(prof.birthMonth);
+                    setMyDay(prof.birthDay);
+                    setMyTime({
+                      hour: prof.birthHour ? parseInt(prof.birthHour) : null,
+                      minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
+                      unknown: !prof.birthHour,
+                      useJajasi: prof.useJajasi,
+                    });
+                  }}
+                  currentData={{
+                    gender: "male",
+                    birthYear: myYear,
+                    birthMonth: myMonth,
+                    birthDay: myDay,
+                    birthHour: myTime.hour != null ? String(myTime.hour) : '',
+                    birthMinute: myTime.minute != null ? String(myTime.minute) : '',
+                    birthPlace: '서울',
+                    calType: myCalType,
+                    isLeapMonth: false,
+                    useJajasi: myTime.useJajasi,
+                  }}
+                />
                 <div className="flex overflow-hidden rounded-lg border border-white/10">
                   {(["solar","lunar"] as const).map(t => (
                     <button key={t} type="button" onClick={() => { setMyCalType(t); setMyMonth(""); setMyDay(""); }}
@@ -338,6 +365,7 @@ function SpyContent() {
                       {t === "solar" ? "양력" : "음력"}
                     </button>
                   ))}
+                </div>
                 </div>
               </div>
               <DropPick value={myYear} opts={yearOpts} onChange={setMyYear} placeholder="연도 선택" suffix="년" />

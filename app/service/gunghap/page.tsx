@@ -7,6 +7,7 @@ import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePick
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import ProfileSaveModal from "@/components/ProfileSaveModal";
 
 const CY_GH = new Date().getFullYear();
 const YEARS_GH = Array.from({ length: CY_GH - 1919 }, (_, i) => CY_GH - i);
@@ -516,12 +517,47 @@ export default function GunghapPage(){
         <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>
           {idx===1?'나':(personLabel||'두 번째 사람')}
         </p>
-        {idx===1&&(
-          <button type="button" onClick={fillP1} style={{
-            fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',
-            background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px',
-          }}>내 사주로 채우기</button>
-        )}
+        <div style={{display:'flex',alignItems:'center',gap:6}}>
+          {idx===1&&(
+            <ProfileSaveModal
+              onSelect={(prof) => {
+                setP({
+                  ...p,
+                  gender: prof.gender,
+                  year: prof.birthYear,
+                  month: prof.birthMonth,
+                  day: prof.birthDay,
+                  birthTime: {
+                    hour: prof.birthHour ? parseInt(prof.birthHour) : null,
+                    minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
+                    unknown: !prof.birthHour,
+                    useJajasi: prof.useJajasi,
+                  },
+                  birthPlace: prof.birthPlace || '서울',
+                  name: prof.name,
+                });
+              }}
+              currentData={{
+                gender: p.gender,
+                birthYear: p.year,
+                birthMonth: p.month,
+                birthDay: p.day,
+                birthHour: p.birthTime.hour != null ? String(p.birthTime.hour) : '',
+                birthMinute: p.birthTime.minute != null ? String(p.birthTime.minute) : '',
+                birthPlace: p.birthPlace || '서울',
+                calType: 'solar',
+                isLeapMonth: false,
+                useJajasi: p.birthTime.useJajasi,
+              }}
+            />
+          )}
+          {idx===1&&(
+            <button type="button" onClick={fillP1} style={{
+              fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',
+              background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px',
+            }}>내 사주로 채우기</button>
+          )}
+        </div>
       </div>
       <div style={{display:'flex',gap:8,marginBottom:10}}>
         {(['male','female'] as const).map(g=>(
