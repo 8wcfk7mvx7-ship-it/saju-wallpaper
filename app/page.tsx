@@ -383,7 +383,7 @@ function ContactSection() {
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[]; saleSticker?: string;
+  border: string; glow: string; categories: Category[];
 }[] = [
   {
     id: "saju", emoji: "🔮",
@@ -395,7 +395,6 @@ const SERVICES: {
     color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
     categories: ["전체", "라이프"],
-    saleSticker: "50% OFF",
   },
   {
     id: "gunghap", emoji: "💑",
@@ -506,7 +505,6 @@ const SERVICES: {
     color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
     categories: ["전체", "금전·투자", "운명·대운", "Special"],
-    saleSticker: "50% OFF",
   },
   {
     id: "place", emoji: "🌍",
@@ -518,7 +516,6 @@ const SERVICES: {
     color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
     categories: ["전체", "운명·대운", "라이프", "Special"],
-    saleSticker: "50% OFF",
   },
   {
     id: "overcome", emoji: "⚡",
@@ -573,15 +570,6 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 
   return (
     <div ref={ref} className="relative">
-      {/* 세일 스티커 */}
-      {svc.saleSticker && (
-        <div className="absolute -top-3 -right-2 z-20 rotate-[10deg] pointer-events-none select-none">
-          <div className="px-3 py-1 rounded-full text-[11px] font-black text-white"
-            style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)", boxShadow: "0 2px 12px rgba(220,38,38,0.6)" }}>
-            {svc.saleSticker}
-          </div>
-        </div>
-      )}
 
       <div
         onClick={() => router.push(svc.href)}
