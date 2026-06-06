@@ -577,13 +577,13 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
   }, []);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative h-full">
 
       <div
         onClick={() => router.push(svc.href)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="kitsch-card cursor-pointer rounded-2xl flex flex-col"
+        className="kitsch-card cursor-pointer rounded-2xl flex flex-col h-full"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(28px)",
@@ -1057,7 +1057,7 @@ export default function MainPage() {
           })()}
 
           {/* 데스크탑: 2컬럼, 모바일: 1컬럼 — 카드 overflow 허용으로 스티커 노출 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-visible">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-visible items-stretch">
             {SERVICES
               .filter(s => s.categories.includes(activeCategory))
               .map((svc, i) => (
