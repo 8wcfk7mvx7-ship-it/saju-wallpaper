@@ -1,5 +1,29 @@
 "use client";
 import { useState, useEffect } from "react";
+
+function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      onClick={handleShare}
+      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
+    >
+      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
+    </button>
+  );
+}
 import { useRouter } from "next/navigation";
 import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult } from "@/lib/saju";
 
@@ -649,7 +673,8 @@ export default function CrushPage() {
           </button>
         </div>
 
-        <button onClick={() => setStep("input")} className="w-full mt-4 py-3 rounded-xl text-sm font-semibold transition"
+        <ShareButton />
+        <button onClick={() => setStep("input")} className="w-full mt-3 py-3 rounded-xl text-sm font-semibold transition"
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
           다시 분석하기
         </button>

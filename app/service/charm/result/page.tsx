@@ -98,6 +98,30 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
 
 const CHARM_PRICE = 4900;
 
+function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      onClick={handleShare}
+      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
+    >
+      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
+    </button>
+  );
+}
+
 function CharmResultContent() {
   const router = useRouter();
   const [result, setResult] = useState<SajuResult | null>(null);
@@ -492,6 +516,7 @@ function CharmResultContent() {
         <div className="text-center mt-6">
           <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 이론 기반 오락용 콘텐츠입니다.</p>
         </div>
+        <ShareButton />
         <button onClick={() => router.push("/service/charm")} className="w-full mt-4 py-3 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition">
           다시 분석하기
         </button>

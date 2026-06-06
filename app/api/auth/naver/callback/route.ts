@@ -53,9 +53,16 @@ export async function GET(req: NextRequest) {
     const profileImage = profile.profile_image || null;
     const email = profile.email || null;
 
-    // Supabase에 upsert
+    // Supabase에 upsert (신규 여부 확인)
+    let isNewUser = false;
     const sb = getSupabase();
     if (sb) {
+      const { data: existing } = await sb
+        .from("kakao_users")
+        .select("id")
+        .eq("kakao_id", naverId)
+        .single();
+      isNewUser = !existing;
       await sb.from("kakao_users").upsert(
         { kakao_id: naverId, nickname, profile_image: profileImage, email, last_login: new Date().toISOString() },
         { onConflict: "kakao_id" }
@@ -63,7 +70,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 쿠키에 사용자 정보 저장 (7일)
-    const userInfo = JSON.stringify({ naverId, nickname, profileImage, email });
+    const userInfo = JSON.stringify({ naverId, nickname, profileImage, email, isNewUser });
     const encodedUser = Buffer.from(userInfo).toString("base64");
 
     const redirectTo = state.startsWith("/") ? `${baseUrl}${state}` : baseUrl;

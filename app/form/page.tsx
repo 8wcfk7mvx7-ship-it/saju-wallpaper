@@ -187,6 +187,25 @@ function DropdownPicker({
   );
 }
 
+function CityInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [composing, setComposing] = useState(false);
+  const [local, setLocal] = useState(value);
+
+  useEffect(() => { if (!composing) setLocal(value); }, [value, composing]);
+
+  return (
+    <input
+      type="text"
+      value={local}
+      placeholder={placeholder}
+      onCompositionStart={() => setComposing(true)}
+      onCompositionEnd={(e) => { setComposing(false); onChange((e.target as HTMLInputElement).value); }}
+      onChange={(e) => { setLocal(e.target.value); if (!composing) onChange(e.target.value); }}
+      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
+    />
+  );
+}
+
 export default function FormPage() {
   const router = useRouter();
   const [lang, setLang] = useState<Lang>("ko");
@@ -565,9 +584,7 @@ export default function FormPage() {
           {/* 태어난 도시 */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">{t.birthPlace}</label>
-            <input type="text" placeholder={t.birthPlaceholder} required
-              value={form.birthPlace} onChange={e => setForm({ ...form, birthPlace: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition" />
+            <CityInput value={form.birthPlace} onChange={v => setForm({ ...form, birthPlace: v })} placeholder={t.birthPlaceholder} />
           </div>
 
           {/* 스타일 */}

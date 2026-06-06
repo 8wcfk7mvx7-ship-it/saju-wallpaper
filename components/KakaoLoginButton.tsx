@@ -6,6 +6,7 @@ interface NaverUser {
   nickname: string;
   profileImage: string | null;
   email: string | null;
+  isNewUser?: boolean;
 }
 
 function parseUser(): NaverUser | null {
@@ -48,7 +49,25 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
 
   // ── 플로팅 모바일 CTA ────────────────────────────────────────────────────
   if (floating) {
-    if (user) return null;
+    if (user) {
+      return (
+        <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-2xl"
+          style={{ background: "rgba(3,199,90,0.1)", border: "1px solid rgba(3,199,90,0.25)" }}>
+          <div className="flex items-center gap-2">
+            {user.profileImage && (
+              <img src={user.profileImage} alt="" className="w-7 h-7 rounded-full object-cover" />
+            )}
+            <span className="text-sm font-bold text-white">
+              안녕하세요, {user.nickname || user.naverId}님!
+            </span>
+          </div>
+          <button onClick={logout} className="text-xs px-2.5 py-1 rounded-lg transition-colors"
+            style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }}>
+            로그아웃
+          </button>
+        </div>
+      );
+    }
     return (
       <a
         href={`/api/auth/naver?redirect=${encodeURIComponent(redirectTo)}`}
