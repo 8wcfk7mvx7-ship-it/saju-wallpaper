@@ -730,7 +730,7 @@ export default function MainPage() {
 
 
   return (
-    <main className="min-h-screen text-white overflow-x-hidden" style={{ background: "#020c1b" }}>
+    <main className="min-h-screen text-white" style={{ background: "#020c1b", overflowX: "clip" }}>
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -844,12 +844,13 @@ export default function MainPage() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20" style={{ overflow: "visible" }}>
 
         {/* ── 히어로 섹션 ── */}
-        <section className="py-16 sm:py-24 text-center relative">
+        <section className="py-16 sm:py-24 text-center relative" style={{ overflow: "visible" }}>
           {/* 마스코트 */}
-          <div className="absolute right-0 bottom-0 pointer-events-none select-none hidden sm:block" style={{ width: 220 }}>
+          <div className="absolute pointer-events-none select-none hidden sm:block"
+            style={{ right: -20, bottom: -20, width: 260, padding: 24, overflow: "visible" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/mascot.png" alt="사주 마스코트" style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 8px 32px rgba(147,51,234,0.4))" }} />
           </div>
