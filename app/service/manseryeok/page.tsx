@@ -359,7 +359,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 
 // ─── 결과 뷰 ──────────────────────────────────────────────────────────────────
 // ─── 오행 도넛 차트 ────────────────────────────────────────────────────────────
-function OhaengDonut({ scores, total }: { scores: Record<string, number>; total: number }) {
+function OhaengDonut({ scores, total }: { scores: { 목: number; 화: number; 토: number; 금: number; 수: number }; total: number }) {
   const EL_COLORS: Record<string, string> = { 목: "#22c55e", 화: "#ef4444", 토: "#f59e0b", 금: "#e2e8f0", 수: "#94a3b8" };
   const els = ["목","화","토","금","수"];
   let cumAngle = -90;
