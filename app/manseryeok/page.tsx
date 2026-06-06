@@ -507,36 +507,80 @@ function ResultView({
       )}
 
       {/* ② 격국 · 용신 */}
-      <Section title="격국 · 용신 · 조후 (格局用神)" accent="#a78bfa">
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          {[
-            { label: "신강/신약", value: result.yongshin.strength, color: result.yongshin.strength === "신강" ? "#f87171" : result.yongshin.strength === "신약" ? "#60a5fa" : "#4ade80" },
-            { label: "용신(用神)", value: result.yongshin.yongshin, color: EL_STYLE[result.yongshin.yongshin]?.text || "#fff" },
-            { label: "희신(喜神)", value: result.yongshin.heeshin, color: EL_STYLE[result.yongshin.heeshin]?.text || "#fff" },
-          ].map(item => (
-            <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
-              <p className="text-lg font-black" style={{ color: item.color }}>{item.value}</p>
+      {(() => {
+        // 조후용신 계산
+        const johuMap: Record<string, { yongshin: string; heeshin: string; desc: string }> = {
+          사: { yongshin:"수", heeshin:"금", desc:"월지 사화(巳) → 조열(燥熱) → 조후용신: 수(水), 희신: 금(金)" },
+          오: { yongshin:"수", heeshin:"금", desc:"월지 오화(午) → 조열(燥熱) → 조후용신: 수(Water), 희신: 금(金)" },
+          미: { yongshin:"수", heeshin:"금", desc:"월지 미토(未) → 조열(燥熱) → 조후용신: 수(水), 희신: 금(金)" },
+          해: { yongshin:"화", heeshin:"목", desc:"월지 해수(亥) → 한랭(寒冷) → 조후용신: 화(火), 희신: 목(木)" },
+          자: { yongshin:"화", heeshin:"목", desc:"월지 자수(子) → 한랭(寒冷) → 조후용신: 화(Fire), 희신: 목(木)" },
+          축: { yongshin:"화", heeshin:"목", desc:"월지 축토(丑) → 한랭(寒冷) → 조후용신: 화(火), 희신: 목(木)" },
+          인: { yongshin:"화", heeshin:"토", desc:"월지 인목(寅) → 온난 → 희신: 화(火)" },
+          묘: { yongshin:"화", heeshin:"토", desc:"월지 묘목(卯) → 온난 → 희신: 화(Fire)" },
+          진: { yongshin:"화", heeshin:"토", desc:"월지 진토(辰) → 온난 → 희신: 화(火)" },
+          신: { yongshin:"화", heeshin:"수", desc:"월지 신금(申) → 서늘 → 희신: 화(火), 기신: 토(土)" },
+          유: { yongshin:"화", heeshin:"수", desc:"월지 유금(酉) → 서늘 → 희신: 화(Fire), 기신: 토(土)" },
+          술: { yongshin:"화", heeshin:"수", desc:"월지 술토(戌) → 서늘 → 희신: 화(火), 기신: 토(土)" },
+        };
+        const johu = johuMap[monthJj];
+        const ys = result.yongshin;
+        // 억부용신과 다른 경우 노트
+        const jysDiff = johu && johu.yongshin !== ys.yongshin;
+        // 기신: 용신을 극하는 오행
+        const gishin = ys.gishin;
+        // 구신: 기신을 생하는 오행
+        const gusinMap: Record<string,string> = { 목:"수", 화:"목", 토:"화", 금:"토", 수:"금" };
+        const gusin = gusinMap[gishin] || "";
+        return (
+          <Section title="격국 · 용신 · 조후 (格局用神)" accent="#a78bfa">
+            {/* 억부용신 그리드 */}
+            <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>억부용신(抑扶用神)</p>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {[
+                { label: "신강/신약", value: ys.strength, color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" },
+                { label: "억부용신", value: ys.yongshin, color: EL_STYLE[ys.yongshin]?.text || "#fff" },
+                { label: "희신(喜神)", value: ys.heeshin, color: EL_STYLE[ys.heeshin]?.text || "#fff" },
+                { label: "기신(忌神)", value: gishin, color: EL_STYLE[gishin]?.text || "#fff" },
+                { label: "구신(仇神)", value: gusin, color: EL_STYLE[gusin]?.text || "#9ca3af" },
+              ].map(item => (
+                <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
+                  <p className="text-lg font-black" style={{ color: item.color }}>{item.value || "—"}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.65)" }}>{result.yongshin.desc}</p>
-        <div className="space-y-3">
-          {(["mindset","boundary","mental","style"] as const).map((key, i) => {
-            const labels = { mindset:"사고방식", boundary:"대인관계", mental:"멘탈구조", style:"행동스타일" };
-            return (
-              <div key={key} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{labels[key]}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{singangTrait[key]}</p>
+            {/* 조후용신 */}
+            {johu && (
+              <div className="mb-4 rounded-xl px-4 py-3" style={{ background: jysDiff ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${jysDiff ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.06)"}` }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: jysDiff ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>조후용신(調候用神)</p>
+                <p className="text-xs leading-relaxed" style={{ color: jysDiff ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>{johu.desc}</p>
+                {jysDiff && (
+                  <p className="text-[10px] mt-1.5 font-bold" style={{ color: "#fbbf24" }}>
+                    ※ 억부용신({ys.yongshin})과 조후용신({johu.yongshin})이 다릅니다. 둘을 함께 고려하세요.
+                  </p>
+                )}
               </div>
-            );
-          })}
-          <div className="rounded-xl px-4 py-3" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
-            <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
-            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{singangTrait.caution}</p>
-          </div>
-        </div>
-      </Section>
+            )}
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.65)" }}>{ys.desc}</p>
+            <div className="space-y-3">
+              {(["mindset","boundary","mental","style"] as const).map((key) => {
+                const labels = { mindset:"사고방식", boundary:"대인관계", mental:"멘탈구조", style:"행동스타일" };
+                return (
+                  <div key={key} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{labels[key]}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{singangTrait[key]}</p>
+                  </div>
+                );
+              })}
+              <div className="rounded-xl px-4 py-3" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{singangTrait.caution}</p>
+              </div>
+            </div>
+          </Section>
+        );
+      })()}
 
       {/* ③ 일간 성격 */}
       {ilganInfo && (
@@ -586,6 +630,73 @@ function ResultView({
           </div>
         </Section>
       )}
+
+      {/* ④-b 외향성·내향성 분석 */}
+      {(() => {
+        const scores = result.scores;
+        const totalScore = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+        const pct = (el: keyof typeof scores) => Math.round((scores[el] / totalScore) * 100);
+        let score = isYang ? 1 : -1;
+        if (pct("화") >= 30) score += 1;
+        if (pct("수") >= 30) score -= 1;
+        if (pct("금") >= 30) score -= 1;
+        score = Math.max(-3, Math.min(3, score));
+        const label =
+          score <= -2 ? "강한 내향성" :
+          score === -1 ? "내향성 우세" :
+          score === 0  ? "균형형" :
+          score === 1  ? "외향성 우세" : "강한 외향성";
+        const desc =
+          score <= -2 ? "혼자만의 공간과 시간이 꼭 필요합니다. 깊은 사색과 집중력이 강점입니다. 사람이 많은 자리는 에너지를 소진시킵니다." :
+          score === -1 ? "기본적으로 내향적이나 필요에 따라 사교적으로 행동할 수 있습니다. 신중하고 관찰력이 뛰어납니다." :
+          score === 0  ? "상황에 따라 외향·내향을 유연하게 전환합니다. 폭넓은 적응력이 강점입니다." :
+          score === 1  ? "대체로 외향적이나 혼자만의 회복 시간도 필요합니다. 활동적이고 표현력이 풍부합니다." :
+          "강한 에너지 발산 기질입니다. 사람들과 어울릴 때 생기가 넘칩니다. 혼자 있으면 에너지가 소진됩니다.";
+        const barColor = score > 0 ? "#ef4444" : score < 0 ? "#94a3b8" : "#fbbf24";
+        const barPct = ((score + 3) / 6) * 100;
+        return (
+          <Section title="외향성·내향성 분석" accent="#a78bfa">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-sm font-black px-3 py-1 rounded-full" style={{ background: "rgba(167,139,250,0.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,0.25)" }}>{label}</span>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>점수 {score > 0 ? "+" : ""}{score} / 3</span>
+            </div>
+            <div className="relative h-2.5 rounded-full mb-3" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <div className="absolute left-0 top-0 h-2.5 rounded-full transition-all" style={{ width: `${barPct}%`, background: barColor }} />
+              <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white" style={{ left: `${barPct}%`, transform: "translate(-50%,-50%)", background: barColor }} />
+            </div>
+            <div className="flex justify-between text-[9px] mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <span>강한 내향 (-3)</span>
+              <span>균형 (0)</span>
+              <span>강한 외향 (+3)</span>
+            </div>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>{desc}</p>
+            <div className="grid grid-cols-2 gap-2 text-[10px]">
+              <div className="rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ color: "rgba(255,255,255,0.4)" }}>기반 기질</span>
+                <span className="ml-2 font-bold" style={{ color: isYang ? "#ef4444" : "#94a3b8" }}>{isYang ? "양간(+1 외향)" : "음간(-1 내향)"}</span>
+              </div>
+              {pct("화") >= 30 && (
+                <div className="rounded-lg px-3 py-2" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                  <span style={{ color: "rgba(255,255,255,0.4)" }}>화(火) 강세</span>
+                  <span className="ml-2 font-bold" style={{ color: "#ef4444" }}>+1 외향</span>
+                </div>
+              )}
+              {pct("수") >= 30 && (
+                <div className="rounded-lg px-3 py-2" style={{ background: "rgba(148,163,184,0.05)", border: "1px solid rgba(148,163,184,0.15)" }}>
+                  <span style={{ color: "rgba(255,255,255,0.4)" }}>수(Water) 강세</span>
+                  <span className="ml-2 font-bold" style={{ color: "#94a3b8" }}>-1 내향</span>
+                </div>
+              )}
+              {pct("금") >= 30 && (
+                <div className="rounded-lg px-3 py-2" style={{ background: "rgba(248,250,252,0.03)", border: "1px solid rgba(248,250,252,0.1)" }}>
+                  <span style={{ color: "rgba(255,255,255,0.4)" }}>금(金) 강세</span>
+                  <span className="ml-2 font-bold" style={{ color: "#f8fafc" }}>-1 신중·내향</span>
+                </div>
+              )}
+            </div>
+          </Section>
+        );
+      })()}
 
       {/* ⑤ 월지 심리 */}
       {weolji && (
