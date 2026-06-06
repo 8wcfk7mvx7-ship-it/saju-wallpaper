@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const KakaoLoginButton = dynamic(() => import("@/components/KakaoLoginButton"), { ssr: false });
 const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr: false });
@@ -854,6 +855,11 @@ export default function MainPage() {
 
         {/* ── 히어로 섹션 ── */}
         <section className="py-16 sm:py-24 text-center relative">
+          {/* 마스코트 */}
+          <div className="absolute right-0 bottom-0 pointer-events-none select-none hidden sm:block" style={{ width: 160, opacity: 0.92 }}>
+            <Image src="/mascot.png" alt="사주 마스코트" width={160} height={200} style={{ objectFit: "contain", filter: "drop-shadow(0 8px 24px rgba(147,51,234,0.35))" }} priority />
+          </div>
+
           {/* 플로팅 장식 별 */}
           <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ec4899" }}>✦</span>
           <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#a78bfa" }}>✦</span>

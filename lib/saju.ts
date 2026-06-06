@@ -145,7 +145,10 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   백호살:   {hanja:"白虎殺", category:"unlucky",  desc:"혈광지재(血光之災). 수술·사고·혈액 관련 질환을 주의하세요"},
   원진살:   {hanja:"怨嗔殺", category:"unlucky",  desc:"배우자·가까운 사람과 원망·갈등이 반복되기 쉽습니다"},
   과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"연애·결혼 시기가 늦거나 독신 경향이 강합니다. 영적 감수성이 뛰어나고 집중력이 강합니다. 여성이 강하게 작용합니다"},
-  평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"예상치 못한 변화와 이별의 기운입니다. 두부(頭部) 건강 주의. 관계에서 급작스러운 단절이 생길 수 있습니다"},
+  평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"리더 기질과 강한 고집을 타고납니다. 남 밑에서 통제받는 것을 체질적으로 거부하며, 주도권을 잡아야 에너지가 살아납니다. 융통성을 의도적으로 기르지 않으면 독불장군이 되기 쉽습니다"},
+  나체도화: {hanja:"裸體桃花", category:"neutral",  desc:"매력이 직관적으로 드러나 숨길 수 없습니다. 어디서든 시선을 끌고 이성이 자연스럽게 모이는 기운. 그만큼 구설수·치정·스캔들에 휘말리기 쉽고 감정 기복으로 스스로 피곤해지는 경향이 있습니다"},
+  낙정관살: {hanja:"落井關殺", category:"unlucky",  desc:"수난사고·추락·함몰 관련 사고에 취약합니다. 폰 보며 걷다 맨홀·싱크홀 빠지는 유형의 부주의가 실제 사고로 이어지기 쉽습니다. 곡각살과 겹치면 물리적 충격이 더욱 강해지니 이동 중 항상 주변을 살피세요"},
+  음인:     {hanja:"陰刃",   category:"unlucky",  desc:"겉으로는 온화하고 만만해 보이나 속에 독한 기운을 품고 있습니다. 양인이 정면충돌형 강함이라면 음인은 끈질기고 은밀한 저항력. 위기 상황에서 생존력이 극대화되며, 감정을 오래 쌓아두다 폭발하는 패턴을 주의하세요"},
   고신살:   {hanja:"孤神殺", category:"unlucky",  desc:"고독하고 의지할 곳이 없는 기운입니다. 이별수가 있습니다"},
   공망:     {hanja:"空亡",   category:"unlucky",  desc:"해당 기둥의 기운이 비어 약해집니다. 해당 분야가 공허해질 수 있습니다"},
   천라지망: {hanja:"天羅地網",category:"unlucky", desc:"뜻하지 않은 구속·제약이 따릅니다 (천라=술해, 지망=진사)"},
@@ -256,6 +259,23 @@ const HAKDANG_JJ: Record<string,string> = {
   기:'유', 경:'사', 신:'자', 임:'신', 계:'묘'};
 // 괴강살(魁罡殺): 경진·경술·임진·임술 일주
 const GOEGANG_ILJU = new Set(['경진','경술','임진','임술']);
+
+// 나체도화(裸體桃花): 일간의 목욕지(沐浴地)가 일지와 일치할 때
+const MUBATH_JJ: Record<string,string> = {
+  갑:'자', 을:'사', 병:'유', 정:'신', 무:'유',
+  기:'신', 경:'오', 신:'해', 임:'묘', 계:'인'};
+
+// 낙정관살(落井關殺): 연지 그룹별 해당 지지
+// 해자축→辰, 인묘진→未, 사오미→戌, 신유술→丑
+const NAKJEONG_MAP: Record<string,string> = {
+  해:'진', 자:'진', 축:'진',
+  인:'미', 묘:'미', 진:'미',
+  사:'술', 오:'술', 미:'술',
+  신:'축', 유:'축', 술:'축'};
+
+// 음인(陰刃): 음간의 양인 다음 지지 (을→辰, 정→未, 기→未, 신→戌, 계→丑)
+const YINYIN_JJ: Record<string,string> = {
+  을:'진', 정:'미', 기:'미', 신:'술', 계:'축'};
 
 // ── 천간 득지/실지 (地盤 강도) 계수 ──────────────────────────────────────
 // 각 천간이 자신의 지지에서 어떤 12운성 상태에 있느냐에 따라 강도가 달라짐
@@ -1310,6 +1330,20 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   addSinsal('홍염살', detailArr.filter(p => p.d.jj === HONGYEOM_JJ[ilgan]).map(p => p.label));
   // 양인살
   addSinsal('양인살', detailArr.filter(p => p.d.jj === YANGIN_JJ[ilgan]).map(p => p.label));
+  // 음인(陰刃): 음간 일간만 해당
+  if (YINYIN_JJ[ilgan]) {
+    addSinsal('음인', detailArr.filter(p => p.d.jj === YINYIN_JJ[ilgan]).map(p => p.label));
+  }
+  // 나체도화: 일지 = 일간의 목욕지
+  if (dayPillar.jj === MUBATH_JJ[ilgan]) {
+    addSinsal('나체도화', ['일']);
+  }
+  // 낙정관살: 연지 그룹 기준 지지가 사주에 존재
+  const nakjeongTarget = NAKJEONG_MAP[yeonji];
+  if (nakjeongTarget) {
+    const nakHits = detailArr.filter(p => p.d.jj === nakjeongTarget).map(p => p.label);
+    if (nakHits.length > 0) addSinsal('낙정관살', nakHits);
+  }
   // 과숙살
   addSinsal('과숙살', detailArr.filter(p => p.d.jj === getGwasukJj(yeonji)).map(p => p.label));
   // 평두살: 년간이나 월간에 갑·경 + 일지가 자·오·묘·유
@@ -3272,4 +3306,28 @@ export const GWANSEONG_TRUTH = {
   crime: "관성 범죄: 나도 고통스러우니 너도 고통받아야 한다. 무관 범죄: 상대의 고통에 둔감하여 저지름. 관성/무관 모두 범죄 가능.",
   identity: "자아는 크되 정체성이 약함. 주변 분위기에 물들기 쉬움. 환경이 삶의 방향을 결정함.",
   modern: "현대사회일수록 관성의 고통 자각이 높아짐. SNS로 자신을 더 많이 보게 되어 관성 고통 증가.",
+};
+
+// 오행별 생활 처방 행동 (부족한 오행 보완)
+export const OHAENG_ACTIONS: Record<string, { title: string; actions: string[] }> = {
+  목: {
+    title: "목(木) 기운 충전",
+    actions: ["새벽 기상 후 스트레칭", "식물·화분 가꾸기", "숲·공원 걷기", "계획 세우고 실행", "새로운 것 시작하기", "초록 채소 섭취"],
+  },
+  화: {
+    title: "화(火) 기운 충전",
+    actions: ["햇빛 쐬기 (오전 30분)", "사람 많은 곳 나가기", "발표·스피치 연습", "운동 강도 올리기", "빨간색·주황색 활용", "열정적인 프로젝트 시작"],
+  },
+  토: {
+    title: "토(土) 기운 충전",
+    actions: ["같은 시간 기상·취침", "식사 시간 일정화", "방 정리·청소", "자동저축 설정", "장기 프로젝트 완주", "하체 운동·걷기", "과한 냉식 피하기"],
+  },
+  금: {
+    title: "금(金) 기운 충전",
+    actions: ["숫자·재무 관리", "기준·원칙 세우기", "불필요한 인간관계 정리", "장비·도구 정돈", "결단력 연습", "흰색·은색 활용", "계약·문서 꼼꼼히"],
+  },
+  수: {
+    title: "수(水) 기운 충전",
+    actions: ["충분한 수면 (7-8시간)", "물 자주 마시기", "혼자 조용히 사색하기", "독서·공부 시간 확보", "직관 일기 쓰기", "명상·마음챙김", "검은색·네이비 활용"],
+  },
 };
