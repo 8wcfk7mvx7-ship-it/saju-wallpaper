@@ -176,124 +176,102 @@ export default function SajuChatPage() {
         minHeight: "100vh", background: "#06060e", color: "#e8e0ff",
         fontFamily: "'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif",
         display: "flex", flexDirection: "column", alignItems: "center",
-        justifyContent: "center", padding: "24px",
+        justifyContent: "center", padding: "24px", position: "relative", overflow: "hidden",
       }}>
         <BackButton />
-        {/* Background glow */}
-        <div style={{
-          position: "fixed", top: "20%", left: "50%", transform: "translateX(-50%)",
-          width: 400, height: 400, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
 
-        <div style={{ maxWidth: 480, width: "100%", zIndex: 1 }}>
-          {/* Icon */}
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <span style={{ fontSize: 64 }}>🔮</span>
-          </div>
-
-          {/* Title */}
-          <h1 style={{
-            textAlign: "center", fontSize: 28, fontWeight: 700,
-            color: "#c4b5fd", margin: "0 0 8px",
-          }}>
-            월령도사
-          </h1>
-          <p style={{
-            textAlign: "center", fontSize: 14, color: "#8b7faa",
-            margin: "0 0 32px", lineHeight: 1.6,
-          }}>
-            온갖 사주 데이터를 학습한 사주 전문 AI 월령도사와 대화해 보세요
-          </p>
-
-          {/* Feature box */}
+        {/* 배경 오라 */}
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
           <div style={{
-            background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.25)",
-            borderRadius: 16, padding: "20px 24px", marginBottom: 24,
-          }}>
-            <p style={{ margin: "0 0 12px", fontSize: 15, color: "#c4b5fd", fontWeight: 600 }}>
-              모든 질문 가능
-            </p>
-            <p style={{ margin: "0 0 16px", fontSize: 13, color: "#9d8ccc", lineHeight: 1.7 }}>
-              연애 · 재물 · 취업 · 건강 · 신살 · 대운 · 궁합 · 전생 · 죽음 등<br />
-              사주로 볼 수 있는 모든 것 — AI가 거부하는 질문도 답합니다
-            </p>
-            <div style={{
-              background: "rgba(124,58,237,0.12)", borderRadius: 10,
-              padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
+            position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)",
+            width: 600, height: 600, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 65%)",
+          }} />
+          <div style={{
+            position: "absolute", bottom: "5%", right: "-5%",
+            width: 350, height: 350, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 65%)",
+          }} />
+        </div>
+
+        <div style={{ maxWidth: 460, width: "100%", zIndex: 1 }}>
+          {/* 상단 뱃지 */}
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <span style={{
+              display: "inline-block", fontSize: 11, fontWeight: 700,
+              padding: "5px 14px", borderRadius: 20,
+              background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.4)",
+              color: "#a78bfa", letterSpacing: "0.08em",
             }}>
-              <span style={{ fontSize: 20 }}>✦</span>
-              <span style={{ fontSize: 14, color: "#c4b5fd" }}>
-                대화 1회 = 별조각 5개 소모
-              </span>
-            </div>
-          </div>
-
-          {/* Stars balance */}
-          <div style={{
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 12, padding: "14px 20px", marginBottom: 16,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-          }}>
-            <span style={{ fontSize: 14, color: "#8b7faa" }}>내 별조각 잔액</span>
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#fbbf24" }}>
-              ✦ {stars}개
+              AI 사주 전문가
             </span>
           </div>
 
-          {/* Bundle purchase */}
-          <div style={{
-            display: "flex", gap: 10, marginBottom: 24,
-          }}>
-            {[BUNDLE_5, BUNDLE_10].map((b) => (
-              <button
-                key={b.count}
-                onClick={() => buyBundle(b.price)}
-                style={{
-                  flex: 1, padding: "12px 8px",
-                  background: "rgba(124,58,237,0.12)",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  borderRadius: 10, color: "#c4b5fd",
-                  fontSize: 13, cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(124,58,237,0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(124,58,237,0.12)";
-                }}
-              >
-                <div style={{ fontWeight: 600, marginBottom: 2 }}>{b.label}</div>
-                <div style={{ fontSize: 12, color: "#8b7faa" }}>✦ {b.price}개 사용</div>
-              </button>
+          {/* 메인 타이틀 */}
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🌙</div>
+            <h1 style={{
+              fontSize: 34, fontWeight: 900, letterSpacing: "-0.5px",
+              background: "linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 50%, #a78bfa 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              margin: "0 0 10px",
+            }}>
+              월령도사
+            </h1>
+            <p style={{ fontSize: 14, color: "rgba(167,139,250,0.7)", margin: 0, lineHeight: 1.6 }}>
+              수십만 사주 데이터를 학습한 AI 역술가<br />
+              연애·재물·대운·궁합·전생 — 뭐든 물어보세요
+            </p>
+          </div>
+
+          {/* 기능 카드 3개 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+            {[
+              { icon: "💬", title: "무제한 질문", desc: "사주로 볼 수 있는 모든 것, AI가 직접 답합니다" },
+              { icon: "🔯", title: "정밀 사주 분석", desc: "사주팔자 입력 후 오행·십신·신살 완전 분석" },
+              { icon: "✦", title: "별조각 5개 / 회", desc: `현재 잔액 ${stars}개` },
+            ].map(item => (
+              <div key={item.title} style={{
+                display: "flex", alignItems: "center", gap: 14,
+                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 12, padding: "14px 18px",
+              }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>{item.icon}</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#d8b4fe", marginBottom: 2 }}>{item.title}</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{item.desc}</div>
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Start button */}
+          {/* 시작 버튼 */}
           <button
             onClick={() => setStep("input")}
             style={{
-              width: "100%", padding: "16px",
-              background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
-              border: "none", borderRadius: 14,
-              color: "#fff", fontSize: 16, fontWeight: 700,
-              cursor: "pointer", letterSpacing: "0.5px",
-              boxShadow: "0 4px 24px rgba(124,58,237,0.3)",
+              width: "100%", padding: "17px",
+              background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)",
+              border: "1px solid rgba(167,139,250,0.3)",
+              borderRadius: 14, color: "#fff", fontSize: 16, fontWeight: 800,
+              cursor: "pointer", letterSpacing: "0.3px",
+              boxShadow: "0 4px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
               transition: "all 0.2s",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 32px rgba(124,58,237,0.4)";
+              (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 40px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.1)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 24px rgba(124,58,237,0.3)";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)";
             }}
           >
-            채팅 시작하기 →
+            월령도사와 대화 시작 →
           </button>
+
+          <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.25)", marginTop: 14 }}>
+            별조각이 부족하면 홈에서 충전하세요
+          </p>
         </div>
       </div>
     );

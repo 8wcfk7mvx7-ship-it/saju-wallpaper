@@ -208,7 +208,6 @@ const NOTICES = [
 
 // ── 실시간 활동 알림 ──────────────────────────────────────────────────────────
 const ACTIVITIES = [
-  "경술일주 차○○님이 대운 흐름을 확인했습니다",
   "무진일주 박○○님이 오행 배경화면을 생성했습니다",
   "갑오일주 김○○님이 사주 궁합을 분석했습니다",
   "갑자일주 정○○님이 MBTI 조합 분석을 완료했습니다",
@@ -1060,7 +1059,7 @@ export default function MainPage() {
         </p>
 
         {/* ── 서비스 섹션 ── */}
-        <section id="services-section" className="mb-16">
+        <section id="services-section" className="mb-16" style={{ scrollMarginTop: "72px" }}>
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ AI SERVICES</p>
@@ -1141,7 +1140,7 @@ export default function MainPage() {
         </section>
 
         {/* ── 정보성 가이드 배너 ── */}
-        <section id="guide-section" className="mb-10">
+        <section id="guide-section" className="mb-10" style={{ scrollMarginTop: "72px" }}>
           <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
             style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
             <div className="flex-1">
@@ -1267,7 +1266,7 @@ export default function MainPage() {
       </div>
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
-      <section id="iljin-section" className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)" }}>
+      <section id="iljin-section" className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)", scrollMarginTop: "72px" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <IljinCalendar />
