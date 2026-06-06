@@ -25,7 +25,7 @@ const UI: Record<Lang, {
   charging: string;
 }> = {
   ko: {
-    h1: ["올해 운이", "안 풀리는 데는", "이유가 있어요"],
+    h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
     heroSub: "사주에 다 나와있습니다. 내 오행 에너지, 지금 확인하세요.",
     heroCta: "내 사주 오행 배경화면 만들기",
     servicesHeading: "지금 바로 확인하세요",
@@ -549,6 +549,13 @@ const SERVICES: {
     color: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)",
     categories: ["전체", "무료", "라이프"],
+  },
+  {
+    id: "fengshui", emoji: "🏮", title: "풍수지리 이야기", viral: "무료로 읽는 풍수 지혜",
+    desc: "침실·현관·부엌·책상 배치부터 오행 아이템까지 — 집을 바꾸면 운이 바뀐다",
+    tags: ["무료", "풍수", "인테리어"], href: "/service/fengshui", badge: "FREE", color: "#65a30d",
+    badgeBg: "rgba(101,163,13,0.15)", border: "rgba(101,163,13,0.3)", glow: "rgba(101,163,13,0.1)",
+    categories: ["전체", "라이프", "무료"],
   },
 ];
 
