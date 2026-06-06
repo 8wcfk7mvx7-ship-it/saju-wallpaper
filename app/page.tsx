@@ -28,7 +28,7 @@ const UI: Record<Lang, {
   ko: {
     h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
     heroSub: "사주에 다 나와있습니다. 내 오행 에너지, 지금 확인하세요.",
-    heroCta: "내 사주 오행 배경화면 만들기",
+    heroCta: "무료로 만세력 확인하기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
@@ -903,7 +903,7 @@ export default function MainPage() {
           {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
           <div className="max-w-sm mx-auto px-4 mb-4">
             <button
-              onClick={() => router.push("/service/saju")}
+              onClick={() => router.push("/service/manseryeok")}
               className="cta-btn w-full font-black text-lg py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
               style={{
                 background: "linear-gradient(135deg, #db2777, #9333ea)",
