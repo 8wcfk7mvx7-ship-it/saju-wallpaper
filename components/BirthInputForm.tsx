@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import ProfileLoadSheet from "@/components/ProfileLoadSheet";
 
 export interface BirthFormData {
   birthYear: number | "";
@@ -121,9 +122,16 @@ export default function BirthInputForm({
 }: Props) {
   const set = (patch: Partial<BirthFormData>) => onChange({ ...value, ...patch });
 
+  // 첫 번째 BirthInputForm(label 없거나 "나")에만 바텀시트 표시
+  const showSheet = !label || label === "나";
+
   const isJajasiRange = value.birthHour !== null && (value.birthHour === 23 || value.birthHour === 0 || value.birthHour === 1);
 
   return (
+    <>
+      {showSheet && (
+        <ProfileLoadSheet onLoad={(data) => onChange({ ...value, ...data })} />
+      )}
     <div className="space-y-4">
       {label && (
         <p className="text-xs font-bold uppercase tracking-widest" style={{ color: accent }}>
@@ -252,5 +260,6 @@ export default function BirthInputForm({
         </div>
       )}
     </div>
+    </>
   );
 }
