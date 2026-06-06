@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 type Step = "gate" | "input" | "chat";
 
@@ -31,11 +32,7 @@ export default function SajuChatPage() {
   const [loading, setLoading] = useState(false);
 
   // Input form state
-  const [birthYear, setBirthYear] = useState("");
-  const [birthMonth, setBirthMonth] = useState("");
-  const [birthDay, setBirthDay] = useState("");
-  const [birthHour, setBirthHour] = useState("");
-  const [gender, setGender] = useState<"male" | "female">("female");
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -57,25 +54,36 @@ export default function SajuChatPage() {
     setStars(next);
   }
 
-  function handleInputSubmit(e: React.FormEvent) {
+  async function handleInputSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const yr = parseInt(birthYear, 10);
-    const mo = parseInt(birthMonth, 10);
-    const dy = parseInt(birthDay, 10);
+    const yr = typeof form.birthYear === "number" ? form.birthYear : 0;
+    const mo = typeof form.birthMonth === "number" ? form.birthMonth : 0;
+    const dy = typeof form.birthDay === "number" ? form.birthDay : 0;
     if (!yr || !mo || !dy) {
       alert("생년월일을 입력해주세요");
       return;
     }
-    const hr = birthHour ? parseInt(birthHour, 10) : null;
+
+    let fy = yr, fm = mo, fd = dy;
+    if (form.calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(fy, fm, fd, form.isLeapMonth);
+        const sol = cal.getSolarCalendar();
+        if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
+      } catch {}
+    }
 
     let result: SajuResult;
     try {
       result = analyzeSaju({
-        birthYear: yr, birthMonth: mo, birthDay: dy,
-        birthHour: hr, birthMinute: hr !== null ? 0 : null,
-        name: "사용자", gender,
-        birthPlace: "서울", style: "auto",
-        productType: "report", useJajasi: false,
+        birthYear: fy, birthMonth: fm, birthDay: fd,
+        birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
+        name: "사용자", gender: form.gender,
+        birthPlace: form.city || "서울", style: "auto",
+        productType: "report", useJajasi: form.useJajasi,
       });
     } catch {
       alert("사주 분석 중 오류가 발생했습니다");
@@ -91,7 +99,7 @@ export default function SajuChatPage() {
       `강한 오행: ${dominantStr}`,
       `신살: ${sinsalNames}`,
       `용신: ${result.yongshin.yongshin} / 희신: ${result.yongshin.heeshin} / 기신: ${result.yongshin.gishin}`,
-      `성별: ${gender === "male" ? "남" : "여"}`,
+      `성별: ${form.gender === "male" ? "남" : "여"}`,
     ].join("\n");
 
     setSajuContext(context);
@@ -192,7 +200,7 @@ export default function SajuChatPage() {
               background: "rgba(124,58,237,0.12)", borderRadius: 10,
               padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
             }}>
-              <span style={{ fontSize: 20 }}>⭐</span>
+              <span style={{ fontSize: 20 }}>✦</span>
               <span style={{ fontSize: 14, color: "#c4b5fd" }}>
                 대화 1회 = 별조각 5개 소모
               </span>
@@ -207,7 +215,7 @@ export default function SajuChatPage() {
           }}>
             <span style={{ fontSize: 14, color: "#8b7faa" }}>내 별조각 잔액</span>
             <span style={{ fontSize: 18, fontWeight: 700, color: "#fbbf24" }}>
-              ⭐ {stars}개
+              ✦ {stars}개
             </span>
           </div>
 
@@ -235,7 +243,7 @@ export default function SajuChatPage() {
                 }}
               >
                 <div style={{ fontWeight: 600, marginBottom: 2 }}>{b.label}</div>
-                <div style={{ fontSize: 12, color: "#8b7faa" }}>⭐ {b.price}개 사용</div>
+                <div style={{ fontSize: 12, color: "#8b7faa" }}>✦ {b.price}개 사용</div>
               </button>
             ))}
           </div>
@@ -296,82 +304,7 @@ export default function SajuChatPage() {
           </p>
 
           <form onSubmit={handleInputSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Birth year */}
-            <div>
-              <label style={{ fontSize: 13, color: "#9d8ccc", display: "block", marginBottom: 6 }}>
-                출생연도 *
-              </label>
-              <input
-                type="number" placeholder="예: 1995"
-                value={birthYear} onChange={(e) => setBirthYear(e.target.value)}
-                required
-                style={inputStyle}
-              />
-            </div>
-
-            {/* Birth month/day */}
-            <div style={{ display: "flex", gap: 12 }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 13, color: "#9d8ccc", display: "block", marginBottom: 6 }}>
-                  월 *
-                </label>
-                <input
-                  type="number" placeholder="1-12"
-                  value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}
-                  min={1} max={12} required
-                  style={inputStyle}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 13, color: "#9d8ccc", display: "block", marginBottom: 6 }}>
-                  일 *
-                </label>
-                <input
-                  type="number" placeholder="1-31"
-                  value={birthDay} onChange={(e) => setBirthDay(e.target.value)}
-                  min={1} max={31} required
-                  style={inputStyle}
-                />
-              </div>
-            </div>
-
-            {/* Birth hour (optional) */}
-            <div>
-              <label style={{ fontSize: 13, color: "#9d8ccc", display: "block", marginBottom: 6 }}>
-                출생시 (선택 — 없으면 비워두세요)
-              </label>
-              <input
-                type="number" placeholder="0-23시"
-                value={birthHour} onChange={(e) => setBirthHour(e.target.value)}
-                min={0} max={23}
-                style={inputStyle}
-              />
-            </div>
-
-            {/* Gender */}
-            <div>
-              <label style={{ fontSize: 13, color: "#9d8ccc", display: "block", marginBottom: 8 }}>
-                성별 *
-              </label>
-              <div style={{ display: "flex", gap: 10 }}>
-                {(["female", "male"] as const).map((g) => (
-                  <button
-                    key={g} type="button"
-                    onClick={() => setGender(g)}
-                    style={{
-                      flex: 1, padding: "12px",
-                      background: gender === g ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.04)",
-                      border: gender === g ? "1px solid rgba(124,58,237,0.6)" : "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 10, color: gender === g ? "#c4b5fd" : "#8b7faa",
-                      fontSize: 14, fontWeight: gender === g ? 600 : 400,
-                      cursor: "pointer", transition: "all 0.2s",
-                    }}
-                  >
-                    {g === "female" ? "여성" : "남성"}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <BirthInputForm value={form} onChange={setForm} accent="#7c3aed" />
 
             <button
               type="submit"
@@ -421,7 +354,7 @@ export default function SajuChatPage() {
           background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)",
           borderRadius: 20, padding: "6px 14px",
         }}>
-          <span style={{ fontSize: 14 }}>⭐</span>
+          <span style={{ fontSize: 14 }}>✦</span>
           <span style={{ fontSize: 14, color: "#fbbf24", fontWeight: 600 }}>{stars}</span>
         </div>
       </div>
@@ -487,7 +420,7 @@ export default function SajuChatPage() {
             borderRadius: 12, padding: "14px 16px", textAlign: "center",
           }}>
             <p style={{ margin: "0 0 10px", fontSize: 14, color: "#fbbf24" }}>
-              ⭐ 별조각이 부족합니다 (현재 {stars}개)
+              ✦ 별조각이 부족합니다 (현재 {stars}개)
             </p>
             <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
               {[BUNDLE_5, BUNDLE_10].map((b) => (
@@ -529,7 +462,7 @@ export default function SajuChatPage() {
               sendMessage();
             }
           }}
-          placeholder="무엇이든 물어보세요 (⭐5개 소모)"
+          placeholder="무엇이든 물어보세요 (✦5개 소모)"
           rows={1}
           style={{
             flex: 1, background: "rgba(255,255,255,0.06)",
@@ -562,11 +495,3 @@ export default function SajuChatPage() {
   );
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "12px 14px",
-  background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 10, color: "#e8e0ff",
-  fontSize: 14, outline: "none",
-  fontFamily: "inherit", boxSizing: "border-box",
-};

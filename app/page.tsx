@@ -765,6 +765,15 @@ export default function MainPage() {
           </button>
 
           <div className="flex items-center gap-2">
+            {/* 가이드 */}
+            <button
+              onClick={() => router.push("/guide")}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+            >
+              <span>📚</span>
+              <span>가이드</span>
+            </button>
             {/* 보관함 — PC only */}
             <button
               onClick={() => router.push("/mypage")}
@@ -784,7 +793,7 @@ export default function MainPage() {
                 color: blueberries > 0 ? "#c4b5fd" : "rgba(255,255,255,0.45)",
               }}
             >
-              <span>⭐</span>
+              <span>✦</span>
               <span>{blueberries > 0 ? blueberries.toLocaleString() : t.charging}</span>
             </button>
 
@@ -1240,6 +1249,7 @@ export default function MainPage() {
           {[
             { icon: "🏠", label: "홈", href: "/" },
             { icon: "🔮", label: "사주", href: "/service/saju" },
+            { icon: "📚", label: "가이드", href: "/guide" },
             { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (

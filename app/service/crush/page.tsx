@@ -108,6 +108,7 @@ const CRUSH_SUCCESS: Record<string, {
 };
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 export const dynamic = "force-dynamic";
 
 type Step = "splash" | "input" | "loading" | "result";
@@ -191,14 +192,7 @@ export default function CrushPage() {
   const [showBtn, setShowBtn] = useState(false);
 
   // 상대방 정보
-  const [targetGender, setTargetGender] = useState<"male" | "female">("male");
-  const [targetCalType, setTargetCalType] = useState<"solar" | "lunar">("solar");
-  const [targetIsLeap, setTargetIsLeap] = useState(false);
-  const [targetYear, setTargetYear] = useState(0);
-  const [targetMonth, setTargetMonth] = useState(0);
-  const [targetDay, setTargetDay] = useState(0);
-  const [targetTime, setTargetTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
-  const [targetBirthPlace, setTargetBirthPlace] = useState("서울");
+  const [targetForm, setTargetForm] = useState<BirthFormData>(defaultBirthData("male"));
 
   // 내 정보 (선택)
   const [myYear, setMyYear] = useState(0);
@@ -212,6 +206,9 @@ export default function CrushPage() {
   useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2000); return () => clearTimeout(t); }, []);
 
   async function handleAnalyze() {
+    const targetYear = typeof targetForm.birthYear === "number" ? targetForm.birthYear : 0;
+    const targetMonth = typeof targetForm.birthMonth === "number" ? targetForm.birthMonth : 0;
+    const targetDay = typeof targetForm.birthDay === "number" ? targetForm.birthDay : 0;
     if (!targetYear || !targetMonth || !targetDay) {
       setFormError("상대방의 생년월일을 모두 입력해주세요."); return;
     }
@@ -219,28 +216,35 @@ export default function CrushPage() {
     setStep("loading");
 
     let fy = targetYear, fm = targetMonth, fd = targetDay;
-    if (targetCalType === "lunar") {
+    if (targetForm.calendarType === "lunar") {
       try {
         // @ts-ignore
         const KLC = (await import("korean-lunar-calendar")).default;
         const cal = new KLC();
-        cal.setLunarDate(fy, fm, fd, targetIsLeap);
+        cal.setLunarDate(fy, fm, fd, targetForm.isLeapMonth);
         const sol = cal.getSolarCalendar();
         if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
       } catch {}
     }
 
+    const targetBirthPlace = targetForm.city || "서울";
+    const targetBirthTime: BirthTimeValue = {
+      hour: targetForm.birthHour,
+      minute: targetForm.birthMinute,
+      unknown: targetForm.birthHour === null,
+      useJajasi: targetForm.useJajasi,
+    };
+
     try {
       const sajuR = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
-        birthHour: targetTime.unknown ? null : targetTime.hour,
-        birthMinute: targetTime.unknown ? null : targetTime.minute,
-        name: "상대방", gender: targetGender, birthPlace: targetBirthPlace || "서울",
-        style: "auto", productType: "report", useJajasi: targetTime.useJajasi,
+        birthHour: targetForm.birthHour, birthMinute: targetForm.birthMinute ?? 0,
+        name: "상대방", gender: targetForm.gender, birthPlace: targetBirthPlace,
+        style: "auto", productType: "report", useJajasi: targetForm.useJajasi,
       });
       setTargetSaju(sajuR);
       const res = await analyzeCrush(
-        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender, birthPlace: targetBirthPlace },
+        { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetBirthTime, calType: targetForm.calendarType, isLeapMonth: targetForm.isLeapMonth, gender: targetForm.gender, birthPlace: targetBirthPlace },
         myYear && myMonth && myDay ? { birthYear: myYear, birthMonth: myMonth, birthDay: myDay } : undefined,
       );
       setResult(res);
@@ -626,7 +630,7 @@ export default function CrushPage() {
         {targetSaju && targetSaju.sinsalList.length > 0 && (
           <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">⭐</span>
+              <span className="text-lg">✦</span>
               <h3 className="text-sm font-black" style={{ color: "#fbbf24" }}>그 사람의 신살 (神殺)</h3>
             </div>
             <div className="flex flex-wrap gap-2">

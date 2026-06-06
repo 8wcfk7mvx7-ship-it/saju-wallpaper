@@ -1,12 +1,12 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   getDayPillar, analyzeSaju, getUunseong,
   CHEONGAN_ELEMENT, JIJI_BONGI,
 } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
@@ -38,49 +38,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function DropPick({ value, opts, onChange, placeholder, suffix, accentColor = "#a78bfa" }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string; accentColor?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-lg"
-        style={{ borderColor: open ? accentColor : "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
-        <span className={display ? "text-white" : "text-gray-500"}>
-          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
-        </span>
-        <span className="text-gray-500 text-base" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220, background: "#12121e", border: "1px solid rgba(255,255,255,0.2)" }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className="px-4 py-2.5 text-lg cursor-pointer transition-colors"
-              style={{ color: value === o.v ? accentColor : "rgba(255,255,255,0.65)", background: value === o.v ? "rgba(167,139,250,0.12)" : "transparent", fontWeight: value === o.v ? 600 : 400 }}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 const UUNS_SCORE: Record<string, number> = {
   제왕: 3, 건록: 2, 장생: 2, 관대: 1, 양: 1,
@@ -213,13 +170,7 @@ export default function CalendarPage() {
 
   // form state
   const [name, setName] = useState("");
-  const [gender, setGender] = useState<"male" | "female">("female");
-  const [calType, setCalType] = useState<CalType>("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [birthYear, setBirthYear] = useState(0);
-  const [birthMonth, setBirthMonth] = useState(0);
-  const [birthDay, setBirthDay] = useState(0);
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [selectedEvent, setSelectedEvent] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -253,13 +204,7 @@ export default function CalendarPage() {
       try {
         const d = JSON.parse(sess);
         if (d.name) setName(d.name);
-        if (d.gender) setGender(d.gender);
-        if (d.calType) setCalType(d.calType);
-        if (d.isLeapMonth !== undefined) setIsLeapMonth(d.isLeapMonth);
-        if (d.birthYear) setBirthYear(d.birthYear);
-        if (d.birthMonth) setBirthMonth(d.birthMonth);
-        if (d.birthDay) setBirthDay(d.birthDay);
-        if (d.birthTime) setBirthTime(d.birthTime);
+        if (d.form) setForm(d.form);
         if (d.selectedEvent) setSelectedEvent(d.selectedEvent);
         if (d.userIlgan) {
           setUserIlgan(d.userIlgan);
@@ -274,11 +219,15 @@ export default function CalendarPage() {
     } else {
       const saved = loadSajuData();
       if (saved && saved.birthYear) {
+        setForm(prev => ({
+          ...prev,
+          ...(saved.name ? {} : {}),
+          ...(saved.gender ? { gender: saved.gender as "male" | "female" } : {}),
+          birthYear: saved.birthYear,
+          birthMonth: saved.birthMonth || prev.birthMonth,
+          birthDay: saved.birthDay || prev.birthDay,
+        }));
         if (saved.name) setName(saved.name);
-        if (saved.gender) setGender(saved.gender as "male" | "female");
-        setBirthYear(saved.birthYear);
-        if (saved.birthMonth) setBirthMonth(saved.birthMonth);
-        if (saved.birthDay) setBirthDay(saved.birthDay);
       }
     }
   }, []);
@@ -642,7 +591,7 @@ export default function CalendarPage() {
                         }}
                         className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
-                        ⭐ 별조각 990개로 즉시 열기
+                        ✦ 별조각 990개로 즉시 열기
                       </button>
                     ) : (
                       <button onClick={handleUnlock}

@@ -1,21 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
 type Step = "splash" | "my" | "their" | "loading" | "result";
-type Gender = "male" | "female";
-
-interface PersonData {
-  gender: Gender;
-  birthYear: string; birthMonth: string; birthDay: string;
-  birthHour: string; birthMinute: string;
-  birthPlace: string;
-  calType: "solar" | "lunar";
-  isLeapMonth: boolean;
-  useJajasi: boolean;
-}
 
 interface ReunionResult {
   score: number; grade: string; oneLineSummary: string;
@@ -39,12 +29,6 @@ function ShareButton({ title, text }: { title: string; text: string }) {
   );
 }
 
-const EMPTY_PERSON = (): PersonData => ({
-  gender: "male", birthYear: "", birthMonth: "", birthDay: "",
-  birthHour: "", birthMinute: "",
-  birthPlace: "서울",
-  calType: "solar", isLeapMonth: false, useJajasi: false,
-});
 
 const SESSION_KEY = "sp_reunion_session";
 const PAID_KEY = "sp_reunion_paid";
@@ -64,141 +48,12 @@ function GradeBar({ score }: { score: number }) {
   );
 }
 
-function PersonForm({
-  label, data, onChange, showBirthHour = true,
-}: {
-  label: string; data: PersonData;
-  onChange: (d: PersonData) => void;
-  showBirthHour?: boolean;
-}) {
-  const set = (k: keyof PersonData, v: string | boolean) =>
-    onChange({ ...data, [k]: v });
-
-  const inputStyle = {
-    background: "rgba(255,255,255,0.07)",
-    border: "1px solid rgba(255,255,255,0.15)",
-    color: "#fff",
-  };
-  const labelStyle = { color: "rgba(255,255,255,0.6)", fontSize: 11 };
-
-  return (
-    <div className="space-y-4">
-      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.35)" }}>{label}</p>
-
-      {/* 성별 */}
-      <div>
-        <p className="text-xs mb-1.5" style={labelStyle}>성별</p>
-        <div className="flex gap-2">
-          {(["male", "female"] as Gender[]).map(g => (
-            <button key={g} onClick={() => set("gender", g)}
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold transition"
-              style={{
-                background: data.gender === g ? (g === "male" ? "rgba(59,130,246,0.25)" : "rgba(236,72,153,0.25)") : "rgba(255,255,255,0.05)",
-                border: `1px solid ${data.gender === g ? (g === "male" ? "rgba(59,130,246,0.5)" : "rgba(236,72,153,0.5)") : "rgba(255,255,255,0.1)"}`,
-                color: data.gender === g ? "#fff" : "rgba(255,255,255,0.45)",
-              }}
-            >{g === "male" ? "남성" : "여성"}</button>
-          ))}
-        </div>
-      </div>
-
-      {/* 양력/음력 */}
-      <div>
-        <p className="text-xs mb-1.5" style={labelStyle}>달력</p>
-        <div className="flex gap-2">
-          {([["solar","양력"],["lunar","음력"]] as [string,string][]).map(([v,l]) => (
-            <button key={v} onClick={() => set("calType", v)}
-              className="flex-1 py-2 rounded-xl text-sm font-bold transition"
-              style={{
-                background: data.calType === v ? "rgba(251,146,60,0.2)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${data.calType === v ? "rgba(251,146,60,0.5)" : "rgba(255,255,255,0.1)"}`,
-                color: data.calType === v ? "#fb923c" : "rgba(255,255,255,0.4)",
-              }}
-            >{l}</button>
-          ))}
-        </div>
-        {data.calType === "lunar" && (
-          <button onClick={() => set("isLeapMonth", !data.isLeapMonth)}
-            className="mt-1.5 text-xs px-3 py-1 rounded-lg"
-            style={{
-              background: data.isLeapMonth ? "rgba(251,146,60,0.15)" : "rgba(255,255,255,0.04)",
-              border: `1px solid ${data.isLeapMonth ? "rgba(251,146,60,0.4)" : "rgba(255,255,255,0.1)"}`,
-              color: data.isLeapMonth ? "#fb923c" : "rgba(255,255,255,0.4)",
-            }}
-          >윤달 {data.isLeapMonth ? "✓" : ""}</button>
-        )}
-      </div>
-
-      {/* 생년월일 */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { k: "birthYear" as const, ph: "1995", lbl: "년" },
-          { k: "birthMonth" as const, ph: "06", lbl: "월" },
-          { k: "birthDay" as const, ph: "15", lbl: "일" },
-        ].map(({ k, ph, lbl }) => (
-          <div key={k}>
-            <p className="text-xs mb-1" style={labelStyle}>{lbl}</p>
-            <input
-              type="number" value={data[k] as string}
-              onChange={e => set(k, e.target.value)}
-              placeholder={ph}
-              className="w-full rounded-xl px-3 py-2.5 text-sm text-center outline-none"
-              style={inputStyle}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* 출생 시각 */}
-      {showBirthHour && (
-        <div>
-          <p className="text-xs mb-1.5" style={labelStyle}>출생 시각 <span style={{ color: "rgba(255,255,255,0.3)" }}>(선택, 경도보정 적용)</span></p>
-          <div className="grid grid-cols-2 gap-2">
-            <input type="number" value={data.birthHour}
-              onChange={e => set("birthHour", e.target.value)}
-              placeholder="시 (0-23)" min={0} max={23}
-              className="w-full rounded-xl px-3 py-2.5 text-sm text-center outline-none"
-              style={inputStyle}
-            />
-            <input type="number" value={data.birthMinute}
-              onChange={e => set("birthMinute", e.target.value)}
-              placeholder="분 (0-59)" min={0} max={59}
-              className="w-full rounded-xl px-3 py-2.5 text-sm text-center outline-none"
-              style={inputStyle}
-            />
-          </div>
-          {data.birthHour === "23" && (
-            <button onClick={() => set("useJajasi", !data.useJajasi)}
-              className="mt-1.5 text-xs px-3 py-1 rounded-lg w-full"
-              style={{
-                background: data.useJajasi ? "rgba(251,146,60,0.15)" : "rgba(255,255,255,0.04)",
-                border: `1px solid ${data.useJajasi ? "rgba(251,146,60,0.4)" : "rgba(255,255,255,0.1)"}`,
-                color: data.useJajasi ? "#fb923c" : "rgba(255,255,255,0.4)",
-              }}
-            >야자시(夜子時) 보정 {data.useJajasi ? "✓" : ""} — 23시는 다음날 사주</button>
-          )}
-        </div>
-      )}
-
-      {/* 출생지 */}
-      <div>
-        <p className="text-xs mb-1.5" style={labelStyle}>출생지 <span style={{ color: "rgba(255,255,255,0.3)" }}>(진태양시 경도보정 자동 적용)</span></p>
-        <input type="text" value={data.birthPlace}
-          onChange={e => set("birthPlace", e.target.value)}
-          placeholder="서울 / 부산 / 도쿄 등"
-          className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
-          style={inputStyle}
-        />
-      </div>
-    </div>
-  );
-}
 
 export default function ReunionPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
-  const [myData, setMyData] = useState<PersonData>(EMPTY_PERSON());
-  const [theirData, setTheirData] = useState<PersonData>(EMPTY_PERSON());
+  const [myData, setMyData] = useState<BirthFormData>(defaultBirthData("male"));
+  const [theirData, setTheirData] = useState<BirthFormData>(defaultBirthData("male"));
   const [result, setResult] = useState<ReunionResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
@@ -225,10 +80,10 @@ export default function ReunionPage() {
     }
   }, []);
 
-  function validate(d: PersonData): string | null {
-    if (!d.birthYear || !d.birthMonth || !d.birthDay) return "생년월일을 입력해주세요.";
+  function validate(d: BirthFormData): string | null {
+    if (d.birthYear === "" || d.birthMonth === "" || d.birthDay === "") return "생년월일을 입력해주세요.";
     const y = Number(d.birthYear);
-    if (y < 1900 || y > 2020) return "생년도를 확인해주세요.";
+    if (y < 1900 || y > 2030) return "생년도를 확인해주세요.";
     const m = Number(d.birthMonth);
     if (m < 1 || m > 12) return "생월을 확인해주세요.";
     return null;
@@ -340,7 +195,7 @@ export default function ReunionPage() {
             <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>재회를 원하는 나의 사주 정보</p>
           </div>
 
-          <PersonForm label="나의 정보" data={myData} onChange={setMyData} />
+          <BirthInputForm value={myData} onChange={setMyData} label="나" accent="#e879f9" />
 
           <button
             onClick={() => { if (!err) setStep("their"); }}
@@ -374,7 +229,7 @@ export default function ReunionPage() {
             <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>재회하고 싶은 그 사람의 사주 정보</p>
           </div>
 
-          <PersonForm label="그 사람 정보" data={theirData} onChange={setTheirData} />
+          <BirthInputForm value={theirData} onChange={setTheirData} label="상대방" accent="#818cf8" />
 
           {error && (
             <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{error}</p>
@@ -503,7 +358,7 @@ export default function ReunionPage() {
                   className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98] mb-2"
                   style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 6px 24px rgba(99,102,241,0.4)" }}
                 >
-                  ⭐ 별조각 3,900개로 즉시 열기
+                  ✦ 별조각 3,900개로 즉시 열기
                 </button>
               ) : (
                 <button
@@ -522,7 +377,7 @@ export default function ReunionPage() {
             <>
               <ShareButton title="재회 가능성 분석 결과" text={result.oneLineSummary} />
               <button
-                onClick={() => { setStep("splash"); setResult(null); setMyData(EMPTY_PERSON()); setTheirData(EMPTY_PERSON()); }}
+                onClick={() => { setStep("splash"); setResult(null); setMyData(defaultBirthData("male")); setTheirData(defaultBirthData("male")); }}
                 className="w-full py-3 rounded-2xl text-sm transition"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
               >

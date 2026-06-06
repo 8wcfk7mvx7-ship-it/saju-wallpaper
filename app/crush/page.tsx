@@ -572,7 +572,7 @@ export default function CrushPage() {
         {targetSaju && targetSaju.sinsalList.length > 0 && (
           <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">⭐</span>
+              <span className="text-lg">✦</span>
               <h3 className="text-sm font-black" style={{ color: "#fbbf24" }}>그 사람의 신살 (神殺)</h3>
             </div>
             <div className="flex flex-wrap gap-2">

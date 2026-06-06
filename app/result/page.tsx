@@ -832,7 +832,7 @@ export default function ResultPage() {
                   { label: "사고 방식", value: traits.mindset, icon: "🧠" },
                   { label: "대인 관계", value: traits.boundary, icon: "🤝" },
                   { label: "정신적 강점", value: traits.mental, icon: "💪" },
-                  { label: "삶의 스타일", value: traits.style, icon: "🌟" },
+                  { label: "삶의 스타일", value: traits.style, icon: "✦" },
                 ].map((item, i) => (
                   <div key={i} className="bg-black/20 border border-white/8 rounded-xl p-3">
                     <p className="text-[10px] text-gray-500 font-bold mb-1.5">{item.icon} {item.label}</p>

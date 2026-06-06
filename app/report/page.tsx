@@ -549,7 +549,7 @@ export default function ReportPage() {
           <div style={{background:"rgba(99,102,241,0.08)",border:"1px solid rgba(99,102,241,0.2)",
             borderRadius:12,padding:"14px 18px",marginBottom:12}}>
             <div style={{fontWeight:700,color:"#a5b4fc",marginBottom:6,fontSize:14}}>
-              🌟 일간 — {dayCg}({profile.symbol})
+              ✦ 일간 — {dayCg}({profile.symbol})
             </div>
             <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#cbd5e1"}}>{profile.personality}</p>
           </div>

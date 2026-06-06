@@ -153,7 +153,7 @@ export default function MyPage() {
         <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
           style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">⭐</span>
+            <span className="text-2xl">✦</span>
             <div>
               <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 별조각</p>
               <p className="text-lg font-black text-white">{blueberries.toLocaleString()} <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.4)" }}>개</span></p>

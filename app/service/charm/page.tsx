@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
-import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
@@ -165,44 +165,8 @@ const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
   수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
 };
 
-// ─── 상수 ────────────────────────────────────────────────────────────────────
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
 interface FormState {
-  name: string; gender: "male" | "female";
-  birthYear: string; birthMonth: string; birthDay: string;
-  birthTime: BirthTimeValue;
-  birthPlace: string;
-}
-
-function DropdownPicker({ value, options, onChange, placeholder, suffix }: {
-  value: string; options: Array<{ v: string; label: string }>;
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const display = options.find(o => o.v === value)?.label ?? "";
-  return (
-    <div className="relative w-full">
-      <div onClick={() => setOpen(!open)}
-        className={`flex items-center justify-between bg-white/5 border rounded-xl px-4 py-3 cursor-pointer transition select-none ${open ? "border-violet-500" : "border-white/10 hover:border-violet-500/50"}`}>
-        <span className={display ? "text-white" : "text-gray-600"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div className="absolute z-50 w-full mt-1 bg-[#12121e] border border-white/20 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: "200px" }}>
-          {options.map(opt => (
-            <div key={opt.v} onClick={() => { onChange(opt.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer ${value === opt.v ? "text-violet-300 bg-violet-900/50 font-semibold" : "text-gray-300 hover:bg-white/8"}`}>
-              {opt.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  name: string;
 }
 
 // ─── 매인 컴포넌트 ────────────────────────────────────────────────────────────
@@ -212,14 +176,8 @@ export default function CharmPage() {
   const [showBtn, setShowBtn] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 600) + 3500);
-  const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [form, setForm] = useState<FormState>({
-    name: "", gender: "female",
-    birthYear: "1995", birthMonth: "6", birthDay: "2",
-    birthTime: { hour: 11, minute: 4, unknown: false, useJajasi: false },
-    birthPlace: "부산",
-  });
+  const [form, setForm] = useState<FormState>({ name: "" });
+  const [birthData, setBirthData] = useState<BirthFormData>(defaultBirthData("female"));
 
   useEffect(() => {
     const t = setTimeout(() => setShowBtn(true), 2500);
@@ -230,52 +188,47 @@ export default function CharmPage() {
     const saved = loadSajuData();
     if (saved) {
       setHasSaved(true);
-      setForm(prev => ({
+      setBirthData(prev => ({
         ...prev,
         gender: saved.gender || "female",
-        birthYear: saved.birthYear ? String(saved.birthYear) : "1995",
-        birthMonth: saved.birthMonth ? String(saved.birthMonth) : "6",
-        birthDay: saved.birthDay ? String(saved.birthDay) : "2",
-        birthTime: {
-          hour: saved.birthHour ?? null,
-          minute: saved.birthMinute ?? null,
-          unknown: saved.birthHourUnknown || false,
-          useJajasi: saved.useJajasi || false,
-        },
-        birthPlace: saved.birthPlace || "서울",
+        birthYear: saved.birthYear || "",
+        birthMonth: saved.birthMonth || "",
+        birthDay: saved.birthDay || "",
+        birthHour: saved.birthHourUnknown ? null : (saved.birthHour ?? null),
+        birthMinute: saved.birthHourUnknown ? null : (saved.birthMinute ?? null),
+        useJajasi: saved.useJajasi || false,
+        city: saved.birthPlace || "",
       }));
     }
   }, []);
 
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
-
   const handleAnalyze = async () => {
-    let y = parseInt(form.birthYear), mo = parseInt(form.birthMonth), d = parseInt(form.birthDay);
+    let y = birthData.birthYear === "" ? NaN : Number(birthData.birthYear);
+    let mo = birthData.birthMonth === "" ? NaN : Number(birthData.birthMonth);
+    let d = birthData.birthDay === "" ? NaN : Number(birthData.birthDay);
     if (!form.name || isNaN(y) || isNaN(mo) || isNaN(d)) {
       alert("이름과 생년월일을 모두 입력해주세요.");
       return;
     }
-    if (calendarType === "lunar") {
+    if (birthData.calendarType === "lunar") {
       try {
         // @ts-ignore
         const KLC = (await import("korean-lunar-calendar")).default;
-        const cal = new KLC();
-        cal.setLunarDate(y, mo, d, isLeapMonth);
-        const s = cal.getSolarCalendar();
-        if (!s?.year) throw new Error();
-        y = s.year; mo = s.month; d = s.day;
+        const klc = new KLC();
+        klc.setLunarDate(y, mo, d, birthData.isLeapMonth);
+        const sol = klc.getSolarCalendar();
+        if (!sol?.year) throw new Error();
+        y = sol.year; mo = sol.month; d = sol.day;
       } catch {
         alert("음력 날짜를 양력으로 변환할 수 없습니다. 날짜를 다시 확인해주세요.");
         return;
       }
     }
-    const h = form.birthTime.unknown ? null : form.birthTime.hour;
-    const min = form.birthTime.unknown ? null : form.birthTime.minute;
-    saveSajuData({ name: form.name, gender: form.gender, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: min, birthHourUnknown: form.birthTime.unknown, birthPlace: form.birthPlace, style: "auto", useJajasi: form.birthTime.useJajasi });
-    const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: min, name: form.name, gender: form.gender, birthPlace: form.birthPlace, style: "auto", productType: "report", useJajasi: form.birthTime.useJajasi });
-    const charmData = { form: { ...form, birthHour: h, birthMinute: min }, result: r };
+    const h = birthData.birthHour;
+    const min = birthData.birthMinute ?? 0;
+    saveSajuData({ name: form.name, gender: birthData.gender, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, birthHourUnknown: h === null, birthPlace: birthData.city || "서울", style: "auto", useJajasi: birthData.useJajasi });
+    const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, name: form.name, gender: birthData.gender, birthPlace: birthData.city || "서울", style: "auto", productType: "report", useJajasi: birthData.useJajasi });
+    const charmData = { form: { ...form, birthHour: h, birthMinute: h != null ? min : null }, result: r };
     try { sessionStorage.setItem("charmData", JSON.stringify(charmData)); } catch {}
     setStep("loading");
   };
@@ -352,20 +305,19 @@ export default function CharmPage() {
           <h1 className="text-3xl font-black mb-2 bg-gradient-to-r from-pink-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">사주 매력 분석</h1>
           <p className="text-gray-400 text-sm">일간 매력 · 신살 · 오행 외모 · 찐친이 보는 실체</p>
         </div>
-        <ProfilePicker onSelect={p => setForm(f => ({
-          ...f,
-          name: p.name,
-          gender: p.gender,
-          birthYear: String(p.birthYear),
-          birthMonth: String(p.birthMonth),
-          birthDay: String(p.birthDay),
-          birthTime: {
-            hour: p.birthHourUnknown ? null : p.birthHour,
-            minute: null,
-            unknown: p.birthHourUnknown,
+        <ProfilePicker onSelect={p => {
+          setForm(f => ({ ...f, name: p.name }));
+          setBirthData(prev => ({
+            ...prev,
+            gender: p.gender,
+            birthYear: p.birthYear || "",
+            birthMonth: p.birthMonth || "",
+            birthDay: p.birthDay || "",
+            birthHour: p.birthHourUnknown ? null : p.birthHour,
+            birthMinute: null,
             useJajasi: false,
-          },
-        }))} />
+          }));
+        }} />
 
         <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 space-y-6 shadow-2xl shadow-black/40">
           <div>
@@ -373,46 +325,7 @@ export default function CharmPage() {
             <input type="text" placeholder="홍길동" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">성별</label>
-            <div className="flex gap-3">
-              {[{ v: "female", l: "여성" }, { v: "male", l: "남성" }].map(g => (
-                <button key={g.v} type="button" onClick={() => setForm({ ...form, gender: g.v as "male" | "female" })}
-                  className={`flex-1 py-3 rounded-xl border transition font-medium ${form.gender === g.v ? "bg-violet-600 border-violet-500" : "bg-white/5 border-white/10 text-gray-400"}`}>
-                  {g.l}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-300">생년월일</label>
-              <div className="flex overflow-hidden rounded-lg border border-white/10">
-                {(["solar","lunar"] as const).map(t => (
-                  <button key={t} type="button" onClick={() => { setCalendarType(t); setForm(f => ({ ...f, birthMonth: "", birthDay: "" })); }}
-                    className={`px-4 py-1.5 text-sm font-medium transition ${calendarType === t ? "bg-violet-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
-                    {t === "solar" ? "양력" : "음력"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="mb-3">
-              <DropdownPicker value={form.birthYear} options={yearOpts} onChange={v => setForm({ ...form, birthYear: v })} placeholder="연도 선택" suffix="년" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <DropdownPicker value={form.birthMonth} options={monthOpts} onChange={v => setForm({ ...form, birthMonth: v })} placeholder="월 선택" suffix="월" />
-              <DropdownPicker value={form.birthDay} options={dayOpts} onChange={v => setForm({ ...form, birthDay: v })} placeholder="일 선택" suffix="일" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">태어난 시간 <span className="text-gray-600 font-normal text-xs">(선택사항)</span></label>
-            <BirthTimePicker value={form.birthTime} onChange={bt => setForm({ ...form, birthTime: bt })} accent="violet" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">태어난 도시</label>
-            <input type="text" placeholder="서울 / 부산 / 대구 등" value={form.birthPlace} onChange={e => setForm({ ...form, birthPlace: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition" />
-          </div>
+          <BirthInputForm value={birthData} onChange={setBirthData} accent="#a855f7" />
           <button onClick={handleAnalyze}
             className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-pink-900/40">
             ✨ 내 숨은 매력 분석하기

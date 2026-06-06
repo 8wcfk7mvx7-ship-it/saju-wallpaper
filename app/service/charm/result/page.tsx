@@ -465,7 +465,7 @@ function CharmResultContent() {
                       }}
                       className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
                     >
-                      ⭐ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+                      ✦ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
                     </button>
                   ) : (
                     <button
@@ -544,7 +544,7 @@ function CharmResultContent() {
                 }}
                 className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
               >
-                ⭐ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+                ✦ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
               </button>
             ) : (
               <button

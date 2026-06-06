@@ -1040,7 +1040,7 @@ export default function GunghapPage(){
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:pl.events.length?8:0}}>
                     <div>
                       <span style={{fontSize:12,fontWeight:800,color:pl.label==='일주'?'#ffd700':'rgba(255,255,255,0.65)'}}>
-                        {pl.label}{pl.label==='일주'?' ⭐':''}
+                        {pl.label}{pl.label==='일주'?' ✦':''}
                       </span>
                       <span style={{fontSize:11,color:'rgba(255,255,255,0.25)',marginLeft:8,fontFamily:'monospace'}}>
                         {pl.cg1}{pl.jj1} ↔ {pl.cg2}{pl.jj2}

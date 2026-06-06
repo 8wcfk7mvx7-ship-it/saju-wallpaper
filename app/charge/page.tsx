@@ -57,7 +57,7 @@ export default function ChargePage() {
 
         {/* 헤더 */}
         <div className="text-center mb-10">
-          <div className="text-5xl mb-4">⭐</div>
+          <div className="text-5xl mb-4">✦</div>
           <h1 className="text-2xl font-black mb-1">별조각 충전</h1>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
             충전 시 <span style={{ color: "#a78bfa" }}>+10% 보너스</span> 별조각 추가 지급
@@ -69,7 +69,7 @@ export default function ChargePage() {
           style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)" }}>
           <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.45)" }}>현재 잔액</p>
           <p className="text-3xl font-black" style={{ color: "#a78bfa" }}>
-            ⭐ {balance.toLocaleString()}
+            ✦ {balance.toLocaleString()}
           </p>
           <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>별조각</p>
         </div>
@@ -114,7 +114,7 @@ export default function ChargePage() {
                     {tier.won.toLocaleString()}원
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-                    ⭐ {tier.base.toLocaleString()} + 보너스 {tier.bonus.toLocaleString()}
+                    ✦ {tier.base.toLocaleString()} + 보너스 {tier.bonus.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right">

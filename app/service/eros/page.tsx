@@ -589,22 +589,22 @@ function ErosContent() {
             </div>
             <div className="bg-white/5 rounded-xl px-4 py-3">
               <p className="text-xs text-rose-400 font-semibold mb-1">낮져밤이 vs 낮이밤져</p>
-              <p className="text-sm text-gray-200">{ILGAN_DAYNIGHT[ilgan]?.[gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입."}</p>
+              <p className="text-sm text-gray-200">{ILGAN_DAYNIGHT[ilgan]?.[form.gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입."}</p>
             </div>
           </div>
           {hasMokYok && (
             <div className="mt-3 bg-rose-950/30 border border-rose-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-rose-300 font-bold mb-1">일지 목욕(沐浴) — 특별 분석</p>
-              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
+              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
             </div>
           )}
-          {gender === "female" && has수기운강 && (
+          {form.gender === "female" && has수기운강 && (
             <div className="mt-3 bg-blue-950/30 border border-blue-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-blue-300 font-bold mb-1">수기운(水氣運) — 명기력(命氣力) 강화</p>
               <p className="text-xs text-gray-200">수(水)는 흡인·수용·생식의 기운입니다. 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있습니다. 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다.</p>
             </div>
           )}
-          {gender === "female" && is음간 && has수기운강 && (
+          {form.gender === "female" && is음간 && has수기운강 && (
             <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-purple-300 font-bold mb-1">음간(陰干) — 음기(陰氣) 집중형</p>
               <p className="text-xs text-gray-200">음간 일간은 수용·집중·흡수의 기운이 강합니다. 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어, 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다.</p>
@@ -753,7 +753,7 @@ function ErosContent() {
         </div>
 
         <ShareButton />
-        <button onClick={() => { setYear(""); setMonth(""); setDay(""); setStep("form"); }}
+        <button onClick={() => { setForm(defaultBirthData("female")); setStep("form"); }}
           className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>

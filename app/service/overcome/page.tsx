@@ -1,104 +1,45 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1929 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
-          open ? "border-red-500 bg-red-950/30" : "border-white/15 bg-white/5 hover:border-red-500/50"
-        }`}>
-        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#1a0808] border border-red-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                value === o.v ? "text-red-300 bg-red-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"
-              }`}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 type Step = "splash" | "input";
-type CalType = "solar" | "lunar";
 
 export default function OvercomePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
-  const [year,  setYear]  = useState("");
-  const [month, setMonth] = useState("");
-  const [day,   setDay]   = useState("");
-  const [calType, setCalType] = useState<CalType>("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [gender, setGender] = useState<"male"|"female">("female");
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 2800);
 
   async function handleAnalyze() {
-    if (!year || !month || !day) { setError("생년월일을 모두 선택해주세요."); return; }
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) { setError("생년월일을 모두 선택해주세요."); return; }
     setError("");
     setLoading(true);
     try {
-      let fy = Number(year), fm = Number(month), fd = Number(day);
-      if (calType === "lunar") {
+      let fy = Number(form.birthYear), fm = Number(form.birthMonth), fd = Number(form.birthDay);
+      if (form.calendarType === "lunar") {
         try {
-          // @ts-ignore
           const KLC = (await import("korean-lunar-calendar")).default;
-          const cal = new KLC();
-          cal.setLunarDate(fy, fm, fd, isLeapMonth);
-          const sol = cal.getSolarCalendar();
+          const klc = new KLC();
+          klc.setLunarDate(fy, fm, fd, form.isLeapMonth);
+          const sol = klc.getSolarCalendar();
           if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
         } catch {}
       }
-      const h = birthTime.unknown ? null : birthTime.hour;
-      const min = birthTime.unknown ? null : birthTime.minute;
       const result = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
-        birthHour: h, birthMinute: min,
-        name: "", gender, birthPlace: "서울", style: "auto",
-        productType: "report", useJajasi: birthTime.useJajasi,
+        birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
+        name: "", gender: form.gender, birthPlace: form.city || "서울", style: "auto",
+        productType: "report", useJajasi: form.useJajasi,
       });
       const orderId = `overcome_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       sessionStorage.setItem("overcomeData", JSON.stringify({
-        form: { year: Number(year), month: Number(month), day: Number(day), gender },
+        form: { year: fy, month: fm, day: fd, gender: form.gender },
         result,
       }));
       router.push(`/overcome/pay?orderId=${orderId}&amount=990`);
@@ -190,71 +131,8 @@ export default function OvercomePage() {
           <p className="text-sm text-gray-500">사주를 분석해 내 신살과 오행 불균형을 찾아냅니다</p>
         </div>
 
-        <div className="space-y-4 mb-6">
-          {/* 양력/음력 */}
-          <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-            {(["solar", "lunar"] as CalType[]).map(t => (
-              <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
-                className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-red-700 text-white" : "text-white/40 hover:text-white/70"}`}>
-                {t === "solar" ? "양력" : "음력"}
-              </button>
-            ))}
-          </div>
-
-          <DropPick
-            value={year}
-            opts={YEARS.map(y => ({ v: String(y), label: String(y) }))}
-            onChange={setYear}
-            placeholder="출생 연도"
-            suffix="년"
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <DropPick
-              value={month}
-              opts={MONTHS.map(m => ({ v: String(m), label: String(m) }))}
-              onChange={setMonth}
-              placeholder="월"
-              suffix="월"
-            />
-            <DropPick
-              value={day}
-              opts={DAYS.map(d => ({ v: String(d), label: String(d) }))}
-              onChange={setDay}
-              placeholder="일"
-              suffix="일"
-            />
-          </div>
-
-          {/* 윤달 (음력 시) */}
-          {calType === "lunar" && (
-            <button type="button" onClick={() => setIsLeapMonth(v => !v)}
-              className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${isLeapMonth ? "border-red-500 bg-red-950/30 text-red-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
-              <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isLeapMonth ? "border-red-400" : "border-gray-600"}`}>
-                {isLeapMonth && <span className="text-[10px] font-black">✓</span>}
-              </span>
-              윤달
-            </button>
-          )}
-
-          {/* 태어난 시간 */}
-          <div>
-            <p className="text-xs text-white/40 mb-2 font-semibold">태어난 시간</p>
-            <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
-          </div>
-
-          {/* 성별 */}
-          <div className="grid grid-cols-2 gap-3">
-            {(["female", "male"] as const).map(g => (
-              <button key={g} onClick={() => setGender(g)}
-                className={`py-3 rounded-xl text-sm font-bold transition border ${
-                  gender === g
-                    ? "border-red-500 bg-red-950/30 text-red-300"
-                    : "border-white/15 bg-white/5 text-gray-400 hover:border-red-500/50"
-                }`}>
-                {g === "female" ? "여성" : "남성"}
-              </button>
-            ))}
-          </div>
+        <div className="mb-6">
+          <BirthInputForm value={form} onChange={setForm} accent="#f97316" />
         </div>
 
         {error && (
@@ -263,7 +141,7 @@ export default function OvercomePage() {
 
         <button
           onClick={handleAnalyze}
-          disabled={loading || !year || !month || !day}
+          disabled={loading || !form.birthYear || !form.birthMonth || !form.birthDay}
           className="w-full py-5 rounded-2xl font-black text-lg text-white transition-all active:scale-[0.97] disabled:opacity-40 flex items-center justify-center gap-2"
           style={{ background: "linear-gradient(135deg, #dc2626 0%, #7c3aed 100%)" }}
         >
