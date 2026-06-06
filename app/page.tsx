@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 
 const KakaoLoginButton = dynamic(() => import("@/components/KakaoLoginButton"), { ssr: false });
 const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr: false });
+const NaverFirstLoginModal = dynamic(() => import("@/components/NaverFirstLoginModal"), { ssr: false });
 
 type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special" | "19금";
 
@@ -1234,6 +1235,9 @@ export default function MainPage() {
       <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 sm:hidden px-4 pb-2">
         <KakaoLoginButton redirectTo="/" floating />
       </div>
+
+      {/* ── 네이버 첫 로그인 프로필 저장 모달 ── */}
+      <NaverFirstLoginModal />
 
       {/* ── 모바일 하단 네비게이션 ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"
