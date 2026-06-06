@@ -43,7 +43,7 @@ export default function OvercomePage() {
         form: { year: fy, month: fm, day: fd, gender: form.gender },
         result,
       }));
-      router.push(`/overcome/pay?orderId=${orderId}&amount=990`);
+      router.push(`/service/overcome/pay?orderId=${orderId}&amount=990`);
     } catch {
       setError("분석 중 오류가 발생했습니다. 다시 시도해주세요.");
       setLoading(false);
@@ -86,6 +86,7 @@ export default function OvercomePage() {
               { icon: "🌿", title: "오행 불균형 진단", desc: "과다·부족 오행 맞춤 극복법" },
               { icon: "🎨", title: "색·방향·숫자", desc: "나에게 맞는 개운 아이템" },
               { icon: "🍽️", title: "음식·물건", desc: "일상에서 기운 채우는 법" },
+              { icon: "🏃", title: "활동·행동", desc: "내 기운을 살리는 생활 루틴" },
             ].map(f => (
               <div key={f.title} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                 <span className="text-2xl">{f.icon}</span>

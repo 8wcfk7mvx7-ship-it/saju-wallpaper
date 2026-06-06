@@ -201,24 +201,22 @@ export default function BirthInputForm({
         </div>
       </div>
 
-      {/* 야자시 */}
-      {value.birthHour !== null && isJajasiRange && (
-        <button type="button"
-          onClick={() => set({ useJajasi: !value.useJajasi })}
-          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition"
-          style={{
-            background: value.useJajasi ? `${accent}22` : "rgba(255,255,255,0.04)",
-            borderColor: value.useJajasi ? accent : "rgba(255,255,255,0.1)",
-            color: value.useJajasi ? accent : "rgba(255,255,255,0.4)",
-          }}
-        >
-          <span className="w-4 h-4 rounded border flex items-center justify-center shrink-0"
-            style={{ borderColor: value.useJajasi ? accent : "rgba(255,255,255,0.2)" }}>
-            {value.useJajasi && <span className="text-[10px] font-black">✓</span>}
-          </span>
-          야자시·조자시 적용 (23시~01시생)
-        </button>
-      )}
+      {/* 야자시 — 항상 표시 */}
+      <button type="button"
+        onClick={() => set({ useJajasi: !value.useJajasi })}
+        className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition"
+        style={{
+          background: value.useJajasi ? `${accent}22` : "rgba(255,255,255,0.04)",
+          borderColor: value.useJajasi ? accent : "rgba(255,255,255,0.1)",
+          color: value.useJajasi ? accent : "rgba(255,255,255,0.4)",
+        }}
+      >
+        <span className="w-4 h-4 rounded border flex items-center justify-center shrink-0"
+          style={{ borderColor: value.useJajasi ? accent : "rgba(255,255,255,0.2)" }}>
+          {value.useJajasi && <span className="text-[10px] font-black">✓</span>}
+        </span>
+        야자시·조자시 적용 (23시~01시생)
+      </button>
 
       {/* 태어난 도시 */}
       <div>

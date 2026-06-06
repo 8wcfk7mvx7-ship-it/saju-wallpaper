@@ -8,7 +8,7 @@ const KakaoLoginButton = dynamic(() => import("@/components/KakaoLoginButton"), 
 const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr: false });
 const NaverFirstLoginModal = dynamic(() => import("@/components/NaverFirstLoginModal"), { ssr: false });
 
-type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special" | "19금";
+type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special" | "매력";
 
 // ── 언어 ─────────────────────────────────────────────────────────────────────
 const LANGS = { ko: "한국어", en: "English", id: "Bahasa Indonesia", ta: "தமிழ்" } as const;
@@ -32,7 +32,7 @@ const UI: Record<Lang, {
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
-    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "19금" },
+    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "매력": "매력" },
     start: "시작",
     charging: "별조각 충전",
   },
@@ -43,7 +43,7 @@ const UI: Record<Lang, {
     servicesHeading: "Explore Services",
     reviewsHeading: "Real Reviews",
     bannerCta: "Create Wallpaper →",
-    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Premium", "19금": "Adults" },
+    catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Premium", "매력": "Charm" },
     start: "Start",
     charging: "Top Up",
   },
@@ -54,7 +54,7 @@ const UI: Record<Lang, {
     servicesHeading: "Jelajahi Sekarang",
     reviewsHeading: "Ulasan Nyata",
     bannerCta: "Buat Wallpaper →",
-    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Takdir", "라이프": "Gaya Hidup", "Special": "Premium", "19금": "Dewasa" },
+    catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Takdir", "라이프": "Gaya Hidup", "Special": "Premium", "매력": "Daya Tarik" },
     start: "Mulai",
     charging: "Isi Ulang",
   },
@@ -65,7 +65,7 @@ const UI: Record<Lang, {
     servicesHeading: "இப்போதே பார்க்கவும்",
     reviewsHeading: "உண்மையான மதிப்புரைகள்",
     bannerCta: "வால்பேப்பர் உருவாக்கு →",
-    catLabel: { "전체": "அனைத்தும்", "무료": "இலவசம்", "연애·궁합": "காதல்", "금전·투자": "பணம்", "운명·대운": "விதி", "라이프": "வாழ்க்கை", "Special": "சிறப்பு", "19금": "வயதுவந்தோர்" },
+    catLabel: { "전체": "அனைத்தும்", "무료": "இலவசம்", "연애·궁합": "காதல்", "금전·투자": "பணம்", "운명·대운": "விதி", "라이프": "வாழ்க்கை", "Special": "சிறப்பு", "매력": "ஈர்ப்பு" },
     start: "தொடங்கு",
     charging: "நிரப்பு",
   },
@@ -78,7 +78,7 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
   { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
   { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
-  { key: "19금",    icon: "🔞",  desc: "성인 전용" },
+  { key: "매력",    icon: "💋",  desc: "이성·매력" },
   { key: "Special", icon: "👑", desc: "프리미엄" },
 ];
 
@@ -497,18 +497,18 @@ const SERVICES: {
     href: "/service/eros", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
+    categories: ["전체", "무료", "연애·궁합", "매력"],
   },
   {
     id: "hotcompat", emoji: "🔥",
-    title: "19금 사주 궁합",
+    title: "사주 성궁합",
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
     href: "/service/hotcompat", badge: "",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
-    categories: ["전체", "연애·궁합", "19금"],
+    categories: ["전체", "연애·궁합", "매력"],
   },
   {
     id: "charm", emoji: "✨",
@@ -519,7 +519,7 @@ const SERVICES: {
     href: "/service/charm", badge: "",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
-    categories: ["전체", "연애·궁합"],
+    categories: ["전체", "연애·궁합", "매력"],
   },
   {
     id: "mbti", emoji: "🧬",
@@ -1082,7 +1082,7 @@ export default function MainPage() {
               "운명·대운":{ bg: "rgba(245,197,24,0.12)", border: "rgba(245,197,24,0.35)",  text: "#f5c518",  glow: "rgba(245,197,24,0.15)" },
               "라이프":  { bg: "rgba(139,92,246,0.15)",  border: "rgba(139,92,246,0.4)",   text: "#a78bfa",  glow: "rgba(139,92,246,0.2)" },
               "Special": { bg: "rgba(245,197,24,0.15)",  border: "rgba(245,197,24,0.45)",  text: "#fbbf24",  glow: "rgba(245,197,24,0.2)" },
-              "19금":    { bg: "rgba(239,68,68,0.15)",   border: "rgba(239,68,68,0.4)",    text: "#f87171",  glow: "rgba(239,68,68,0.2)" },
+              "매력":    { bg: "rgba(244,114,182,0.15)", border: "rgba(244,114,182,0.4)",  text: "#f472b6",  glow: "rgba(244,114,182,0.2)" },
             };
             return (
               <div className="relative mb-6">
@@ -1161,7 +1161,7 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* ── 19금 서비스 링크 ── */}
+        {/* ── 매력 서비스 링크 ── */}
         <section className="mb-10">
           <button
             onClick={() => router.push("/service/19plus")}
