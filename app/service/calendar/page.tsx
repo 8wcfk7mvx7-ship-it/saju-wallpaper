@@ -219,9 +219,8 @@ export default function CalendarPage() {
     } else {
       const saved = loadSajuData();
       if (saved && saved.birthYear) {
-        setForm(prev => ({
+        setForm((prev: BirthFormData) => ({
           ...prev,
-          ...(saved.name ? {} : {}),
           ...(saved.gender ? { gender: saved.gender as "male" | "female" } : {}),
           birthYear: saved.birthYear,
           birthMonth: saved.birthMonth || prev.birthMonth,
@@ -233,18 +232,17 @@ export default function CalendarPage() {
   }, []);
 
   async function handleAnalyze() {
-    if (!birthYear || !birthMonth || !birthDay) { setFormError("생년월일을 모두 입력해주세요."); return; }
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) { setFormError("생년월일을 모두 입력해주세요."); return; }
     if (!selectedEvent) { setFormError("궁금한 날짜 종류를 선택해주세요."); return; }
     setFormError("");
 
-    let fy = birthYear, fm = birthMonth, fd = birthDay;
-    if (calType === "lunar") {
+    let fy = Number(form.birthYear), fm = Number(form.birthMonth), fd = Number(form.birthDay);
+    if (form.calendarType === "lunar") {
       try {
-        // @ts-ignore
         const KLC = (await import("korean-lunar-calendar")).default;
-        const cal = new KLC();
-        cal.setLunarDate(fy, fm, fd, isLeapMonth);
-        const sol = cal.getSolarCalendar();
+        const klc = new KLC();
+        klc.setLunarDate(fy, fm, fd, form.isLeapMonth);
+        const sol = klc.getSolarCalendar();
         if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
       } catch {}
     }
@@ -252,10 +250,9 @@ export default function CalendarPage() {
     try {
       const r = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
-        birthHour: birthTime.unknown ? null : birthTime.hour,
-        birthMinute: birthTime.unknown ? null : birthTime.minute,
-        name: name || "나", gender, birthPlace: "서울",
-        style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
+        birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
+        name: name || "나", gender: form.gender, birthPlace: form.city || "서울",
+        style: "auto", productType: "report", useJajasi: form.useJajasi,
       });
       setUserIlgan(r.pillarsDetail.day.cg);
       setUserMonthJj(r.pillarsDetail.month.jj);
@@ -271,8 +268,7 @@ export default function CalendarPage() {
 
   function handleUnlock() {
     sessionStorage.setItem("sp_calendar_session", JSON.stringify({
-      name, gender, calType, isLeapMonth, birthYear, birthMonth, birthDay,
-      birthTime, selectedEvent, userIlgan, userMonthJj,
+      name, form, selectedEvent, userIlgan, userMonthJj,
     }));
     const orderId = `cal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     router.push(`/calendar/pay?orderId=${orderId}`);
@@ -369,58 +365,8 @@ export default function CalendarPage() {
               className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-base placeholder-white/20 focus:outline-none focus:border-emerald-500/50" />
           </div>
 
-          {/* 양력/음력 */}
-          <div>
-            <label className="block text-base text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
-            <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-              {(["solar", "lunar"] as CalType[]).map(t => (
-                <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
-                  className={`flex-1 py-2.5 text-base font-bold transition ${calType === t ? "bg-emerald-700 text-white" : "text-white/40 hover:text-white/70"}`}>
-                  {t === "solar" ? "양력" : "음력"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 생년월일 */}
-          <div>
-            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일 <span className="text-emerald-400">*</span></label>
-            <div className="space-y-2">
-              <DropPick value={birthYear ? String(birthYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setBirthYear(Number(v))} placeholder="출생 연도" suffix="년" />
-              <div className="grid grid-cols-2 gap-2">
-                <DropPick value={birthMonth ? String(birthMonth) : ""} opts={MONTH_OPTS.map(m => ({ v: String(m), label: String(m) }))} onChange={v => setBirthMonth(Number(v))} placeholder="월" suffix="월" />
-                <DropPick value={birthDay ? String(birthDay) : ""} opts={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ v: String(d), label: String(d) }))} onChange={v => setBirthDay(Number(v))} placeholder="일" suffix="일" />
-              </div>
-              {calType === "lunar" && (
-                <button type="button" onClick={() => setIsLeapMonth(v => !v)}
-                  className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-base transition ${isLeapMonth ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
-                  <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isLeapMonth ? "border-emerald-400" : "border-gray-600"}`}>
-                    {isLeapMonth && <span className="text-[12px] font-black">✓</span>}
-                  </span>
-                  윤달
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* 태어난 시간 */}
-          <div>
-            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간</label>
-            <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="emerald" />
-          </div>
-
-          {/* 성별 */}
-          <div>
-            <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">성별</label>
-            <div className="grid grid-cols-2 gap-3">
-              {(["female", "male"] as const).map(g => (
-                <button key={g} onClick={() => setGender(g)}
-                  className={`py-3 rounded-xl text-base font-bold transition border ${gender === g ? "border-emerald-500 bg-emerald-950/30 text-emerald-300" : "border-white/15 bg-white/5 text-gray-400 hover:border-emerald-500/50"}`}>
-                  {g === "female" ? "여성" : "남성"}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* 사주 입력 폼 */}
+          <BirthInputForm value={form} onChange={setForm} accent="#06b6d4" />
 
           {/* 날짜 종류 */}
           <div>
