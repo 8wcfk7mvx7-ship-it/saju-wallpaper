@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION } from "@/lib/saju";
+import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION, detectSamhapBanghap } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
@@ -210,6 +210,7 @@ export default function TastePage() {
   const [element, setElement] = useState<string>("수");
   const [ilgan, setIlgan] = useState<string>("임");
   const [name, setName] = useState("나");
+  const [pillarsDetail, setPillarsDetail] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"movies" | "books" | "music" | "travel">("movies");
 
   useEffect(() => {
@@ -265,6 +266,7 @@ export default function TastePage() {
       setElement(r.dominant[0] || "수");
       setIlgan(r.pillarsDetail.day.cg || "임");
       setName(formName || "나");
+      setPillarsDetail(r.pillarsDetail);
       setActiveTab("movies");
       setStep("main");
     } catch {
@@ -619,6 +621,39 @@ export default function TastePage() {
                 <span className="text-xs text-gray-400">{sd.direction}의 방향</span>
               </div>
               <p className="text-sm text-gray-300 leading-relaxed">{sd.desc}</p>
+            </div>
+          );
+        })()}
+
+        {/* 삼합·방합 취향 기질 */}
+        {(() => {
+          const samhapList = pillarsDetail ? detectSamhapBanghap(pillarsDetail) : [];
+          if (!samhapList || samhapList.length === 0) return null;
+          return (
+            <div className="mt-4 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">삼합·방합 취향 기질</p>
+              <div className="space-y-3">
+                {samhapList.map((s: any, i: number) => {
+                  const badgeStyle =
+                    s.type === "삼합" ? { bg: "bg-amber-500/20", text: "text-amber-300", border: "border-amber-500/30" } :
+                    s.type === "반합" ? { bg: "bg-yellow-500/20", text: "text-yellow-300", border: "border-yellow-500/30" } :
+                    { bg: "bg-green-500/20", text: "text-green-300", border: "border-green-500/30" };
+                  const tasteHint =
+                    s.type === "삼합" ? "웅장하고 변혁적인 스토리, 서사가 큰 작품에 끌립니다." :
+                    s.type === "방합" ? "감정·관계 중심의 드라마, 섬세한 인간 이야기에 공명합니다." :
+                    "반합의 에너지가 취향에 미묘한 방향성을 더합니다.";
+                  return (
+                    <div key={i} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold border ${badgeStyle.bg} ${badgeStyle.text} ${badgeStyle.border}`}>{s.type}</span>
+                        <span className="text-sm font-bold text-white">{s.name}</span>
+                      </div>
+                      <p className="text-xs text-gray-400 leading-relaxed mb-1">{s.detail}</p>
+                      <p className="text-xs text-gray-500 leading-relaxed">{tasteHint}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           );
         })()}
