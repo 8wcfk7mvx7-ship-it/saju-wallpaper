@@ -457,7 +457,7 @@ function ResultView({
   const siksangInfo = analyzeSiksang(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
   const chunganChung = detectChunganChung(pd);
-  const singangKey = result.singang === "신강" ? "신강" : "신약";
+  const singangKey = result.yongshin.strength === "신강" ? "신강" : "신약";
   const singangStyle = SINGANG_RESPONSE_STYLE[singangKey];
   const hapCount = samhapResults.filter(s => s.type === "삼합" || s.type === "반합").length;
   const chungCount = (result.sinsalList || []).filter(s => s.name?.includes("충")).length;
@@ -859,7 +859,7 @@ function ResultView({
 
       {/* 신약·신강 대응 방식 */}
       {singangStyle && (
-        <Section title={`${result.singang} 사주 — 세상을 대하는 방식`} accent="#38bdf8">
+        <Section title={`${result.yongshin.strength} 사주 — 세상을 대하는 방식`} accent="#38bdf8">
           <div className="space-y-3">
             <div className="rounded-xl px-4 py-3" style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.18)" }}>
               <p className="text-xs font-bold mb-1" style={{ color: "#38bdf8" }}>핵심 기질</p>
