@@ -430,8 +430,8 @@ function ErosContent() {
   const 수기운천간 = ["임","계"];
   const 수기운지지 = ["자","해","축"];
   const pd = result.pillarsDetail;
-  const 수기운기둥수 = [pd.year, pd.month, pd.day, pd.time].filter(p =>
-    수기운천간.includes(p.cg) || 수기운지지.includes(p.jj)
+  const 수기운기둥수 = [pd.year, pd.month, pd.day, pd.hour].filter(p => p && (
+    수기운천간.includes(p.cg) || 수기운지지.includes(p.jj))
   ).length;
   const has수기운강 = 수기운기둥수 >= 2 || result.dominant.includes("수");
 
