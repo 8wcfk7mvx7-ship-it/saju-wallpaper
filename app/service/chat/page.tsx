@@ -106,7 +106,7 @@ export default function SajuChatPage() {
     setSajuContext(context);
     setMessages([{
       role: "assistant",
-      content: `안녕하세요. 사주 역술 AI입니다.\n\n사주팔자를 분석했습니다: **${result.fourPillars}**\n\n어떤 것이 궁금하신가요? 연애·재물·건강·대운·궁합·전생·죽음 등 사주로 볼 수 있는 모든 것을 물어보세요.`,
+      content: `안녕하세요! 저는 온갖 사주 데이터를 학습한 사주 전문 AI, 월령도사입니다 🌙\n\n사주팔자를 살펴봤어요: **${result.fourPillars}**\n\n연애·재물·건강·직업적성·대운·궁합·전생 등 뭐든 편하게 물어보세요. 사주로 볼 수 있는 건 뭐든 함께 이야기해 드릴게요!`,
     }]);
     setStep("chat");
   }
@@ -177,13 +177,13 @@ export default function SajuChatPage() {
             textAlign: "center", fontSize: 28, fontWeight: 700,
             color: "#c4b5fd", margin: "0 0 8px",
           }}>
-            사주 AI 역술사
+            월령도사
           </h1>
           <p style={{
             textAlign: "center", fontSize: 14, color: "#8b7faa",
             margin: "0 0 32px", lineHeight: 1.6,
           }}>
-            현업 사주 명리학 자격증 보유 역술인이 직접 개발한 AI 채팅 서비스
+            온갖 사주 데이터를 학습한 사주 전문 AI 월령도사와 대화해 보세요
           </p>
 
           {/* Feature box */}
@@ -342,7 +342,7 @@ export default function SajuChatPage() {
           >
             ←
           </button>
-          <span style={{ fontSize: 16, fontWeight: 700, color: "#c4b5fd" }}>🔮 사주 AI 역술사</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#c4b5fd" }}>🔮 월령도사</span>
         </div>
         <div style={{
           display: "flex", alignItems: "center", gap: 6,
