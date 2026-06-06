@@ -81,7 +81,7 @@ export default function MyPage() {
       lang: "ko",
     };
     sessionStorage.setItem("sajuForm", JSON.stringify(form));
-    router.push("/saju");
+    router.push("/service/saju");
   }
 
   function saveLabel(index: number) {
@@ -196,7 +196,7 @@ export default function MyPage() {
                 <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
                   사주 분석 페이지에서 생년월일을 입력하면<br />자동으로 여기에 저장됩니다
                 </p>
-                <button onClick={() => router.push("/saju")}
+                <button onClick={() => router.push("/service/saju")}
                   className="text-sm px-5 py-2.5 rounded-xl font-bold transition-all"
                   style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
                   사주 분석하러 가기 →
@@ -249,7 +249,7 @@ export default function MyPage() {
                       style={{ background: "rgba(201,168,76,0.12)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.2)" }}>
                       이 사주로 분석하기 →
                     </button>
-                    <button onClick={() => { loadSaju(saju); router.push("/gunghap"); }}
+                    <button onClick={() => { loadSaju(saju); router.push("/service/gunghap"); }}
                       className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
                       style={{ background: "rgba(236,72,153,0.08)", color: "#f9a8d4", border: "1px solid rgba(236,72,153,0.15)" }}>
                       궁합 보기 →
@@ -274,7 +274,7 @@ export default function MyPage() {
                 <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
                   결제 완료 후 레포트를 구매하면<br />여기서 다시 확인할 수 있어요
                 </p>
-                <button onClick={() => router.push("/daewoon")}
+                <button onClick={() => router.push("/service/daewoon")}
                   className="text-sm px-5 py-2.5 rounded-xl font-bold transition-all"
                   style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
                   프리미엄 서비스 보기 →
@@ -318,7 +318,7 @@ export default function MyPage() {
         <div className="flex items-stretch h-16">
           {[
             { icon: "🏠", label: "홈", href: "/" },
-            { icon: "🔮", label: "사주", href: "/saju" },
+            { icon: "🔮", label: "사주", href: "/service/saju" },
             { icon: "📦", label: "보관함", href: "/mypage", active: true },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (

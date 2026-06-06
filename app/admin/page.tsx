@@ -199,8 +199,8 @@ export default function AdminPage() {
     sessionStorage.setItem("paymentDone", "true");
     sessionStorage.setItem("sajuForm", JSON.stringify({ name: previewName, gender: previewGender, birthYear: parseInt(previewYear), birthMonth: parseInt(previewMonth), birthDay: parseInt(previewDay), birthHour: parseInt(previewHour), birthMinute: 0, birthHourUnknown: false, birthPlace: "서울", style: "auto", productType: "report", useJajasi: false, lang: "ko" }));
     if (target === "generating") router.push("/generating?type=report");
-    else if (target === "stock") router.push("/stock");
-    else if (target === "charm") router.push("/charm");
+    else if (target === "stock") router.push("/service/stock");
+    else if (target === "charm") router.push("/service/charm");
     else if (target === "result") router.push("/loading");
     else if (target === "report") router.push("/report");
   }

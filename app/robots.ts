@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/admin/", "/19plus/"],
+        disallow: ["/api/", "/admin/", "/service/19plus/"],
       },
     ],
     sitemap: "https://summerpalace.ai.kr/sitemap.xml",

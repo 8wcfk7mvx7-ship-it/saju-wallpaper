@@ -390,7 +390,7 @@ const SERVICES: {
     viral: "지금 배경화면이 에너지를 갉아먹고 있을 수 있습니다",
     desc: "내 사주에 부족한 오행을 채워주는 AI 맞춤 배경화면. 목·화·토·금·수 중 내가 보완해야 할 기운을 찾아드립니다.",
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
-    href: "/saju", badge: "완전 무료",
+    href: "/service/saju", badge: "완전 무료",
     color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
     categories: ["전체", "라이프"],
@@ -402,7 +402,7 @@ const SERVICES: {
     viral: "지금 만나는 사람, 내 에너지를 갉아먹는 사주일 수 있어요",
     desc: "원진살·귀문관살·합충 관계로 보는 깊은 궁합. 바람기 DNA부터 이별 위험도까지 전부 분석합니다.",
     tags: ["원진살", "합충", "바람기 분석"],
-    href: "/gunghap", badge: "완전 무료",
+    href: "/service/gunghap", badge: "완전 무료",
     color: "#f9a8d4", badgeBg: "rgba(139,92,246,0.85)",
     border: "rgba(236,72,153,0.3)", glow: "rgba(236,72,153,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -413,7 +413,7 @@ const SERVICES: {
     viral: "이 사람, 내가 꼬실 수 있는 사주인지 확인해보세요",
     desc: "짝사랑하는 상대의 이상형·심리 패턴·공략 포인트를 사주로 완전 분석. 쟁재남인지, 어떻게 다가가야 심장이 흔들리는지 알려드립니다.",
     tags: ["이상형 분석", "공략법", "쟁재남 진단"],
-    href: "/crush", badge: "완전 무료",
+    href: "/service/crush", badge: "완전 무료",
     color: "#fb7185", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -424,7 +424,7 @@ const SERVICES: {
     viral: "지금 그 사람, 다른 누군가와 함께하고 있을지도 모릅니다",
     desc: "헤어진 그 사람과 다시 이어질 수 있는지, 지금이 재회의 시기인지 사주로 완전 분석합니다. 망설이는 동안 기회의 문이 닫힙니다.",
     tags: ["재회 가능성", "경도 보정", "대운 분석"],
-    href: "/reunion", badge: "",
+    href: "/service/reunion", badge: "",
     color: "#f97316", badgeBg: "rgba(234,88,12,0.85)",
     border: "rgba(249,115,22,0.3)", glow: "rgba(249,115,22,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -435,7 +435,7 @@ const SERVICES: {
     viral: "당신의 편은 들지 않습니다. 오직 사실만 말합니다.",
     desc: "바람기·도화살·불륜 가능성까지. 매운맛 분석입니다. 애인의 생년월일만 입력하세요.",
     tags: ["바람기", "도화살", "이성 관계"],
-    href: "/spy", badge: "완전 무료",
+    href: "/service/spy", badge: "완전 무료",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -446,7 +446,7 @@ const SERVICES: {
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
     desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
     tags: ["홍염살", "도화살", "이성 매력"],
-    href: "/eros", badge: "완전 무료",
+    href: "/service/eros", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합", "19금"],
@@ -457,7 +457,7 @@ const SERVICES: {
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "",
+    href: "/service/hotcompat", badge: "",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "연애·궁합", "19금"],
@@ -468,7 +468,7 @@ const SERVICES: {
     viral: "본인만 모르는 숨겨진 이성 매력이 있습니다",
     desc: "도화살·홍염살·12운성으로 보는 이성 매력. 나도 몰랐던 타고난 매력 포인트를 완전히 공개합니다.",
     tags: ["도화살", "홍염살", "이성운"],
-    href: "/charm", badge: "",
+    href: "/service/charm", badge: "",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -479,7 +479,7 @@ const SERVICES: {
     viral: "MBTI만으로는 절반밖에 모릅니다",
     desc: "사주 오행 + MBTI 16유형의 시너지 분석. 타고난 나를 두 가지 렌즈로 완전 해석하고 최적 직업을 제안합니다.",
     tags: ["MBTI", "성격 분석", "직업 추천"],
-    href: "/mbti", badge: "완전 무료",
+    href: "/service/mbti", badge: "완전 무료",
     color: "#e879f9", badgeBg: "rgba(162,28,175,0.9)",
     border: "rgba(217,70,239,0.3)", glow: "rgba(217,70,239,0.12)",
     categories: ["전체", "무료", "연애·궁합", "라이프"],
@@ -490,7 +490,7 @@ const SERVICES: {
     viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
     desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
     tags: ["주식", "코인", "ETF·레버리지"],
-    href: "/stock", badge: "완전 무료",
+    href: "/service/stock", badge: "완전 무료",
     color: "#6ee7b7", badgeBg: "rgba(5,150,105,0.9)",
     border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -501,7 +501,7 @@ const SERVICES: {
     viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
     desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
     tags: ["대운", "세운", "교운기 전략"],
-    href: "/daewoon", badge: "",
+    href: "/service/daewoon", badge: "",
     color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
     categories: ["전체", "금전·투자", "운명·대운", "Special"],
@@ -513,7 +513,7 @@ const SERVICES: {
     viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
     desc: "용신 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
     tags: ["거주지", "해외 추천", "용신 방위"],
-    href: "/place", badge: "",
+    href: "/service/place", badge: "",
     color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
     categories: ["전체", "운명·대운", "라이프", "Special"],
@@ -525,7 +525,7 @@ const SERVICES: {
     viral: "역마살·귀문관살도 방향 맞으면 최강 무기입니다",
     desc: "내 신살과 오행 불균형을 제대로 알고 극복하는 완벽 가이드. 나쁜 사주도 방향 틀면 달라집니다.",
     tags: ["신살 극복", "오행 보완", "개운법"],
-    href: "/overcome", badge: "완전 무료",
+    href: "/service/overcome", badge: "완전 무료",
     color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "운명·대운"],
@@ -536,7 +536,7 @@ const SERVICES: {
     viral: "결정의 날짜를 고르면 결과가 달라집니다",
     desc: "이사·결혼·시험·개업·계약·수술·여행·투자·연애·임신 — 내 사주와 맞는 최적의 날짜를 찾아드립니다.",
     tags: ["길일·흉일", "날짜 선택", "이사·결혼·시험"],
-    href: "/calendar", badge: "",
+    href: "/service/calendar", badge: "",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
     categories: ["전체", "무료", "운명·대운", "라이프"],
@@ -547,7 +547,7 @@ const SERVICES: {
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
     desc: "오행별 영화·책·음악·여행 취향 완전 분석. 지금까지 좋아했던 것들이 사주로 다 설명됩니다.",
     tags: ["영화", "책", "여행 스타일"],
-    href: "/taste", badge: "완전 무료",
+    href: "/service/taste", badge: "완전 무료",
     color: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -910,7 +910,7 @@ export default function MainPage() {
           {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
           <div className="max-w-sm mx-auto px-4 mb-4">
             <button
-              onClick={() => router.push("/saju")}
+              onClick={() => router.push("/service/saju")}
               className="cta-btn w-full font-black text-lg py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
               style={{
                 background: "linear-gradient(135deg, #db2777, #9333ea)",
@@ -1084,7 +1084,7 @@ export default function MainPage() {
         {/* ── 19금 서비스 링크 ── */}
         <section className="mb-10">
           <button
-            onClick={() => router.push("/19plus")}
+            onClick={() => router.push("/service/19plus")}
             className="w-full rounded-xl px-4 py-3 text-xs flex items-center justify-center gap-2 transition-all"
             style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}
           >
@@ -1241,7 +1241,7 @@ export default function MainPage() {
         <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
-            { icon: "🔮", label: "사주", href: "/saju" },
+            { icon: "🔮", label: "사주", href: "/service/saju" },
             { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
