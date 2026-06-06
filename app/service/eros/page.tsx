@@ -28,7 +28,8 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import AdultGate from "@/components/AdultGate";
+
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
@@ -296,25 +297,32 @@ function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GR
 function ErosContent() {
   const router = useRouter();
   const [step, setStep]     = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [gender, setGender] = useState<"male" | "female">("female");
-  const [year,  setYear]    = useState("");
-  const [month, setMonth]   = useState("");
-  const [day,   setDay]     = useState("");
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [form, setForm]     = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
 
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
+  async function handleAnalyze() {
+    const yr = typeof form.birthYear === "number" ? form.birthYear : 0;
+    const mo = typeof form.birthMonth === "number" ? form.birthMonth : 0;
+    const dy = typeof form.birthDay === "number" ? form.birthDay : 0;
+    if (!yr || !mo || !dy) return;
 
-  function handleAnalyze() {
-    if (!year || !month || !day) return;
-    const h = birthTime.unknown ? null : birthTime.hour;
+    let fy = yr, fm = mo, fd = dy;
+    if (form.calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const cal = new KLC();
+        cal.setLunarDate(fy, fm, fd, form.isLeapMonth);
+        const sol = cal.getSolarCalendar();
+        if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
+      } catch {}
+    }
+
     resultRef.current = analyzeSaju({
-      birthYear: parseInt(year), birthMonth: parseInt(month), birthDay: parseInt(day),
-      birthHour: h, birthMinute: birthTime.unknown ? null : (birthTime.minute ?? null),
-      name: "나", gender,
-      birthPlace: "", style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
+      birthYear: fy, birthMonth: fm, birthDay: fd,
+      birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
+      name: "나", gender: form.gender,
+      birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
     setStep("loading");
   }
@@ -370,7 +378,7 @@ function ErosContent() {
 
   // ── 폼 ──────────────────────────────────────────────────────────────────
   if (step === "form") {
-    const ready = !!year && !!month && !!day;
+    const ready = !!form.birthYear && !!form.birthMonth && !!form.birthDay;
     return (
       <main className="min-h-screen bg-[#08010f] text-white">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -386,29 +394,7 @@ function ErosContent() {
             <p className="text-gray-500 text-sm">시간을 알면 더 정밀한 분석이 가능합니다</p>
           </div>
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-3">내 성별</label>
-              <div className="grid grid-cols-2 gap-3">
-                {(["male", "female"] as const).map(g => (
-                  <button key={g} type="button" onClick={() => setGender(g)}
-                    className={`py-3 rounded-xl border font-semibold text-sm transition ${gender === g ? "bg-rose-900/50 border-rose-500 text-rose-200" : "bg-white/5 border-white/15 text-gray-400 hover:border-white/30"}`}>
-                    {g === "male" ? "남성" : "여성"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-3">생년월일</label>
-              <div className="mb-3"><DropPick value={year} opts={yearOpts} onChange={setYear} placeholder="연도 선택" suffix="년" /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <DropPick value={month} opts={monthOpts} onChange={setMonth} placeholder="월" suffix="월" />
-                <DropPick value={day}   opts={dayOpts}   onChange={setDay}   placeholder="일" suffix="일" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-3">태어난 시간</label>
-              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="violet" />
-            </div>
+            <BirthInputForm value={form} onChange={setForm} accent="#ec4899" />
             <button onClick={handleAnalyze} disabled={!ready}
               className={`w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] ${ready ? "bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/40" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"}`}>
               분석 시작
@@ -457,7 +443,7 @@ function ErosContent() {
   if (has역마)   rawScore += 10;
   if (haHwa)     rawScore += 10;
   // 여성: 수기운·음간·음기 보너스 (명기력)
-  if (gender === "female") {
+  if (form.gender === "female") {
     if (has수기운강) rawScore += 15;
     if (is음간)      rawScore += 10;
   }
@@ -469,10 +455,10 @@ function ErosContent() {
   const wolggan = result.pillarsDetail.month.cg;
   const app    = ILGAN_APPEARANCE[ilgan] ?? ILGAN_APPEARANCE["무"];
   const sex    = ILGAN_SEX[ilgan] ?? ILGAN_SEX["무"];
-  const sexData = gender === "female" ? sex.female : sex.male;
+  const sexData = form.gender === "female" ? sex.female : sex.male;
   const hidden = ILJI_HIDDEN_CHARM[ilji] ?? { charm: "알면 알수록 빠져드는 매력", weapon: "깊은 내면의 에너지" };
   const tips   = SEDUCTION_TIPS[ilgan] ?? SEDUCTION_TIPS["무"];
-  const tipList = gender === "female" ? tips.male : tips.female;
+  const tipList = form.gender === "female" ? tips.male : tips.female;
   const outerImage = WOLGGAN_OUTER[wolggan] ?? "사회적으로 안정적이고 신뢰감 있는 이미지.";
 
   const charmSinsals: { name: string; desc: string }[] = [];
@@ -481,7 +467,7 @@ function ErosContent() {
   if (has도화)   charmSinsals.push({ name: "도화살(桃花殺)", desc: "자연스럽게 이성을 끌어당기는 에너지입니다." });
   if (hasMokYok) charmSinsals.push({ name: `일지 목욕(沐浴) — ${ilji}`, desc: "12운성 중 감각과 관능이 가장 강한 위치입니다." });
 
-  const targetGender = gender === "female" ? "남자" : "여자";
+  const targetGender = form.gender === "female" ? "남자" : "여자";
 
   // ── 암합·지지합·충 분석 ──────────────────────────────────────────────────
   const cgList = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean);
@@ -777,5 +763,5 @@ function ErosContent() {
 }
 
 export default function ErosPage() {
-  return <AdultGate><ErosContent /></AdultGate>;
+  return <ErosContent />;
 }

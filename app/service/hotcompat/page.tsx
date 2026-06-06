@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import AdultGate from "@/components/AdultGate";
+
 
 export const dynamic = "force-dynamic";
 
@@ -503,5 +503,5 @@ function HotCompatContent() {
 }
 
 export default function HotCompatPage() {
-  return <AdultGate><HotCompatContent /></AdultGate>;
+  return <HotCompatContent />;
 }

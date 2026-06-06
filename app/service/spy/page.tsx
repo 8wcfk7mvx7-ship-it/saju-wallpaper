@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
   const [copied, setCopied] = useState(false);
@@ -27,61 +27,10 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 import { useRouter } from "next/navigation";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import AdultGate from "@/components/AdultGate";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
-import ProfileSaveModal from "@/components/ProfileSaveModal";
+
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
-// ── 드롭다운 ─────────────────────────────────────────────────────────────────
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
-          open ? "border-red-500 bg-red-950/30" : "border-white/15 bg-white/5 hover:border-red-500/50"
-        }`}>
-        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#1a0808] border border-red-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                value === o.v ? "text-red-300 bg-red-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"
-              }`}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── 일간별 스파이 데이터 ───────────────────────────────────────────────────────
 const ILGAN_SPY: Record<string, {
@@ -195,61 +144,51 @@ function getGrade(score: number) {
 }
 
 // ── 메인 ─────────────────────────────────────────────────────────────────────
-const defaultTime = (): BirthTimeValue => ({ hour: null, minute: null, unknown: true, useJajasi: false });
-
 function SpyContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [myYear,  setMyYear]  = useState("");
-  const [myMonth, setMyMonth] = useState("");
-  const [myDay,   setMyDay]   = useState("");
-  const [myTime,  setMyTime]  = useState<BirthTimeValue>(defaultTime);
-  const [myCalType, setMyCalType] = useState<"solar"|"lunar">("solar");
-  const [year,    setYear]    = useState("");
-  const [month,   setMonth]   = useState("");
-  const [day,     setDay]     = useState("");
-  const [theirTime,  setTheirTime]  = useState<BirthTimeValue>(defaultTime);
-  const [theirCalType, setTheirCalType] = useState<"solar"|"lunar">("solar");
+  const [myForm, setMyForm] = useState<BirthFormData>(defaultBirthData("female"));
+  const [theirForm, setTheirForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef   = useRef<SajuResult | null>(null);
   const myResultRef = useRef<SajuResult | null>(null);
 
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
-
-  async function convertLunar(y: number, m: number, d: number): Promise<{year:number;month:number;day:number}> {
-    try {
-      // @ts-ignore
-      const KLC = (await import("korean-lunar-calendar")).default;
-      const cal = new KLC();
-      cal.setLunarDate(y, m, d, false);
-      const s = cal.getSolarCalendar();
-      if (s?.year) return { year: s.year, month: s.month, day: s.day };
-    } catch {}
-    return { year: y, month: m, day: d };
-  }
-
   async function handleAnalyze() {
-    if (!myYear || !myMonth || !myDay || !year || !month || !day) return;
-    let my = { year: parseInt(myYear), month: parseInt(myMonth), day: parseInt(myDay) };
-    let their = { year: parseInt(year), month: parseInt(month), day: parseInt(day) };
-    if (myCalType === "lunar") my = await convertLunar(my.year, my.month, my.day);
-    if (theirCalType === "lunar") their = await convertLunar(their.year, their.month, their.day);
-    const myH = myTime.unknown ? null : myTime.hour;
-    const myMin = myTime.unknown ? null : myTime.minute;
-    const theirH = theirTime.unknown ? null : theirTime.hour;
-    const theirMin = theirTime.unknown ? null : theirTime.minute;
+    if (!myForm.birthYear || !myForm.birthMonth || !myForm.birthDay ||
+        !theirForm.birthYear || !theirForm.birthMonth || !theirForm.birthDay) return;
+
+    let my = { year: Number(myForm.birthYear), month: Number(myForm.birthMonth), day: Number(myForm.birthDay) };
+    let their = { year: Number(theirForm.birthYear), month: Number(theirForm.birthMonth), day: Number(theirForm.birthDay) };
+
+    if (myForm.calendarType === "lunar") {
+      try {
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const klc = new KLC();
+        klc.setLunarDate(my.year, my.month, my.day, myForm.isLeapMonth);
+        const sol = klc.getSolarCalendar();
+        if (sol?.year) { my.year = sol.year; my.month = sol.month; my.day = sol.day; }
+      } catch {}
+    }
+    if (theirForm.calendarType === "lunar") {
+      try {
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const klc = new KLC();
+        klc.setLunarDate(their.year, their.month, their.day, theirForm.isLeapMonth);
+        const sol = klc.getSolarCalendar();
+        if (sol?.year) { their.year = sol.year; their.month = sol.month; their.day = sol.day; }
+      } catch {}
+    }
+
     myResultRef.current = analyzeSaju({
       birthYear: my.year, birthMonth: my.month, birthDay: my.day,
-      birthHour: myH, birthMinute: myMin,
-      name: "나", gender: "male",
-      birthPlace: "서울", style: "auto", productType: "report", useJajasi: myTime.useJajasi,
+      birthHour: myForm.birthHour, birthMinute: myForm.birthMinute ?? 0,
+      name: "나", gender: myForm.gender,
+      birthPlace: myForm.city || "서울", style: "auto", productType: "report", useJajasi: myForm.useJajasi,
     });
     resultRef.current = analyzeSaju({
       birthYear: their.year, birthMonth: their.month, birthDay: their.day,
-      birthHour: theirH, birthMinute: theirMin,
-      name: "그 사람", gender: "male",
-      birthPlace: "서울", style: "auto", productType: "report", useJajasi: theirTime.useJajasi,
+      birthHour: theirForm.birthHour, birthMinute: theirForm.birthMinute ?? 0,
+      name: "그 사람", gender: theirForm.gender,
+      birthPlace: theirForm.city || "서울", style: "auto", productType: "report", useJajasi: theirForm.useJajasi,
     });
     setStep("loading");
   }
@@ -310,7 +249,8 @@ function SpyContent() {
 
   // ── 입력 폼 ───────────────────────────────────────────────────────────────
   if (step === "form") {
-    const ready = !!myYear && !!myMonth && !!myDay && !!year && !!month && !!day;
+    const ready = !!myForm.birthYear && !!myForm.birthMonth && !!myForm.birthDay &&
+                  !!theirForm.birthYear && !!theirForm.birthMonth && !!theirForm.birthDay;
     return (
       <main className="min-h-screen bg-[#0a0101] text-white">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -328,52 +268,8 @@ function SpyContent() {
           </div>
 
           <div className="space-y-5">
-            {/* 나의 정보 */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-gray-400"><span className="text-white font-black">나</span>의 생년월일</label>
-                <div className="flex items-center gap-2">
-                <ProfileSaveModal
-                  onSelect={(prof) => {
-                    setMyYear(prof.birthYear);
-                    setMyMonth(prof.birthMonth);
-                    setMyDay(prof.birthDay);
-                    setMyTime({
-                      hour: prof.birthHour ? parseInt(prof.birthHour) : null,
-                      minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
-                      unknown: !prof.birthHour,
-                      useJajasi: prof.useJajasi,
-                    });
-                  }}
-                  currentData={{
-                    gender: "male",
-                    birthYear: myYear,
-                    birthMonth: myMonth,
-                    birthDay: myDay,
-                    birthHour: myTime.hour != null ? String(myTime.hour) : '',
-                    birthMinute: myTime.minute != null ? String(myTime.minute) : '',
-                    birthPlace: '서울',
-                    calType: myCalType,
-                    isLeapMonth: false,
-                    useJajasi: myTime.useJajasi,
-                  }}
-                />
-                <div className="flex overflow-hidden rounded-lg border border-white/10">
-                  {(["solar","lunar"] as const).map(t => (
-                    <button key={t} type="button" onClick={() => { setMyCalType(t); setMyMonth(""); setMyDay(""); }}
-                      className={`px-3 py-1 text-xs font-medium transition ${myCalType === t ? "bg-red-700 text-white" : "text-gray-500 hover:bg-white/5"}`}>
-                      {t === "solar" ? "양력" : "음력"}
-                    </button>
-                  ))}
-                </div>
-                </div>
-              </div>
-              <DropPick value={myYear} opts={yearOpts} onChange={setMyYear} placeholder="연도 선택" suffix="년" />
-              <div className="grid grid-cols-2 gap-3">
-                <DropPick value={myMonth} opts={monthOpts} onChange={setMyMonth} placeholder="월" suffix="월" />
-                <DropPick value={myDay}   opts={dayOpts}   onChange={setMyDay}   placeholder="일" suffix="일" />
-              </div>
-              <BirthTimePicker value={myTime} onChange={setMyTime} accent="indigo" />
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
+              <BirthInputForm value={myForm} onChange={setMyForm} label="나" accent="#8b5cf6" />
             </div>
 
             <div className="flex items-center gap-3">
@@ -382,25 +278,8 @@ function SpyContent() {
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
-            {/* 그 사람 정보 */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-gray-400"><span className="text-red-300 font-black">그 사람</span>의 생년월일</label>
-                <div className="flex overflow-hidden rounded-lg border border-white/10">
-                  {(["solar","lunar"] as const).map(t => (
-                    <button key={t} type="button" onClick={() => { setTheirCalType(t); setMonth(""); setDay(""); }}
-                      className={`px-3 py-1 text-xs font-medium transition ${theirCalType === t ? "bg-red-700 text-white" : "text-gray-500 hover:bg-white/5"}`}>
-                      {t === "solar" ? "양력" : "음력"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <DropPick value={year}  opts={yearOpts}  onChange={setYear}  placeholder="연도 선택" suffix="년" />
-              <div className="grid grid-cols-2 gap-3">
-                <DropPick value={month} opts={monthOpts} onChange={setMonth} placeholder="월" suffix="월" />
-                <DropPick value={day}   opts={dayOpts}   onChange={setDay}   placeholder="일" suffix="일" />
-              </div>
-              <BirthTimePicker value={theirTime} onChange={setTheirTime} accent="indigo" />
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
+              <BirthInputForm value={theirForm} onChange={setTheirForm} label="상대방" accent="#ec4899" />
             </div>
 
             <p className="text-xs text-gray-600 text-center">성별 무관 — 동성 커플도 동일하게 분석됩니다.</p>
@@ -762,7 +641,7 @@ function SpyContent() {
 
         <ShareButton />
         <button
-          onClick={() => { setMyYear(""); setMyMonth(""); setMyDay(""); setYear(""); setMonth(""); setDay(""); setStep("form"); }}
+          onClick={() => { setMyForm(defaultBirthData("female")); setTheirForm(defaultBirthData("female")); setStep("form"); }}
           className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-red-700/40 text-red-400 hover:bg-red-950/30 transition-all">
           다른 사람 분석하기
         </button>
@@ -771,4 +650,4 @@ function SpyContent() {
   );
 }
 
-export default function SpyPage() { return <AdultGate><SpyContent /></AdultGate>; }
+export default function SpyPage() { return <SpyContent />; }
