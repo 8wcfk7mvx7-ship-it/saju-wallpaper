@@ -2726,7 +2726,7 @@ export const BIGYEOK_INSIGHT = {
 // ══════════════════════════════════════════════════════════════════════════════
 
 export interface SamhapResult {
-  type: "삼합" | "방합";
+  type: "삼합" | "반합" | "방합";
   name: string; jiji: string[];
   element: Element; color: string;
   title: string; core: string; detail: string;
@@ -2810,8 +2810,17 @@ export function detectSamhapBanghap(pillarsDetail: SajuResult["pillarsDetail"]):
   const results: SamhapResult[] = [];
 
   for (const s of SAMHAP_SETS) {
-    if (s.jiji.every(j => jijis.includes(j))) {
+    const matched = s.jiji.filter(j => jijis.includes(j));
+    if (matched.length === 3) {
       results.push({ type: "삼합", ...s });
+    } else if (matched.length === 2) {
+      // 반합(半合): 삼합 지지 중 2개만 있음
+      results.push({
+        type: "반합",
+        ...s,
+        name: s.name.replace(" 삼합", " 반합"),
+        core: `완전한 삼합은 아니지만 ${s.element} 오행의 기운이 부분적으로 형성됩니다. ${s.core}`,
+      });
     }
   }
 
@@ -2859,4 +2868,77 @@ export function analyzeSiksang(pillarsDetail: SajuResult["pillarsDetail"]): {
       ? `식상(${[...new Set(siksangList)].join("·")})이 있어 에너지 발산 통로가 열려 있다. 표현·창작·가르침 활동이 몸과 마음 모두에 활력을 준다.`
       : "식상이 없는 사주다. 에너지가 내부에 집중되는 구조로, 몸을 극도로 혹사하는 직업·활동은 장기적으로 체력을 소진시킨다. 표현과 발산의 통로(글·말·예술·봉사)를 의도적으로 만드는 것이 중요하다.",
   };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 십성 구조 분석: 무비겁·무재·쟁재·종격 패턴
+// ══════════════════════════════════════════════════════════════════════════════
+export interface SipseongPattern {
+  name: string;
+  hanja: string;
+  desc: string;
+  advice: string;
+}
+
+export function analyzeSipseongPatterns(pillarsDetail: SajuResult["pillarsDetail"]): SipseongPattern[] {
+  const allSipseong = [
+    pillarsDetail.year.sipseongCg, pillarsDetail.year.sipseongJj,
+    pillarsDetail.month.sipseongCg, pillarsDetail.month.sipseongJj,
+    pillarsDetail.day.sipseongCg, pillarsDetail.day.sipseongJj,
+    ...(pillarsDetail.hour ? [pillarsDetail.hour.sipseongCg, pillarsDetail.hour.sipseongJj] : []),
+  ].filter(Boolean);
+
+  const has = (ss: string[]) => ss.some(s => allSipseong.includes(s));
+  const countOf = (ss: string[]) => allSipseong.filter(s => ss.includes(s)).length;
+
+  const patterns: SipseongPattern[] = [];
+
+  if (!has(["비견","겁재"])) {
+    patterns.push({
+      name: "무비겁(無比劫)",
+      hanja: "無比劫",
+      desc: "사주에 비겁(비견·겁재)이 없습니다. 경쟁자나 동료 의식이 약하고, 혼자서도 충분히 자립할 수 있는 구조입니다.",
+      advice: "협업보다 독립적인 역할에서 빛납니다. 경쟁을 피하고 자기만의 영역을 구축하세요.",
+    });
+  }
+
+  if (!has(["정재","편재"])) {
+    patterns.push({
+      name: "무재(無財)",
+      hanja: "無財",
+      desc: "사주에 재성(정재·편재)이 없습니다. 돈보다 가치와 명예를 우선시하는 구조. 재물이 손에 쥐어지기보다 흘러가기 쉬운 경향.",
+      advice: "재물보다 자신의 가치를 높이는 데 집중하세요. 인맥과 실력이 재물을 대신합니다.",
+    });
+  }
+
+  const jaeCount = countOf(["정재","편재"]);
+  const bigeupCount = countOf(["비견","겁재"]);
+  if (jaeCount >= 1 && bigeupCount >= 2) {
+    patterns.push({
+      name: "쟁재(爭財)",
+      hanja: "爭財",
+      desc: "비겁이 많고 재성을 두고 다투는 구조입니다. 재물이 생겨도 주변과 나눠야 하거나, 경쟁으로 인해 손실이 생기기 쉽습니다.",
+      advice: "재물을 혼자 독차지하려 하면 오히려 잃습니다. 협력하여 파이를 키우는 전략이 효과적입니다.",
+    });
+  }
+
+  if (!has(["정관","편관"])) {
+    patterns.push({
+      name: "무관(無官)",
+      hanja: "無官",
+      desc: "사주에 관성(정관·편관)이 없습니다. 규칙·조직보다 자유로운 구조를 선호합니다. 직장보다 자영업·프리랜서가 더 잘 맞을 수 있습니다.",
+      advice: "조직 생활보다 독립적인 업무 환경에서 더 능력을 발휘합니다.",
+    });
+  }
+
+  if (!has(["정인","편인"])) {
+    patterns.push({
+      name: "무인(無印)",
+      hanja: "無印",
+      desc: "사주에 인성(정인·편인)이 없습니다. 학문·배움보다 실전·경험 중심으로 성장하는 유형입니다.",
+      advice: "이론보다 현장 경험을 쌓으세요. 실전에서 빠르게 배우는 능력이 있습니다.",
+    });
+  }
+
+  return patterns;
 }
