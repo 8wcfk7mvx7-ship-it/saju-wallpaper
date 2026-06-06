@@ -26,62 +26,11 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
   );
 }
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import AnalysisLoading from "@/components/AnalysisLoading";
-
+import AdultGate from "@/components/AdultGate";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
-// ── 드롭다운 ─────────────────────────────────────────────────────────────────
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
-          open ? "border-rose-500 bg-rose-950/30" : "border-white/15 bg-white/5 hover:border-rose-500/50"
-        }`}>
-        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#180a12] border border-rose-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                value === o.v ? "text-rose-300 bg-rose-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"
-              }`}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── 외모 (일간별) ────────────────────────────────────────────────────────────
 const ILGAN_APPEARANCE: Record<string, { face: string; body: string; vibe: string; celeb: string }> = {
@@ -763,5 +712,5 @@ function ErosContent() {
 }
 
 export default function ErosPage() {
-  return <ErosContent />;
+  return <AdultGate><ErosContent /></AdultGate>;
 }

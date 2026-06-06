@@ -332,111 +332,42 @@ export default function CrushPage() {
         </div>
 
         <div className="space-y-5">
-          {/* 성별 */}
+          {/* 상대방 정보 */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>그 사람 성별</label>
-            <div className="grid grid-cols-2 gap-3">
-              {(["male", "female"] as const).map(g => (
-                <button key={g} onClick={() => setTargetGender(g)}
-                  className="py-3 rounded-xl text-sm font-bold border transition"
-                  style={{
-                    borderColor: targetGender === g ? "#f43f5e" : "rgba(255,255,255,0.1)",
-                    background: targetGender === g ? "rgba(244,63,94,0.12)" : "rgba(255,255,255,0.04)",
-                    color: targetGender === g ? "#fb7185" : "rgba(255,255,255,0.45)",
-                  }}>
-                  {g === "male" ? "남성" : "여성"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 양력/음력 */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>양력 / 음력</label>
-            <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-              {(["solar", "lunar"] as const).map(t => (
-                <button key={t} type="button" onClick={() => { setTargetCalType(t); setTargetIsLeap(false); }}
-                  className={`flex-1 py-2.5 text-sm font-bold transition ${targetCalType === t ? "text-white" : "text-white/40"}`}
-                  style={{ background: targetCalType === t ? "rgba(244,63,94,0.3)" : "transparent" }}>
-                  {t === "solar" ? "양력" : "음력"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 생년월일 */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-3">
               <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.5)" }}>
-                그 사람 생년월일 <span style={{ color: "#f43f5e" }}>*</span>
+                그 사람 정보 <span style={{ color: "#f43f5e" }}>*</span>
               </label>
               <ProfileSaveModal
                 onSelect={(prof) => {
-                  setTargetGender(prof.gender);
-                  setTargetYear(parseInt(prof.birthYear) || 0);
-                  setTargetMonth(parseInt(prof.birthMonth) || 0);
-                  setTargetDay(parseInt(prof.birthDay) || 0);
-                  setTargetTime({
-                    hour: prof.birthHour ? parseInt(prof.birthHour) : null,
-                    minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
-                    unknown: !prof.birthHour,
-                    useJajasi: prof.useJajasi,
+                  setTargetForm({
+                    gender: prof.gender,
+                    birthYear: parseInt(prof.birthYear) || "",
+                    birthMonth: parseInt(prof.birthMonth) || "",
+                    birthDay: parseInt(prof.birthDay) || "",
+                    birthHour: prof.birthHour ? parseInt(prof.birthHour) : null,
+                    birthMinute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
+                    city: prof.birthPlace || "서울",
+                    calendarType: prof.calType || "solar",
+                    isLeapMonth: prof.isLeapMonth || false,
+                    useJajasi: prof.useJajasi || false,
                   });
-                  setTargetBirthPlace(prof.birthPlace || '서울');
                 }}
                 currentData={{
-                  gender: targetGender,
-                  birthYear: String(targetYear || ''),
-                  birthMonth: String(targetMonth || ''),
-                  birthDay: String(targetDay || ''),
-                  birthHour: targetTime.hour != null ? String(targetTime.hour) : '',
-                  birthMinute: targetTime.minute != null ? String(targetTime.minute) : '',
-                  birthPlace: targetBirthPlace || '서울',
-                  calType: targetCalType,
-                  isLeapMonth: targetIsLeap,
-                  useJajasi: targetTime.useJajasi,
+                  gender: targetForm.gender,
+                  birthYear: String(targetForm.birthYear || ""),
+                  birthMonth: String(targetForm.birthMonth || ""),
+                  birthDay: String(targetForm.birthDay || ""),
+                  birthHour: targetForm.birthHour != null ? String(targetForm.birthHour) : "",
+                  birthMinute: targetForm.birthMinute != null ? String(targetForm.birthMinute) : "",
+                  birthPlace: targetForm.city || "서울",
+                  calType: targetForm.calendarType,
+                  isLeapMonth: targetForm.isLeapMonth,
+                  useJajasi: targetForm.useJajasi,
                 }}
               />
             </div>
-            <div className="space-y-2">
-              <DropPick value={targetYear ? String(targetYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setTargetYear(Number(v))} placeholder="출생 연도" suffix="년" />
-              <div className="grid grid-cols-2 gap-2">
-                <DropPick value={targetMonth ? String(targetMonth) : ""} opts={MONTH_OPTS.map(m => ({ v: String(m), label: String(m) }))} onChange={v => setTargetMonth(Number(v))} placeholder="월" suffix="월" />
-                <DropPick value={targetDay ? String(targetDay) : ""} opts={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ v: String(d), label: String(d) }))} onChange={v => setTargetDay(Number(v))} placeholder="일" suffix="일" />
-              </div>
-              {targetCalType === "lunar" && (
-                <button type="button" onClick={() => setTargetIsLeap(v => !v)}
-                  className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${targetIsLeap ? "border-rose-500 bg-rose-950/30 text-rose-300" : "border-white/10 bg-white/5 text-gray-500"}`}>
-                  <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${targetIsLeap ? "border-rose-400" : "border-gray-600"}`}>
-                    {targetIsLeap && <span className="text-[10px] font-black">✓</span>}
-                  </span>
-                  윤달
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* 태어난 시간 */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-              그 사람 태어난 시간 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(모르면 모름 선택)</span>
-            </label>
-            <BirthTimePicker value={targetTime} onChange={setTargetTime} accent="violet" />
-          </div>
-
-          {/* 태어난 장소 */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-              그 사람 태어난 장소 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(진태양시 경도보정 자동 적용)</span>
-            </label>
-            <input
-              type="text"
-              value={targetBirthPlace}
-              onChange={e => setTargetBirthPlace(e.target.value)}
-              placeholder="서울 / 부산 / 도쿄 / 뉴욕 등"
-              className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition"
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)" }}
-            />
+            <BirthInputForm value={targetForm} onChange={setTargetForm} accent="#f59e0b" />
           </div>
 
           {/* 구분선 */}
@@ -510,7 +441,7 @@ export default function CrushPage() {
           <div className="text-5xl mb-3">💘</div>
           <h1 className="text-2xl font-black text-white mb-1">그 사람 사주 완전 분석</h1>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-            {targetGender === "male" ? "남성" : "여성"} · {targetYear}년 {targetMonth}월 {targetDay}일생
+            {targetForm.gender === "male" ? "남성" : "여성"} · {targetForm.birthYear}년 {targetForm.birthMonth}월 {targetForm.birthDay}일생
           </p>
         </div>
 
