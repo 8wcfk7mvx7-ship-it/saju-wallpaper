@@ -3,58 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 
 export const dynamic = "force-dynamic";
 
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
 
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
-          open ? "border-rose-500 bg-rose-950/30" : "border-white/15 bg-white/5 hover:border-rose-500/50"
-        }`}>
-        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#180a12] border border-rose-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${value === o.v ? "text-rose-300 bg-rose-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"}`}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface PersonForm { gender: "male" | "female"; year: string; month: string; day: string; hour: string; useJajasi: boolean; birthPlace: string; }
 
 // ── 성적 케미 분석 로직 ───────────────────────────────────────────────────────
 
@@ -209,17 +163,13 @@ function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GR
 function HotCompatContent() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [p1, setP1] = useState<PersonForm>({ gender: "female", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" });
-  const [p2, setP2] = useState<PersonForm>({ gender: "male",   year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" });
+  const [p1, setP1] = useState<BirthFormData>(defaultBirthData("female"));
+  const [p2, setP2] = useState<BirthFormData>(defaultBirthData("male"));
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
   const chemRef = useRef<ChemResult | null>(null);
   const r1Ref   = useRef<SajuResult | null>(null);
   const r2Ref   = useRef<SajuResult | null>(null);
-
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   useEffect(() => {
     const isAdmin = localStorage.getItem("sp_admin") === "true";
@@ -228,50 +178,40 @@ function HotCompatContent() {
     setBlueberries(isNaN(bb) ? 0 : bb);
   }, []);
 
-  function handleAnalyze() {
-    if (!p1.year || !p1.month || !p1.day || !p2.year || !p2.month || !p2.day) return;
-    const r1 = analyzeSaju({ birthYear: +p1.year, birthMonth: +p1.month, birthDay: +p1.day, birthHour: p1.hour ? +p1.hour : null, birthMinute: p1.hour ? 30 : null, name: "나", gender: p1.gender, birthPlace: p1.birthPlace || "서울", style: "auto", productType: "report", useJajasi: p1.useJajasi });
-    const r2 = analyzeSaju({ birthYear: +p2.year, birthMonth: +p2.month, birthDay: +p2.day, birthHour: p2.hour ? +p2.hour : null, birthMinute: p2.hour ? 30 : null, name: "상대", gender: p2.gender, birthPlace: p2.birthPlace || "서울", style: "auto", productType: "report", useJajasi: p2.useJajasi });
+  async function handleAnalyze() {
+    let y1 = p1.birthYear === "" ? NaN : Number(p1.birthYear);
+    let m1 = p1.birthMonth === "" ? NaN : Number(p1.birthMonth);
+    let d1 = p1.birthDay === "" ? NaN : Number(p1.birthDay);
+    let y2 = p2.birthYear === "" ? NaN : Number(p2.birthYear);
+    let m2 = p2.birthMonth === "" ? NaN : Number(p2.birthMonth);
+    let d2 = p2.birthDay === "" ? NaN : Number(p2.birthDay);
+    if (isNaN(y1) || isNaN(m1) || isNaN(d1) || isNaN(y2) || isNaN(m2) || isNaN(d2)) return;
+    if (p1.calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const klc = new KLC(); klc.setLunarDate(y1, m1, d1, p1.isLeapMonth);
+        const sol = klc.getSolarCalendar(); if (!sol?.year) throw new Error();
+        y1 = sol.year; m1 = sol.month; d1 = sol.day;
+      } catch { alert("첫 번째 사람의 음력 날짜를 변환할 수 없습니다."); return; }
+    }
+    if (p2.calendarType === "lunar") {
+      try {
+        // @ts-ignore
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const klc = new KLC(); klc.setLunarDate(y2, m2, d2, p2.isLeapMonth);
+        const sol = klc.getSolarCalendar(); if (!sol?.year) throw new Error();
+        y2 = sol.year; m2 = sol.month; d2 = sol.day;
+      } catch { alert("두 번째 사람의 음력 날짜를 변환할 수 없습니다."); return; }
+    }
+    const h1 = p1.birthHour; const min1 = p1.birthMinute ?? 0;
+    const h2 = p2.birthHour; const min2 = p2.birthMinute ?? 0;
+    const r1 = analyzeSaju({ birthYear: y1, birthMonth: m1, birthDay: d1, birthHour: h1, birthMinute: h1 != null ? min1 : null, name: "나", gender: p1.gender, birthPlace: p1.city || "서울", style: "auto", productType: "report", useJajasi: p1.useJajasi });
+    const r2 = analyzeSaju({ birthYear: y2, birthMonth: m2, birthDay: d2, birthHour: h2, birthMinute: h2 != null ? min2 : null, name: "상대", gender: p2.gender, birthPlace: p2.city || "서울", style: "auto", productType: "report", useJajasi: p2.useJajasi });
     r1Ref.current  = r1;
     r2Ref.current  = r2;
     chemRef.current = calcChem(r1, r2);
     setStep("loading");
-  }
-
-  // PersonForm 입력 컴포넌트
-  function PersonInput({ label, form, setForm }: { label: string; form: PersonForm; setForm: (f: PersonForm) => void }) {
-    return (
-      <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4">
-        <p className="text-sm font-bold text-gray-300 mb-4">{label}</p>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {(["female", "male"] as const).map(g => (
-            <button key={g} type="button" onClick={() => setForm({ ...form, gender: g })}
-              className={`py-2.5 rounded-xl border font-semibold text-sm transition ${form.gender === g ? "bg-rose-900/50 border-rose-500 text-rose-200" : "bg-white/5 border-white/15 text-gray-400 hover:border-white/30"}`}>
-              {g === "male" ? "남성" : "여성"}
-            </button>
-          ))}
-        </div>
-        <div className="space-y-2">
-          <DropPick value={form.year}  opts={yearOpts}  onChange={v => setForm({ ...form, year: v })}  placeholder="연도" suffix="년" />
-          <div className="grid grid-cols-2 gap-2">
-            <DropPick value={form.month} opts={monthOpts} onChange={v => setForm({ ...form, month: v })} placeholder="월" suffix="월" />
-            <DropPick value={form.day}   opts={dayOpts}   onChange={v => setForm({ ...form, day: v })}   placeholder="일" suffix="일" />
-          </div>
-          <DropPick value={form.hour} opts={[{ v: "", label: "시간 모름" }, ...Array.from({ length: 24 }, (_, i) => ({ v: String(i), label: `${i}시` }))]} onChange={v => setForm({ ...form, hour: v })} placeholder="출생 시간 (선택)" />
-          <button type="button" onClick={() => setForm({ ...form, useJajasi: !form.useJajasi })}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl border text-xs transition"
-            style={{ background: form.useJajasi ? "rgba(244,63,94,0.1)" : "rgba(255,255,255,0.03)", border: form.useJajasi ? "1px solid rgba(244,63,94,0.4)" : "1px solid rgba(255,255,255,0.1)", color: form.useJajasi ? "#f87171" : "rgba(255,255,255,0.4)" }}>
-            <span className="w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0" style={{ borderColor: form.useJajasi ? "#f87171" : "rgba(255,255,255,0.2)" }}>
-              {form.useJajasi && <span className="text-[9px] font-black">✓</span>}
-            </span>
-            야자시·조자시 적용
-          </button>
-          <input type="text" value={form.birthPlace} onChange={e => setForm({ ...form, birthPlace: e.target.value })}
-            placeholder="태어난 도시 (경도 보정)"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-rose-500 transition" />
-        </div>
-      </div>
-    );
   }
 
   // ── 진입 ────────────────────────────────────────────────────────────────
@@ -320,7 +260,7 @@ function HotCompatContent() {
 
   // ── 폼 ──────────────────────────────────────────────────────────────────
   if (step === "form") {
-    const ready = p1.year && p1.month && p1.day && p2.year && p2.month && p2.day;
+    const ready = p1.birthYear !== "" && p1.birthMonth !== "" && p1.birthDay !== "" && p2.birthYear !== "" && p2.birthMonth !== "" && p2.birthDay !== "";
     return (
       <main className="min-h-screen bg-[#08010f] text-white">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -336,9 +276,9 @@ function HotCompatContent() {
             <p className="text-gray-500 text-sm">생년월일만으로 성적 케미를 분석합니다</p>
           </div>
           <div className="space-y-4 mb-6">
-            <PersonInput label="첫 번째 사람" form={p1} setForm={setP1} />
+            <BirthInputForm value={p1} onChange={setP1} label="나" accent="#f43f5e" />
             <div className="flex items-center gap-3"><div className="flex-1 h-px bg-white/10" /><span className="text-gray-600 text-xs">vs</span><div className="flex-1 h-px bg-white/10" /></div>
-            <PersonInput label="두 번째 사람" form={p2} setForm={setP2} />
+            <BirthInputForm value={p2} onChange={setP2} label="상대방" accent="#818cf8" />
           </div>
           <button onClick={handleAnalyze} disabled={!ready}
             className={`w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] ${ready ? "bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/40" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"}`}>
@@ -493,7 +433,7 @@ function HotCompatContent() {
           </p>
         </div>
 
-        <button onClick={() => { setP1({ gender: "female", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" }); setP2({ gender: "male", year: "", month: "", day: "", hour: "", useJajasi: false, birthPlace: "서울" }); setStep("form"); }}
+        <button onClick={() => { setP1(defaultBirthData("female")); setP2(defaultBirthData("male")); setStep("form"); }}
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>

@@ -3,69 +3,12 @@ import { useState, useEffect, useCallback, useRef, type CSSProperties, type Reac
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
-const CY_GH = new Date().getFullYear();
-const YEARS_GH = Array.from({ length: CY_GH - 1919 }, (_, i) => CY_GH - i);
-const MONTHS_GH = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS_GH = Array.from({ length: 31 }, (_, i) => i + 1);
-
-function GhPicker({ value, options, onChange, placeholder, suffix, style }: {
-  value: string; options: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string; style?: CSSProperties;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-  useEffect(() => {
-    if (open && listRef.current && value) {
-      const el = listRef.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = options.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} style={{ position: "relative", ...style }}>
-      <div onClick={() => setOpen(!open)} style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        background: "rgba(255,255,255,0.05)", border: `1.5px solid ${open ? "rgba(167,139,250,0.6)" : "rgba(255,255,255,0.1)"}`,
-        borderRadius: 10, padding: "10px 12px", cursor: "pointer", userSelect: "none",
-      }}>
-        <span style={{ fontSize: 13, color: display ? "#fff" : "rgba(255,255,255,0.3)" }}>
-          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
-        </span>
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
-      </div>
-      {open && (
-        <div ref={listRef} style={{
-          position: "absolute", zIndex: 100, width: "100%", marginTop: 4,
-          background: "#12121e", border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 10, maxHeight: 180, overflowY: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-        }}>
-          {options.map(opt => (
-            <div key={opt.v} data-v={opt.v} onClick={() => { onChange(opt.v); setOpen(false); }} style={{
-              padding: "9px 12px", fontSize: 13, cursor: "pointer",
-              background: value === opt.v ? "rgba(139,92,246,0.3)" : "transparent",
-              color: value === opt.v ? "#c4b5fd" : "rgba(255,255,255,0.7)",
-              fontWeight: value === opt.v ? 700 : 400,
-            }}>
-              {opt.label}{suffix && opt.v ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════
    관계 테이블
@@ -336,8 +279,8 @@ function ohaengRel(a:string,b:string):'상생'|'상극'|'중립'{
 /* ═══════════════════════════════════════════════════════════════
    입력/상태
 ═══════════════════════════════════════════════════════════════ */
-interface PI{name:string;gender:'male'|'female';year:string;month:string;day:string;birthTime:BirthTimeValue;birthPlace:string;}
-const empty=():PI=>({name:'',gender:'male',year:'',month:'',day:'',birthTime:{hour:null,minute:null,unknown:true,useJajasi:false},birthPlace:'서울'});
+interface PI { name: string; birthData: BirthFormData; }
+const empty = (): PI => ({ name: '', birthData: defaultBirthData('male') });
 
 // 한국어 IME 커서 튐 방지: uncontrolled name input
 const NameInput = memo(function NameInput({ defaultValue, onBlur, style }: { defaultValue: string; onBlur: (v: string) => void; style: CSSProperties }) {
@@ -402,54 +345,60 @@ export default function GunghapPage(){
   const [step,setStep]=useState<'entry'|'form'|'loading'|'result'>('entry');
   const [relationType,setRelationType]=useState('');
   const selectedRelation=RELATION_TYPES.find(r=>r.id===relationType)||null;
-  const [p1Cal,setP1Cal]=useState<{type:'solar'|'lunar';leap:boolean}>({type:'solar',leap:false});
-  const [p2Cal,setP2Cal]=useState<{type:'solar'|'lunar';leap:boolean}>({type:'solar',leap:false});
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
 
   const fillP1=useCallback(()=>{
     const saved=loadSajuData();
     if(!saved) return;
     setP1({
-      name:saved.name||'',gender:saved.gender||'male',
-      year:String(saved.birthYear),month:String(saved.birthMonth),day:String(saved.birthDay),
-      birthTime:{
-        hour:saved.birthHourUnknown?null:saved.birthHour,
-        minute:saved.birthHourUnknown?null:saved.birthMinute,
-        unknown:saved.birthHourUnknown||false,
+      name:saved.name||'',
+      birthData:{
+        gender:saved.gender||'male',
+        birthYear:saved.birthYear||'',
+        birthMonth:saved.birthMonth||'',
+        birthDay:saved.birthDay||'',
+        birthHour:saved.birthHourUnknown?null:saved.birthHour,
+        birthMinute:saved.birthHourUnknown?null:saved.birthMinute,
+        city:saved.birthPlace||'서울',
+        calendarType:'solar',
         useJajasi:saved.useJajasi||false,
+        isLeapMonth:false,
       },
-      birthPlace:saved.birthPlace||'서울',
     });
   },[]);
 
   const calc=async()=>{
-    let y1=+p1.year,m1=+p1.month,d1=+p1.day;
-    let y2=+p2.year,m2=+p2.month,d2=+p2.day;
-    if(!p1.name||!p2.name||!y1||!m1||!d1||!y2||!m2||!d2) { alert('두 사람의 이름과 생년월일을 모두 입력해주세요.'); return; }
-    if(p1Cal.type==='lunar'){
+    let y1=p1.birthData.birthYear===''?NaN:Number(p1.birthData.birthYear);
+    let m1=p1.birthData.birthMonth===''?NaN:Number(p1.birthData.birthMonth);
+    let d1=p1.birthData.birthDay===''?NaN:Number(p1.birthData.birthDay);
+    let y2=p2.birthData.birthYear===''?NaN:Number(p2.birthData.birthYear);
+    let m2=p2.birthData.birthMonth===''?NaN:Number(p2.birthData.birthMonth);
+    let d2=p2.birthData.birthDay===''?NaN:Number(p2.birthData.birthDay);
+    if(!p1.name||!p2.name||isNaN(y1)||isNaN(m1)||isNaN(d1)||isNaN(y2)||isNaN(m2)||isNaN(d2)) { alert('두 사람의 이름과 생년월일을 모두 입력해주세요.'); return; }
+    if(p1.birthData.calendarType==='lunar'){
       try{
         // @ts-ignore
         const KLC=(await import('korean-lunar-calendar')).default;
-        const cal=new KLC(); cal.setLunarDate(y1,m1,d1,p1Cal.leap);
-        const s=cal.getSolarCalendar(); if(!s?.year) throw new Error();
-        y1=s.year; m1=s.month; d1=s.day;
+        const klc=new KLC(); klc.setLunarDate(y1,m1,d1,p1.birthData.isLeapMonth);
+        const sol=klc.getSolarCalendar(); if(!sol?.year) throw new Error();
+        y1=sol.year; m1=sol.month; d1=sol.day;
       } catch { alert('첫 번째 사람의 음력 날짜를 변환할 수 없습니다.'); return; }
     }
-    if(p2Cal.type==='lunar'){
+    if(p2.birthData.calendarType==='lunar'){
       try{
         // @ts-ignore
         const KLC=(await import('korean-lunar-calendar')).default;
-        const cal=new KLC(); cal.setLunarDate(y2,m2,d2,p2Cal.leap);
-        const s=cal.getSolarCalendar(); if(!s?.year) throw new Error();
-        y2=s.year; m2=s.month; d2=s.day;
+        const klc=new KLC(); klc.setLunarDate(y2,m2,d2,p2.birthData.isLeapMonth);
+        const sol=klc.getSolarCalendar(); if(!sol?.year) throw new Error();
+        y2=sol.year; m2=sol.month; d2=sol.day;
       } catch { alert('두 번째 사람의 음력 날짜를 변환할 수 없습니다.'); return; }
     }
-    const h1=p1.birthTime.unknown?null:p1.birthTime.hour;
-    const min1=p1.birthTime.unknown?null:(p1.birthTime.minute??0);
-    const h2=p2.birthTime.unknown?null:p2.birthTime.hour;
-    const min2=p2.birthTime.unknown?null:(p2.birthTime.minute??0);
-    const r1=analyzeSaju({birthYear:y1,birthMonth:m1,birthDay:d1,birthHour:h1,birthMinute:h1!=null?min1:null,name:p1.name,gender:p1.gender,birthPlace:p1.birthPlace||'서울',style:'auto',productType:'report',useJajasi:p1.birthTime.useJajasi});
-    const r2=analyzeSaju({birthYear:y2,birthMonth:m2,birthDay:d2,birthHour:h2,birthMinute:h2!=null?min2:null,name:p2.name,gender:p2.gender,birthPlace:p2.birthPlace||'서울',style:'auto',productType:'report',useJajasi:p2.birthTime.useJajasi});
+    const h1=p1.birthData.birthHour;
+    const min1=p1.birthData.birthMinute??0;
+    const h2=p2.birthData.birthHour;
+    const min2=p2.birthData.birthMinute??0;
+    const r1=analyzeSaju({birthYear:y1,birthMonth:m1,birthDay:d1,birthHour:h1,birthMinute:h1!=null?min1:null,name:p1.name,gender:p1.birthData.gender,birthPlace:p1.birthData.city||'서울',style:'auto',productType:'report',useJajasi:p1.birthData.useJajasi});
+    const r2=analyzeSaju({birthYear:y2,birthMonth:m2,birthDay:d2,birthHour:h2,birthMinute:h2!=null?min2:null,name:p2.name,gender:p2.birthData.gender,birthPlace:p2.birthData.city||'서울',style:'auto',productType:'report',useJajasi:p2.birthData.useJajasi});
     const pd1=r1.pillarsDetail, pd2=r2.pillarsDetail;
     const jjs1=[pd1.year.jj,pd1.month.jj,pd1.day.jj,...(pd1.hour?[pd1.hour.jj]:[])];
     const jjs2=[pd2.year.jj,pd2.month.jj,pd2.day.jj,...(pd2.hour?[pd2.hour.jj]:[])];
@@ -502,114 +451,8 @@ export default function GunghapPage(){
     borderRadius:10,fontSize:13,background:'rgba(255,255,255,0.05)',
     color:'#fff',outline:'none',boxSizing:'border-box',fontFamily:'inherit',...s,
   });
-  const selStyle=(s?:CSSProperties):CSSProperties=>({...inp(),appearance:'none' as const,...s});
 
   const gradeColors:{[k:string]:string}={합:'#10ac84',삼합:'#10ac84',암합:'#4ecdc4',충:'#ee5a24',원진:'#c0392b',해:'#e67e22',파:'#e67e22',형:'#e74c3c',암충:'#e74c3c'};
-
-  const Form=({p,setP,idx,personLabel,cal,setCal}:{
-    p:PI;setP:(v:PI)=>void;idx:1|2;personLabel?:string;
-    cal:{type:'solar'|'lunar';leap:boolean};
-    setCal:(v:{type:'solar'|'lunar';leap:boolean})=>void;
-  })=>(
-    <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',
-      border:'1px solid rgba(255,255,255,0.07)',marginBottom:idx===1?12:0}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>
-          {idx===1?'나':(personLabel||'두 번째 사람')}
-        </p>
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          {idx===1&&(
-            <ProfileSaveModal
-              onSelect={(prof) => {
-                setP({
-                  ...p,
-                  gender: prof.gender,
-                  year: prof.birthYear,
-                  month: prof.birthMonth,
-                  day: prof.birthDay,
-                  birthTime: {
-                    hour: prof.birthHour ? parseInt(prof.birthHour) : null,
-                    minute: prof.birthMinute ? parseInt(prof.birthMinute) : null,
-                    unknown: !prof.birthHour,
-                    useJajasi: prof.useJajasi,
-                  },
-                  birthPlace: prof.birthPlace || '서울',
-                  name: prof.name,
-                });
-              }}
-              currentData={{
-                gender: p.gender,
-                birthYear: p.year,
-                birthMonth: p.month,
-                birthDay: p.day,
-                birthHour: p.birthTime.hour != null ? String(p.birthTime.hour) : '',
-                birthMinute: p.birthTime.minute != null ? String(p.birthTime.minute) : '',
-                birthPlace: p.birthPlace || '서울',
-                calType: 'solar',
-                isLeapMonth: false,
-                useJajasi: p.birthTime.useJajasi,
-              }}
-            />
-          )}
-          {idx===1&&(
-            <button type="button" onClick={fillP1} style={{
-              fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',
-              background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px',
-            }}>내 사주로 채우기</button>
-          )}
-        </div>
-      </div>
-      <div style={{display:'flex',gap:8,marginBottom:10}}>
-        {(['male','female'] as const).map(g=>(
-          <button key={g} onClick={()=>setP({...p,gender:g})} style={{
-            flex:1,padding:'9px 0',borderRadius:8,border:'1.5px solid',cursor:'pointer',fontSize:13,fontWeight:700,
-            borderColor:p.gender===g?(g==='male'?'#4f8ef7':'#f97bb1'):'rgba(255,255,255,0.08)',
-            background:p.gender===g?(g==='male'?'rgba(79,142,247,0.1)':'rgba(249,123,177,0.1)'):'transparent',
-            color:p.gender===g?(g==='male'?'#7eb0ff':'#f9a8d4'):'rgba(255,255,255,0.35)'}}>
-            {g==='male'?'👨 남성':'👩 여성'}
-          </button>
-        ))}
-      </div>
-      <NameInput defaultValue={p.name} onBlur={v=>setP({...p,name:v})} style={{...inp(),marginBottom:8}} />
-      {/* 양력/음력 토글 */}
-      <div style={{display:'flex',marginBottom:8,gap:6}}>
-        {(['solar','lunar'] as const).map(t=>(
-          <button key={t} type="button" onClick={()=>setCal({...cal,type:t,leap:false})} style={{
-            flex:1,padding:'7px 0',borderRadius:8,border:'1.5px solid',cursor:'pointer',fontSize:12,fontWeight:700,
-            borderColor:cal.type===t?'rgba(167,139,250,0.6)':'rgba(255,255,255,0.08)',
-            background:cal.type===t?'rgba(139,92,246,0.15)':'transparent',
-            color:cal.type===t?'#c4b5fd':'rgba(255,255,255,0.35)',
-          }}>{t==='solar'?'양력':'음력'}</button>
-        ))}
-      </div>
-      {cal.type==='lunar'&&(
-        <label style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'rgba(255,255,255,0.45)',marginBottom:8,cursor:'pointer'}}>
-          <input type="checkbox" checked={cal.leap} onChange={e=>setCal({...cal,leap:e.target.checked})} style={{accentColor:'#a78bfa'}}/>
-          윤달
-        </label>
-      )}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:7,marginBottom:10}}>
-        <GhPicker value={p.year}
-          options={YEARS_GH.map(y=>({v:String(y),label:String(y)}))}
-          onChange={v=>setP({...p,year:v})} placeholder="연도" suffix="년"/>
-        <GhPicker value={p.month}
-          options={MONTHS_GH.map(m=>({v:String(m),label:String(m)}))}
-          onChange={v=>setP({...p,month:v})} placeholder="월" suffix="월"/>
-        <GhPicker value={p.day}
-          options={DAYS_GH.map(d=>({v:String(d),label:String(d)}))}
-          onChange={v=>setP({...p,day:v})} placeholder="일" suffix="일"/>
-      </div>
-      <div style={{marginBottom:10}}>
-        <p style={{color:'rgba(255,255,255,0.35)',fontSize:11,fontWeight:700,marginBottom:8}}>태어난 시간</p>
-        <BirthTimePicker
-          value={p.birthTime}
-          onChange={bt=>setP({...p,birthTime:bt})}
-          accent="violet"
-        />
-      </div>
-      <input style={inp()} placeholder="출생 도시 (서울 / 부산 등)" value={p.birthPlace} onChange={e=>setP({...p,birthPlace:e.target.value})}/>
-    </div>
-  );
 
   if(step==='loading') return (
     <AnalysisLoading subject={`${p1.name}·${p2.name} 궁합`} onDone={()=>setStep('result')} />
@@ -809,23 +652,35 @@ export default function GunghapPage(){
                 </div>
                 <ProfilePicker onSelect={p => setP1({
                   name: p.name || '',
-                  gender: p.gender,
-                  year: String(p.birthYear),
-                  month: String(p.birthMonth),
-                  day: String(p.birthDay),
-                  birthTime: {
-                    hour: p.birthHourUnknown ? null : (p.birthHour === -1 ? null : p.birthHour),
-                    minute: null,
-                    unknown: p.birthHourUnknown || p.birthHour === -1,
+                  birthData: {
+                    ...defaultBirthData(p.gender),
+                    gender: p.gender,
+                    birthYear: p.birthYear || '',
+                    birthMonth: p.birthMonth || '',
+                    birthDay: p.birthDay || '',
+                    birthHour: p.birthHourUnknown ? null : p.birthHour,
+                    birthMinute: null,
                     useJajasi: false,
                   },
-                  birthPlace: '서울',
                 })} />
-                <Form p={p1} setP={setP1} idx={1} cal={p1Cal} setCal={setP1Cal}/>
+                <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',border:'1px solid rgba(255,255,255,0.07)',marginBottom:12}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+                    <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>나</p>
+                    <button type="button" onClick={fillP1} style={{fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px'}}>내 사주로 채우기</button>
+                  </div>
+                  <NameInput defaultValue={p1.name} onBlur={v=>setP1({...p1,name:v})} style={{...inp(),marginBottom:12}} />
+                  <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} label="나" accent="#f43f5e" />
+                </div>
                 <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
                   {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
                 </div>
-                <Form p={p2} setP={setP2} idx={2} personLabel={selectedRelation?.p2Label} cal={p2Cal} setCal={setP2Cal}/>
+                <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',border:'1px solid rgba(255,255,255,0.07)'}}>
+                  <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:'0 0 12px'}}>
+                    {selectedRelation?.p2Label||'상대방'}
+                  </p>
+                  <NameInput defaultValue={p2.name} onBlur={v=>setP2({...p2,name:v})} style={{...inp(),marginBottom:12}} />
+                  <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} label="상대방" accent="#818cf8" />
+                </div>
                 <button onClick={calc} style={{
                   width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',
                   background:'linear-gradient(135deg,#7c3aed,#6366f1)',color:'#fff',
@@ -851,7 +706,7 @@ export default function GunghapPage(){
                 </div>
               )}
               <div style={{fontSize:12,color:'rgba(255,255,255,0.3)',marginBottom:4}}>
-                {p1.name}({p1.year}) {p1.gender==='male'?'👨':'👩'} &nbsp;+&nbsp; {p2.name}({p2.year}) {p2.gender==='male'?'👨':'👩'}
+                {p1.name}({p1.birthData.birthYear}) {p1.birthData.gender==='male'?'👨':'👩'} &nbsp;+&nbsp; {p2.name}({p2.birthData.birthYear}) {p2.birthData.gender==='male'?'👨':'👩'}
               </div>
               <div style={{width:120,height:120,borderRadius:'50%',margin:'12px auto',
                 background:`conic-gradient(${result.gradeColor} ${result.totalScore}%, rgba(255,255,255,0.04) 0%)`,
@@ -867,12 +722,12 @@ export default function GunghapPage(){
               <div style={{fontSize:13,color:'rgba(255,255,255,0.45)',lineHeight:1.6}}>{result.gradeDesc}</div>
               <SaveProfilePrompt
                 name={p1.name}
-                birthYear={parseInt(p1.year) || 0}
-                birthMonth={parseInt(p1.month) || 0}
-                birthDay={parseInt(p1.day) || 0}
-                birthHour={p1.birthTime.unknown ? null : p1.birthTime.hour}
-                birthHourUnknown={p1.birthTime.unknown || p1.birthTime.hour === null}
-                gender={p1.gender}
+                birthYear={Number(p1.birthData.birthYear) || 0}
+                birthMonth={Number(p1.birthData.birthMonth) || 0}
+                birthDay={Number(p1.birthData.birthDay) || 0}
+                birthHour={p1.birthData.birthHour}
+                birthHourUnknown={p1.birthData.birthHour === null}
+                gender={p1.birthData.gender}
               />
             </div>
 
@@ -939,7 +794,7 @@ export default function GunghapPage(){
                     일지(日支) 안에 숨어 있는 천간의 기운이 상대에게 어떻게 작용하는지 보여줍니다.
                   </p>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                    {[{name:p1.name,jj:jj1,desc:desc1},{name:p2.name,jj:jj2,desc:desc2}].map((x,i)=>x.desc&&(
+                    {([{name:p1.name,jj:jj1,desc:desc1},{name:p2.name,jj:jj2,desc:desc2}] as {name:string;jj:string;desc:string|null}[]).map((x,i)=>x.desc&&(
                       <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:10,padding:'10px',
                         border:'1px solid rgba(255,255,255,0.06)'}}>
                         <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:'0 0 3px'}}>{x.name}</p>
@@ -966,12 +821,12 @@ export default function GunghapPage(){
               <div style={{display:'flex',gap:8,marginBottom:8}}>
                 <div style={{flex:1,background:'rgba(255,255,255,0.05)',borderRadius:8,padding:'8px',textAlign:'center'}}>
                   <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:3}}>{p1.name}</p>
-                  <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g1]}</p>
+                  <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g1 as string]}</p>
                 </div>
                 <div style={{display:'flex',alignItems:'center',color:'rgba(255,255,255,0.2)',fontSize:18}}>↔</div>
                 <div style={{flex:1,background:'rgba(255,255,255,0.05)',borderRadius:8,padding:'8px',textAlign:'center'}}>
                   <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:3}}>{p2.name}</p>
-                  <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g2]}</p>
+                  <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g2 as string]}</p>
                 </div>
               </div>
               <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6,margin:0}}>{result.johu.desc}</p>
@@ -1013,8 +868,8 @@ export default function GunghapPage(){
                 </span>
               </div>
               <div style={{display:'flex',gap:8,marginBottom:8}}>
-                {[{name:p1.name,dohwa:result.baram.p1dohwa,hongyeom:result.baram.p1hongyeom},
-                  {name:p2.name,dohwa:result.baram.p2dohwa,hongyeom:result.baram.p2hongyeom}].map((b,i)=>(
+                {([{name:p1.name,dohwa:result.baram.p1dohwa,hongyeom:result.baram.p1hongyeom},
+                  {name:p2.name,dohwa:result.baram.p2dohwa,hongyeom:result.baram.p2hongyeom}]).map((b,i)=>(
                   <div key={i} style={{flex:1,background:'rgba(255,255,255,0.04)',borderRadius:8,padding:'8px'}}>
                     <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:4}}>{b.name}</p>
                     <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
