@@ -21,6 +21,22 @@ interface ReunionResult {
   score: number; grade: string; oneLineSummary: string;
   currentHeart: string; reunionTiming: string;
   strategy: string; danger: string; compatibility: string;
+  afterReunionCompat: string;
+}
+
+function ShareButton({ title, text }: { title: string; text: string }) {
+  const [copied, setCopied] = useState(false);
+  async function share() {
+    if (navigator.share) { try { await navigator.share({ title, text, url: window.location.href }); return; } catch {} }
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  }
+  return (
+    <button onClick={share} className="w-full py-3 rounded-2xl text-sm font-bold transition"
+      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
+      {copied ? "✓ 링크 복사됨" : "🔗 결과 공유하기"}
+    </button>
+  );
 }
 
 const EMPTY_PERSON = (): PersonData => ({
@@ -452,6 +468,7 @@ export default function ReunionPage() {
             { label: "📋 단계별 재회 전략", key: "strategy", color: "#60a5fa" },
             { label: "🚫 절대 하면 안 되는 것", key: "danger", color: "#f87171" },
             { label: "💫 장기 궁합·지속 가능성", key: "compatibility", color: "#a78bfa" },
+            { label: "💞 재회 후 두 사람의 관계", key: "afterReunionCompat", color: "#f472b6" },
           ] as { label: string; key: keyof ReunionResult; color: string }[]).map(({ label, key, color }) => (
             <div key={key} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
               <p className="text-xs font-bold mb-2" style={{ color }}>{label}</p>
@@ -502,13 +519,16 @@ export default function ReunionPage() {
           )}
 
           {!locked && (
-            <button
-              onClick={() => { setStep("splash"); setResult(null); setMyData(EMPTY_PERSON()); setTheirData(EMPTY_PERSON()); }}
-              className="w-full py-3 rounded-2xl text-sm transition"
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
-            >
-              새로 분석하기
-            </button>
+            <>
+              <ShareButton title="재회 가능성 분석 결과" text={result.oneLineSummary} />
+              <button
+                onClick={() => { setStep("splash"); setResult(null); setMyData(EMPTY_PERSON()); setTheirData(EMPTY_PERSON()); }}
+                className="w-full py-3 rounded-2xl text-sm transition"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+              >
+                새로 분석하기
+              </button>
+            </>
           )}
         </div>
       </main>
