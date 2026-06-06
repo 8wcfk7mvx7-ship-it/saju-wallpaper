@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -21,6 +22,18 @@ export async function POST(req: NextRequest) {
     const sinsalSummary = (sinsalList || [])
       .map((s: { name: string; category: string }) => s.name)
       .join(", ") || "없음";
+
+    // 십신 심화 설명
+    const sipseongDescs = Array.from(new Set(
+      Object.values(pillarsDetail as Record<string, { sipseongCg?: string; sipseongJj?: string }> || {})
+        .flatMap(v => [v.sipseongCg, v.sipseongJj]).filter(Boolean) as string[]
+    )).map(ss => SIPSEONG_DESC[ss] ? `${ss}: ${SIPSEONG_DESC[ss].detail}` : null).filter(Boolean).join("\n");
+
+    // 재물 구조 콤보
+    const moneyComboText = Object.entries(SIPSEONG_MONEY_COMBO)
+      .filter(([k]) => sipseongList.includes(k))
+      .map(([, v]) => `${v.name}(${v.hanja}): ${v.desc}`)
+      .join("\n");
 
     // 재성 유무 (재다 진단)
     const hasManyJaeseong = pillarsDetail
@@ -48,6 +61,8 @@ export async function POST(req: NextRequest) {
 - 신살: ${sinsalSummary}
 - 재성 다수 여부: ${hasManyJaeseong ? "예 (쟁재·재다 경향)" : "아니오"}
 - 인성 유무: ${hasInseong ? "있음" : "없음"}
+${sipseongDescs ? `\n## 십신 심화 데이터\n${sipseongDescs}` : ""}
+${moneyComboText ? `\n## 재물 구조\n${moneyComboText}` : ""}
 ${myBirth ? `\n## 나의 생일 (궁합 참고)\n- ${myBirth.birthYear}년 ${myBirth.birthMonth}월 ${myBirth.birthDay}일생` : ""}
 
 반드시 아래 JSON 형식으로만 응답하세요:

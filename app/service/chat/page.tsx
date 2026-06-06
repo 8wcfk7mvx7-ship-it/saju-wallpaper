@@ -3,6 +3,7 @@ import BackButton from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
 
 type Step = "gate" | "input" | "chat";
 
@@ -93,15 +94,33 @@ export default function SajuChatPage() {
 
     const sinsalNames = result.sinsalList.map((s) => s.name).join(", ") || "없음";
     const dominantStr = result.dominant.join(", ") || "없음";
+
+    // 십신별 심화 설명 구성
+    const sipseongSet = new Set<string>();
+    for (const p of Object.values(result.pillarsDetail)) {
+      if ((p as { sipseong?: string }).sipseong) sipseongSet.add((p as { sipseong: string }).sipseong);
+    }
+    const sipseongDesc = [...sipseongSet]
+      .map(ss => SIPSEONG_DESC[ss] ? `${ss}(${SIPSEONG_DESC[ss].hanja}): ${SIPSEONG_DESC[ss].short}` : null)
+      .filter(Boolean).join(", ");
+
+    // 재물 구조 콤보 감지
+    const moneyComboKeys = Object.keys(SIPSEONG_MONEY_COMBO);
+    const detectedCombos = moneyComboKeys
+      .filter(k => sinsalNames.includes(k) || result.fourPillars.includes(k))
+      .map(k => `${SIPSEONG_MONEY_COMBO[k].name}(${SIPSEONG_MONEY_COMBO[k].hanja}): ${SIPSEONG_MONEY_COMBO[k].desc}`)
+      .join("; ");
+
     const context = [
       `사주팔자: ${result.fourPillars}`,
       `일간: ${result.pillarsDetail.day.cg}`,
       `오행 점수 — 목:${result.scores.목} 화:${result.scores.화} 토:${result.scores.토} 금:${result.scores.금} 수:${result.scores.수}`,
       `강한 오행: ${dominantStr}`,
       `신살: ${sinsalNames}`,
-      `용신: ${result.yongshin.yongshin} / 희신: ${result.yongshin.heeshin} / 기신: ${result.yongshin.gishin}`,
+      `십신 요약: ${sipseongDesc || "없음"}`,
+      detectedCombos ? `재물구조: ${detectedCombos}` : "",
       `성별: ${form.gender === "male" ? "남" : "여"}`,
-    ].join("\n");
+    ].filter(Boolean).join("\n");
 
     setSajuContext(context);
     setMessages([{

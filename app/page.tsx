@@ -424,8 +424,15 @@ function ContactSection() {
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[];
+  border: string; glow: string; categories: Category[]; featured?: boolean;
 }[] = [
+  {
+    id: "chat", emoji: "🔮", title: "월령도사 — 사주 AI 채팅", viral: "사주로 뭐든 물어보세요. AI가 전부 답합니다",
+    desc: "연애·재물·건강·대운·궁합·직업·전생까지. 월령도사가 당신의 사주를 보고 솔직하게 답해드려요. 대화 1회 = 별조각 5개",
+    tags: ["AI 채팅", "전체 상담", "무제한 질문"], href: "/service/chat", badge: "NEW", color: "#a78bfa",
+    badgeBg: "rgba(124,58,237,0.9)", border: "rgba(139,92,246,0.5)", glow: "rgba(124,58,237,0.25)",
+    categories: ["전체", "운명·대운", "라이프", "연애·궁합"], featured: true,
+  },
   {
     id: "saju", emoji: "🔮",
     title: "사주 오행 배경화면",
@@ -581,13 +588,6 @@ const SERVICES: {
     categories: ["전체", "무료", "운명·대운", "라이프"],
   },
   {
-    id: "chat", emoji: "🔮", title: "사주 AI 역술사", viral: "사주 보는 AI가 생겼습니다",
-    desc: "현업 역술인 개발 · 모든 질문 가능 · 대화 1회 = 별조각 5개",
-    tags: ["AI", "채팅", "전체상담"], href: "/service/chat", badge: "NEW", color: "#7c3aed",
-    badgeBg: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)", glow: "rgba(124,58,237,0.15)",
-    categories: ["전체", "운명·대운", "라이프", "연애·궁합"],
-  },
-  {
     id: "taste", emoji: "🎬",
     title: "사주로 보는 취향 분석",
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
@@ -628,15 +628,41 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(28px)",
           transition: `opacity 0.6s ease ${index * 55}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${index * 55}ms`,
-          background: hovered
-            ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
-            : "rgba(11,4,28,0.85)",
-          border: `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
-          boxShadow: hovered
-            ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
-            : "inset 0 1px 0 rgba(255,255,255,0.03)",
+          background: svc.featured
+            ? hovered
+              ? "linear-gradient(135deg, #1a0533 0%, #0d0224 45%, #160840 100%)"
+              : "linear-gradient(135deg, rgba(99,32,180,0.22) 0%, rgba(6,4,20,0.97) 50%, rgba(79,70,229,0.15) 100%)"
+            : hovered
+              ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
+              : "rgba(11,4,28,0.85)",
+          border: svc.featured
+            ? `1px solid ${hovered ? "rgba(167,139,250,0.8)" : "rgba(124,58,237,0.45)"}`
+            : `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
+          boxShadow: svc.featured
+            ? hovered
+              ? `0 0 0 1px rgba(124,58,237,0.5), 0 16px 60px rgba(124,58,237,0.35), 0 0 80px rgba(99,32,180,0.15), inset 0 1px 0 rgba(167,139,250,0.12)`
+              : `0 0 30px rgba(124,58,237,0.18), inset 0 1px 0 rgba(167,139,250,0.07)`
+            : hovered
+              ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
+              : "inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
+        {/* featured 오라 오버레이 */}
+        {svc.featured && (
+          <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden" aria-hidden>
+            <div style={{
+              position: "absolute", top: "-30%", right: "-10%", width: "55%", height: "130%",
+              background: "radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%)",
+              transition: "opacity 0.4s", opacity: hovered ? 1 : 0.6,
+            }} />
+            <div style={{
+              position: "absolute", bottom: "-20%", left: "5%", width: "40%", height: "80%",
+              background: "radial-gradient(ellipse, rgba(99,102,241,0.14) 0%, transparent 70%)",
+              transition: "opacity 0.4s", opacity: hovered ? 1 : 0.5,
+            }} />
+          </div>
+        )}
+
         {/* 왼쪽 컬러 스트라이프 */}
         <div className="flex flex-1">
           <div className="w-1 rounded-l-2xl shrink-0" style={{ background: `linear-gradient(180deg, ${svc.color}, transparent)`, opacity: hovered ? 1 : 0.4, transition: "opacity 0.3s" }} />
@@ -1101,7 +1127,9 @@ export default function MainPage() {
             {SERVICES
               .filter(s => s.categories.includes(activeCategory))
               .map((svc, i) => (
-                <ServiceCard key={svc.id} svc={svc} index={i} startLabel={t.start} />
+                <div key={svc.id} className={svc.featured ? "sm:col-span-2" : ""}>
+                  <ServiceCard svc={svc} index={i} startLabel={t.start} />
+                </div>
               ))}
           </div>
 
