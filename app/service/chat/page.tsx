@@ -209,7 +209,6 @@ export default function SajuChatPage() {
 
           {/* 메인 타이틀 */}
           <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🌙</div>
             <h1 style={{
               fontSize: 34, fontWeight: 900, letterSpacing: "-0.5px",
               background: "linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 50%, #a78bfa 100%)",
