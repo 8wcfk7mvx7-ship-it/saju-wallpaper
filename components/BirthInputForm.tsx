@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import ProfileLoadSheet from "@/components/ProfileLoadSheet";
 
 export interface BirthFormData {
+  name: string;
   birthYear: number | "";
   birthMonth: number | "";
   birthDay: number | "";
@@ -17,6 +18,7 @@ export interface BirthFormData {
 
 export function defaultBirthData(gender: "male" | "female" = "female"): BirthFormData {
   return {
+    name: "",
     birthYear: "", birthMonth: "", birthDay: "",
     birthHour: null, birthMinute: null,
     gender, city: "", calendarType: "solar",
@@ -138,6 +140,21 @@ export default function BirthInputForm({
           {label}
         </p>
       )}
+
+      {/* 이름 */}
+      <div>
+        <label className="text-xs font-medium block mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+          이름 / 별명 <span style={{ color: accent }}>*</span>
+        </label>
+        <input
+          type="text"
+          value={value.name}
+          onChange={e => set({ name: e.target.value })}
+          placeholder="홍길동"
+          className="w-full px-4 py-3 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none transition"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+        />
+      </div>
 
       {/* 양음력 토글 */}
       <div>

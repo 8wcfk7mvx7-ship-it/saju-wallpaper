@@ -1,62 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION, detectSamhapBanghap } from "@/lib/saju";
-import { loadSajuData } from "@/lib/savedSaju";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
-// ── 드롭다운 (amber 테마) ──────────────────────────────────────────────────────
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  useEffect(() => {
-    if (open && list.current && value) {
-      const el = list.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none transition text-sm ${
-          open ? "border-amber-500 bg-amber-950/30" : "border-white/15 bg-white/5 hover:border-amber-500/50"
-        }`}>
-        <span className={display ? "text-white" : "text-gray-500"}>{display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}</span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={list} className="absolute z-50 w-full mt-1 bg-[#1a1000] border border-amber-900/40 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220 }}>
-          {opts.map(o => (
-            <div key={o.v} data-v={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                value === o.v ? "text-amber-300 bg-amber-900/40 font-semibold" : "text-gray-300 hover:bg-white/8"
-              }`}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── 오행별 취향 DB ────────────────────────────────────────────────────────────
 interface TasteItem { title: string; why: string; genre: string; }
@@ -199,13 +148,7 @@ export default function TastePage() {
 
   // 입력 폼 상태
   const [formName, setFormName] = useState("");
-  const [gender, setGender] = useState<"female" | "male">("female");
-  const [calType, setCalType] = useState<"solar" | "lunar">("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [birthYear, setBirthYear] = useState("");
-  const [birthMonth, setBirthMonth] = useState("");
-  const [birthDay, setBirthDay] = useState("");
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
 
   // 결과 상태
   const [element, setElement] = useState<string>("수");
@@ -219,33 +162,22 @@ export default function TastePage() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    const saved = loadSajuData();
-    if (saved) {
-      setFormName(saved.name || "");
-      if (saved.gender) setGender(saved.gender as "female" | "male");
-      if (saved.birthYear) setBirthYear(String(saved.birthYear));
-      if (saved.birthMonth) setBirthMonth(String(saved.birthMonth));
-      if (saved.birthDay) setBirthDay(String(saved.birthDay));
-    }
-  }, []);
-
   async function handleAnalyze() {
     if (!formName.trim()) {
       alert("이름을 입력해주세요.");
       return;
     }
-    if (!birthYear || !birthMonth || !birthDay) {
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) {
       alert("생년월일을 모두 선택해주세요.");
       return;
     }
-    let y = parseInt(birthYear), m = parseInt(birthMonth), d = parseInt(birthDay);
-    if (calType === "lunar") {
+    let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
+    if (form.calendarType === "lunar") {
       try {
         // @ts-ignore
         const KLC = (await import("korean-lunar-calendar")).default;
         const cal = new KLC();
-        cal.setLunarDate(y, m, d, isLeapMonth);
+        cal.setLunarDate(y, m, d, form.isLeapMonth);
         const s = cal.getSolarCalendar();
         if (!s?.year) throw new Error();
         y = s.year; m = s.month; d = s.day;
@@ -254,15 +186,13 @@ export default function TastePage() {
         return;
       }
     }
-    const h = birthTime.unknown ? null : birthTime.hour;
-    const min = birthTime.unknown ? null : birthTime.minute;
     try {
       const r = analyzeSaju({
         birthYear: y, birthMonth: m, birthDay: d,
-        birthHour: h, birthMinute: min,
-        name: formName || "나", gender,
-        birthPlace: "서울", style: "auto", productType: "report",
-        useJajasi: birthTime.useJajasi,
+        birthHour: form.birthHour, birthMinute: form.birthMinute,
+        name: formName || "나", gender: form.gender,
+        birthPlace: form.city || "서울", style: "auto", productType: "report",
+        useJajasi: form.useJajasi,
       });
       setElement(r.dominant[0] || "수");
       setIlgan(r.pillarsDetail.day.cg || "임");
@@ -277,10 +207,6 @@ export default function TastePage() {
 
   const taste = ELEMENT_TASTE[element] || ELEMENT_TASTE["수"];
   const ilganTaste = ILGAN_TASTE[ilgan];
-
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   // ── 스플래시 ──────────────────────────────────────────────────────────────
   if (step === "splash") return (
@@ -363,7 +289,7 @@ export default function TastePage() {
 
   // ── 입력 폼 ───────────────────────────────────────────────────────────────
   if (step === "input") {
-    const ready = !!birthYear && !!birthMonth && !!birthDay;
+    const ready = !!form.birthYear && !!form.birthMonth && !!form.birthDay;
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
         <BackButton />
@@ -391,51 +317,7 @@ export default function TastePage() {
               />
             </div>
 
-            {/* 성별 */}
-            <div>
-              <label className="text-xs text-gray-500 block mb-1.5">성별</label>
-              <div className="flex gap-2">
-                {(["female", "male"] as const).map(g => (
-                  <button key={g} type="button" onClick={() => setGender(g)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition ${gender === g ? "text-white" : "bg-white/5 text-gray-400 border border-white/10"}`}
-                    style={gender === g ? { background: "linear-gradient(135deg, #d97706, #f59e0b)", color: "#1a0f00" } : {}}>
-                    {g === "female" ? "여성" : "남성"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 양력/음력 */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs text-gray-500">생년월일</label>
-                <div className="flex overflow-hidden rounded-lg border border-white/10">
-                  {(["solar", "lunar"] as const).map(t => (
-                    <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); setBirthMonth(""); setBirthDay(""); }}
-                      className={`px-3 py-1 text-xs font-medium transition ${calType === t ? "bg-amber-600 text-white" : "text-gray-400 hover:bg-white/5"}`}>
-                      {t === "solar" ? "양력" : "음력"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {calType === "lunar" && (
-                <label className="flex items-center gap-2 text-xs text-gray-400 mb-2 cursor-pointer select-none">
-                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="accent-amber-500" />
-                  윤달
-                </label>
-              )}
-              <DropPick value={birthYear} opts={yearOpts} onChange={setBirthYear} placeholder="연도 선택" suffix="년" />
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <DropPick value={birthMonth} opts={monthOpts} onChange={setBirthMonth} placeholder="월" suffix="월" />
-                <DropPick value={birthDay}   opts={dayOpts}   onChange={setBirthDay}   placeholder="일" suffix="일" />
-              </div>
-            </div>
-
-            {/* 시간 */}
-            <div>
-              <label className="text-xs text-gray-500 block mb-2">태어난 시간 <span className="text-gray-700">(선택사항)</span></label>
-              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
-            </div>
+            <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             <button onClick={handleAnalyze} disabled={!ready}
               className={`w-full py-4 rounded-2xl font-black text-lg tracking-tight transition-all active:scale-[0.98] ${

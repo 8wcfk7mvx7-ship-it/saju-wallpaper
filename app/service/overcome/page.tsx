@@ -35,7 +35,7 @@ export default function OvercomePage() {
       const result = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
         birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-        name: "", gender: form.gender, birthPlace: form.city || "서울", style: "auto",
+        name: form.name || "사용자", gender: form.gender, birthPlace: form.city || "서울", style: "auto",
         productType: "report", useJajasi: form.useJajasi,
       });
       const orderId = `overcome_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju } from "@/lib/saju";
-import { loadSajuData } from "@/lib/savedSaju";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import BirthTimePicker, { BirthTimeValue } from "@/components/BirthTimePicker";
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+
 
 export const dynamic = "force-dynamic";
 
@@ -149,18 +149,12 @@ function findCityElement(city: string): string | null {
 }
 
 type Step = "splash" | "form" | "loading" | "result";
-type CalType = "solar" | "lunar";
 
 export default function PlacePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
   const [name, setName] = useState("");
-  const [birthYear, setBirthYear] = useState(1990);
-  const [birthMonth, setBirthMonth] = useState(0);
-  const [birthDay, setBirthDay] = useState(0);
-  const [calType, setCalType] = useState<CalType>("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: null, minute: null, unknown: true, useJajasi: false });
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [birthCity, setBirthCity] = useState("");
   const [currentCity, setCurrentCity] = useState("");
   const [yongshinEl, setYongshinEl] = useState("토");
@@ -170,36 +164,26 @@ export default function PlacePage() {
   const [counter] = useState(() => Math.floor(Math.random() * 120) + 87);
   const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 18000);
 
-  useEffect(() => {
-    const saved = loadSajuData();
-    if (saved && saved.name !== "테스트") {
-      setName(saved.name || "");
-      if (saved.birthYear) setBirthYear(saved.birthYear);
-      if (saved.birthMonth) setBirthMonth(saved.birthMonth);
-      if (saved.birthDay) setBirthDay(saved.birthDay);
-    }
-  }, []);
-
   async function handleFormSubmit() {
     if (!name.trim()) {
       setFormError("이름을 입력해주세요.");
       return;
     }
-    if (!birthYear || !birthMonth || !birthDay) {
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) {
       setFormError("생년월일을 모두 입력해주세요.");
       return;
     }
     setFormError("");
     setStep("loading");
 
-    let fy = birthYear, fm = birthMonth, fd = birthDay;
+    let fy = Number(form.birthYear), fm = Number(form.birthMonth), fd = Number(form.birthDay);
 
-    if (calType === "lunar") {
+    if (form.calendarType === "lunar") {
       try {
         // @ts-ignore
         const KLC = (await import("korean-lunar-calendar")).default;
         const cal = new KLC();
-        cal.setLunarDate(fy, fm, fd, isLeapMonth);
+        cal.setLunarDate(fy, fm, fd, form.isLeapMonth);
         const sol = cal.getSolarCalendar();
         if (!sol?.year) throw new Error("변환 실패");
         fy = sol.year; fm = sol.month; fd = sol.day;
@@ -213,10 +197,10 @@ export default function PlacePage() {
     try {
       const r = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
-        birthHour: birthTime.unknown ? null : birthTime.hour,
-        birthMinute: birthTime.unknown ? null : birthTime.minute,
-        name: name || "나", gender: "female", birthPlace: "서울",
-        style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
+        birthHour: form.birthHour,
+        birthMinute: form.birthMinute,
+        name: name || "나", gender: form.gender, birthPlace: form.city || "서울",
+        style: "auto", productType: "report", useJajasi: form.useJajasi,
       });
       const el = r.yongshin.yongshin || r.lacking[0] || "토";
       setYongshinEl(el);
@@ -229,6 +213,7 @@ export default function PlacePage() {
     setCurrentCityEl(findCityElement(currentCity));
   }
 
+
   if (step === "loading") return (
     <AnalysisLoading subject={`${name ? name + "님의 " : ""}운명의 도시`} onDone={() => setStep("result")} />
   );
@@ -238,12 +223,6 @@ export default function PlacePage() {
   const worldData = WORLD_BY_ELEMENT[displayEl];
   const dirData = DIRECTION_BY_ELEMENT[displayEl];
   const elInfo = ELEMENT_LABELS[displayEl];
-
-  const yearOptions = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
-  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-
-  const selectCls = "w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm appearance-none focus:outline-none focus:border-amber-500/50";
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white" style={{ animation: "fadeIn 0.45s ease-out" }}>
@@ -373,49 +352,7 @@ export default function PlacePage() {
               />
             </div>
 
-            {/* 양력/음력 */}
-            <div>
-              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">양력 / 음력</label>
-              <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                {(["solar", "lunar"] as CalType[]).map(t => (
-                  <button key={t} type="button" onClick={() => { setCalType(t); setIsLeapMonth(false); }}
-                    className={`flex-1 py-2.5 text-sm font-bold transition ${calType === t ? "bg-amber-600 text-white" : "text-white/40 hover:text-white/70"}`}>
-                    {t === "solar" ? "양력" : "음력"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 생년월일 */}
-            <div>
-              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">생년월일</label>
-              <div className="grid grid-cols-3 gap-2">
-                <select value={birthYear} onChange={e => setBirthYear(Number(e.target.value))} className={selectCls}>
-                  <option value={0}>년도</option>
-                  {yearOptions.map(y => <option key={y} value={y}>{y}년</option>)}
-                </select>
-                <select value={birthMonth} onChange={e => setBirthMonth(Number(e.target.value))} className={selectCls}>
-                  <option value={0}>월</option>
-                  {monthOptions.map(m => <option key={m} value={m}>{m}월</option>)}
-                </select>
-                <select value={birthDay} onChange={e => setBirthDay(Number(e.target.value))} className={selectCls}>
-                  <option value={0}>일</option>
-                  {dayOptions.map(d => <option key={d} value={d}>{d}일</option>)}
-                </select>
-              </div>
-              {calType === "lunar" && (
-                <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-amber-500" />
-                  <span className="text-xs text-white/45">윤달에 태어난 경우 체크</span>
-                </label>
-              )}
-            </div>
-
-            {/* 출생 시간 */}
-            <div>
-              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">태어난 시간 (야자시·조자시 포함)</label>
-              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="violet" />
-            </div>
+            <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             {/* 현재 사는 도시 */}
             <div>

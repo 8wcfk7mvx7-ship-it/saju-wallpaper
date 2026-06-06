@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
   detectSamhapBanghap, analyzeSiksang, analyzeSipseongPatterns, detectChunganChung,
@@ -440,11 +440,11 @@ function OhaengDonut({ scores, total }: { scores: { 목: number; 화: number; �
 }
 
 function ResultView({
-  result, form, birthTime, birthYear, birthMonth, birthDay, onReset,
+  result, form, birthHour, birthYear, birthMonth, birthDay, onReset,
 }: {
   result: SajuResult;
   form: { name: string; gender: string; birthPlace: string };
-  birthTime: BirthTimeValue;
+  birthHour: number | null;
   birthYear: number; birthMonth: number; birthDay: number;
   onReset: () => void;
 }) {
@@ -505,7 +505,7 @@ function ResultView({
           <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#60a5fa" }}>무료 만세력 · 사주팔자 완전분석</p>
           <h1 className="text-2xl font-black text-white">{form.name || "사주"}님의 팔자</h1>
           <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-            {birthYear}년 {birthMonth}월 {birthDay}일 {birthTime.unknown ? "시간 모름" : `${birthTime.hour}시`}
+            {birthYear}년 {birthMonth}월 {birthDay}일 {birthHour === null ? "시간 모름" : `${birthHour}시`}
             {form.birthPlace ? ` · ${form.birthPlace}` : ""}
           </p>
         </div>
@@ -1157,40 +1157,32 @@ function ResultView({
 
 // ─── 메인 페이지 ──────────────────────────────────────────────────────────────
 export default function ManseryeokPage() {
-  const [form, setForm] = useState({ name: "", gender: "female", birthPlace: "" });
-  const [birthYear, setBirthYear] = useState("");
-  const [birthMonth, setBirthMonth] = useState("");
-  const [birthDay, setBirthDay] = useState("");
-  const [calendarType, setCalendarType] = useState<CalendarType>("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
-  const [birthTime, setBirthTime] = useState<BirthTimeValue>({ hour: 12, minute: 30, unknown: false, useJajasi: false });
+  const [birthForm, setBirthForm] = useState<BirthFormData>(defaultBirthData("female"));
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState<"male" | "female">("female");
   const [result, setResult] = useState<SajuResult | null>(null);
-  const [calcInput, setCalcInput] = useState<{ year: number; month: number; day: number } | null>(null);
+  const [calcInput, setCalcInput] = useState<{ year: number; month: number; day: number; birthHour: number | null } | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const yearOpts  = YEARS.map(y => ({ v: String(y), label: String(y) }));
-  const monthOpts = MONTHS.map(m => ({ v: String(m), label: String(m) }));
-  const dayOpts   = DAYS.map(d => ({ v: String(d), label: String(d) }));
 
   const handleSubmit = async (e: import("react").FormEvent) => {
     e.preventDefault();
-    if (!birthYear || !birthMonth || !birthDay) {
+    if (!birthForm.birthYear || !birthForm.birthMonth || !birthForm.birthDay) {
       alert("생년월일을 모두 선택해주세요.");
       return;
     }
     setLoading(true);
     await new Promise(r => setTimeout(r, 1400));
 
-    let year  = parseInt(birthYear);
-    let month = parseInt(birthMonth);
-    let day   = parseInt(birthDay);
+    let year  = Number(birthForm.birthYear);
+    let month = Number(birthForm.birthMonth);
+    let day   = Number(birthForm.birthDay);
 
-    if (calendarType === "lunar") {
+    if (birthForm.calendarType === "lunar") {
       try {
         // @ts-ignore
         const KoreanLunarCalendar = (await import("korean-lunar-calendar")).default;
         const cal = new KoreanLunarCalendar();
-        cal.setLunarDate(year, month, day, isLeapMonth);
+        cal.setLunarDate(year, month, day, birthForm.isLeapMonth);
         const solar = cal.getSolarCalendar();
         if (!solar?.year) throw new Error();
         year = solar.year; month = solar.month; day = solar.day;
@@ -1203,17 +1195,17 @@ export default function ManseryeokPage() {
 
     const r = analyzeSaju({
       birthYear: year, birthMonth: month, birthDay: day,
-      birthHour: birthTime.unknown ? null : (birthTime.hour ?? null),
-      birthMinute: birthTime.unknown ? null : (birthTime.minute ?? null),
-      name: form.name || "사주",
-      gender: form.gender as "male" | "female",
-      birthPlace: form.birthPlace || "서울",
+      birthHour: birthForm.birthHour,
+      birthMinute: birthForm.birthMinute,
+      name: name || "사주",
+      gender: birthForm.gender,
+      birthPlace: birthForm.city || "서울",
       style: "auto",
       productType: "report",
-      useJajasi: birthTime.useJajasi,
+      useJajasi: birthForm.useJajasi,
     });
 
-    setCalcInput({ year, month, day });
+    setCalcInput({ year, month, day, birthHour: birthForm.birthHour });
     setResult(r);
     setLoading(false);
   };
@@ -1241,8 +1233,8 @@ export default function ManseryeokPage() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <ResultView
           result={result}
-          form={form}
-          birthTime={birthTime}
+          form={{ name, gender: birthForm.gender, birthPlace: birthForm.city || "서울" }}
+          birthHour={calcInput.birthHour}
           birthYear={calcInput.year}
           birthMonth={calcInput.month}
           birthDay={calcInput.day}
@@ -1326,78 +1318,13 @@ export default function ManseryeokPage() {
             {/* 이름 */}
             <div>
               <label className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: "#a78bfa" }}>이름 <span className="text-xs font-normal normal-case" style={{ color: "rgba(255,255,255,0.3)" }}>(선택)</span></label>
-              <input type="text" placeholder="홍길동" value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
+              <input type="text" placeholder="홍길동" value={name}
+                onChange={e => setName(e.target.value)}
                 className="w-full rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none"
                 style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)", animation: "inputGlow2 3s ease-in-out infinite", transition: "border-color 0.3s" }} />
             </div>
 
-            {/* 성별 */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: "#a78bfa" }}>성별</label>
-              <div className="flex gap-3">
-                {[{ v: "female", l: "👩 여성" }, { v: "male", l: "👨 남성" }].map(g => (
-                  <button key={g.v} type="button" onClick={() => setForm({ ...form, gender: g.v })}
-                    className="flex-1 py-3 rounded-xl text-sm font-bold transition-all"
-                    style={{
-                      background: form.gender === g.v ? "rgba(139,92,246,0.3)" : "rgba(255,255,255,0.04)",
-                      border: form.gender === g.v ? "1.5px solid rgba(167,139,250,0.7)" : "1px solid rgba(255,255,255,0.09)",
-                      color: form.gender === g.v ? "#c4b5fd" : "rgba(255,255,255,0.45)",
-                      boxShadow: form.gender === g.v ? "0 0 20px rgba(139,92,246,0.35)" : "none",
-                    }}>
-                    {g.l}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 생년월일 */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-black uppercase tracking-widest" style={{ color: "#a78bfa" }}>생년월일</label>
-                <div className="flex rounded-lg overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                  {(["solar","lunar"] as CalendarType[]).map(type => (
-                    <button key={type} type="button"
-                      onClick={() => { setCalendarType(type); setIsLeapMonth(false); setBirthMonth(""); setBirthDay(""); }}
-                      className="px-4 py-1.5 text-xs font-bold transition"
-                      style={{ background: calendarType === type ? "rgba(139,92,246,0.35)" : "transparent", color: calendarType === type ? "#c4b5fd" : "rgba(255,255,255,0.4)" }}>
-                      {type === "solar" ? "양력" : "음력"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mb-3">
-                <Dropdown value={birthYear} options={yearOpts} onChange={setBirthYear} placeholder="연도 선택" suffix="년" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Dropdown value={birthMonth} options={monthOpts} onChange={setBirthMonth} placeholder="월 선택" suffix="월" />
-                <Dropdown value={birthDay}   options={dayOpts}   onChange={setBirthDay}   placeholder="일 선택" suffix="일" />
-              </div>
-              {calendarType === "lunar" && (
-                <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="w-4 h-4 rounded accent-violet-500" />
-                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>윤달에 태어난 경우 체크</span>
-                </label>
-              )}
-            </div>
-
-            {/* 태어난 시간 */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-3" style={{ color: "#a78bfa" }}>태어난 시간</label>
-              <BirthTimePicker value={birthTime} onChange={setBirthTime} accent="indigo" />
-            </div>
-
-            {/* 태어난 도시 */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: "#a78bfa" }}>
-                태어난 도시
-                <span className="ml-2 text-xs font-normal normal-case" style={{ color: "rgba(255,255,255,0.3)" }}>경도 보정에 사용됩니다</span>
-              </label>
-              <input type="text" placeholder="서울 / 부산 / 대구 / 뉴욕..." value={form.birthPlace}
-                onChange={e => setForm({ ...form, birthPlace: e.target.value })}
-                className="w-full rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none"
-                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)", animation: "inputGlow2 3.5s ease-in-out infinite 1s", transition: "border-color 0.3s" }} />
-            </div>
+            <BirthInputForm value={birthForm} onChange={setBirthForm} accent="#7c3aed" />
 
             <button type="submit"
               className="w-full py-5 rounded-2xl font-black text-lg transition-all active:scale-[0.97]"
