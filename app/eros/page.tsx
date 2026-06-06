@@ -192,9 +192,9 @@ const SEDUCTION_TIPS: Record<string, { female: string[]; male: string[] }> = {
 
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
-  { min: 81, grade: "S", label: "본능형", color: "#f43f5e", bg: "rgba(244,63,94,0.15)", border: "rgba(244,63,94,0.35)", desc: "치명적인 도화 기운의 소유자. 의도하지 않아도 이성이 먼저 다가옵니다.", oneliner: "근처에 있기만 해도 주변 이성이 흔들립니다." },
-  { min: 61, grade: "A", label: "매혹형", color: "#ec4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.30)", desc: "강한 이성 매력을 타고났습니다. 노력하지 않아도 자연스럽게 끌립니다.", oneliner: "이성이 먼저 연락하는 타입입니다." },
-  { min: 41, grade: "B", label: "감성형", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.25)", desc: "은근하고 깊은 매력입니다. 처음엔 몰랐다가 시간이 지나면서 중독됩니다.", oneliner: "가까워질수록 빠져드는 타입입니다." },
+  { min: 86, grade: "S", label: "본능형", color: "#f43f5e", bg: "rgba(244,63,94,0.15)", border: "rgba(244,63,94,0.35)", desc: "치명적인 도화 기운의 소유자. 의도하지 않아도 이성이 먼저 다가옵니다.", oneliner: "근처에 있기만 해도 주변 이성이 흔들립니다." },
+  { min: 71, grade: "A", label: "매혹형", color: "#ec4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.30)", desc: "강한 이성 매력을 타고났습니다. 노력하지 않아도 자연스럽게 끌립니다.", oneliner: "이성이 먼저 연락하는 타입입니다." },
+  { min: 46, grade: "B", label: "감성형", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.25)", desc: "은근하고 깊은 매력입니다. 처음엔 몰랐다가 시간이 지나면서 중독됩니다.", oneliner: "가까워질수록 빠져드는 타입입니다." },
   { min: 21, grade: "C", label: "은은형", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.22)", desc: "도화 기운보다는 인격과 내면에서 매력이 나옵니다.", oneliner: "알면 알수록 좋아지는 타입입니다." },
   { min: 0,  grade: "D", label: "지성형", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)", desc: "타고난 도화 기운은 약하지만, 실력과 능력으로 매력을 만드는 타입입니다.", oneliner: "잘될수록 더 매력적으로 보이는 타입입니다." },
 ];
@@ -223,7 +223,7 @@ function ErosContent() {
       birthYear: parseInt(year), birthMonth: parseInt(month), birthDay: parseInt(day),
       birthHour: h, birthMinute: null,
       name: "나", gender,
-      birthPlace: "서울", style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
+      birthPlace: "", style: "auto", productType: "report", useJajasi: birthTime.useJajasi,
     });
     setStep("loading");
   }
@@ -345,6 +345,19 @@ function ErosContent() {
   const hasMokYok = result.pillarsDetail.day.uunseong === "목욕";
   const haHwa     = result.dominant.includes("화");
 
+  // 음간(을·정·기·신·계) = 음기 강함
+  const 음간목록 = ["을","정","기","신","계"];
+  const ilganForScore = result.pillarsDetail.day.cg;
+  const is음간 = 음간목록.includes(ilganForScore);
+  // 수기운 점수: 수 오행 포함 기둥 수 (임·계 천간, 자·해 지지 포함)
+  const 수기운천간 = ["임","계"];
+  const 수기운지지 = ["자","해","축"];
+  const pd = result.pillarsDetail;
+  const 수기운기둥수 = [pd.year, pd.month, pd.day, pd.time].filter(p =>
+    수기운천간.includes(p.cg) || 수기운지지.includes(p.jj)
+  ).length;
+  const has수기운강 = 수기운기둥수 >= 2 || result.dominant.includes("수");
+
   let rawScore = 0;
   if (has홍염)   rawScore += 30;
   if (has진도화) rawScore += 25;
@@ -352,6 +365,11 @@ function ErosContent() {
   if (hasMokYok) rawScore += 25;
   if (has역마)   rawScore += 10;
   if (haHwa)     rawScore += 10;
+  // 여성: 수기운·음간·음기 보너스 (명기력)
+  if (gender === "female") {
+    if (has수기운강) rawScore += 15;
+    if (is음간)      rawScore += 10;
+  }
   const score = Math.min(rawScore, 100);
 
   const grade  = getGrade(score);
@@ -459,6 +477,18 @@ function ErosContent() {
             <div className="mt-3 bg-rose-950/30 border border-rose-700/30 rounded-xl px-4 py-3">
               <p className="text-xs text-rose-300 font-bold mb-1">일지 목욕(沐浴) — 특별 분석</p>
               <p className="text-xs text-gray-400">12운성 중 감각과 관능이 가장 강한 위치. {gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
+            </div>
+          )}
+          {gender === "female" && has수기운강 && (
+            <div className="mt-3 bg-blue-950/30 border border-blue-700/30 rounded-xl px-4 py-3">
+              <p className="text-xs text-blue-300 font-bold mb-1">수기운(水氣運) — 명기력(命氣力) 강화</p>
+              <p className="text-xs text-gray-400">수(水)는 흡인·수용·생식의 기운입니다. 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있습니다. 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다.</p>
+            </div>
+          )}
+          {gender === "female" && is음간 && (
+            <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
+              <p className="text-xs text-purple-300 font-bold mb-1">음간(陰干) — 음기(陰氣) 집중형</p>
+              <p className="text-xs text-gray-400">음간 일간은 수용·집중·흡수의 기운이 강합니다. 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어, 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다.</p>
             </div>
           )}
         </div>

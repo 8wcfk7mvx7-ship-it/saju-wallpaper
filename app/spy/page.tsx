@@ -391,6 +391,21 @@ function SpyContent() {
     편인: { keyword: "독립형", desc: "자유롭고 독창적입니다. 비밀주의적이며 서운함이 쌓이면 조용히 사라집니다.", warning: "감정을 쉽게 표현 안 해 상대가 답답해함. 잠수 주의.", color: "#94a3b8" },
   };
 
+  // ── 일간별 이상형·끌리는 이유 ──────────────────────────────────────────────
+  const IDEAL_TYPE: Record<string, { type: string; why: string; notType: string }> = {
+    갑: { type: "나를 인정해주고 함께 성장하는 파트너. 능력 있고 독립적인 사람.", why: "강인하고 추진력 있는 모습. 리더십과 자기 기준이 확실한 사람.", notType: "지나치게 의존적이거나 목표 없이 흘러가는 사람은 매력을 못 느낍니다." },
+    을: { type: "따뜻하고 나를 감싸주는 사람. 감성적이고 섬세한 파트너.", why: "부드럽고 유연하게 맞춰주는 모습. 덩굴처럼 포근하게 기대게 하는 에너지.", notType: "너무 딱딱하거나 냉정한 사람은 힘듭니다." },
+    병: { type: "에너지 넘치고 솔직한 파트너. 밝고 활기 있는 사람.", why: "태양 같은 존재감. 주변을 환하게 만드는 사람.", notType: "소극적이고 어두운 분위기는 오래 곁에 있기 어렵습니다." },
+    정: { type: "감성 깊고 나를 진심으로 이해해주는 사람.", why: "촛불 같은 깊고 은은한 따뜻함. 마음이 연결된다는 느낌.", notType: "감정 교감이 없는 건조한 관계는 금방 식습니다." },
+    무: { type: "안정감 있고 신뢰할 수 있는 파트너. 가정적인 사람.", why: "든든하고 믿음직한 존재감. 흔들리지 않는 사람.", notType: "자유분방하고 들뜬 사람과는 장기 관계가 힘듭니다." },
+    기: { type: "꼼꼼하고 세심하게 챙겨주는 사람. 나를 잘 알아봐주는 파트너.", why: "섬세하게 맞춰주는 능력. 알아서 챙겨주는 세심함.", notType: "무뚝뚝하고 배려 없는 사람은 힘듭니다." },
+    경: { type: "원칙 있고 의리 강한 파트너. 실력 있고 단단한 사람.", why: "금속처럼 반짝이는 카리스마. 강인하고 멋있는 모습.", notType: "흐리멍덩하거나 결단력 없는 사람은 답답합니다." },
+    신: { type: "고급스럽고 섬세한 파트너. 품격 있는 사람.", why: "서리처럼 차갑고 고급스러운 매력. 자기 관리 철저한 모습.", notType: "지저분하거나 기준이 낮은 사람은 끌리지 않습니다." },
+    임: { type: "자유롭고 신비로운 파트너. 깊고 넓은 세계관을 가진 사람.", why: "물처럼 자유롭고 깊은 에너지. 끝을 알 수 없는 매력.", notType: "좁은 세계에 갇힌 사람과는 숨이 막힙니다." },
+    계: { type: "감성적이고 내 마음을 알아주는 파트너. 예민하고 섬세한 사람.", why: "안개처럼 스며드는 부드러운 에너지. 감성적 공감 능력.", notType: "무감각하고 둔한 사람과는 연결이 안 됩니다." },
+  };
+  const idealData = IDEAL_TYPE[result.pillarsDetail.day.cg] ?? IDEAL_TYPE["무"];
+
   const hasSinsal = (name: string) => result.sinsalList.some(s => s.name === name);
   const has도화   = hasSinsal("도화살");
   const has홍염   = hasSinsal("홍염살");
@@ -642,6 +657,47 @@ function SpyContent() {
               </div>
             );
           })}
+        </div>
+
+        {/* 이상형 · 끌리는 이유 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">이 사람의 진짜 이상형</p>
+          <div className="space-y-3">
+            <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
+              <p className="text-xs text-rose-400 font-semibold mb-1">이상형</p>
+              <p className="text-sm text-gray-200 leading-relaxed">{idealData.type}</p>
+            </div>
+            <div className="bg-white/5 rounded-xl px-4 py-3">
+              <p className="text-xs text-gray-500 font-semibold mb-1">이 사람이 상대에게 끌리는 이유</p>
+              <p className="text-sm text-gray-300 leading-relaxed">{idealData.why}</p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/8 rounded-xl px-4 py-3">
+              <p className="text-xs text-gray-500 font-semibold mb-1">매력 못 느끼는 유형</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{idealData.notType}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 이 사람이 나를 좋아할 수 있는 이유 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">사주적으로 나를 좋아하는 이유</p>
+          <p className="text-xs text-gray-600 mb-3">일지 십성(일지 {result.pillarsDetail.day.sipseongJj}) 기반</p>
+          {(() => {
+            const ss = result.pillarsDetail.day.sipseongJj;
+            const WHY_LIKE: Record<string, string> = {
+              비견: "대등하게 맞서는 당신의 자존심과 독립심이 이 사람을 자극합니다. 질 수 없다는 본능이 끌림으로 이어집니다.",
+              겁재: "당신의 에너지와 매력이 이 사람의 소유욕을 자극합니다. 가지고 싶어지는 존재로 보입니다.",
+              식신: "당신의 따뜻함과 여유가 이 사람을 편하게 만듭니다. 옆에 있으면 행복하다고 느낍니다.",
+              상관: "당신의 자유로움과 독창성이 이 사람을 매혹합니다. 예측불허한 매력에 빠져듭니다.",
+              정재: "당신의 안정감과 신뢰감이 이 사람이 원하는 파트너상과 맞습니다.",
+              편재: "당신의 매력과 자유로움이 이 사람을 설레게 합니다. 잡고 싶은 존재로 느껴집니다.",
+              정관: "당신의 원칙과 품격이 이 사람이 추구하는 파트너와 일치합니다.",
+              편관: "당신의 강인함과 카리스마가 이 사람의 지배 본능을 자극합니다.",
+              정인: "당신의 지적 깊이와 포용력이 이 사람을 안심시킵니다. 기대고 싶어집니다.",
+              편인: "당신의 신비로움과 독립성이 이 사람의 호기심을 끊임없이 자극합니다.",
+            };
+            return <p className="text-sm text-gray-200 leading-relaxed">{WHY_LIKE[ss] ?? "상대의 일지 십성 에너지가 당신과 공명합니다."}</p>;
+          })()}
         </div>
 
         {/* 면책 고지 */}

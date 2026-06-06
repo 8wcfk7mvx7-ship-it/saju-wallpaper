@@ -43,6 +43,23 @@ function calcSewoonForDaewoon(ilgan: string, yearStart: number) {
   });
 }
 
+// ─── 월건 계산 (년간 기준 월주 천간지지) ─────────────────────────────────────
+// 갑/기년=병인 시작, 을/경=무인, 병/신=경인, 정/임=임인, 무/계=갑인
+const WOLJEON_CG_START: Record<string, number> = {
+  갑:2, 기:2, 을:4, 경:4, 병:6, 신:6, 정:8, 임:8, 무:0, 계:0,
+};
+// 월지: 1월=인(index 2), 2=묘(3), 3=진(4), 4=사(5), 5=오(6), 6=미(7), 7=신(8), 8=유(9), 9=술(10), 10=해(11), 11=자(0), 12=축(1)
+const MONTH_JJ_IDX = [2,3,4,5,6,7,8,9,10,11,0,1]; // 1월~12월
+const CHEONGAN_LIST = ["갑","을","병","정","무","기","경","신","임","계"];
+const JIJI_LIST = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+function getMonthPillarForYear(yearCg: string, month: number): { cg: string; jj: string } {
+  // month: 1-12
+  const startCgIdx = WOLJEON_CG_START[yearCg] ?? 0;
+  const cgIdx = (startCgIdx + (month - 1)) % 10;
+  const jjIdx = MONTH_JJ_IDX[month - 1];
+  return { cg: CHEONGAN_LIST[cgIdx], jj: JIJI_LIST[jjIdx] };
+}
+
 // ─── 대운표 + 세운표 컴포넌트 ─────────────────────────────────────────────────
 function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
   daewoon: ReturnType<typeof calcDaewoon>;
@@ -50,6 +67,7 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
   birthYear: number;
 }) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [openSewoonYear, setOpenSewoonYear] = useState<number | null>(null);
   const DAEWOON_LABEL = ["유아기","아동기","청소년기","청년기","장년기","중년기","중장년기","노년기"];
   const nowYear = new Date().getFullYear();
 
@@ -109,8 +127,8 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
                   {/* 십성 + 운성 */}
                   <div className="flex-1">
                     <div className="flex flex-wrap gap-1 mb-1">
-                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.12)", color: sipseongColor(p.sipseongCg) }}>{p.sipseongCg}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.08)", color: sipseongColor(p.sipseongJj) }}>{p.sipseongJj}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.12)", color: sipseongColorByIlgan(ilgan, p.sipseongCg) }}>{p.sipseongCg}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: "rgba(167,139,250,0.08)", color: sipseongColorByIlgan(ilgan, p.sipseongJj) }}>{p.sipseongJj}</span>
                       <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.45)" }}>{p.uunseong}</span>
                     </div>
                     <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{p.yearStart}~{p.yearStart + 9}년</p>
@@ -135,30 +153,65 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
                       const swJiEl = jijiElement(sw.jj);
                       const swCgStyle = EL_STYLE[swCgEl];
                       const swJiStyle = EL_STYLE[swJiEl];
+                      const isSwOpen = openSewoonYear === sw.year;
                       return (
-                        <div key={sw.year} className="flex items-center gap-3 px-4 py-2.5"
-                          style={{ background: sw.isCurrent ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.01)" }}>
-                          {/* 연도 */}
-                          <div className="w-12 shrink-0 text-center">
-                            {sw.isCurrent && <span className="text-[8px] block font-black mb-0.5" style={{ color: "#fbbf24" }}>올해</span>}
-                            <span className="text-sm font-black" style={{ color: sw.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.6)" }}>{sw.year}</span>
-                          </div>
-                          {/* 천간 */}
-                          <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swCgStyle.bg, border: `1px solid ${swCgStyle.border}` }}>
-                            <span className="text-sm font-black" style={{ color: swCgStyle.text }}>{sw.cg}</span>
-                          </div>
-                          {/* 지지 */}
-                          <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swJiStyle.bg, border: `1px solid ${swJiStyle.border}` }}>
-                            <span className="text-sm font-black" style={{ color: swJiStyle.text }}>{sw.jj}</span>
-                          </div>
-                          {/* 십성 + 운성 */}
-                          <div className="flex-1 flex flex-wrap gap-1">
-                            <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColor(sw.sipseongCg), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongCg}</span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColor(sw.sipseongJj), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongJj}</span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)" }}>{sw.uunseong}</span>
-                          </div>
-                          {/* 오행 */}
-                          <div className="text-[9px] shrink-0" style={{ color: swCgStyle.text }}>{swCgEl}</div>
+                        <div key={sw.year}>
+                          <button type="button" className="w-full text-left flex items-center gap-3 px-4 py-2.5 transition-all"
+                            onClick={() => setOpenSewoonYear(isSwOpen ? null : sw.year)}
+                            style={{ background: sw.isCurrent ? "rgba(251,191,36,0.06)" : isSwOpen ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.01)" }}>
+                            {/* 연도 */}
+                            <div className="w-12 shrink-0 text-center">
+                              {sw.isCurrent && <span className="text-[8px] block font-black mb-0.5" style={{ color: "#fbbf24" }}>올해</span>}
+                              <span className="text-sm font-black" style={{ color: sw.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.6)" }}>{sw.year}</span>
+                            </div>
+                            {/* 천간 */}
+                            <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swCgStyle.bg, border: `1px solid ${swCgStyle.border}` }}>
+                              <span className="text-sm font-black" style={{ color: swCgStyle.text }}>{sw.cg}</span>
+                            </div>
+                            {/* 지지 */}
+                            <div className="w-8 h-8 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: swJiStyle.bg, border: `1px solid ${swJiStyle.border}` }}>
+                              <span className="text-sm font-black" style={{ color: swJiStyle.text }}>{sw.jj}</span>
+                            </div>
+                            {/* 십성 + 운성 */}
+                            <div className="flex-1 flex flex-wrap gap-1">
+                              <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColorByIlgan(ilgan, sw.sipseongCg), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongCg}</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ color: sipseongColorByIlgan(ilgan, sw.sipseongJj), background: "rgba(0,0,0,0.2)" }}>{sw.sipseongJj}</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)" }}>{sw.uunseong}</span>
+                            </div>
+                            {/* 오행 + 펼침 */}
+                            <div className="flex items-center gap-1 shrink-0">
+                              <div className="text-[9px]" style={{ color: swCgStyle.text }}>{swCgEl}</div>
+                              <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{isSwOpen ? "▲" : "▼"}</span>
+                            </div>
+                          </button>
+                          {/* 월별 펼침 */}
+                          {isSwOpen && (
+                            <div className="ml-4 mb-2 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
+                              <div className="px-3 py-1.5 text-[9px] font-bold" style={{ background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.35)" }}>
+                                {sw.year}년 월별 운 (月運)
+                              </div>
+                              <div className="grid grid-cols-3 gap-0 divide-y divide-x" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+                                {Array.from({length:12},(_,mi)=>mi+1).map(mon => {
+                                  const mp = getMonthPillarForYear(sw.cg, mon);
+                                  const mCgEl = CHEONGAN_ELEMENT[mp.cg] || "토";
+                                  const mJjEl = jijiElement(mp.jj);
+                                  const mCgStyle = EL_STYLE[mCgEl];
+                                  const mJjStyle = EL_STYLE[mJjEl];
+                                  return (
+                                    <div key={mon} className="px-2 py-2 flex flex-col items-center gap-0.5" style={{ background: "rgba(255,255,255,0.01)" }}>
+                                      <span className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{mon}월</span>
+                                      <span className="text-xs font-black" style={{ color: mCgStyle.text }}>{mp.cg}</span>
+                                      <span className="text-xs font-black" style={{ color: mJjStyle.text }}>{mp.jj}</span>
+                                      <span className="text-[7px]" style={{ color: "rgba(255,255,255,0.2)" }}>{mCgEl}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <div className="px-3 py-1.5 text-[8px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                일운 상세는 추후 지원 예정
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -188,6 +241,31 @@ const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge
   금: { bg: "rgba(209,213,219,0.10)",text: "#d1d5db", border: "rgba(209,213,219,0.25)",badge: "rgba(209,213,219,0.15)" },
   수: { bg: "rgba(59,130,246,0.10)", text: "#60a5fa", border: "rgba(59,130,246,0.25)",  badge: "rgba(59,130,246,0.15)" },
 };
+// 오행 기반 십성 색상 체계 (일간 기준)
+const OHAENG_COLOR: Record<string, string> = {
+  목: "#22c55e", 화: "#ef4444", 토: "#f59e0b", 금: "#f8fafc", 수: "#94a3b8",
+};
+// 오행 생극 관계
+const OHAENG_GENERATES: Record<string, string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };
+const OHAENG_CONTROLS:  Record<string, string> = { 목:"토", 화:"금", 토:"수", 금:"목", 수:"화" };
+const OHAENG_GENERATED_BY: Record<string, string> = { 화:"목", 토:"화", 금:"토", 수:"금", 목:"수" };
+const OHAENG_CONTROLLED_BY: Record<string, string> = { 토:"목", 금:"화", 수:"토", 목:"금", 화:"수" };
+
+// 십성 → 오행 (일간 기준)
+function sipseongToOhaeng(ilgan: string, sipseong: string): string {
+  const ilEl = CHEONGAN_ELEMENT[ilgan] || "토";
+  if (!sipseong) return ilEl;
+  if (sipseong === "비견" || sipseong === "겁재") return ilEl;
+  if (sipseong === "식신" || sipseong === "상관") return OHAENG_GENERATES[ilEl] || ilEl;
+  if (sipseong === "편재" || sipseong === "정재") return OHAENG_CONTROLS[ilEl] || ilEl;
+  if (sipseong === "편관" || sipseong === "정관") return OHAENG_CONTROLLED_BY[ilEl] || ilEl;
+  if (sipseong === "편인" || sipseong === "정인") return OHAENG_GENERATED_BY[ilEl] || ilEl;
+  return ilEl;
+}
+function sipseongColorByIlgan(ilgan: string, sipseong: string): string {
+  return OHAENG_COLOR[sipseongToOhaeng(ilgan, sipseong)] || "#9ca3af";
+}
+// fallback for non-ilgan-context usages
 const SIPSEONG_COLOR: Record<string, string> = {
   비견:"#a78bfa", 겁재:"#c084fc", 식신:"#34d399", 상관:"#6ee7b7",
   편재:"#fbbf24", 정재:"#fde68a", 편관:"#f87171", 정관:"#fca5a5",
@@ -345,7 +423,7 @@ function ResultView({
                   <span className="text-2xl font-black" style={{ color: cgStyle.text }}>{d.cg}</span>
                   <span className="text-[10px] font-semibold" style={{ color: cgStyle.text }}>{cgEl}</span>
                   {d.sipseongCg && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColor(d.sipseongCg) }}>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColorByIlgan(ilgan, d.sipseongCg) }}>
                       {d.sipseongCg}
                     </span>
                   )}
@@ -355,7 +433,7 @@ function ResultView({
                   <span className="text-2xl font-black" style={{ color: jiStyle.text }}>{d.jj}</span>
                   <span className="text-[10px] font-semibold" style={{ color: jiStyle.text }}>{jiEl}</span>
                   {d.sipseongJj && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColor(d.sipseongJj) }}>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColorByIlgan(ilgan, d.sipseongJj) }}>
                       {d.sipseongJj}
                     </span>
                   )}

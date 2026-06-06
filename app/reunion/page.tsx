@@ -486,7 +486,7 @@ export default function ReunionPage() {
                   className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98] mb-2"
                   style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 6px 24px rgba(99,102,241,0.4)" }}
                 >
-                  🫐 블루베리 3,900개로 즉시 열기
+                  ⭐ 별조각 3,900개로 즉시 열기
                 </button>
               ) : (
                 <button

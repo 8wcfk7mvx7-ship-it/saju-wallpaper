@@ -52,7 +52,7 @@ function HotCompatPayContent() {
   function handleBlueberryPayment() {
     if (!agreed) { setError("이용약관에 동의해주세요."); return; }
     if (blueberries < BLUEBERRY_PRICE) {
-      setError(`블루베리가 부족합니다. 현재 ${blueberries.toLocaleString()}개 / 필요 ${BLUEBERRY_PRICE.toLocaleString()}개`);
+      setError(`별조각가 부족합니다. 현재 ${blueberries.toLocaleString()}개 / 필요 ${BLUEBERRY_PRICE.toLocaleString()}개`);
       return;
     }
     const newAmount = blueberries - BLUEBERRY_PRICE;
@@ -91,13 +91,13 @@ function HotCompatPayContent() {
           </ul>
         </div>
 
-        {/* 블루베리 현황 */}
+        {/* 별조각 현황 */}
         <div className="rounded-2xl p-4 mb-5" style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">🫐</span>
+              <span className="text-xl">⭐</span>
               <div>
-                <p className="text-xs" style={{ color: "#a78bfa" }}>내 블루베리</p>
+                <p className="text-xs" style={{ color: "#a78bfa" }}>내 별조각</p>
                 <p className="text-base font-black text-white">{blueberries.toLocaleString()}개</p>
               </div>
             </div>
@@ -133,7 +133,7 @@ function HotCompatPayContent() {
         )}
 
         <div className="space-y-2.5">
-          {/* 블루베리 결제 */}
+          {/* 별조각 결제 */}
           <button
             onClick={handleBlueberryPayment}
             disabled={loading || !agreed || !canAffordBlueberry}
@@ -144,7 +144,7 @@ function HotCompatPayContent() {
               boxShadow: canAffordBlueberry ? "0 6px 24px rgba(99,102,241,0.4)" : "none",
             }}
           >
-            🫐 블루베리 {BLUEBERRY_PRICE.toLocaleString()}개로 결제
+            ⭐ 별조각 {BLUEBERRY_PRICE.toLocaleString()}개로 결제
             {!canAffordBlueberry && <span className="text-xs ml-1 opacity-70">(부족)</span>}
           </button>
 
@@ -164,7 +164,7 @@ function HotCompatPayContent() {
               className="w-full py-3 rounded-2xl font-bold text-sm transition-all"
               style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", color: "#a78bfa" }}
             >
-              🫐 블루베리 충전하기
+              ⭐ 별조각 충전하기
             </button>
           )}
         </div>

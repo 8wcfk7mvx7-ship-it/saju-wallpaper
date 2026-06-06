@@ -642,7 +642,7 @@ export default function CalendarPage() {
                         }}
                         className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
-                        🫐 블루베리 990개로 즉시 열기
+                        ⭐ 별조각 990개로 즉시 열기
                       </button>
                     ) : (
                       <button onClick={handleUnlock}

@@ -144,7 +144,8 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   양인살:   {hanja:"羊刃殺", category:"unlucky",  desc:"강한 추진력이 있으나 충동적이고 사고·부상을 주의해야 합니다"},
   백호살:   {hanja:"白虎殺", category:"unlucky",  desc:"혈광지재(血光之災). 수술·사고·혈액 관련 질환을 주의하세요"},
   원진살:   {hanja:"怨嗔殺", category:"unlucky",  desc:"배우자·가까운 사람과 원망·갈등이 반복되기 쉽습니다"},
-  과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"배우자와의 인연이 약하거나 혼자 지내는 시간이 많습니다"},
+  과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"연애·결혼 시기가 늦거나 독신 경향이 강합니다. 영적 감수성이 뛰어나고 집중력이 강합니다. 여성이 강하게 작용합니다"},
+  평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"예상치 못한 변화와 이별의 기운입니다. 두부(頭部) 건강 주의. 관계에서 급작스러운 단절이 생길 수 있습니다"},
   고신살:   {hanja:"孤神殺", category:"unlucky",  desc:"고독하고 의지할 곳이 없는 기운입니다. 이별수가 있습니다"},
   공망:     {hanja:"空亡",   category:"unlucky",  desc:"해당 기둥의 기운이 비어 약해집니다. 해당 분야가 공허해질 수 있습니다"},
   천라지망: {hanja:"天羅地網",category:"unlucky", desc:"뜻하지 않은 구속·제약이 따릅니다 (천라=술해, 지망=진사)"},
@@ -1311,6 +1312,10 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   addSinsal('양인살', detailArr.filter(p => p.d.jj === YANGIN_JJ[ilgan]).map(p => p.label));
   // 과숙살
   addSinsal('과숙살', detailArr.filter(p => p.d.jj === getGwasukJj(yeonji)).map(p => p.label));
+  // 평두살: 년간이나 월간에 갑·경 + 일지가 자·오·묘·유
+  if ((pillarsDetail.year.cg === "갑" || pillarsDetail.year.cg === "경" || pillarsDetail.month.cg === "갑" || pillarsDetail.month.cg === "경") && ["자","오","묘","유"].includes(pillarsDetail.day.jj)) {
+    addSinsal("평두살", ["일"]);
+  }
   // 천라지망: 술+해(天羅), 진+사(地網)
   const jjSet = new Set(detailArr.map(p => p.d.jj));
   const hasCheonra = jjSet.has('술') && jjSet.has('해');
@@ -1407,14 +1412,14 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   }
 
   // === 삼형살(三刑殺) 및 형(刑) 신살 등록 ===
-  // 인사신 삼형(지세지형): 2개 이상이면 형살 성립
+  // 인사신 삼형(지세지형): 3개 모두 있어야 삼형 성립
   const inSaSinF = detailArr.filter(p => ["인","사","신"].includes(p.d.jj));
-  if (inSaSinF.length >= 2) {
+  if (inSaSinF.length >= 3) {
     addSinsal('인사신삼형', inSaSinF.map(p => p.label));
   }
-  // 축술미 삼형(무은지형): 2개 이상이면 형살 성립
+  // 축술미 삼형(무은지형): 3개 모두 있어야 삼형 성립
   const chukSulMiF = detailArr.filter(p => ["축","술","미"].includes(p.d.jj));
-  if (chukSulMiF.length >= 2) {
+  if (chukSulMiF.length >= 3) {
     addSinsal('축술미삼형', chukSulMiF.map(p => p.label));
   }
   // 자묘형(무례지형)
@@ -1493,7 +1498,7 @@ export const ILGAN_PERSONALITY: Record<string, { short: string; detail: string; 
   갑: {
     short: "갑목(甲木) — 곧게 뻗는 큰 나무",
     keyword: "추진력·목표지향·리더십",
-    detail: "명리학적으로 '소년'의 기운입니다. 일단 저질러 놓고 보는 실행력이 있습니다. '나 안 건들면 너도 안 건들여' 기질로 자유를 중시하고 권위를 싫어합니다. 실패해도 그러려니 하고 다시 꿈을 꿉니다. 폼을 중시하고 자기개발에 집착합니다. 겉으론 '상관없어'라도 머릿속은 빠르게 계산합니다. 재성이 土이므로 부동산·실물 자산에서 재물운이 강합니다.",
+    detail: "명리학적으로 '어린이'의 기운입니다. 일단 저질러 놓고 보는 실행력이 있습니다. '나 안 건들면 너도 안 건들여' 기질로 자유를 중시하고 권위를 싫어합니다. 실패해도 그러려니 하고 다시 꿈을 꿉니다. 폼을 중시하고 자기개발에 집착합니다. 겉으론 '상관없어'라도 머릿속은 빠르게 계산합니다. 재성이 土이므로 부동산·실물 자산에서 재물운이 강합니다.",
   },
   을: {
     short: "을목(乙木) — 유연한 넝쿨·풀",

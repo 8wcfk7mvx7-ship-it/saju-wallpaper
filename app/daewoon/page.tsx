@@ -844,7 +844,7 @@ export default function DaewoonPage() {
                   }}
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
                 >
-                  🫐 블루베리 {PRICE.toLocaleString()}개로 즉시 열기
+                  ⭐ 별조각 {PRICE.toLocaleString()}개로 즉시 열기
                 </button>
               ) : (
                 <button

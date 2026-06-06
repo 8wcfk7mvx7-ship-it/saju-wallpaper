@@ -32,7 +32,7 @@ const UI: Record<Lang, {
     bannerCta: "배경화면 만들기 →",
     catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "19금" },
     start: "시작",
-    charging: "블루베리 충전",
+    charging: "별조각 충전",
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -682,7 +682,7 @@ export default function MainPage() {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
-  // 블루베리 잔액
+  // 별조각 잔액
   const [blueberries, setBlueberries] = useState(0);
 
   const t = UI[lang];
@@ -777,7 +777,7 @@ export default function MainPage() {
               <span>📂</span>
               <span>보관함</span>
             </button>
-            {/* 블루베리 잔액/충전 — PC only */}
+            {/* 별조각 잔액/충전 — PC only */}
             <button
               onClick={() => router.push("/charge")}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
@@ -787,7 +787,7 @@ export default function MainPage() {
                 color: blueberries > 0 ? "#c4b5fd" : "rgba(255,255,255,0.45)",
               }}
             >
-              <span>🫐</span>
+              <span>⭐</span>
               <span>{blueberries > 0 ? blueberries.toLocaleString() : t.charging}</span>
             </button>
 
