@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 
-interface KakaoUser {
-  kakaoId: string;
+interface NaverUser {
+  naverId: string;
   nickname: string;
   profileImage: string | null;
   email: string | null;
+  isNewUser?: boolean;
 }
 
-function parseUser(): KakaoUser | null {
+function parseUser(): NaverUser | null {
   try {
     const match = document.cookie.split(";").find(c => c.trim().startsWith("sp_user="));
     if (!match) return null;
@@ -19,9 +20,9 @@ function parseUser(): KakaoUser | null {
   }
 }
 
-const KakaoIcon = ({ size = 20 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
-    <path d="M9 1.5C4.858 1.5 1.5 4.134 1.5 7.375c0 2.1 1.377 3.94 3.45 5.017l-.879 3.243a.281.281 0 00.432.3l3.87-2.565A8.9 8.9 0 009 13.25c4.142 0 7.5-2.634 7.5-5.875S13.142 1.5 9 1.5z" fill="#1A1A1A"/>
+const NaverIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
   </svg>
 );
 
@@ -31,7 +32,7 @@ interface KakaoLoginButtonProps {
 }
 
 export default function KakaoLoginButton({ redirectTo = "/", floating = false }: KakaoLoginButtonProps) {
-  const [user, setUser] = useState<KakaoUser | null>(null);
+  const [user, setUser] = useState<NaverUser | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,15 +49,33 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
 
   // ── 플로팅 모바일 CTA ────────────────────────────────────────────────────
   if (floating) {
-    if (user) return null;
+    if (user) {
+      return (
+        <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-2xl"
+          style={{ background: "rgba(3,199,90,0.1)", border: "1px solid rgba(3,199,90,0.25)" }}>
+          <div className="flex items-center gap-2">
+            {user.profileImage && (
+              <img src={user.profileImage} alt="" className="w-7 h-7 rounded-full object-cover" />
+            )}
+            <span className="text-sm font-bold text-white">
+              안녕하세요, {user.nickname || user.naverId}님!
+            </span>
+          </div>
+          <button onClick={logout} className="text-xs px-2.5 py-1 rounded-lg transition-colors"
+            style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }}>
+            로그아웃
+          </button>
+        </div>
+      );
+    }
     return (
       <a
-        href={`/api/auth/kakao?redirect=${encodeURIComponent(redirectTo)}`}
-        className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-[#1A1A1A] transition-all active:scale-[0.99] whitespace-nowrap overflow-hidden"
-        style={{ background: "#FEE500", boxShadow: "0 4px 20px rgba(254,229,0,0.3)" }}
+        href={`/api/auth/naver?redirect=${encodeURIComponent(redirectTo)}`}
+        className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-white transition-all active:scale-[0.99] whitespace-nowrap overflow-hidden"
+        style={{ background: "#03C75A", boxShadow: "0 4px 20px rgba(3,199,90,0.3)" }}
       >
-        <KakaoIcon size={20} />
-        <span className="text-[14px]">카카오톡으로 시작하기</span>
+        <NaverIcon size={20} />
+        <span className="text-[14px]">네이버로 시작하기</span>
       </a>
     );
   }
@@ -78,17 +97,18 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
 
   return (
     <a
-      href={`/api/auth/kakao?redirect=${encodeURIComponent(redirectTo)}`}
-      className="inline-flex items-center gap-1.5 bg-[#FEE500] hover:bg-[#F5DC00] text-[#1A1A1A] font-black text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap"
+      href={`/api/auth/naver?redirect=${encodeURIComponent(redirectTo)}`}
+      className="inline-flex items-center gap-1.5 text-white font-black text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap"
+      style={{ background: "#03C75A" }}
     >
-      <KakaoIcon size={16} />
-      <span>카카오톡으로 시작하기</span>
+      <NaverIcon size={16} />
+      <span>네이버로 시작하기</span>
     </a>
   );
 }
 
-export function useKakaoUser(): KakaoUser | null {
-  const [user, setUser] = useState<KakaoUser | null>(null);
+export function useKakaoUser(): NaverUser | null {
+  const [user, setUser] = useState<NaverUser | null>(null);
   useEffect(() => { setUser(parseUser()); }, []);
   return user;
 }

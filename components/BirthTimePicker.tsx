@@ -219,7 +219,7 @@ export default function BirthTimePicker({ value, onChange, accent = "indigo", si
       )}
 
       {/* 야자시·조자시 체크박스 */}
-      {!value.unknown && isJajaRange(value.hour) && (
+      {!value.unknown && (
         <button
           type="button"
           onClick={() => onChange({ ...value, useJajasi: !value.useJajasi })}

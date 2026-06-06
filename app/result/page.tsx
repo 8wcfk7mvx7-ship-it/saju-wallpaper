@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ILJU_60, ILGAN_PERSONALITY, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER
+  ILJU_60, ILGAN_PERSONALITY, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER,
+  detectSamhapBanghap
 } from "@/lib/saju";
 
 // ── 스크롤 페이드인 컴포넌트 ────────────────────────────────────────────────
@@ -1359,6 +1360,43 @@ export default function ResultPage() {
           </div>
           </FadeIn>
         )}
+
+        {/* ─── 삼합·방합 기질 분석 ─── */}
+        {(() => {
+          const samhapList = sajuResult.pillarsDetail ? detectSamhapBanghap(sajuResult.pillarsDetail) : [];
+          if (!samhapList || samhapList.length === 0) return null;
+          return (
+            <FadeIn delay={60}>
+            <div className="rounded-2xl overflow-hidden border border-white/10">
+              <div className="bg-gradient-to-br from-yellow-950/60 to-amber-950/40 px-6 pt-6 pb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="font-bold text-lg">✦ 삼합·방합 기질</h2>
+                  <span className="text-xs text-gray-500">지지의 합 에너지</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">사주 지지에 형성된 합국이 기질과 삶의 방향에 영향을 줍니다</p>
+              </div>
+              <div className="bg-black/20 px-6 py-5 space-y-3">
+                {samhapList.map((s: any, i: number) => {
+                  const badgeStyle =
+                    s.type === "삼합" ? { bg: "bg-amber-500/20", text: "text-amber-300", border: "border-amber-500/30" } :
+                    s.type === "반합" ? { bg: "bg-yellow-500/20", text: "text-yellow-300", border: "border-yellow-500/30" } :
+                    { bg: "bg-green-500/20", text: "text-green-300", border: "border-green-500/30" };
+                  return (
+                    <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold border ${badgeStyle.bg} ${badgeStyle.text} ${badgeStyle.border}`}>{s.type}</span>
+                        <span className="text-sm font-bold text-white">{s.name}</span>
+                        <span className="text-xs text-gray-500">{s.element} 기운</span>
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">{s.detail}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            </FadeIn>
+          );
+        })()}
 
         {/* ─── 쟁재 분석 ─── */}
         {hasJaengJae && (() => {

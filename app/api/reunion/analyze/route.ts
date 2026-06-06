@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
   "reunionTiming": "재회 최적 시기 — 언제(몇 월, 어떤 오행 흐름일 때) 접근하면 가장 효과적인지 구체적으로 (100-150자)",
   "strategy": "재회 전략 — 어떻게 접근해야 하는지, 첫 연락부터 만남까지 단계별로 구체적인 방법 (200-250자)",
   "danger": "절대 하면 안 되는 것 — 재회 시도 시 관계를 완전히 망치는 패턴, 피해야 할 행동 (100-150자)",
-  "compatibility": "두 사람의 근본 궁합 — 재회 후 장기적으로 어떻게 될지, 지속 가능성 (100-150자)"
+  "compatibility": "두 사람의 근본 궁합 — 재회 후 장기적으로 어떻게 될지, 지속 가능성 (100-150자)",
+  "afterReunionCompat": "재회 후 두 사람의 관계 — 사주 오행 기반으로 재회 후 어떤 감정이 오가고 어떤 갈등이 생길지, 행복한 결말인지 비극인지 (150-200자)"
 }`;
 
     const message = await client.messages.create({
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
         oneLineSummary: "분석 실패",
         currentHeart: "분석 결과를 불러오지 못했습니다.",
         reunionTiming: "다시 시도해주세요.",
-        strategy: "", danger: "", compatibility: "",
+        strategy: "", danger: "", compatibility: "", afterReunionCompat: "",
       };
     }
 

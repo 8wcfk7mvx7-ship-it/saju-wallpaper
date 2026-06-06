@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 const SERVICES = [
-  { emoji: "🔮", title: "사주 분석", desc: "오행·일간·용신 완전 분석", href: "/saju" },
-  { emoji: "🌊", title: "대운·세운", desc: "10년 단위 인생 흐름", href: "/daewoon" },
-  { emoji: "💑", title: "궁합 분석", desc: "원진·합충·오행 궁합", href: "/gunghap" },
-  { emoji: "✨", title: "매력 분석", desc: "일간별 타고난 매력", href: "/charm" },
-  { emoji: "🗺️", title: "도시 추천", desc: "용신 오행 맞춤 거주지", href: "/place" },
-  { emoji: "📈", title: "투자 성향", desc: "사주로 보는 투자 DNA", href: "/stock" },
+  { emoji: "🔮", title: "사주 분석", desc: "오행·일간·용신 완전 분석", href: "/service/saju" },
+  { emoji: "🌊", title: "대운·세운", desc: "10년 단위 인생 흐름", href: "/service/daewoon" },
+  { emoji: "💑", title: "궁합 분석", desc: "원진·합충·오행 궁합", href: "/service/gunghap" },
+  { emoji: "✨", title: "매력 분석", desc: "일간별 타고난 매력", href: "/service/charm" },
+  { emoji: "🗺️", title: "도시 추천", desc: "용신 오행 맞춤 거주지", href: "/service/place" },
+  { emoji: "📈", title: "투자 성향", desc: "사주로 보는 투자 DNA", href: "/service/stock" },
 ];
 
 const BOOKS = [
@@ -96,7 +96,7 @@ export default function PublishPage() {
             동양 철학의 언어로.
           </p>
           <button
-            onClick={() => router.push("/saju")}
+            onClick={() => router.push("/service/saju")}
             className="inline-flex items-center gap-3 font-black text-sm px-7 py-3.5 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, #c9a84c 0%, #d4a843 100%)",

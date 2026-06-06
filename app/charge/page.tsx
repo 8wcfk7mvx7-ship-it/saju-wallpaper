@@ -57,10 +57,10 @@ export default function ChargePage() {
 
         {/* 헤더 */}
         <div className="text-center mb-10">
-          <div className="text-5xl mb-4">🫐</div>
-          <h1 className="text-2xl font-black mb-1">블루베리 충전</h1>
+          <div className="text-5xl mb-4">⭐</div>
+          <h1 className="text-2xl font-black mb-1">별조각 충전</h1>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-            충전 시 <span style={{ color: "#a78bfa" }}>+10% 보너스</span> 블루베리 추가 지급
+            충전 시 <span style={{ color: "#a78bfa" }}>+10% 보너스</span> 별조각 추가 지급
           </p>
         </div>
 
@@ -69,9 +69,9 @@ export default function ChargePage() {
           style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)" }}>
           <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.45)" }}>현재 잔액</p>
           <p className="text-3xl font-black" style={{ color: "#a78bfa" }}>
-            🫐 {balance.toLocaleString()}
+            ⭐ {balance.toLocaleString()}
           </p>
-          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>블루베리</p>
+          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>별조각</p>
         </div>
 
         {/* 충전 성공 메시지 */}
@@ -79,7 +79,7 @@ export default function ChargePage() {
           <div className="rounded-2xl p-4 mb-6 text-center"
             style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)" }}>
             <p className="text-sm font-bold" style={{ color: "#6ee7b7" }}>
-              ✓ {justCharged.toLocaleString()} 블루베리 충전 완료!
+              ✓ {justCharged.toLocaleString()} 별조각 충전 완료!
             </p>
           </div>
         )}
@@ -114,14 +114,14 @@ export default function ChargePage() {
                     {tier.won.toLocaleString()}원
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-                    🫐 {tier.base.toLocaleString()} + 보너스 {tier.bonus.toLocaleString()}
+                    ⭐ {tier.base.toLocaleString()} + 보너스 {tier.bonus.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-black text-lg" style={{ color: "#a78bfa" }}>
                     {tier.total.toLocaleString()}
                   </p>
-                  <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>블루베리</p>
+                  <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>별조각</p>
                 </div>
               </div>
             </button>
@@ -164,13 +164,13 @@ export default function ChargePage() {
         </button>
 
         <p className="text-center text-xs mt-4" style={{ color: "rgba(255,255,255,0.25)" }}>
-          블루베리는 Summer Palace 서비스 내에서만 사용 가능합니다.<br />
+          별조각는 Summer Palace 서비스 내에서만 사용 가능합니다.<br />
           유효기간: 충전일로부터 1년 · 환불 불가
         </p>
 
-        {/* 블루베리 사용처 */}
+        {/* 별조각 사용처 */}
         <div className="mt-10">
-          <p className="text-xs font-bold mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>블루베리로 이용 가능한 서비스</p>
+          <p className="text-xs font-bold mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>별조각로 이용 가능한 서비스</p>
           <div className="grid grid-cols-2 gap-2">
             {[
               { emoji: "🔮", name: "오행 배경화면", price: "AI 유료" },

@@ -81,7 +81,7 @@ export default function MyPage() {
       lang: "ko",
     };
     sessionStorage.setItem("sajuForm", JSON.stringify(form));
-    router.push("/saju");
+    router.push("/service/saju");
   }
 
   function saveLabel(index: number) {
@@ -122,7 +122,7 @@ export default function MyPage() {
             )}
             <div>
               <p className="font-bold text-white text-sm">{user.nickname}님</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>카카오 로그인 완료</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>네이버 로그인 완료</p>
             </div>
             <button
               onClick={() => { document.cookie = "sp_user=; max-age=0; path=/"; router.refresh(); }}
@@ -133,25 +133,29 @@ export default function MyPage() {
           </div>
         ) : (
           <div className="mb-6 p-5 rounded-2xl text-center"
-            style={{ background: "rgba(254,229,0,0.05)", border: "1px solid rgba(254,229,0,0.15)" }}>
-            <p className="text-sm text-white mb-1 font-bold">카카오로 로그인하면</p>
+            style={{ background: "rgba(3,199,90,0.05)", border: "1px solid rgba(3,199,90,0.2)" }}>
+            <p className="text-sm text-white mb-1 font-bold">네이버로 로그인하면</p>
             <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
               저장한 사주와 결제 내역을 어디서든 볼 수 있어요
             </p>
-            <a href="/api/auth/kakao?redirect=/mypage"
-              className="inline-flex items-center gap-2 bg-[#FEE500] hover:bg-[#F5DC00] text-[#1A1A1A] font-bold text-sm px-5 py-2.5 rounded-xl transition-all">
-              카카오로 시작하기
+            <a href="/api/auth/naver?redirect=/mypage"
+              className="inline-flex items-center gap-2 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all"
+              style={{ background: "#03C75A" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
+              </svg>
+              네이버로 시작하기
             </a>
           </div>
         )}
 
-        {/* 블루베리 잔액 카드 */}
+        {/* 별조각 잔액 카드 */}
         <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
           style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">🫐</span>
+            <span className="text-2xl">⭐</span>
             <div>
-              <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 블루베리</p>
+              <p className="text-xs font-bold" style={{ color: "#a78bfa" }}>내 별조각</p>
               <p className="text-lg font-black text-white">{blueberries.toLocaleString()} <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.4)" }}>개</span></p>
             </div>
           </div>
@@ -192,7 +196,7 @@ export default function MyPage() {
                 <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
                   사주 분석 페이지에서 생년월일을 입력하면<br />자동으로 여기에 저장됩니다
                 </p>
-                <button onClick={() => router.push("/saju")}
+                <button onClick={() => router.push("/service/saju")}
                   className="text-sm px-5 py-2.5 rounded-xl font-bold transition-all"
                   style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
                   사주 분석하러 가기 →
@@ -245,7 +249,7 @@ export default function MyPage() {
                       style={{ background: "rgba(201,168,76,0.12)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.2)" }}>
                       이 사주로 분석하기 →
                     </button>
-                    <button onClick={() => { loadSaju(saju); router.push("/gunghap"); }}
+                    <button onClick={() => { loadSaju(saju); router.push("/service/gunghap"); }}
                       className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
                       style={{ background: "rgba(236,72,153,0.08)", color: "#f9a8d4", border: "1px solid rgba(236,72,153,0.15)" }}>
                       궁합 보기 →
@@ -270,7 +274,7 @@ export default function MyPage() {
                 <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
                   결제 완료 후 레포트를 구매하면<br />여기서 다시 확인할 수 있어요
                 </p>
-                <button onClick={() => router.push("/daewoon")}
+                <button onClick={() => router.push("/service/daewoon")}
                   className="text-sm px-5 py-2.5 rounded-xl font-bold transition-all"
                   style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
                   프리미엄 서비스 보기 →
@@ -314,7 +318,7 @@ export default function MyPage() {
         <div className="flex items-stretch h-16">
           {[
             { icon: "🏠", label: "홈", href: "/" },
-            { icon: "🔮", label: "사주", href: "/saju" },
+            { icon: "🔮", label: "사주", href: "/service/saju" },
             { icon: "📦", label: "보관함", href: "/mypage", active: true },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (

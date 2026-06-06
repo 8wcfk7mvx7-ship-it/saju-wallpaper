@@ -2,9 +2,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const KakaoLoginButton = dynamic(() => import("@/components/KakaoLoginButton"), { ssr: false });
 const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr: false });
+const NaverFirstLoginModal = dynamic(() => import("@/components/NaverFirstLoginModal"), { ssr: false });
 
 type Category = "전체" | "무료" | "연애·궁합" | "금전·투자" | "운명·대운" | "라이프" | "Special" | "19금";
 
@@ -24,18 +26,18 @@ const UI: Record<Lang, {
   charging: string;
 }> = {
   ko: {
-    h1: ["당신의 사주,", "지금 이 순간도", "말하고 있습니다"],
-    heroSub: "남들은 이미 확인했습니다. 당신만 아직 모르고 있었어요.",
-    heroCta: "내 사주의 모든 것 파악하기",
+    h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
+    heroSub: "사주에 다 나와있습니다. 내 오행 에너지, 지금 확인하세요.",
+    heroCta: "내 사주 오행 배경화면 만들기",
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
     catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "19금": "19금" },
     start: "시작",
-    charging: "블루베리 충전",
+    charging: "별조각 충전",
   },
   en: {
-    h1: ["Your Saju", "is speaking to you", "right now"],
+    h1: ["Your current wallpaper", "might be blocking", "your energy"],
     heroSub: "Everyone else has already checked. You're the only one still in the dark.",
     heroCta: "Uncover My Full Destiny",
     servicesHeading: "Explore Services",
@@ -46,7 +48,7 @@ const UI: Record<Lang, {
     charging: "Top Up",
   },
   id: {
-    h1: ["Saju Anda", "sedang berbicara", "kepada Anda sekarang"],
+    h1: ["Wallpaper Anda saat ini", "mungkin memblokir", "energi Anda"],
     heroSub: "Yang lain sudah mengeceknya. Hanya Anda yang belum mengetahuinya.",
     heroCta: "Ungkap Seluruh Takdir Saya",
     servicesHeading: "Jelajahi Sekarang",
@@ -57,7 +59,7 @@ const UI: Record<Lang, {
     charging: "Isi Ulang",
   },
   ta: {
-    h1: ["உங்கள் சாஜு,", "இப்போதும்", "பேசுகிறது"],
+    h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
     heroSub: "மற்றவர்கள் ஏற்கனவே சரிபார்த்தனர். நீங்கள் மட்டும் இன்னும் தெரியாமல் இருக்கிறீர்கள்.",
     heroCta: "என் சாஜுவை முழுமையாக அறிக",
     servicesHeading: "இப்போதே பார்க்கவும்",
@@ -82,11 +84,11 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
 
 // ── 후기 데이터 ───────────────────────────────────────────────────────────────
 const REVIEWS = [
+  // ★★★★★ 5점
   { name: "이○○", region: "서울", age: "32세", text: "배경화면 바꾸고 나서 진짜 기분인지 모르겠는데 취업됐어요. 믿기 싫었는데 신기합니다.", service: "오행 배경화면", stars: 5 },
   { name: "박○○", region: "부산", age: "28세", text: "궁합 봤는데 원진살이라고 나왔어요. 헤어지고 나니까 그게 맞더라고요. 좀 더 일찍 볼걸.", service: "궁합 분석", stars: 5 },
   { name: "김○○", region: "대구", age: "45세", text: "대운 분석이 너무 정확해서 소름 돋았습니다. 40대 중반에 큰 변화 온다고 했는데 딱 맞았어요.", service: "대운·세운", stars: 5 },
   { name: "최○○", region: "인천", age: "26세", text: "MBTI랑 사주 조합 분석이 진짜 신선했어요. INFJ-갑목 조합이 이렇게 맞을 수가 없어요.", service: "MBTI×사주", stars: 5 },
-  { name: "정○○", region: "광주", age: "38세", text: "주식투자 스타일 분석 보고 포트폴리오 바꿨는데 수익률이 좋아졌어요. 신기하네요.", service: "주식 분석", stars: 5 },
   { name: "한○○", region: "수원", age: "33세", text: "쓰레기 사주 극복법 읽고 진짜 울었어요. 내가 왜 힘들었는지 처음으로 이해가 됐습니다.", service: "신살 극복", stars: 5 },
   { name: "윤○○", region: "서울", age: "29세", text: "도화살 있다고 나왔는데 진짜로 갑자기 연락 오는 사람 늘었어요. 우연이라 하기엔 너무 신기해서.", service: "신살 분석", stars: 5 },
   { name: "오○○", region: "경기", age: "35세", text: "남자친구 사주 염탐했는데 바람기 위험도 B등급 나왔고 실제로 좀 자유분방한 편인데 맞더라고요.", service: "염탐하기", stars: 5 },
@@ -101,7 +103,6 @@ const REVIEWS = [
   { name: "배○○", region: "서울", age: "33세", text: "세운 분석에서 올해 금전 흐름 주의하라고 했는데 진짜 예상치 못한 지출이 많았어요.", service: "대운·세운", stars: 5 },
   { name: "채○○", region: "광주", age: "26세", text: "경금일간이라고 원칙형이라는 게 뭔가 싫었는데 읽을수록 나맞다는 거 인정하게 됨 ㅋ", service: "사주 분석", stars: 5 },
   { name: "서○○", region: "부산", age: "48세", text: "50대 진입하는 대운 분석이 그렇게 자세히 나올 줄 몰랐어요. 준비할 수 있어서 다행입니다.", service: "대운·세운", stars: 5 },
-  { name: "전○○", region: "수원", age: "30세", text: "배경화면 오행 분석 후 나무 기운 배경으로 바꿨더니 뭔가 마음이 차분해졌어요. 플라시보든 뭐든.", service: "오행 배경화면", stars: 5 },
   { name: "마○○", region: "서울", age: "25세", text: "갑자기 좋아하는 사람이 생겼는데 염탐해봤어요. 도화살 있고 편재 강함. 그냥 포기해야겠다ㅠ", service: "염탐하기", stars: 5 },
   { name: "홍○○", region: "경기", age: "36세", text: "쓰레기 사주라는 표현이 처음엔 충격이었는데 읽고 나니까 오히려 위로가 됐어요.", service: "신살 극복", stars: 5 },
   { name: "권○○", region: "대전", age: "42세", text: "일진달력 보면서 오늘 하루가 왜 이렇게 피곤했는지 이해됐어요. 흙기운 강한 날이었네요.", service: "일진달력", stars: 5 },
@@ -116,8 +117,6 @@ const REVIEWS = [
   { name: "남○○", region: "부산", age: "40세", text: "40대 대운이 나쁘게 나와서 불안했는데 극복 방향도 같이 나와서 오히려 마음이 정해졌습니다.", service: "대운·세운", stars: 5 },
   { name: "심○○", region: "수원", age: "26세", text: "기토일간이라 세심하고 실용적이라는 게 100% 나야요. 가족한테 보여줬더니 다들 웃었어요.", service: "사주 분석", stars: 5 },
   { name: "엄○○", region: "서울", age: "35세", text: "역마살이랑 도화살 같이 있는 사람 분석 처음 봤는데 이게 나한테 이렇게 잘 맞을 수가.", service: "신살 분석", stars: 5 },
-  { name: "원○○", region: "경기", age: "32세", text: "염탐 기능이 좀 무서운 기능이긴 한데... 알고 싶은 게 있었고 답은 얻었습니다.", service: "염탐하기", stars: 5 },
-  { name: "천○○", region: "대전", age: "43세", text: "오행 배경화면 그냥 예뻐서 만들었는데 실제로 운이 좋아진 것 같은 느낌이에요. 믿거나 말거나.", service: "오행 배경화면", stars: 5 },
   { name: "방○○", region: "서울", age: "24세", text: "일진달력 보면서 기운 좋은 날 면접 잡았어요. 결과는... 합격이었습니다 ㅎㅎ", service: "일진달력", stars: 5 },
   { name: "공○○", region: "부산", age: "37세", text: "병화일간 설명에서 태양처럼 에너지 넘친다는 거 진짜예요. 주변이 다 알아요 ㅋㅋ", service: "사주 분석", stars: 5 },
   { name: "현○○", region: "인천", age: "30세", text: "쓰레기 사주 극복법 결제하고 봤는데 솔직히 돈이 아깝지 않았어요. 필요했던 말들이었어요.", service: "신살 극복", stars: 5 },
@@ -127,7 +126,6 @@ const REVIEWS = [
   { name: "석○○", region: "광주", age: "33세", text: "주식 분석에서 단타보다 중장기가 맞는다고 나왔는데 그 조언 따랐더니 수익률이 달라졌어요.", service: "주식 분석", stars: 5 },
   { name: "민○○", region: "서울", age: "28세", text: "취향 분석 책 추천이 신기해요. 내가 좋아하는 책 종류랑 딱 맞는 장르로 추천해줘요.", service: "취향 분석", stars: 5 },
   { name: "길○○", region: "수원", age: "36세", text: "무토일간 안정형 맞는데 주변에서도 항상 나더러 흔들리지 않는다고 하거든요.", service: "사주 분석", stars: 5 },
-  { name: "복○○", region: "부산", age: "44세", text: "궁합에서 원진살이 있는데도 지금 10년 넘게 잘 살고 있어요. 의지로 극복하는 중.", service: "궁합 분석", stars: 4 },
   { name: "항○○", region: "경기", age: "25세", text: "처음엔 그냥 심심해서 해봤는데 지금은 거의 매일 일진달력 확인하고 있어요.", service: "일진달력", stars: 5 },
   { name: "두○○", region: "인천", age: "31세", text: "을목일간이라 유연해 보여도 속은 강철이라는 표현이 진짜 나를 표현하는 최고의 문장이에요.", service: "사주 분석", stars: 5 },
   { name: "라○○", region: "서울", age: "38세", text: "도시 추천 받아서 여행 가봤는데 진짜 맞는 에너지의 도시였어요. 충전이 됐달까.", service: "도시 추천", stars: 5 },
@@ -136,12 +134,73 @@ const REVIEWS = [
   { name: "미○○", region: "서울", age: "21세", text: "친구들이랑 서로 염탐 기능 써봤는데 다들 너무 맞아서 진짜냐고 물어봤어요 ㅋㅋ", service: "염탐하기", stars: 5 },
   { name: "화○○", region: "경기", age: "40세", text: "갑목일간 리더십형이라는데 회사 팀장 맡고 있어요. 맞습니다 ㅎ 근데 고집도 맞아요.", service: "사주 분석", stars: 5 },
   { name: "수○○", region: "부산", age: "26세", text: "극복법 보고 내 신살들이 단점이 아니라 특성이라는 걸 처음으로 받아들이게 됐어요.", service: "신살 극복", stars: 5 },
+  { name: "감○○", region: "서울", age: "30세", text: "정화일간이라 집중력 강하다는 게 딱 맞아요. 뭔가 꽂히면 끝장을 보는 스타일이라.", service: "사주 분석", stars: 5 },
+  { name: "봄○○", region: "경기", age: "23세", text: "재회운 분석에서 지금 시기가 아니라고 나왔는데 그 사람한테 먼저 연락 안 했어요. 잘한 것 같아요.", service: "재회운", stars: 5 },
+  { name: "여○○", region: "대전", age: "41세", text: "길일 확인하고 계약서 쓴 날 진짜 문제없이 잘 됐어요. 우연이라 해도 이제 꼭 확인하게 됐습니다.", service: "길일·흉일", stars: 5 },
+  { name: "름○○", region: "부산", age: "33세", text: "ESTP-병화 조합이라는 거 읽고 내가 왜 이렇게 즉흥적이고 현장파인지 이해됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "겨○○", region: "서울", age: "47세", text: "대운 흐름에서 이 시기가 인생의 전환점이라고 나왔는데 실제로 큰 결정 앞에 있습니다. 도움이 됐어요.", service: "대운·세운", stars: 5 },
+  { name: "울○○", region: "인천", age: "29세", text: "짝사랑 공략법 보고 접근 방식 바꿨는데 상대방이 먼저 연락 오더라고요. 신기해요.", service: "짝사랑", stars: 5 },
+  { name: "눈○○", region: "광주", age: "35세", text: "계수일간이라 지략가 스타일이라는 게 너무 맞아요. 뭐든 혼자 다 계획하는 편이거든요.", service: "사주 분석", stars: 5 },
+  { name: "꽃○○", region: "수원", age: "22세", text: "취향 분석에서 추천한 영화 장르가 진짜 제가 즐겨보던 거랑 똑같아서 소름이었어요.", service: "취향 분석", stars: 5 },
+  { name: "달○○", region: "서울", age: "38세", text: "오행 배경화면 만들고 폰 배경으로 썼는데 색깔 조합이 진짜 예쁘고 기분 좋아요.", service: "오행 배경화면", stars: 5 },
+  { name: "빛○○", region: "경기", age: "44세", text: "남편 사주 분석해봤더니 성격 특성이 너무 딱 맞아서 웃음이 나왔어요. 오래 살아봐야 아는데 사주가 다 알더라고요.", service: "사주 분석", stars: 5 },
+  { name: "강○○", region: "제주", age: "31세", text: "제주 살다가 도시 추천에서 다른 지역 나왔는데 실제로 이사 고민 중이에요. 방향 잡는 데 도움됐습니다.", service: "도시 추천", stars: 5 },
+  { name: "해○○", region: "세종", age: "27세", text: "신살 분석에서 학당귀인 있다고 나왔는데 공부할 때마다 집중이 잘 되는 편이에요. 맞는 것 같아요.", service: "신살 분석", stars: 5 },
+  { name: "솔○○", region: "천안", age: "36세", text: "대운 분석 읽고 지금 시기를 왜 이렇게 버텨왔는지 이해됐어요. 힘들었던 이유가 있었구나 싶었습니다.", service: "대운·세운", stars: 5 },
+  { name: "산○○", region: "서울", age: "25세", text: "짝사랑 분석에서 상대 일간 분석이 너무 정확했어요. 그 사람한테 딱 맞는 접근법이라 감탄했어요.", service: "짝사랑", stars: 5 },
+  { name: "바○○", region: "전주", age: "42세", text: "무관살 있다고 나왔는데 실제로 법 관련 직종에서 일하고 있어요. 맞는 게 신기해요.", service: "신살 분석", stars: 5 },
+  { name: "람○○", region: "창원", age: "28세", text: "궁합 분석에서 두 사람 오행 보완 관계가 잘 설명돼 있어서 서로 이해하는 데 도움이 됐어요.", service: "궁합 분석", stars: 5 },
+  { name: "들○○", region: "청주", age: "33세", text: "을목일간 설명 보다가 내 전 남자친구가 딱 을목 유형이었다는 걸 깨달았어요. 왜 맞지 않았는지 이제 알겠어요.", service: "사주 분석", stars: 5 },
+  { name: "강○○", region: "서울", age: "19세", text: "수능 전에 길일 확인하고 그날 모의고사 봤는데 점수 잘 나왔어요. 긴장이 덜했던 것 같아요.", service: "길일·흉일", stars: 5 },
+  { name: "새○○", region: "울산", age: "46세", text: "정재성 분석에서 저축 성향 강하다는 게 딱 맞아요. 돈 쓰는 게 불안해서 통장에 그냥 넣어두는 타입이거든요.", service: "사주 분석", stars: 5 },
+  { name: "아○○", region: "경북", age: "30세", text: "재회운에서 가능성 있다고 나왔는데 실제로 그 사람이 먼저 연락 왔어요. 진짜인지 아직도 신기해요.", service: "재회운", stars: 5 },
+  { name: "침○○", region: "부산", age: "37세", text: "묘목일간이라 예술적 감성 강하다는 거 딱 맞아요. 주변에서 항상 감성적이라고 하거든요.", service: "사주 분석", stars: 5 },
+  { name: "구○○", region: "수원", age: "22세", text: "길일에 이사했는데 진짜 생활이 안정되는 느낌이에요. 이전 집이랑 분위기가 달라요.", service: "길일·흉일", stars: 5 },
+  { name: "름○○", region: "인천", age: "43세", text: "40대 중반 대운이 힘들 수 있다고 나왔는데 실제로 힘들었고, 극복 조언이 큰 위안이 됐습니다.", service: "대운·세운", stars: 5 },
+  { name: "터○○", region: "서울", age: "27세", text: "INTJ-경금 조합이라는 거 보고 왜 내가 이렇게 냉정하고 계획적인지 처음으로 설명이 됐어요.", service: "MBTI×사주", stars: 5 },
+  { name: "눈○○", region: "대전", age: "34세", text: "편인 강한 사주라서 독립적이고 독창적이라는 게 딱 맞아요. 혼자 하는 일이 항상 더 잘 돼요.", service: "사주 분석", stars: 5 },
+  { name: "서○○", region: "광주", age: "29세", text: "짝사랑 분석에서 절대 금물이라는 행동이 제가 하려던 거였어요. 안 했길 잘했다는 생각이 들어요.", service: "짝사랑", stars: 5 },
+  { name: "이○○", region: "경기", age: "50세", text: "50대 대운이 오히려 인생 전성기라고 나와서 희망이 생겼어요. 진짜 요즘 뭔가 풀리는 것 같아요.", service: "대운·세운", stars: 5 },
+  { name: "우○○", region: "전주", age: "24세", text: "취향 분석에서 여행 스타일이 계획보다 즉흥 여행이라는 게 맞아요. 계획 짜놓고 항상 바꾸거든요.", service: "취향 분석", stars: 5 },
+  { name: "주○○", region: "세종", age: "39세", text: "오행 배경화면 만들고 집 전체 컬러를 바꿔봤는데 진짜 집에 있는 시간이 좋아졌어요.", service: "오행 배경화면", stars: 5 },
+  { name: "만○○", region: "부산", age: "32세", text: "염탐 기능으로 부모님 사주 봤더니 두 분이 어떻게 수십 년을 함께했는지 이해가 됐어요.", service: "염탐하기", stars: 5 },
+  { name: "세○○", region: "대구", age: "46세", text: "갱년기 시기 대운 분석이 너무 정확했어요. 이 시기를 잘 이해하고 넘어갈 수 있었습니다.", service: "대운·세운", stars: 5 },
+  { name: "기○○", region: "서울", age: "20세", text: "사주 보기 전엔 그냥 미신 같은 거라 생각했는데 분석 읽고 나니 진짜 학문이구나 싶었어요.", service: "사주 분석", stars: 5 },
+  { name: "쁜○○", region: "수원", age: "35세", text: "길일에 계약서 쓰고 사업 시작했는데 첫 달부터 생각보다 잘 돼서 신기했어요.", service: "길일·흉일", stars: 5 },
+
+  // ★★★★☆ 4점 (~15%)
+  { name: "전○○", region: "수원", age: "30세", text: "배경화면 오행 분석 후 나무 기운으로 바꿨더니 뭔가 차분해졌어요. 플라시보인지 진짜인지는 모르겠지만 기분은 좋아요.", service: "오행 배경화면", stars: 4 },
+  { name: "원○○", region: "경기", age: "32세", text: "염탐 기능이 좀 독특한 기능이긴 한데... 알고 싶은 게 있었고 답은 얻었습니다. 전적으로 믿진 않지만 참고가 됐어요.", service: "염탐하기", stars: 4 },
+  { name: "복○○", region: "부산", age: "44세", text: "궁합에서 원진살이 있는데도 지금 10년 넘게 잘 살고 있어요. 의지로 극복하는 중이에요.", service: "궁합 분석", stars: 4 },
+  { name: "정○○", region: "광주", age: "38세", text: "주식투자 스타일 분석 보고 포트폴리오 바꿨는데 수익률이 조금 나아졌어요. 100% 믿긴 어렵지만 방향 잡는 데 참고됩니다.", service: "주식 분석", stars: 4 },
+  { name: "천○○", region: "대전", age: "43세", text: "오행 배경화면 예뻐서 만들었는데 운이 좋아진 것 같기도 하고 아닌 것 같기도 해요. 그냥 예쁜 건 확실해요.", service: "오행 배경화면", stars: 4 },
+  { name: "이○○", region: "부산", age: "36세", text: "아주 정확하진 않지만 재미있어요. 전반적인 성격 흐름은 맞는 것 같은데 세부적으론 좀 다른 부분도 있어요.", service: "사주 분석", stars: 4 },
+  { name: "권○○", region: "서울", age: "42세", text: "일부는 딱 맞고 일부는 좀 애매했어요. 그래도 100% 안 믿어도 나를 돌아보는 계기가 됐습니다.", service: "사주 분석", stars: 4 },
+  { name: "박○○", region: "인천", age: "25세", text: "처음 기대보다 살짝 덜했는데 시간 지나고 다시 보니 맞더라고요. 즉시가 아니라 나중에 공감이 오는 타입인 것 같아요.", service: "대운·세운", stars: 4 },
+  { name: "유○○", region: "경기", age: "33세", text: "전반적으로 재미있고 나를 돌아보게 됐어요. 모든 게 딱 맞지는 않지만 큰 흐름은 비슷해서 도움이 됐습니다.", service: "MBTI×사주", stars: 4 },
+  { name: "임○○", region: "대구", age: "28세", text: "취향 분석에서 음악 추천은 잘 맞는데 영화 쪽은 좀 달랐어요. 그래도 전체적으로 재미있게 봤어요.", service: "취향 분석", stars: 4 },
+  { name: "송○○", region: "광주", age: "45세", text: "길일에 이사하려고 했는데 일정이 안 맞아서 못 했어요. 그래도 참고용으로 좋은 서비스예요.", service: "길일·흉일", stars: 4 },
+  { name: "오○○", region: "서울", age: "31세", text: "궁합 분석이 전부 나쁘게만 나와서 좀 불안했는데, 극복 방법도 같이 있어서 다행이었어요. 조금 더 긍정적 메시지가 있으면 좋겠어요.", service: "궁합 분석", stars: 4 },
+  { name: "최○○", region: "세종", age: "37세", text: "도시 추천이 예상과 다르게 나왔어요. 근데 왜 그 도시인지 설명을 읽으니까 나름 납득이 됐습니다.", service: "도시 추천", stars: 4 },
+  { name: "윤○○", region: "전주", age: "29세", text: "사주 분석 전체는 재미있게 봤는데 직업 부분은 저한테 맞지 않는 것도 있었어요. 참고만 할게요.", service: "사주 분석", stars: 4 },
+  { name: "홍○○", region: "제주", age: "40세", text: "짝사랑 분석이 도움은 됐는데 너무 일반적인 것 같기도 해요. 상대방 일간별로 다르다는 건 신선했습니다.", service: "짝사랑", stars: 4 },
+  { name: "한○○", region: "청주", age: "23세", text: "재미로 보기 좋아요. 100% 믿기보다 자기 이해 도구로 쓰면 좋을 것 같습니다. 분석 자체는 꽤 상세해요.", service: "사주 분석", stars: 4 },
+  { name: "안○○", region: "수원", age: "48세", text: "MBTI 분석이랑 결합한 건 신선했는데 사주 쪽은 좀 더 자세하면 좋겠어요. 전체적으로 괜찮습니다.", service: "MBTI×사주", stars: 4 },
+  { name: "정○○", region: "대전", age: "34세", text: "신살 극복법이 위로가 됐어요. 모든 내용이 딱 들어맞지는 않았지만 힘들 때 읽기 좋았습니다.", service: "신살 극복", stars: 4 },
+
+  // ★★★☆☆ 3점 (~4%)
+  { name: "김○○", region: "서울", age: "27세", text: "재미로 보기엔 좋은데 너무 진지하게 받아들이긴 어려워요. 분석이 포괄적이라 어느 정도는 누구한테나 해당될 것 같기도 해요.", service: "사주 분석", stars: 3 },
+  { name: "이○○", region: "경기", age: "41세", text: "좀 더 구체적이고 세밀했으면 좋겠어요. 전반적인 방향은 이해가 됐는데 실제 삶에 적용하기엔 추상적인 부분이 있어요.", service: "대운·세운", stars: 3 },
+  { name: "박○○", region: "인천", age: "33세", text: "결과가 맞는 부분도 있고 다른 부분도 있어요. 완전히 믿기보다 여러 관점 중 하나로 참고하는 게 좋을 것 같아요.", service: "궁합 분석", stars: 3 },
+  { name: "최○○", region: "부산", age: "22세", text: "흥미롭긴 한데 과학적 근거가 없다는 점이 계속 걸려요. 재미는 있어요. 진지하게 결정에 활용하기엔 무리인 것 같아요.", service: "사주 분석", stars: 3 },
+  { name: "강○○", region: "대구", age: "38세", text: "일부 내용은 꽤 맞았는데 일부는 전혀 공감이 안 됐어요. 반반 정도 맞는 것 같아요. 참고용으로는 괜찮아요.", service: "신살 분석", stars: 3 },
+  { name: "정○○", region: "광주", age: "46세", text: "분석 내용 자체는 잘 정리돼 있어요. 결과를 어떻게 해석하느냐에 따라 다 달라지는 것 같아서 점수를 이렇게 줬습니다.", service: "사주 분석", stars: 3 },
 ];
 
 // ── 공지사항 ──────────────────────────────────────────────────────────────────
 const NOTICES = [
   { date: "2026.06.04", title: "짝사랑 성공 비결 서비스 오픈", badge: "NEW", color: "#fbbf24" },
-  { date: "2026.06.03", title: "카카오 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
+  { date: "2026.06.03", title: "네이버 로그인 서비스 오픈", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.02", title: "대운·세운 80년 분석 서비스 출시", badge: "NEW", color: "#fbbf24" },
   { date: "2026.06.01", title: "이용약관·환불규정 개정 안내", badge: "공지", color: "#94a3b8" },
   { date: "2026.05.28", title: "일진 달력 1975~2030 신규 오픈", badge: "NEW", color: "#fbbf24" },
@@ -161,29 +220,6 @@ const ACTIVITIES = [
   "계축일주 강○○님이 궁합 위험도를 확인했습니다",
 ];
 
-// ── 라이브 피드 ───────────────────────────────────────────────────────────────
-const LIVE_FEED_POOL = [
-  { name: "윤○현", desc: "석양 아래 귀갓길의 여행자", rarity: 37.9 },
-  { name: "최○우", desc: "봄바람에 흔들리는 버드나무", rarity: 31.3 },
-  { name: "오○진", desc: "심해의 진주조개", rarity: 6.6 },
-  { name: "이○민", desc: "사막을 건너는 낙타의 끈기", rarity: 5.1 },
-  { name: "김○혁", desc: "빈 들판의 마지막 씨앗", rarity: 2.1 },
-  { name: "강○빈", desc: "아침 안개 속 정원사", rarity: 23.0 },
-  { name: "홍○연", desc: "석양 아래 귀갓길의 여행자", rarity: 28.6 },
-  { name: "송○호", desc: "벼랑 끝의 독수리", rarity: 3.4 },
-  { name: "박○서", desc: "고요한 새벽의 등불", rarity: 44.2 },
-  { name: "정○아", desc: "태풍 전야의 고요함", rarity: 8.7 },
-  { name: "한○준", desc: "물 위에 떠가는 연잎", rarity: 17.5 },
-  { name: "임○하", desc: "달빛 아래 선인장", rarity: 1.8 },
-  { name: "조○현", desc: "바람을 가르는 화살", rarity: 62.3 },
-  { name: "신○영", desc: "여명의 첫 새소리", rarity: 12.4 },
-  { name: "황○찬", desc: "눈보라 속 홀로 선 소나무", rarity: 4.2 },
-  { name: "문○지", desc: "가을 강가의 갈대", rarity: 38.9 },
-  { name: "차○선", desc: "폭풍 속에 핀 야생화", rarity: 9.3 },
-  { name: "노○빈", desc: "사계절을 담은 호수", rarity: 51.7 },
-  { name: "유○현", desc: "새벽 이슬의 거울", rarity: 7.2 },
-  { name: "권○수", desc: "모래 위의 나침반", rarity: 3.1 },
-];
 
 function ContactSection() {
   const [name, setName] = useState("");
@@ -348,7 +384,7 @@ function ContactSection() {
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[]; saleSticker?: string;
+  border: string; glow: string; categories: Category[];
 }[] = [
   {
     id: "saju", emoji: "🔮",
@@ -356,11 +392,10 @@ const SERVICES: {
     viral: "지금 배경화면이 에너지를 갉아먹고 있을 수 있습니다",
     desc: "내 사주에 부족한 오행을 채워주는 AI 맞춤 배경화면. 목·화·토·금·수 중 내가 보완해야 할 기운을 찾아드립니다.",
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
-    href: "/saju", badge: "분석 무료",
+    href: "/service/saju", badge: "완전 무료",
     color: "#a78bfa", badgeBg: "rgba(99,102,241,0.85)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.15)",
     categories: ["전체", "라이프"],
-    saleSticker: "50% OFF",
   },
   {
     id: "gunghap", emoji: "💑",
@@ -368,7 +403,7 @@ const SERVICES: {
     viral: "지금 만나는 사람, 내 에너지를 갉아먹는 사주일 수 있어요",
     desc: "원진살·귀문관살·합충 관계로 보는 깊은 궁합. 바람기 DNA부터 이별 위험도까지 전부 분석합니다.",
     tags: ["원진살", "합충", "바람기 분석"],
-    href: "/gunghap", badge: "무료",
+    href: "/service/gunghap", badge: "완전 무료",
     color: "#f9a8d4", badgeBg: "rgba(139,92,246,0.85)",
     border: "rgba(236,72,153,0.3)", glow: "rgba(236,72,153,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -379,7 +414,7 @@ const SERVICES: {
     viral: "이 사람, 내가 꼬실 수 있는 사주인지 확인해보세요",
     desc: "짝사랑하는 상대의 이상형·심리 패턴·공략 포인트를 사주로 완전 분석. 쟁재남인지, 어떻게 다가가야 심장이 흔들리는지 알려드립니다.",
     tags: ["이상형 분석", "공략법", "쟁재남 진단"],
-    href: "/crush", badge: "무료",
+    href: "/service/crush", badge: "완전 무료",
     color: "#fb7185", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -390,7 +425,7 @@ const SERVICES: {
     viral: "지금 그 사람, 다른 누군가와 함께하고 있을지도 모릅니다",
     desc: "헤어진 그 사람과 다시 이어질 수 있는지, 지금이 재회의 시기인지 사주로 완전 분석합니다. 망설이는 동안 기회의 문이 닫힙니다.",
     tags: ["재회 가능성", "경도 보정", "대운 분석"],
-    href: "/reunion", badge: "₩3,900",
+    href: "/service/reunion", badge: "",
     color: "#f97316", badgeBg: "rgba(234,88,12,0.85)",
     border: "rgba(249,115,22,0.3)", glow: "rgba(249,115,22,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -401,10 +436,10 @@ const SERVICES: {
     viral: "당신의 편은 들지 않습니다. 오직 사실만 말합니다.",
     desc: "바람기·도화살·불륜 가능성까지. 매운맛 분석입니다. 애인의 생년월일만 입력하세요.",
     tags: ["바람기", "도화살", "이성 관계"],
-    href: "/spy", badge: "무료",
+    href: "/service/spy", badge: "완전 무료",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "19금"],
+    categories: ["전체", "무료", "연애·궁합"],
   },
   {
     id: "eros", emoji: "🌹",
@@ -412,7 +447,7 @@ const SERVICES: {
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
     desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
     tags: ["홍염살", "도화살", "이성 매력"],
-    href: "/eros", badge: "무료",
+    href: "/service/eros", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(236,72,153,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합", "19금"],
@@ -423,7 +458,7 @@ const SERVICES: {
     viral: "정임합·자오충·인오술합. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 정임암합부터 자오충까지 완전 공개.",
     tags: ["정임합", "자오충", "성적 케미"],
-    href: "/hotcompat", badge: "₩4,900",
+    href: "/service/hotcompat", badge: "",
     color: "#fb7185", badgeBg: "rgba(244,63,94,0.85)",
     border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
     categories: ["전체", "연애·궁합", "19금"],
@@ -434,7 +469,7 @@ const SERVICES: {
     viral: "본인만 모르는 숨겨진 이성 매력이 있습니다",
     desc: "도화살·홍염살·12운성으로 보는 이성 매력. 나도 몰랐던 타고난 매력 포인트를 완전히 공개합니다.",
     tags: ["도화살", "홍염살", "이성운"],
-    href: "/charm", badge: "₩1,900",
+    href: "/service/charm", badge: "",
     color: "#fda4af", badgeBg: "rgba(225,29,72,0.85)",
     border: "rgba(244,63,94,0.3)", glow: "rgba(244,63,94,0.12)",
     categories: ["전체", "연애·궁합"],
@@ -445,7 +480,7 @@ const SERVICES: {
     viral: "MBTI만으로는 절반밖에 모릅니다",
     desc: "사주 오행 + MBTI 16유형의 시너지 분석. 타고난 나를 두 가지 렌즈로 완전 해석하고 최적 직업을 제안합니다.",
     tags: ["MBTI", "성격 분석", "직업 추천"],
-    href: "/mbti", badge: "무료",
+    href: "/service/mbti", badge: "완전 무료",
     color: "#e879f9", badgeBg: "rgba(162,28,175,0.9)",
     border: "rgba(217,70,239,0.3)", glow: "rgba(217,70,239,0.12)",
     categories: ["전체", "무료", "연애·궁합", "라이프"],
@@ -456,7 +491,7 @@ const SERVICES: {
     viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
     desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
     tags: ["주식", "코인", "ETF·레버리지"],
-    href: "/stock", badge: "무료",
+    href: "/service/stock", badge: "완전 무료",
     color: "#6ee7b7", badgeBg: "rgba(5,150,105,0.9)",
     border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -467,11 +502,10 @@ const SERVICES: {
     viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
     desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
     tags: ["대운", "세운", "교운기 전략"],
-    href: "/daewoon", badge: "₩15,000",
+    href: "/service/daewoon", badge: "",
     color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
     border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
     categories: ["전체", "금전·투자", "운명·대운", "Special"],
-    saleSticker: "50% OFF",
   },
   {
     id: "place", emoji: "🌍",
@@ -479,11 +513,10 @@ const SERVICES: {
     viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
     desc: "용신 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
     tags: ["거주지", "해외 추천", "용신 방위"],
-    href: "/place", badge: "₩990",
+    href: "/service/place", badge: "",
     color: "#a5b4fc", badgeBg: "rgba(109,40,217,0.9)",
     border: "rgba(139,92,246,0.3)", glow: "rgba(99,102,241,0.12)",
     categories: ["전체", "운명·대운", "라이프", "Special"],
-    saleSticker: "50% OFF",
   },
   {
     id: "overcome", emoji: "⚡",
@@ -491,7 +524,7 @@ const SERVICES: {
     viral: "역마살·귀문관살도 방향 맞으면 최강 무기입니다",
     desc: "내 신살과 오행 불균형을 제대로 알고 극복하는 완벽 가이드. 나쁜 사주도 방향 틀면 달라집니다.",
     tags: ["신살 극복", "오행 보완", "개운법"],
-    href: "/overcome", badge: "무료",
+    href: "/service/overcome", badge: "완전 무료",
     color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "운명·대운"],
@@ -502,10 +535,17 @@ const SERVICES: {
     viral: "결정의 날짜를 고르면 결과가 달라집니다",
     desc: "이사·결혼·시험·개업·계약·수술·여행·투자·연애·임신 — 내 사주와 맞는 최적의 날짜를 찾아드립니다.",
     tags: ["길일·흉일", "날짜 선택", "이사·결혼·시험"],
-    href: "/calendar", badge: "₩990",
+    href: "/service/calendar", badge: "",
     color: "#7dd3fc", badgeBg: "rgba(2,132,199,0.9)",
     border: "rgba(14,165,233,0.3)", glow: "rgba(14,165,233,0.12)",
     categories: ["전체", "무료", "운명·대운", "라이프"],
+  },
+  {
+    id: "chat", emoji: "🔮", title: "사주 AI 역술사", viral: "사주 보는 AI가 생겼습니다",
+    desc: "현업 역술인 개발 · 모든 질문 가능 · 대화 1회 = 별조각 5개",
+    tags: ["AI", "채팅", "전체상담"], href: "/service/chat", badge: "NEW", color: "#7c3aed",
+    badgeBg: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)", glow: "rgba(124,58,237,0.15)",
+    categories: ["전체", "운명·대운", "라이프", "연애·궁합"],
   },
   {
     id: "taste", emoji: "🎬",
@@ -513,10 +553,17 @@ const SERVICES: {
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
     desc: "오행별 영화·책·음악·여행 취향 완전 분석. 지금까지 좋아했던 것들이 사주로 다 설명됩니다.",
     tags: ["영화", "책", "여행 스타일"],
-    href: "/taste", badge: "무료",
+    href: "/service/taste", badge: "완전 무료",
     color: "#fcd34d", badgeBg: "rgba(180,83,9,0.9)",
     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)",
     categories: ["전체", "무료", "라이프"],
+  },
+  {
+    id: "fengshui", emoji: "🏮", title: "풍수지리 이야기", viral: "무료로 읽는 풍수 지혜",
+    desc: "침실·현관·부엌·책상 배치부터 오행 아이템까지 — 집을 바꾸면 운이 바뀐다",
+    tags: ["무료", "풍수", "인테리어"], href: "/service/fengshui", badge: "FREE", color: "#65a30d",
+    badgeBg: "rgba(101,163,13,0.15)", border: "rgba(101,163,13,0.3)", glow: "rgba(101,163,13,0.1)",
+    categories: ["전체", "라이프", "무료"],
   },
 ];
 
@@ -538,83 +585,80 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
 
   return (
     <div ref={ref} className="relative">
-      {/* 50% OFF 거친 테이프 스티커 */}
-      {svc.saleSticker && (
-        <div className="absolute -top-3 -right-2 z-20 rotate-[8deg] pointer-events-none select-none" style={{ filter: "drop-shadow(0 2px 6px rgba(185,28,28,0.7))" }}>
-          <svg width="80" height="28" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* 왼쪽 거친 찢김 */}
-            <path d="M0 8 Q1 5 3 9 Q5 13 7 7 Q9 1 11 6 Q13 11 15 5 L15 23 Q13 27 11 22 Q9 17 7 21 Q5 25 3 19 Q1 13 0 18 Z" fill="#991b1b"/>
-            {/* 몸통 */}
-            <rect x="13" y="2" width="52" height="24" fill="#dc2626"/>
-            {/* 오른쪽 거친 찢김 */}
-            <path d="M65 2 L65 26 Q67 22 69 27 Q71 32 73 26 Q75 20 77 25 Q79 30 80 27 L80 7 Q79 3 77 7 Q75 11 73 5 Q71 -1 69 4 Q67 9 65 2 Z" fill="#991b1b"/>
-            {/* 테이프 반투명 광택 */}
-            <rect x="13" y="2" width="52" height="9" fill="rgba(255,255,255,0.10)"/>
-            {/* 가로줄 텍스처 */}
-            <rect x="13" y="13" width="52" height="1" fill="rgba(0,0,0,0.08)"/>
-            <text x="40" y="19" textAnchor="middle" fill="white" fontSize="10.5" fontWeight="900" fontFamily="Arial Black, Arial, sans-serif" letterSpacing="1">
-              {svc.saleSticker}
-            </text>
-          </svg>
-        </div>
-      )}
 
       <div
         onClick={() => router.push(svc.href)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        className="kitsch-card cursor-pointer rounded-2xl flex flex-col"
         style={{
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(24px)",
-          transition: `opacity 0.7s ease ${index * 60}ms, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${index * 60}ms`,
-          borderColor: hovered ? svc.border : "rgba(255,255,255,0.07)",
-          boxShadow: hovered ? `0 8px 40px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)` : "inset 0 1px 0 rgba(255,255,255,0.03)",
-          background: hovered ? `radial-gradient(ellipse at top left, ${svc.glow} 0%, rgba(10,10,20,0.95) 60%)` : "rgba(10,10,20,0.6)",
+          transform: visible ? "translateY(0)" : "translateY(28px)",
+          transition: `opacity 0.6s ease ${index * 55}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${index * 55}ms`,
+          background: hovered
+            ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
+            : "rgba(11,4,28,0.85)",
+          border: `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
+          boxShadow: hovered
+            ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
+            : "inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
-        className="relative border rounded-2xl p-5 cursor-pointer transition-all duration-400 flex flex-col gap-3 backdrop-blur-sm"
       >
-        {/* 뱃지 */}
-        <div className="flex items-start justify-between">
-          <div
-            className="text-3xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0"
-            style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${svc.border}` }}
-          >
-            {svc.emoji}
-          </div>
-          <span
-            className="text-xs font-black px-2.5 py-1 rounded-full text-white"
-            style={{ background: svc.badgeBg }}
-          >
-            {svc.badge}
-          </span>
-        </div>
+        {/* 왼쪽 컬러 스트라이프 */}
+        <div className="flex flex-1">
+          <div className="w-1 rounded-l-2xl shrink-0" style={{ background: `linear-gradient(180deg, ${svc.color}, transparent)`, opacity: hovered ? 1 : 0.4, transition: "opacity 0.3s" }} />
 
-        <div>
-          <h3 className="text-base font-black text-white mb-1 leading-tight">{svc.title}</h3>
-          <p className="text-xs font-semibold mb-2" style={{ color: svc.color }}>
-            &ldquo;{svc.viral}&rdquo;
-          </p>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
-            {svc.desc}
-          </p>
-        </div>
+          <div className="flex-1 p-5 flex flex-col gap-3.5">
+            {/* 헤더 */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl w-11 h-11 flex items-center justify-center rounded-xl shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${svc.glow.replace('0.12','0.25').replace('0.15','0.3')}, rgba(255,255,255,0.03))`,
+                    border: `1px solid ${svc.border}`,
+                    boxShadow: hovered ? `0 0 16px ${svc.glow}` : "none",
+                    transition: "box-shadow 0.3s",
+                  }}>
+                  {svc.emoji}
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-black text-white leading-tight">{svc.title}</h3>
+                  {svc.badge && (
+                    <span className="inline-block mt-0.5 text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                      style={{ background: svc.badgeBg }}>
+                      {svc.badge}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <span className="text-sm font-black shrink-0 transition-transform duration-200"
+                style={{ color: svc.color, transform: hovered ? "translateX(4px)" : "translateX(0)" }}>→</span>
+            </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-1">
-            {svc.tags.map(tag => (
-              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                {tag}
-              </span>
-            ))}
+            {/* 바이럴 카피 */}
+            <p className="text-[13px] font-bold leading-snug" style={{ color: svc.color }}>
+              &ldquo;{svc.viral}&rdquo;
+            </p>
+
+            {/* 설명 */}
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+              {svc.desc}
+            </p>
+
+            {/* 태그 */}
+            <div className="flex flex-wrap gap-1.5">
+              {svc.tags.map(tag => (
+                <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full font-medium"
+                  style={{
+                    background: `${svc.glow.replace('0.12','0.12').replace('0.15','0.12')}`,
+                    color: svc.color,
+                    border: `1px solid ${svc.border}`,
+                  }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
-          <span
-            className="text-xs font-bold flex items-center gap-1 shrink-0"
-            style={{ color: svc.color }}
-          >
-            {startLabel}
-            <span style={{ transform: hovered ? "translateX(4px)" : "translateX(0)", transition: "transform 0.2s ease", display: "inline-block" }}>→</span>
-          </span>
         </div>
       </div>
     </div>
@@ -632,25 +676,17 @@ export default function MainPage() {
     localStorage.setItem("sp_main_counter", String(next));
     return next;
   });
-  const [todayCounter] = useState(() => {
-    const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
-    const isNight = kstH >= 23 || kstH < 7;
-    return isNight ? 28 + Math.floor(Math.random() * 11) : 92 + Math.floor(Math.random() * 17);
-  });
   const [activityIndex, setActivityIndex] = useState(0);
   const [activityVisible, setActivityVisible] = useState(true);
   const [noticeIndex, setNoticeIndex] = useState(0);
   const [noticeVisible, setNoticeVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
-  const [feedOffset, setFeedOffset] = useState(0);
-  const [feedVisible, setFeedVisible] = useState(true);
-
   // 언어
   const [lang, setLang] = useState<Lang>("ko");
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
-  // 블루베리 잔액
+  // 별조각 잔액
   const [blueberries, setBlueberries] = useState(0);
 
   const t = UI[lang];
@@ -699,36 +735,38 @@ export default function MainPage() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFeedVisible(false);
-      setTimeout(() => {
-        setFeedOffset(i => (i + 1) % LIVE_FEED_POOL.length);
-        setFeedVisible(true);
-      }, 350);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
-    <main className="min-h-screen bg-[#06060e] text-white overflow-x-hidden">
+    <main className="min-h-screen text-white overflow-x-hidden" style={{ background: "#020c1b" }}>
 
       {/* ── 배경 글로우 ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[900px] h-[900px] rounded-full bg-indigo-950/50 blur-[250px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-violet-950/40 blur-[220px]" />
-        <div className="absolute top-[40%] left-[30%] w-[500px] h-[500px] rounded-full blur-[180px]" style={{ background: "rgba(201,168,76,0.03)" }} />
+        {/* 핑크 좌상단 */}
+        <div className="absolute top-[-15%] left-[-5%] w-[700px] h-[700px] rounded-full blur-[200px]"
+          style={{ background: "rgba(59,130,246,0.15)" }} />
+        {/* 퍼플 중앙 */}
+        <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[220px]"
+          style={{ background: "rgba(30,64,175,0.12)" }} />
+        {/* 골드 하단 */}
+        <div className="absolute bottom-[-10%] left-[20%] w-[700px] h-[700px] rounded-full blur-[200px]"
+          style={{ background: "rgba(6,182,212,0.08)" }} />
+        {/* 사이언 우하단 */}
+        <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] rounded-full blur-[160px]"
+          style={{ background: "rgba(245,197,24,0.05)" }} />
+        {/* 미세 그리드 패턴 */}
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
       </div>
 
       {/* ── 상단 네비게이션 (모바일 숨김) ── */}
-      <nav className="hidden sm:block sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl"
-        style={{ background: "rgba(6,6,14,0.85)" }}>
+      <nav className="hidden sm:block sticky top-0 z-50 border-b backdrop-blur-xl"
+        style={{ background: "rgba(7,0,26,0.88)", borderColor: "rgba(59,130,246,0.15)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <button onClick={() => router.push("/")} className="flex items-center gap-2.5">
-            <span className="text-lg" style={{ color: "#c9a84c" }}>☯</span>
+            <span className="text-xl star-1" style={{ color: "#3b82f6" }}>☯</span>
             <span className="font-black text-base tracking-tight text-white">Summer Palace</span>
-            <span className="hidden sm:block text-xs px-2 py-0.5 rounded-full font-medium"
-              style={{ background: "rgba(201,168,76,0.12)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.25)" }}>
+            <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full font-black"
+              style={{ background: "rgba(59,130,246,0.15)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.25)" }}>
               AI 사주
             </span>
           </button>
@@ -737,23 +775,23 @@ export default function MainPage() {
             {/* 보관함 — PC only */}
             <button
               onClick={() => router.push("/mypage")}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-amber-500/15"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.45)" }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
             >
               <span>📂</span>
               <span>보관함</span>
             </button>
-            {/* 블루베리 잔액/충전 — PC only */}
+            {/* 별조각 잔액/충전 — PC only */}
             <button
               onClick={() => router.push("/charge")}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-colors hover:bg-indigo-500/20"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105"
               style={{
-                background: blueberries > 0 ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.04)",
-                border: blueberries > 0 ? "1px solid rgba(99,102,241,0.35)" : "1px solid rgba(255,255,255,0.08)",
-                color: blueberries > 0 ? "#a78bfa" : "rgba(255,255,255,0.4)",
+                background: blueberries > 0 ? "rgba(139,92,246,0.18)" : "rgba(255,255,255,0.04)",
+                border: blueberries > 0 ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                color: blueberries > 0 ? "#c4b5fd" : "rgba(255,255,255,0.45)",
               }}
             >
-              <span>🫐</span>
+              <span>⭐</span>
               <span>{blueberries > 0 ? blueberries.toLocaleString() : t.charging}</span>
             </button>
 
@@ -816,166 +854,109 @@ export default function MainPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
 
         {/* ── 히어로 섹션 ── */}
-        <section className="py-14 sm:py-20 text-center relative">
-          {/* 실시간 활동 알림 */}
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span
-                style={{
-                  color: "rgba(255,255,255,0.5)",
-                  opacity: activityVisible ? 1 : 0,
-                  transition: "opacity 0.4s ease",
-                }}
-              >
+        <section className="py-16 sm:py-24 text-center relative">
+          {/* 마스코트 */}
+          <div className="absolute right-0 bottom-0 pointer-events-none select-none hidden sm:block" style={{ width: 160, opacity: 0.92 }}>
+            <Image src="/mascot.png" alt="사주 마스코트" width={160} height={200} style={{ objectFit: "contain", filter: "drop-shadow(0 8px 24px rgba(147,51,234,0.35))" }} priority />
+          </div>
+
+          {/* 플로팅 장식 별 */}
+          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ec4899" }}>✦</span>
+          <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#a78bfa" }}>✦</span>
+          <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#f472b6" }}>◆</span>
+          <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#818cf8" }}>✦</span>
+
+          {/* 서비스 배지 */}
+          <div className="flex justify-center mb-5">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold tracking-widest uppercase"
+              style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", color: "rgba(255,255,255,0.5)" }}>
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#ec4899" }} />
+              SUMMER PALACE · 무료 사주 분석
+            </div>
+          </div>
+
+          {/* 스파클 아이콘 */}
+          <div className="flex justify-center mb-5">
+            <div className="relative">
+              <span className="text-4xl" style={{ filter: "drop-shadow(0 0 20px rgba(236,72,153,0.5))" }}>✦</span>
+              <span className="text-2xl absolute -top-2 -right-4" style={{ filter: "drop-shadow(0 0 12px rgba(167,139,250,0.6))" }}>✦</span>
+            </div>
+          </div>
+
+          {/* 실시간 카운터 */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
+              <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
                 {ACTIVITIES[activityIndex]}
               </span>
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.1] mb-5 tracking-tight"
-            style={{
-              background: "linear-gradient(160deg, #ffffff 0%, rgba(255,255,255,0.9) 40%, rgba(201,168,76,0.75) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
-            {t.h1[0]}<br />
-            <span style={{ WebkitTextFillColor: "#c9a84c" }}>{t.h1[1]}</span><br />
-            {t.h1[2]}
-          </h1>
+          {/* 메인 헤드라인 */}
+          <div className="mb-3 max-w-md mx-auto px-2">
+            <h1 className="text-4xl sm:text-5xl font-black leading-tight mb-4 text-white" style={{ letterSpacing: "-0.02em" }}>
+              {t.h1[0]}<br />
+              <span style={{ color: "#f472b6" }}>{t.h1[1]}</span><br />
+              {t.h1[2]}
+            </h1>
+            <p className="text-base font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+              {t.heroSub}
+            </p>
+          </div>
 
-          <p className="text-sm sm:text-base max-w-md mx-auto mb-3 leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.42)" }}>
-            {t.heroSub}
-          </p>
-
-          {/* 강렬한 바이럴 카피 */}
-          <div className="max-w-xl mx-auto mb-8 space-y-2">
-            {[
-              "내 사주에 맞는 배경화면이 따로 있습니다 — 지금 쓰는 배경화면이 기운을 막고 있을 수 있어요",
-              "인오술 삼합이라도 자오충 앞에서는 무너집니다 — 궁합, 가볍게 넘기지 마세요",
-              "대운 터지는 나이가 정해져 있습니다 — 내가 몇 살에 운이 열리는지 알고 싶지 않으세요?",
-            ].map((copy, i) => (
-              <div key={i} className="text-xs text-left rounded-xl px-4 py-2.5 flex items-start gap-2"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.45)" }}>
-                <span style={{ color: "#c9a84c" }} className="shrink-0 mt-0.5">✦</span>
-                <span>{copy}</span>
-              </div>
+          {/* 피처 태그 */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
+            {["격국·용신 분석", "60갑자 일주론", "신살 발견", "대운·세운표", "경도 보정", "무료"].map(tag => (
+              <span key={tag} className="text-xs px-3 py-1.5 rounded-full font-semibold"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.5)" }}>
+                {tag}
+              </span>
             ))}
           </div>
 
-          <button
-            onClick={() => router.push("/saju")}
-            className="inline-flex items-center gap-2 font-black text-base px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #c9a84c)",
-              color: "#fff",
-              boxShadow: "0 8px 32px rgba(124,58,237,0.35)",
-            }}
-          >
-            {t.heroCta}
-            <span>→</span>
-          </button>
-
-          {/* ── 실시간 통계 + 라이브 피드 ── */}
-          <div className="mt-10 max-w-sm mx-auto">
-            {/* 3-col stats */}
-            <div className="flex items-center justify-center gap-0 mb-5">
-              <div className="text-center px-5">
-                <p className="text-2xl font-black" style={{ color: "#f97316" }}>{todayCounter}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>지금 열람 중</p>
-              </div>
-              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <div className="text-center px-5">
-                <p className="text-2xl font-black text-white">{Math.floor(counter / 14).toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>오늘 열람</p>
-              </div>
-              <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <div className="text-center px-5">
-                <p className="text-2xl font-black text-white">{counter.toLocaleString()}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>누적 열람</p>
-              </div>
-            </div>
-
-            {/* 구분선 */}
-            <div className="w-full mb-4" style={{ height: 1, background: "rgba(255,255,255,0.07)" }} />
-
-            {/* 라이브 피드 헤더 */}
-            <div className="flex items-center gap-1.5 mb-3 justify-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>지금 사주를 열람 중인 분들</span>
-            </div>
-
-            {/* 라이브 피드 4행 */}
-            <div
-              className="space-y-2"
-              style={{ opacity: feedVisible ? 1 : 0, transition: "opacity 0.35s ease" }}
+          {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
+          <div className="max-w-sm mx-auto px-4 mb-4">
+            <button
+              onClick={() => router.push("/service/saju")}
+              className="cta-btn w-full font-black text-lg py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              style={{
+                background: "linear-gradient(135deg, #db2777, #9333ea)",
+                color: "#fff",
+                boxShadow: "0 0 40px rgba(219,39,119,0.35), 0 0 80px rgba(147,51,234,0.2)",
+              }}
             >
-              {Array.from({ length: 4 }).map((_, i) => {
-                const entry = LIVE_FEED_POOL[(feedOffset + i) % LIVE_FEED_POOL.length];
-                const isRare = entry.rarity < 10;
-                return (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {/* 아바타 */}
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black"
-                      style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                      {entry.name.slice(0, 2)}
-                    </div>
-                    {/* 이름 + 설명 */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-white">{entry.name}</p>
-                      <p className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)" }}>{entry.desc}</p>
-                    </div>
-                    {/* 희소성 */}
-                    <div className="text-right shrink-0">
-                      <p className="text-xs font-black" style={{ color: isRare ? "#f97316" : "rgba(255,255,255,0.5)" }}>
-                        희소성 {entry.rarity}%
-                      </p>
-                      <p className="text-[10px] flex items-center justify-end gap-1" style={{ color: "rgba(255,255,255,0.3)" }}>
-                        <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
-                        열람 중
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+              {t.heroCta}
+            </button>
+          </div>
+
+          {/* 소셜 프루프 한 줄 */}
+          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+            무료 · 1분 완성 · 친구한테 공유 필수
+          </p>
+
+          {/* 별점 + 누적 */}
+          <div className="flex items-center justify-center gap-4 flex-wrap mt-4">
+            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
+              style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.18)", color: "rgba(255,255,255,0.55)" }}>
+              <span style={{ color: "#f5c518" }}>★★★★★</span>
+              <span className="font-bold" style={{ color: "#f5c518" }}>4.7</span>
+              <span>실제 후기</span>
+            </div>
+            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
+              <span>누적 분석 <strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>건</span>
             </div>
           </div>
 
-          {/* ── 히어로 하단 카테고리 퀵메뉴 ── */}
-          <div className="mt-10 relative">
-            <p className="text-sm font-bold mb-3 tracking-wide" style={{ color: "rgba(255,255,255,0.55)" }}>카테고리로 찾기 ↓</p>
-            <div className="flex gap-2 justify-center flex-wrap">
-              {CATEGORIES.map(({ key, icon }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveCategory(key);
-                    document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200"
-                  style={{
-                    background: activeCategory === key ? "rgba(201,168,76,0.15)" : "rgba(255,255,255,0.04)",
-                    border: activeCategory === key ? "1px solid rgba(201,168,76,0.3)" : "1px solid rgba(255,255,255,0.07)",
-                    color: activeCategory === key ? "#e8c97a" : "rgba(255,255,255,0.4)",
-                  }}
-                >
-                  <span>{icon}</span>
-                  <span className="hidden sm:inline">{t.catLabel[key]}</span>
-                  <span className="sm:hidden">{t.catLabel[key]}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* ── 공지사항 (1줄 롤링) ── */}
         <section className="mb-10">
           <div
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer hover:bg-white/[0.03] transition-colors"
-            style={{ background: "rgba(10,10,20,0.5)", border: "1px solid rgba(255,255,255,0.07)" }}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-[1.01]"
+            style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.15)" }}
             onClick={() => router.push("/notice")}
           >
             <span className="text-xs font-bold shrink-0" style={{ color: "#fbbf24" }}>📢</span>
@@ -1004,76 +985,73 @@ export default function MainPage() {
           </div>
         </section>
 
+        {/* ── 면책 공지 ── */}
+        <p className="text-center mb-6" style={{ color: "rgba(255,255,255,0.18)", fontSize: 10 }}>
+          본 서비스는 오락·참고 목적의 AI 콘텐츠입니다. 실제 의사결정의 근거로 사용하지 마세요.
+        </p>
+
         {/* ── 서비스 섹션 ── */}
-        <section id="services-section" className="mb-14">
-          <div className="flex items-end justify-between mb-4">
+        <section id="services-section" className="mb-16">
+          <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>AI SERVICES</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">{t.servicesHeading}</h2>
+              <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ AI SERVICES</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.servicesHeading}</h2>
             </div>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지 서비스
+            <span className="text-xs px-3 py-1 rounded-full font-bold"
+              style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
+              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지
             </span>
           </div>
 
           {/* ── 카테고리 필터 탭 ── */}
-          <div className="relative mb-5">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
-              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}>
-              {CATEGORIES.map(({ key, icon }) => {
-                const isActive = activeCategory === key;
-                const count = key === "전체" ? SERVICES.length : SERVICES.filter(s => s.categories.includes(key)).length;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setActiveCategory(key)}
-                    className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap"
-                    style={{
-                      background: isActive
-                        ? key === "Special" ? "linear-gradient(135deg, rgba(201,168,76,0.25), rgba(161,98,7,0.3))"
-                          : key === "무료" ? "rgba(16,185,129,0.2)"
-                          : key === "연애·궁합" ? "rgba(236,72,153,0.2)"
-                          : key === "금전·투자" ? "rgba(16,185,129,0.2)"
-                          : key === "운명·대운" ? "rgba(202,138,4,0.2)"
-                          : key === "라이프" ? "rgba(99,102,241,0.2)"
-                          : "rgba(255,255,255,0.1)"
-                        : key === "무료" ? "rgba(16,185,129,0.07)" : key === "Special" ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.04)",
-                      border: isActive
-                        ? key === "Special" ? "1px solid rgba(201,168,76,0.4)"
-                          : key === "무료" ? "1px solid rgba(16,185,129,0.35)"
-                          : key === "연애·궁합" ? "1px solid rgba(236,72,153,0.35)"
-                          : key === "금전·투자" ? "1px solid rgba(16,185,129,0.35)"
-                          : key === "운명·대운" ? "1px solid rgba(202,138,4,0.35)"
-                          : key === "라이프" ? "1px solid rgba(99,102,241,0.35)"
-                          : "1px solid rgba(255,255,255,0.18)"
-                        : key === "무료" ? "1px solid rgba(16,185,129,0.2)" : key === "Special" ? "1px solid rgba(201,168,76,0.2)" : "1px solid rgba(255,255,255,0.07)",
-                      color: isActive
-                        ? key === "Special" ? "#e8c97a"
-                          : key === "무료" ? "#6ee7b7"
-                          : key === "연애·궁합" ? "#f9a8d4"
-                          : key === "금전·투자" ? "#6ee7b7"
-                          : key === "운명·대운" ? "#fbbf24"
-                          : key === "라이프" ? "#a78bfa"
-                          : "rgba(255,255,255,0.9)"
-                        : key === "무료" ? "rgba(52,211,153,0.8)" : key === "Special" ? "rgba(232,201,122,0.7)" : "rgba(255,255,255,0.38)",
-                    }}
-                  >
-                    <span>{icon}</span>
-                    <span>{t.catLabel[key]}</span>
-                    {isActive && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
-                        style={{ background: "rgba(255,255,255,0.12)" }}>
-                        {count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {/* 오른쪽 페이드 */}
-            <div className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none"
-              style={{ background: "linear-gradient(to right, transparent, #06060e)" }} />
-          </div>
+          {(() => {
+            const CAT_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
+              "전체":    { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.2)",  text: "#ffffff",  glow: "rgba(255,255,255,0.1)" },
+              "무료":    { bg: "rgba(16,185,129,0.18)",  border: "rgba(16,185,129,0.4)",   text: "#6ee7b7",  glow: "rgba(16,185,129,0.2)" },
+              "연애·궁합":{ bg: "rgba(59,130,246,0.15)", border: "rgba(59,130,246,0.4)",   text: "#3b82f6",  glow: "rgba(59,130,246,0.2)" },
+              "금전·투자":{ bg: "rgba(16,185,129,0.15)", border: "rgba(16,185,129,0.35)",  text: "#34d399",  glow: "rgba(16,185,129,0.15)" },
+              "운명·대운":{ bg: "rgba(245,197,24,0.12)", border: "rgba(245,197,24,0.35)",  text: "#f5c518",  glow: "rgba(245,197,24,0.15)" },
+              "라이프":  { bg: "rgba(139,92,246,0.15)",  border: "rgba(139,92,246,0.4)",   text: "#a78bfa",  glow: "rgba(139,92,246,0.2)" },
+              "Special": { bg: "rgba(245,197,24,0.15)",  border: "rgba(245,197,24,0.45)",  text: "#fbbf24",  glow: "rgba(245,197,24,0.2)" },
+              "19금":    { bg: "rgba(239,68,68,0.15)",   border: "rgba(239,68,68,0.4)",    text: "#f87171",  glow: "rgba(239,68,68,0.2)" },
+            };
+            return (
+              <div className="relative mb-6">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {CATEGORIES.map(({ key, icon }) => {
+                    const isActive = activeCategory === key;
+                    const c = CAT_COLORS[key] || CAT_COLORS["전체"];
+                    const count = key === "전체" ? SERVICES.length : SERVICES.filter(s => s.categories.includes(key)).length;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setActiveCategory(key)}
+                        className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 whitespace-nowrap"
+                        style={{
+                          background: isActive ? c.bg : "rgba(255,255,255,0.03)",
+                          border: isActive ? `1.5px solid ${c.border}` : "1px solid rgba(255,255,255,0.07)",
+                          color: isActive ? c.text : "rgba(255,255,255,0.38)",
+                          boxShadow: isActive ? `0 0 16px ${c.glow}` : "none",
+                          transform: isActive ? "scale(1.05)" : "scale(1)",
+                        }}
+                      >
+                        <span>{icon}</span>
+                        <span>{t.catLabel[key]}</span>
+                        {isActive && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
+                            style={{ background: "rgba(255,255,255,0.15)" }}>
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="absolute right-0 top-0 bottom-1 w-10 pointer-events-none"
+                  style={{ background: "linear-gradient(to right, transparent, #020c1b)" }} />
+              </div>
+            );
+          })()}
 
           {/* 데스크탑: 2컬럼, 모바일: 1컬럼 — 카드 overflow 허용으로 스티커 노출 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-visible">
@@ -1091,18 +1069,61 @@ export default function MainPage() {
           )}
         </section>
 
+        {/* ── 정보성 가이드 배너 ── */}
+        <section className="mb-10">
+          <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+            style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
+            <div className="flex-1">
+              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>📚 사주 명리학 가이드</p>
+              <p className="text-sm font-bold text-white mb-1">사주가 처음이신가요?</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                오행·천간지지·신살·대운 등 기초를 광고 없이 설명합니다.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/guide")}
+              className="shrink-0 text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+              style={{ background: "rgba(201,168,76,0.15)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.3)" }}
+            >
+              가이드 보기 →
+            </button>
+          </div>
+        </section>
+
+        {/* ── 19금 서비스 링크 ── */}
+        <section className="mb-10">
+          <button
+            onClick={() => router.push("/service/19plus")}
+            className="w-full rounded-xl px-4 py-3 text-xs flex items-center justify-center gap-2 transition-all"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}
+          >
+            <span>🔞</span>
+            <span>성인 전용 서비스는 별도 페이지에서 확인하세요</span>
+            <span>→</span>
+          </button>
+        </section>
+
         {/* ── 바이럴 띠 배너 ── */}
-        <section className="mb-14 -mx-4 sm:-mx-6">
-          <div className="relative py-10 sm:py-14 px-6 sm:px-12 text-center overflow-hidden"
-            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(10,10,20,0.9) 40%, rgba(201,168,76,0.12) 100%)", borderTop: "1px solid rgba(201,168,76,0.15)", borderBottom: "1px solid rgba(201,168,76,0.15)" }}>
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.025] text-[220px] font-black select-none pointer-events-none"
-              style={{ fontFamily: "'Noto Serif KR', serif" }}>☯</div>
-            <p className="text-xs font-semibold mb-3 tracking-widest uppercase" style={{ color: "rgba(201,168,76,0.65)" }}>Before & After</p>
-            <h3 className="text-xl sm:text-3xl font-black text-white mb-4 leading-snug">
+        <section className="mb-16 -mx-4 sm:-mx-6">
+          <div className="relative py-12 sm:py-16 px-6 sm:px-12 text-center overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(7,0,26,0.95) 45%, rgba(30,64,175,0.12) 100%)",
+              borderTop: "1px solid rgba(59,130,246,0.2)",
+              borderBottom: "1px solid rgba(139,92,246,0.2)",
+            }}>
+            {/* 배경 큰 기호 */}
+            <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
+              style={{ fontSize: 280, opacity: 0.018, fontWeight: 900, color: "#3b82f6" }}>命</div>
+            {/* 장식 별 */}
+            <span className="absolute top-6 left-[10%] text-2xl star-1" style={{ color: "#3b82f6", opacity: 0.6 }}>✦</span>
+            <span className="absolute bottom-6 right-[8%] text-xl star-3" style={{ color: "#f5c518", opacity: 0.6 }}>★</span>
+
+            <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(59,130,246,0.7)" }}>✦ Before & After ✦</p>
+            <h3 className="text-2xl sm:text-4xl font-black text-white mb-5 leading-snug">
               &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
-              <span style={{ color: "#c9a84c" }}>처음으로 방향이 보였습니다&rdquo;</span>
+              <span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
-            <p className="text-sm max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm sm:text-base max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
               타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
             </p>
@@ -1110,51 +1131,48 @@ export default function MainPage() {
         </section>
 
         {/* ── 후기 게시판 ── */}
-        <section className="mb-14">
-          <style>{`
-            @keyframes reviewTicker {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            .review-ticker:hover { animation-play-state: paused; }
-          `}</style>
-
-          <div className="flex items-end justify-between mb-5">
+        <section className="mb-16">
+          <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>REVIEWS</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white">{t.reviewsHeading}</h2>
+              <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ REVIEWS</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.reviewsHeading}</h2>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-yellow-400 text-sm">★★★★★</span>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>4.9 / 5.0</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.2)" }}>
+              <span style={{ color: "#f5c518" }}>★★★★★</span>
+              <span className="text-xs font-black" style={{ color: "#f5c518" }}>4.7</span>
             </div>
           </div>
 
           {/* 무한 가로 스크롤 필름 */}
           <div className="overflow-hidden -mx-4 sm:-mx-6">
             <div
-              className="review-ticker flex gap-3 py-2"
-              style={{ animation: "reviewTicker 180s linear infinite", width: "max-content" }}
+              className="review-ticker flex gap-3 py-2 px-4 sm:px-6"
+              style={{ animation: "reviewTicker 490s linear infinite", width: "max-content" }}
             >
               {[...REVIEWS, ...REVIEWS].map((r, i) => (
-                <div key={i} className="w-72 shrink-0 rounded-2xl p-4 flex flex-col gap-3"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={i} className="w-72 shrink-0 rounded-2xl p-5 flex flex-col gap-3"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderTop: "2px solid rgba(59,130,246,0.3)",
+                  }}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-bold text-white">{r.name}</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{r.region} · {r.age}</p>
+                      <p className="text-sm font-black text-white">{r.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{r.region} · {r.age}</p>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
-                      style={{ background: "rgba(201,168,76,0.1)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.2)" }}>
+                    <span className="text-[10px] px-2 py-1 rounded-full shrink-0 font-bold"
+                      style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.2)" }}>
                       {r.service}
                     </span>
                   </div>
                   <div className="flex gap-0.5">
                     {Array.from({ length: r.stars }).map((_, j) => (
-                      <span key={j} className="text-yellow-400 text-xs">★</span>
+                      <span key={j} style={{ color: "#f5c518" }}>★</span>
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
                     &ldquo;{r.text}&rdquo;
                   </p>
                 </div>
@@ -1178,12 +1196,12 @@ export default function MainPage() {
       </div>
 
       {/* ── 일진달력 + 문의하기 (PC 나란히 / 모바일 세로) ── */}
-      <section className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
+      <section className="border-t" style={{ borderColor: "rgba(59,130,246,0.1)" }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <IljinCalendar />
           </div>
-          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }}>
+          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <ContactSection />
           </div>
         </div>
@@ -1196,7 +1214,7 @@ export default function MainPage() {
             style={{ color: "rgba(255,255,255,0.35)" }}>
             <button onClick={() => router.push("/terms")} className="hover:text-amber-400/70 transition-colors">이용약관</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-            <button onClick={() => router.push("/privacy")} className="hover:text-amber-400/70 transition-colors font-semibold" style={{ color: "rgba(255,255,255,0.55)" }}>개인정보처리방침</button>
+            <button onClick={() => router.push("/privacy")} className="hover:text-amber-400/70 transition-colors" style={{ color: "rgba(255,255,255,0.35)" }}>개인정보처리방침</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors">환불규정</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
@@ -1226,13 +1244,16 @@ export default function MainPage() {
         <KakaoLoginButton redirectTo="/" floating />
       </div>
 
+      {/* ── 네이버 첫 로그인 프로필 저장 모달 ── */}
+      <NaverFirstLoginModal />
+
       {/* ── 모바일 하단 네비게이션 ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"
-        style={{ background: "rgba(6,6,14,0.97)", borderColor: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}>
+        style={{ background: "rgba(7,0,26,0.97)", borderColor: "rgba(59,130,246,0.15)", backdropFilter: "blur(20px)" }}>
         <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
-            { icon: "🔮", label: "사주", href: "/saju" },
+            { icon: "🔮", label: "사주", href: "/service/saju" },
             { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (

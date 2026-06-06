@@ -66,7 +66,7 @@ function TermsContent() {
                 : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
             }`}
           >
-            📋 이용약관
+            이용약관
           </button>
           <button
             onClick={() => setTab("refund")}
@@ -76,7 +76,7 @@ function TermsContent() {
                 : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
             }`}
           >
-            💰 환불규정
+            환불규정
           </button>
         </div>
 
@@ -84,7 +84,7 @@ function TermsContent() {
         {tab === "terms" && (
           <>
             <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-5 mb-10">
-              <p className="text-amber-300 font-bold text-sm mb-2">⚠️ 서비스 이용 전 반드시 확인하세요</p>
+              <p className="text-amber-300 font-bold text-sm mb-2">!서비스 이용 전 반드시 확인하세요</p>
               <p className="text-amber-200/80 text-xs leading-relaxed">
                 Summer Palace의 모든 사주·오행·MBTI·운세·배경화면·보고서 서비스는 <strong>순수 오락·참고 목적</strong>의 AI 생성 콘텐츠입니다.
                 분석 결과는 <strong>투자·의료·법률·진로·관계 등 실생활 결정의 근거로 사용할 수 없으며</strong>,
@@ -147,7 +147,7 @@ function TermsContent() {
 
               <Section num={6} title="서비스의 성격 및 면책 고지 (필독)">
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-3">
-                  <p className="text-red-300 font-bold text-sm mb-2">🚫 서비스 결과물의 한계</p>
+                  <p className="text-red-300 font-bold text-sm mb-2">서비스 결과물의 한계</p>
                   <ul className="space-y-1 text-xs text-red-200/80">
                     <Li>모든 분석 결과는 <strong>동양 철학 이론(사주팔자, 오행 등)과 AI 알고리즘을 결합한 오락·참고용 콘텐츠</strong>입니다.</Li>
                     <Li>분석 결과에는 과학적·의학적·법적 근거가 없으며, 실제 사실 또는 미래를 예언하지 않습니다.</Li>
@@ -168,7 +168,7 @@ function TermsContent() {
 
               <Section num={8} title="청약철회 및 환불">
                 <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4 mb-3">
-                  <p className="text-violet-300 font-bold text-sm mb-1">💰 자세한 환불 정책</p>
+                  <p className="text-violet-300 font-bold text-sm mb-1">자세한 환불 정책</p>
                   <p className="text-violet-200/80 text-xs leading-relaxed">
                     상단의 <strong>환불규정 탭</strong>에서 전체 환불 정책을 확인하세요.
                     「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따라,
@@ -256,7 +256,7 @@ function TermsContent() {
         {tab === "refund" && (
           <>
             <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-5 mb-6">
-              <p className="text-red-300 font-black text-sm mb-2">🚨 결제 전 필수 고지 (법적 효력)</p>
+              <p className="text-red-300 font-black text-sm mb-2">결제 전 필수 고지 (법적 효력)</p>
               <p className="text-red-200/80 text-xs leading-relaxed">
                 Summer Palace의 모든 유료 서비스는 <strong>결제 완료 즉시 서버에서 AI 콘텐츠 생성이 시작</strong>됩니다.
                 이용자가 결제 화면에서 동의 체크박스를 선택함으로써 본 환불불가 조건에 사전 동의한 것으로 처리됩니다.
@@ -267,7 +267,7 @@ function TermsContent() {
 
             {/* 서비스 제공 기간 및 방법 */}
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8 text-sm">
-              <p className="text-white font-bold mb-3">📋 서비스 제공 기간 및 방법</p>
+              <p className="text-white font-bold mb-3">서비스 제공 기간 및 방법</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
                 <span className="text-gray-500">제공 시점</span>
                 <span className="text-white font-bold">결제 완료 즉시 (수 초 이내)</span>
@@ -361,7 +361,7 @@ function TermsContent() {
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                      <span className="text-2xl">💬</span>
+                      <span className="text-sm text-yellow-400 font-bold">채팅</span>
                       <div>
                         <p className="font-bold text-yellow-300 text-sm">카카오 채널</p>
                         <p className="text-xs text-yellow-400/70 mt-0.5">pf.kakao.com/_cuksX</p>
@@ -369,7 +369,7 @@ function TermsContent() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                      <span className="text-2xl">📧</span>
+                      <span className="text-sm text-indigo-400 font-bold">메일</span>
                       <div>
                         <p className="font-bold text-indigo-300 text-sm">이메일 문의</p>
                         <p className="text-xs text-indigo-400/70 mt-0.5">smple@outlook.kr</p>
