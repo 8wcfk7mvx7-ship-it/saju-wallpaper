@@ -365,7 +365,7 @@ function OhaengDonut({ scores, total }: { scores: { 목: number; 화: number; �
   let cumAngle = -90;
   const R = 60, cx = 80, cy = 80, strokeW = 22;
   const segments = els.map(el => {
-    const pct = total > 0 ? scores[el] / total : 0;
+    const pct = total > 0 ? scores[el as keyof typeof scores] / total : 0;
     const angle = pct * 360;
     const startAngle = cumAngle;
     cumAngle += angle;
