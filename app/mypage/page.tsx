@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 interface SavedSaju {
   name: string;
@@ -43,6 +44,9 @@ export default function MyPage() {
   const [blueberries, setBlueberries] = useState(0);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState<BirthFormData>(defaultBirthData());
+  const [addName, setAddName] = useState("");
 
   useEffect(() => {
     setUser(parseUser());
@@ -84,6 +88,26 @@ export default function MyPage() {
     router.push("/service/saju");
   }
 
+  function saveNewSaju() {
+    if (!addName.trim() || !addForm.birthYear || !addForm.birthMonth || !addForm.birthDay) return;
+    const entry: SavedSaju = {
+      name: addName.trim(),
+      birthYear: Number(addForm.birthYear),
+      birthMonth: Number(addForm.birthMonth),
+      birthDay: Number(addForm.birthDay),
+      birthHour: addForm.birthHour ?? 0,
+      birthHourUnknown: addForm.birthHour === null,
+      gender: addForm.gender,
+      savedAt: new Date().toISOString(),
+    };
+    const next = [...savedSajus, entry];
+    setSavedSajus(next);
+    localStorage.setItem(SAJU_STORAGE_KEY, JSON.stringify(next));
+    setShowAddModal(false);
+    setAddName("");
+    setAddForm(defaultBirthData());
+  }
+
   function saveLabel(index: number) {
     const next = savedSajus.map((s, i) => i === index ? { ...s, label: editLabel } : s);
     setSavedSajus(next);
@@ -104,7 +128,7 @@ export default function MyPage() {
       <div className="sticky top-0 z-40 border-b backdrop-blur-xl"
         style={{ background: "rgba(6,6,14,0.9)", borderColor: "rgba(255,255,255,0.07)" }}>
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition text-sm">←</button>
+          <button onClick={() => router.push("/")} className="text-gray-400 hover:text-white transition text-sm">←</button>
           <h1 className="text-base font-black text-white">보관함</h1>
         </div>
       </div>
@@ -208,10 +232,10 @@ export default function MyPage() {
                 <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
                   사주 분석 페이지에서 생년월일을 입력하면<br />자동으로 여기에 저장됩니다
                 </p>
-                <button onClick={() => router.push("/service/saju")}
+                <button onClick={() => setShowAddModal(true)}
                   className="text-sm px-5 py-2.5 rounded-xl font-bold transition-all"
                   style={{ background: "rgba(201,168,76,0.15)", color: "#e8c97a", border: "1px solid rgba(201,168,76,0.3)" }}>
-                  사주 분석하러 가기 →
+                  새로운 생년월일 입력하기 →
                 </button>
               </div>
             ) : (
@@ -324,6 +348,50 @@ export default function MyPage() {
         )}
         </>}
       </div>
+
+      {/* 새 생년월일 입력 모달 */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowAddModal(false); }}>
+          <div className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl overflow-y-auto"
+            style={{ background: "#0e0e1a", border: "1px solid rgba(255,255,255,0.1)", maxHeight: "90vh" }}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b"
+              style={{ background: "#0e0e1a", borderColor: "rgba(255,255,255,0.08)" }}>
+              <h2 className="font-black text-white text-base">새로운 생년월일 입력</h2>
+              <button onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-white transition text-xl leading-none">✕</button>
+            </div>
+            <div className="px-5 pt-4 pb-2">
+              <label className="block text-xs font-bold mb-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>이름 또는 별명</label>
+              <input
+                value={addName}
+                onChange={e => setAddName(e.target.value)}
+                placeholder="예: 나, 엄마, 친구"
+                className="w-full px-4 py-3 rounded-xl text-sm text-white focus:outline-none mb-4"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+              />
+            </div>
+            <div className="px-5 pb-4">
+              <BirthInputForm
+                value={addForm}
+                onChange={setAddForm}
+                accent="#c9a84c"
+              />
+            </div>
+            <div className="sticky bottom-0 px-5 pb-6 pt-3 border-t"
+              style={{ background: "#0e0e1a", borderColor: "rgba(255,255,255,0.08)" }}>
+              <button
+                onClick={saveNewSaju}
+                disabled={!addName.trim() || !addForm.birthYear || !addForm.birthMonth || !addForm.birthDay}
+                className="w-full py-3.5 rounded-2xl font-black text-sm transition-all disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #c9a84c, #e8c97a)", color: "#06060e" }}>
+                저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 모바일 하단 네비 */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden border-t"

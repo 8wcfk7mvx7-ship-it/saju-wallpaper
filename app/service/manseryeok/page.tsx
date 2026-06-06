@@ -11,8 +11,42 @@ import {
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
+  JIJANGAN_DISPLAY,
   type SajuResult, type Element,
 } from "@/lib/saju";
+
+// ─── 한자 변환 ──────────────────────────────────────────────────────────────────
+const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
+const JJ_HANJA: Record<string,string> = { 자:"子",축:"丑",인:"寅",묘:"卯",진:"辰",사:"巳",오:"午",미:"未",신:"申",유:"酉",술:"戌",해:"亥" };
+const UUNSEONG_HANJA: Record<string,string> = {
+  장생:"長生", 목욕:"沐浴", 관대:"冠帶", 건록:"建祿", 제왕:"帝旺",
+  쇠:"衰", 병:"病", 사:"死", 묘:"墓", 절:"絶", 태:"胎", 양:"養",
+};
+const UUNSEONG_PEAK = new Set(["제왕","건록","장생"]);
+const UUNSEONG_WEAK = new Set(["사","묘","절","병"]);
+
+// ─── 격국 계산 ──────────────────────────────────────────────────────────────────
+const ILGAN_GEONROK: Record<string,string> = { 갑:"인",을:"묘",병:"사",정:"오",무:"사",기:"오",경:"신",신:"유",임:"해",계:"자" };
+const ILGAN_YANGIN:  Record<string,string> = { 갑:"묘",병:"오",무:"오",경:"유",임:"자" };
+function calcGyeokguk(ilgan: string, monthJj: string): { name: string; hanja: string; color: string } {
+  if (ILGAN_GEONROK[ilgan] === monthJj) return { name: "건록격", hanja: "建祿格", color: "#34d399" };
+  if (ILGAN_YANGIN[ilgan]  === monthJj) return { name: "양인격", hanja: "羊刃格", color: "#f87171" };
+  const bongi = JIJI_BONGI[monthJj] || "";
+  const ss = getSipseong(ilgan, bongi);
+  const MAP: Record<string, { name: string; hanja: string; color: string }> = {
+    식신: { name:"식신격", hanja:"食神格", color:"#34d399" },
+    상관: { name:"상관격", hanja:"傷官格", color:"#6ee7b7" },
+    편재: { name:"편재격", hanja:"偏財格", color:"#fbbf24" },
+    정재: { name:"정재격", hanja:"正財格", color:"#fde68a" },
+    편관: { name:"칠살격", hanja:"七殺格", color:"#f87171" },
+    정관: { name:"정관격", hanja:"正官格", color:"#fca5a5" },
+    편인: { name:"편인격", hanja:"偏印格", color:"#60a5fa" },
+    정인: { name:"정인격", hanja:"正印格", color:"#93c5fd" },
+    비견: { name:"건록격", hanja:"建祿格", color:"#34d399" },
+    겁재: { name:"양인격", hanja:"羊刃格", color:"#f87171" },
+  };
+  return MAP[ss] || { name:"잡격", hanja:"雜格", color:"#9ca3af" };
+}
 
 function jijiElement(jj: string): Element {
   return (CHEONGAN_ELEMENT[JIJI_BONGI[jj] || ""] || "토") as Element;
@@ -488,49 +522,88 @@ function ResultView({
       )}
 
       {/* ① 사주팔자 4주 그리드 */}
+      {(() => {
+        const gyeokguk = calcGyeokguk(ilgan, monthJj);
+        return (
       <Section title="사주팔자 (四柱八字)" accent="#818cf8">
-        <div className={`grid gap-2.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3"}`}>
+        {/* 격국 뱃지 */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xs px-2.5 py-1 rounded-full font-black" style={{ background: `${gyeokguk.color}18`, color: gyeokguk.color, border: `1px solid ${gyeokguk.color}40` }}>
+            {gyeokguk.name} ({gyeokguk.hanja})
+          </span>
+          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>월지 본기 기준</span>
+        </div>
+
+        <div className={`grid gap-1.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3"}`}>
           {pillars.map(({ label, d }) => {
             const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
             const jiEl = jijiElement(d.jj);
             const cgStyle = EL_STYLE[cgEl];
             const jiStyle = EL_STYLE[jiEl];
+            const jijangan = JIJANGAN_DISPLAY[d.jj] || [];
+            const isWeak = d.uunseong ? UUNSEONG_WEAK.has(d.uunseong) : false;
+            const isPeak = d.uunseong ? UUNSEONG_PEAK.has(d.uunseong) : false;
             return (
-              <div key={label} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="text-center py-1.5 text-[11px] font-bold" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)" }}>{label}</div>
-                {/* 천간 */}
-                <div className="py-4 flex flex-col items-center gap-1" style={{ background: cgStyle.bg, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <span className="text-2xl font-black" style={{ color: cgStyle.text }}>{d.cg}</span>
-                  <span className="text-[10px] font-semibold" style={{ color: cgStyle.text }}>{cgEl}</span>
-                  {d.sipseongCg && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColorByIlgan(ilgan, d.sipseongCg) }}>
-                      {d.sipseongCg}
-                    </span>
-                  )}
+              <div key={label} className="rounded-xl overflow-hidden flex flex-col" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                {/* 기둥 라벨 */}
+                <div className="text-center py-1 text-[10px] font-bold" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.35)" }}>{label}</div>
+
+                {/* 천간 십신 */}
+                {d.sipseongCg && (
+                  <div className="text-center py-0.5 text-[9px] font-bold" style={{ background: cgStyle.bg, color: sipseongColorByIlgan(ilgan, d.sipseongCg) }}>{d.sipseongCg}</div>
+                )}
+
+                {/* 천간 한자 박스 */}
+                <div className="py-3 flex flex-col items-center gap-0.5" style={{ background: cgStyle.bg, borderBottom: "1px solid rgba(0,0,0,0.15)" }}>
+                  <span className="font-black leading-none" style={{ color: cgStyle.text, fontSize: "1.8rem" }}>{CG_HANJA[d.cg] || d.cg}</span>
+                  <span className="text-[9px] font-bold" style={{ color: cgStyle.text, opacity: 0.7 }}>{d.cg} · {cgEl}</span>
                 </div>
-                {/* 지지 */}
-                <div className="py-4 flex flex-col items-center gap-1" style={{ background: jiStyle.bg }}>
-                  <span className="text-2xl font-black" style={{ color: jiStyle.text }}>{d.jj}</span>
-                  <span className="text-[10px] font-semibold" style={{ color: jiStyle.text }}>{jiEl}</span>
-                  {d.sipseongJj && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(0,0,0,0.3)", color: sipseongColorByIlgan(ilgan, d.sipseongJj) }}>
-                      {d.sipseongJj}
-                    </span>
-                  )}
+
+                {/* 지지 십신 */}
+                {d.sipseongJj && (
+                  <div className="text-center py-0.5 text-[9px] font-bold" style={{ background: jiStyle.bg, color: sipseongColorByIlgan(ilgan, d.sipseongJj) }}>{d.sipseongJj}</div>
+                )}
+
+                {/* 지지 한자 박스 */}
+                <div className="py-3 flex flex-col items-center gap-0.5" style={{ background: jiStyle.bg }}>
+                  <span className="font-black leading-none" style={{ color: jiStyle.text, fontSize: "1.8rem" }}>{JJ_HANJA[d.jj] || d.jj}</span>
+                  <span className="text-[9px] font-bold" style={{ color: jiStyle.text, opacity: 0.7 }}>{d.jj} · {jiEl}</span>
                 </div>
+
+                {/* 지장간 */}
+                {jijangan.length > 0 && (
+                  <div className="px-1 py-1.5 flex justify-center gap-1" style={{ background: "rgba(0,0,0,0.25)", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                    {jijangan.map(({ stem, role }) => {
+                      const sel = CHEONGAN_ELEMENT[stem] || "토";
+                      const ss = getSipseong(ilgan, stem);
+                      return (
+                        <div key={stem} className="flex flex-col items-center">
+                          <span className="font-black text-[11px] leading-none" style={{ color: EL_STYLE[sel].text }}>{CG_HANJA[stem] || stem}</span>
+                          <span className="text-[7px] leading-none mt-0.5" style={{ color: ss ? sipseongColorByIlgan(ilgan, ss) : "rgba(255,255,255,0.3)" }}>{ss || stem}</span>
+                          <span className="text-[6px] leading-none" style={{ color: role === "정기" ? "#fbbf24" : "rgba(255,255,255,0.2)" }}>{role === "정기" ? "본" : role === "중기" ? "중" : "여"}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
                 {/* 12운성 */}
                 {d.uunseong && (
-                  <div className="text-center py-2 text-[10px]" style={{ background: "rgba(0,0,0,0.2)", color: "rgba(255,255,255,0.4)" }}>
-                    {d.uunseong}
+                  <div className="text-center py-1.5 text-[9px] font-bold" style={{
+                    background: "rgba(0,0,0,0.2)",
+                    color: isPeak ? "#fbbf24" : isWeak ? "#f87171" : "rgba(255,255,255,0.45)",
+                  }}>
+                    {UUNSEONG_HANJA[d.uunseong] || ""} {d.uunseong}
+                    {d.uunseong === "제왕" && <span className="ml-0.5 text-[7px]">★</span>}
                   </div>
                 )}
               </div>
             );
           })}
         </div>
-        <div className="mt-3 text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
-          일간(日干): <span className="font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{ilgan}({CHEONGAN_ELEMENT[ilgan]})</span>
-          &nbsp;·&nbsp;일지 12운성: <span className="font-bold text-white">{pd.day.uunseong}</span>
+        <div className="mt-3 text-[10px] text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+          일간(日干): <span className="font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{CG_HANJA[ilgan] || ilgan} {ilgan}({CHEONGAN_ELEMENT[ilgan]})</span>
+          &nbsp;·&nbsp;일지 12운성: <span className="font-bold" style={{ color: UUNSEONG_PEAK.has(pd.day.uunseong) ? "#fbbf24" : UUNSEONG_WEAK.has(pd.day.uunseong) ? "#f87171" : "white" }}>{pd.day.uunseong}</span>
         </div>
 
         {/* 궁성론 — 각 기둥 의미 */}
@@ -564,6 +637,8 @@ function ResultView({
           })}
         </div>
       </Section>
+        );
+      })()}
 
       {/* 신살 — 사주 바로 아래 */}
       {result.sinsalList.length > 0 && (
