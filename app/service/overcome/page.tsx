@@ -62,9 +62,6 @@ export default function OvercomePage() {
           <div className="absolute bottom-[-20%] right-[-20%] w-[500px] h-[500px] rounded-full blur-[140px]" style={{ background: "rgba(139,92,246,0.08)" }} />
         </div>
 
-        <div className="relative z-10 flex items-center px-5 py-4">
-          <span className="text-xs px-2 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/20">₩990</span>
-        </div>
 
         <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
           <div className="flex items-center gap-2 mb-8">
