@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import {
-  getDayPillar, analyzeSaju, getUunseong,
+  getDayPillar, analyzeSaju, getUunseong, getSipseong,
   CHEONGAN_ELEMENT, JIJI_BONGI,
+  type SajuResult,
 } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -155,6 +156,34 @@ const DAY_COLOR: Record<string, { bg: string; text: string; dot: string; ring: s
 function daysInMonth(y: number, m: number) { return new Date(y, m, 0).getDate(); }
 function firstDow(y: number, m: number) { return new Date(y, m - 1, 1).getDay(); }
 
+const CG_HANJA: Record<string, string> = {
+  갑:"甲", 을:"乙", 병:"丙", 정:"丁", 무:"戊", 기:"己", 경:"庚", 신:"辛", 임:"壬", 계:"癸",
+};
+const JJ_HANJA: Record<string, string> = {
+  자:"子", 축:"丑", 인:"寅", 묘:"卯", 진:"辰", 사:"巳", 오:"午", 미:"未", 신:"申", 유:"酉", 술:"戌", 해:"亥",
+};
+const JIJANGAN_DISP: Record<string, Array<{stem: string; role: string}>> = {
+  자:[{stem:"임",role:"여"},{stem:"계",role:"정"}],
+  축:[{stem:"계",role:"여"},{stem:"신",role:"중"},{stem:"기",role:"정"}],
+  인:[{stem:"무",role:"여"},{stem:"병",role:"중"},{stem:"갑",role:"정"}],
+  묘:[{stem:"갑",role:"여"},{stem:"을",role:"정"}],
+  진:[{stem:"을",role:"여"},{stem:"계",role:"중"},{stem:"무",role:"정"}],
+  사:[{stem:"무",role:"여"},{stem:"경",role:"중"},{stem:"병",role:"정"}],
+  오:[{stem:"병",role:"여"},{stem:"기",role:"중"},{stem:"정",role:"정"}],
+  미:[{stem:"정",role:"여"},{stem:"을",role:"중"},{stem:"기",role:"정"}],
+  신:[{stem:"무",role:"여"},{stem:"임",role:"중"},{stem:"경",role:"정"}],
+  유:[{stem:"경",role:"여"},{stem:"신",role:"정"}],
+  술:[{stem:"신",role:"여"},{stem:"정",role:"중"},{stem:"무",role:"정"}],
+  해:[{stem:"무",role:"여"},{stem:"갑",role:"중"},{stem:"임",role:"정"}],
+};
+
+const EL_COLOR: Record<string, string> = {
+  목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#94a3b8", 수: "#60a5fa",
+};
+const EL_BG: Record<string, string> = {
+  목: "rgba(74,222,128,0.15)", 화: "rgba(248,113,113,0.15)", 토: "rgba(251,191,36,0.12)", 금: "rgba(148,163,184,0.15)", 수: "rgba(96,165,250,0.15)",
+};
+
 const CURRENT_YEAR = 2026;
 const YEAR_OPTS = Array.from({ length: CURRENT_YEAR - 1929 }, (_, i) => CURRENT_YEAR - i);
 const MONTH_OPTS = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -178,6 +207,7 @@ export default function CalendarPage() {
   // result state
   const [userIlgan, setUserIlgan] = useState<string | null>(null);
   const [userMonthJj, setUserMonthJj] = useState<string | null>(null);
+  const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
   const [viewYear, setViewYear] = useState(CURRENT_YEAR);
   const [viewMonth, setViewMonth] = useState(new Date().getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState<{ day: number; dp: { cg: string; jj: string }; score: number; uuns: string } | null>(null);
@@ -257,6 +287,7 @@ export default function CalendarPage() {
       });
       setUserIlgan(r.pillarsDetail.day.cg);
       setUserMonthJj(r.pillarsDetail.month.jj);
+      setSajuResult(r);
       const now = new Date();
       setViewYear(now.getFullYear());
       setViewMonth(now.getMonth() + 1);
@@ -420,6 +451,93 @@ export default function CalendarPage() {
             </p>
           </div>
         </div>
+
+        {/* 원국 (原局) */}
+        {sajuResult && (() => {
+          const ilgan = sajuResult.pillarsDetail.day.cg;
+          const pillars = [
+            { label: "연주", pd: sajuResult.pillarsDetail.year },
+            { label: "월주", pd: sajuResult.pillarsDetail.month },
+            { label: "일주", pd: sajuResult.pillarsDetail.day },
+            ...(sajuResult.pillarsDetail.hour ? [{ label: "시주", pd: sajuResult.pillarsDetail.hour! }] : []),
+          ];
+          // display order: 시주·일주·월주·연주 (right-to-left reading, but we show left-to-right as 시·일·월·연 in Korean apps)
+          // Reference app shows 시→일→월→연 from left, so reverse to match
+          const orderedPillars = [...pillars].reverse();
+
+          return (
+            <div className="mb-6 rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1 h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #a78bfa, #60a5fa)" }} />
+                <h2 className="text-base font-black text-white tracking-wide">원국 <span className="text-xs font-normal" style={{ color: "rgba(255,255,255,0.35)" }}>(原局)</span></h2>
+              </div>
+
+              <div className={`grid gap-2`} style={{ gridTemplateColumns: `repeat(${orderedPillars.length}, 1fr)` }}>
+                {orderedPillars.map(({ label, pd }) => {
+                  const cgEl = CHEONGAN_ELEMENT[pd.cg] ?? "토";
+                  const jjEl = CHEONGAN_ELEMENT[JIJI_BONGI[pd.jj] ?? ""] ?? "토";
+                  const sipCg = getSipseong(ilgan, pd.cg);
+                  const sipJj = getSipseong(ilgan, JIJI_BONGI[pd.jj] ?? "");
+                  const jzList = JIJANGAN_DISP[pd.jj] ?? [];
+
+                  return (
+                    <div key={label} className="flex flex-col items-center gap-1">
+                      {/* 기둥 레이블 */}
+                      <span className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.35)" }}>{label}</span>
+
+                      {/* 천간 */}
+                      <div className="w-full flex flex-col items-center">
+                        <span className="text-[11px] font-bold mb-0.5" style={{ color: EL_COLOR[cgEl] }}>{sipCg || "─"}</span>
+                        <div className="w-full aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0"
+                          style={{ background: EL_BG[cgEl], border: `1px solid ${EL_COLOR[cgEl]}40` }}>
+                          <span className="font-black leading-none" style={{ fontSize: "clamp(1.4rem,5vw,2rem)", color: EL_COLOR[cgEl] }}>
+                            {CG_HANJA[pd.cg] ?? pd.cg}
+                          </span>
+                          <span className="text-[11px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.cg}</span>
+                        </div>
+                      </div>
+
+                      {/* 지지 */}
+                      <div className="w-full flex flex-col items-center">
+                        <div className="w-full aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0"
+                          style={{ background: EL_BG[jjEl], border: `1px solid ${EL_COLOR[jjEl]}40` }}>
+                          <span className="font-black leading-none" style={{ fontSize: "clamp(1.4rem,5vw,2rem)", color: EL_COLOR[jjEl] }}>
+                            {JJ_HANJA[pd.jj] ?? pd.jj}
+                          </span>
+                          <span className="text-[11px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.jj}</span>
+                        </div>
+                        <span className="text-[11px] font-bold mt-0.5" style={{ color: EL_COLOR[jjEl] }}>{sipJj || "─"}</span>
+                      </div>
+
+                      {/* 지장간 */}
+                      <div className="w-full rounded-lg p-1.5 flex flex-col items-center gap-1"
+                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        {jzList.map((jz) => {
+                          const jzEl = CHEONGAN_ELEMENT[jz.stem] ?? "토";
+                          const jzSip = getSipseong(ilgan, jz.stem);
+                          return (
+                            <div key={jz.stem + jz.role} className="flex flex-col items-center leading-none gap-0.5">
+                              <span className="text-[13px] font-black" style={{ color: EL_COLOR[jzEl] }}>
+                                {CG_HANJA[jz.stem] ?? jz.stem}
+                              </span>
+                              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>{jz.stem}</span>
+                              <span className="text-[10px] font-semibold" style={{ color: EL_COLOR[jzEl] }}>{jzSip || "─"}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* 12운성 */}
+                      <span className="text-[11px] font-semibold text-center leading-tight" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {pd.uunseong}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 3개월 분석 공지 */}
         <div className="mb-5 px-4 py-3 rounded-xl text-sm flex items-start gap-2"
