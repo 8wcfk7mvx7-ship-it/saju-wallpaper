@@ -98,7 +98,9 @@ export default function SajuChatPage() {
     // 십신별 심화 설명 구성
     const sipseongSet = new Set<string>();
     for (const p of Object.values(result.pillarsDetail)) {
-      if ((p as { sipseong?: string }).sipseong) sipseongSet.add((p as { sipseong: string }).sipseong);
+      const pd = p as { sipseongCg?: string; sipseongJj?: string };
+      if (pd.sipseongCg) sipseongSet.add(pd.sipseongCg);
+      if (pd.sipseongJj) sipseongSet.add(pd.sipseongJj);
     }
     const sipseongDesc = [...sipseongSet]
       .map(ss => SIPSEONG_DESC[ss] ? `${ss}(${SIPSEONG_DESC[ss].hanja}): ${SIPSEONG_DESC[ss].short}` : null)
