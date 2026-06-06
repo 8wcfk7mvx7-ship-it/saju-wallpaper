@@ -849,8 +849,9 @@ export default function MainPage() {
         {/* ── 히어로 섹션 ── */}
         <section className="py-16 sm:py-24 text-center relative">
           {/* 마스코트 */}
-          <div className="absolute right-0 bottom-0 pointer-events-none select-none hidden sm:block" style={{ width: 160, opacity: 0.92 }}>
-            <Image src="/mascot.png" alt="사주 마스코트" width={160} height={200} style={{ objectFit: "contain", filter: "drop-shadow(0 8px 24px rgba(147,51,234,0.35))" }} priority />
+          <div className="absolute right-0 bottom-0 pointer-events-none select-none hidden sm:block" style={{ width: 220 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/mascot.png" alt="사주 마스코트" style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 8px 32px rgba(147,51,234,0.4))" }} />
           </div>
 
           {/* 플로팅 장식 별 */}
