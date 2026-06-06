@@ -859,15 +859,6 @@ export default function MainPage() {
           <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#f472b6" }}>◆</span>
           <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#818cf8" }}>✦</span>
 
-          {/* 서비스 배지 */}
-          <div className="flex justify-center mb-5">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold tracking-widest uppercase"
-              style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", color: "rgba(255,255,255,0.5)" }}>
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#ec4899" }} />
-              SUMMER PALACE · 무료 사주 분석
-            </div>
-          </div>
-
           {/* 스파클 아이콘 */}
           <div className="flex justify-center mb-5">
             <div className="relative">
