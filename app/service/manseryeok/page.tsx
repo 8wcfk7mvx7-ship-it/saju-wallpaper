@@ -360,26 +360,38 @@ function Section({ title, accent = "#60a5fa", children }: { title: string; accen
   );
 }
 
-function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
-  const [copied, setCopied] = useState(false);
+function ShareButton({ targetId = "manseryeok-result", fileName = "내사주_만세력" }: { targetId?: string; fileName?: string }) {
+  const [saving, setSaving] = useState(false);
+  const [done, setDone] = useState(false);
 
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
+  async function handleSaveImage() {
+    const node = document.getElementById(targetId);
+    if (!node) return;
+    setSaving(true);
+    try {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(node, { backgroundColor: "#06060e", pixelRatio: 2 });
+      const link = document.createElement("a");
+      link.download = `${fileName}.png`;
+      link.href = dataUrl;
+      link.click();
+      setDone(true);
+      setTimeout(() => setDone(false), 2000);
+    } catch {
+      // ignore
+    } finally {
+      setSaving(false);
     }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
     <button
-      onClick={handleShare}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+      onClick={handleSaveImage}
+      disabled={saving}
+      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
       style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
     >
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
+      {saving ? "저장 중..." : done ? "✓ 이미지 저장됨" : "⬇ 이미지로 저장하기"}
     </button>
   );
 }
@@ -491,7 +503,7 @@ function ResultView({
   const hapChungChar = hapCount > chungCount ? HAP_CHUNG_CHARACTER.합 : chungCount > 0 ? HAP_CHUNG_CHARACTER.충 : null;
 
   return (
-    <div className="space-y-5">
+    <div id="manseryeok-result" className="space-y-5">
       {/* 헤더 */}
       <div className="flex items-start justify-between">
         <div>
@@ -527,7 +539,7 @@ function ResultView({
           <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>월지 본기 기준</span>
         </div>
 
-        <div className={`grid gap-1.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3"}`}>
+        <div className={`grid gap-1.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3 max-w-[75%] mx-auto"}`}>
           {pillars.map(({ label, d }) => {
             const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
             const jiEl = jijiElement(d.jj);
