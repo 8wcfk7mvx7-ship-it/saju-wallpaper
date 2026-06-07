@@ -340,6 +340,7 @@ function TermsContent() {
                     <Li icon="x"><span><strong className="text-gray-300">다른 서비스와 중복 이용</strong>하거나 다른 플랫폼에서 유사 분석을 이미 받은 경우</span></Li>
                     <Li icon="x"><span>결제 후 <strong className="text-gray-300">단순 변심</strong></span></Li>
                     <Li icon="x"><span>PDF 다운로드·이미지 저장·캡처·공유 등 <strong className="text-gray-300">콘텐츠를 외부로 반출</strong>한 경우</span></Li>
+                    <Li icon="x"><span>AI 채팅 서비스 이용 중 <strong className="text-gray-300">음란물·불법행위 등 AI가 답변할 수 없는 내용을 질문</strong>하여 답변이 거부된 경우 (별조각은 정상 차감되며 환불 대상이 아님)</span></Li>
                     <Li icon="x"><span>결제 화면에서 <strong className="text-gray-300">이용약관·환불불가 조건에 동의 체크</strong> 후 결제를 진행한 경우 (모든 결제에 해당)</span></Li>
                   </ul>
                 </div>
