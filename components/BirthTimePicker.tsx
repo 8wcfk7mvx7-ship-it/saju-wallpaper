@@ -218,23 +218,21 @@ export default function BirthTimePicker({ value, onChange, accent = "indigo", si
         </p>
       )}
 
-      {/* 야자시·조자시 체크박스 */}
-      {!value.unknown && (
-        <button
-          type="button"
-          onClick={() => onChange({ ...value, useJajasi: !value.useJajasi })}
-          className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${
-            value.useJajasi ? accentCheck + " font-medium" : "bg-white/5 border-white/10 text-gray-500 hover:text-gray-300"
-          }`}
-        >
-          <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-            value.useJajasi ? "border-current" : "border-gray-600"
-          }`}>
-            {value.useJajasi && <span className="text-[10px] font-black">✓</span>}
-          </span>
-          야자시·조자시 적용
-        </button>
-      )}
+      {/* 야자시·조자시 체크박스 — 항상 표시 */}
+      <button
+        type="button"
+        onClick={() => onChange({ ...value, useJajasi: !value.useJajasi })}
+        className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition ${
+          value.useJajasi ? accentCheck + " font-medium" : "bg-white/5 border-white/10 text-gray-500 hover:text-gray-300"
+        }`}
+      >
+        <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+          value.useJajasi ? "border-current" : "border-gray-600"
+        }`}>
+          {value.useJajasi && <span className="text-[10px] font-black">✓</span>}
+        </span>
+        야자시·조자시 적용
+      </button>
     </div>
   );
 }
