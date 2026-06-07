@@ -147,6 +147,8 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"연애·결혼 시기가 늦거나 독신 경향이 강해요. 영적 감수성이 뛰어나고 집중력이 강해요. 여성에게 강하게 작용해요"},
   평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"리더 기질과 강한 고집을 타고났어요. 남 밑에서 통제받는 것을 체질적으로 거부하며, 주도권을 잡아야 에너지가 살아나요. 융통성을 의도적으로 기르지 않으면 독불장군이 되기 쉬워요"},
   나체도화: {hanja:"裸體桃花", category:"neutral",  desc:"매력이 직관적으로 드러나 숨길 수 없어요. 어디서든 시선을 끌고 이성이 자연스럽게 모이는 기운이에요. 그만큼 구설수·치정·스캔들에 휘말리기 쉽고 감정 기복으로 스스로 피곤해지는 경향이 있어요"},
+  곤랑도화: {hanja:"滾浪桃花", category:"unlucky",  desc:"천간끼리는 끈끈하게 합을 이루는데 지지끼리는 서로 부딪히는 형(刑)의 구조예요. 겉으로는 깊이 끌리고 가까워지지만 속으로는 갈등과 구설이 쌓이기 쉬운 애정운이에요. 치정 시비나 관재구설로 번지지 않도록 거리 조절이 중요해요"},
+  녹방도화: {hanja:"祿傍桃花", category:"lucky",  desc:"이성에게 어필하는 매력이 재물·명예운(건록·정관)과 함께 자리한 귀한 구조예요. 끼를 부리지 않아도 기품 있는 분위기로 사람을 끌고, 그 매력이 곧 사회적 인정과 좋은 인연으로 이어지는 흐름이에요"},
   낙정관살: {hanja:"落井關殺", category:"unlucky",  desc:"수난사고·추락·함몰 관련 사고에 취약해요. 폰 보며 걷다 맨홀·싱크홀에 빠지는 유형의 부주의가 실제 사고로 이어지기 쉬워요. 곡각살과 겹치면 물리적 충격이 더욱 강해지니 이동 중 항상 주변을 살피세요"},
   음인:     {hanja:"陰刃",   category:"unlucky",  desc:"겉으로는 온화하고 만만해 보이나 속에 독한 기운을 품고 있어요. 양인이 정면충돌형 강함이라면 음인은 끈질기고 은밀한 저항력이에요. 위기 상황에서 생존력이 극대화되며, 감정을 오래 쌓아두다 폭발하는 패턴을 주의하세요"},
   고신살:   {hanja:"孤神殺", category:"unlucky",  desc:"고독하고 의지할 곳이 없는 기운이에요. 이별수가 있어요"},
@@ -1338,6 +1340,31 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   // 나체도화: 일지 = 일간의 목욕지
   if (dayPillar.jj === MUBATH_JJ[ilgan]) {
     addSinsal('나체도화', ['일']);
+  }
+  // 곤랑도화(滾浪桃花): 두 기둥의 천간이 합(合)을 이루면서 동시에 지지가 형(刑)을 이루는 구조
+  {
+    const HAP_PAIRS = [["갑","기"],["을","경"],["병","신"],["정","임"],["무","계"]];
+    const HYEONG_PAIRS = [["자","묘"],["인","사"],["사","신"],["인","신"],["축","술"],["술","미"],["축","미"],["진","진"],["오","오"],["유","유"],["해","해"]];
+    const isHap = (a:string,b:string) => HAP_PAIRS.some(([x,y]) => (a===x&&b===y)||(a===y&&b===x));
+    const isHyeong = (a:string,b:string) => HYEONG_PAIRS.some(([x,y]) => (a===x&&b===y)||(a===y&&b===x));
+    let gonglangFound: string[] = [];
+    for (let i = 0; i < detailArr.length; i++) {
+      for (let j = i + 1; j < detailArr.length; j++) {
+        const a = detailArr[i], b = detailArr[j];
+        if (isHap(a.d.cg, b.d.cg) && isHyeong(a.d.jj, b.d.jj)) {
+          gonglangFound = [a.label, b.label];
+        }
+      }
+    }
+    addSinsal('곤랑도화', gonglangFound);
+  }
+  // 녹방도화(祿傍桃花): 도화 지지를 가진 기둥이 건록(運星) 또는 정관(十神)과 함께 자리할 때
+  {
+    const dohwaJjForNokbang = getDohwaJj(yeonji);
+    const nokbangPillars = detailArr
+      .filter(p => p.d.jj === dohwaJjForNokbang && (p.d.uunseong === '건록' || getSipseong(ilgan, p.d.cg) === '정관'))
+      .map(p => p.label);
+    addSinsal('녹방도화', nokbangPillars);
   }
   // 낙정관살: 연지 그룹 기준 지지가 사주에 존재
   const nakjeongTarget = NAKJEONG_MAP[yeonji];
