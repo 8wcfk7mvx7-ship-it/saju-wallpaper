@@ -353,6 +353,7 @@ export default function GunghapPage(){
     setP1({
       name:saved.name||'',
       birthData:{
+        name:saved.name||'',
         gender:saved.gender||'male',
         birthYear:saved.birthYear||'',
         birthMonth:saved.birthMonth||'',
