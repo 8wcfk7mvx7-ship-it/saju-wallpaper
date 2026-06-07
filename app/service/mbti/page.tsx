@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER } from "@/lib/saju";
+import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, CHEONGAN_ELEMENT } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
-import type { SajuResult } from "@/lib/saju";
+import type { SajuResult, Element } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
@@ -128,6 +128,117 @@ const MBTI_CAREER: Record<MBTI, string[]> = {
   ESFP:["연예인·가수","이벤트 사회자","관광 가이드","뷰티 전문가"],
 };
 
+
+// ── 사주 기반 5가지 성향 축 (MBTI 스타일 차트) ──────────────────────────────────
+const YANG_GAN = new Set(["갑", "병", "무", "경", "임"]);
+type SajuAxis = { key: string; left: string; right: string; score: number; color: string; desc: string };
+
+function calcSajuMbtiAxes(result: SajuResult): SajuAxis[] {
+  const ilgan = result.pillarsDetail.day.cg;
+  const isYang = YANG_GAN.has(ilgan);
+  const total = Object.values(result.scores).reduce((a, b) => a + b, 0) || 1;
+  const pct = (el: "목" | "화" | "토" | "금" | "수") => (result.scores[el] / total) * 100;
+  const clamp = (n: number) => Math.max(6, Math.min(94, Math.round(n)));
+
+  // 십성 그룹 카운트 (연·월·일·시 천간/지지, 일간 자신 제외)
+  const pillars = [result.pillarsDetail.year, result.pillarsDetail.month, result.pillarsDetail.day, result.pillarsDetail.hour].filter(Boolean) as { sipseongCg: string; sipseongJj: string }[];
+  const sipCounts: Record<string, number> = {};
+  pillars.forEach((p, i) => {
+    if (!(i === 2)) sipCounts[p.sipseongCg] = (sipCounts[p.sipseongCg] || 0) + 1; // 일간 천간(자기 자신) 제외
+    sipCounts[p.sipseongJj] = (sipCounts[p.sipseongJj] || 0) + 1;
+  });
+  const cnt = (...names: string[]) => names.reduce((a, n) => a + (sipCounts[n] || 0), 0);
+
+  // ① 외향성 ↔ 내향성 (일간 음양 + 화/수/금 기운)
+  const eiScore = clamp(50 + (isYang ? 12 : -12) + (pct("화") - 20) * 0.7 - (pct("수") - 20) * 0.6 - (pct("금") - 20) * 0.4);
+
+  // ② 추상적 사고 ↔ 현실적 사고 (수·목=직관/사색, 토·금=감각/현실)
+  const abstractRealScore = clamp(50 - (pct("수") + pct("목") - 40) * 0.6 + (pct("토") + pct("금") - 40) * 0.6);
+
+  // ③ 결과지향 ↔ 과정지향 (금·화=속도와 완성, 목·수=흐름과 성장)
+  const resultProcessScore = clamp(50 - (pct("금") + pct("화") - 40) * 0.55 + (pct("목") + pct("수") - 40) * 0.55);
+
+  // ④ 통제형(계획·관리) ↔ 자유형(판단에 얽매이지 않음) — 관성 vs 식상
+  const gwanCnt = cnt("정관", "편관"), siksangCnt = cnt("식신", "상관");
+  const controlFreeScore = clamp(50 + (gwanCnt - siksangCnt) * 11);
+
+  // ⑤ 자기주도형 ↔ 신중형 — 비겁 vs 인성
+  const bigyeopCnt = cnt("비견", "겁재"), inseongCnt = cnt("편인", "정인");
+  const leadCarefulScore = clamp(50 + (bigyeopCnt - inseongCnt) * 11);
+
+  return [
+    {
+      key: "ei", left: "내향(I)", right: "외향(E)", score: eiScore, color: "#f472b6",
+      desc: eiScore >= 50
+        ? `일간이 ${isYang ? "양간(陽干)이라 에너지가 밖으로 발산" : "음간(陰干)이지만 화(火) 기운이 강해 표현 욕구가 살아있"}는 구조예요. 사람들과 부대끼며 에너지를 얻고, 생각을 입 밖으로 꺼내며 정리하는 타입이에요.`
+        : `일간이 ${!isYang ? "음간(陰干)이라 에너지를 안으로 갈무리" : "양간이지만 수(水)·금(金) 기운이 안정적으로 받쳐주어 차분하게 가라앉히"}는 구조예요. 혼자만의 시간 속에서 에너지를 충전하고, 생각을 충분히 정리한 뒤에 표현하는 타입이에요.`
+    },
+    {
+      key: "ns", left: "현실 감각(S)", right: "추상·직관(N)", score: abstractRealScore, color: "#60a5fa",
+      desc: abstractRealScore >= 50
+        ? `사주에 수(水)·목(木)의 기운이 두드러져, 눈에 보이지 않는 가능성과 의미를 먼저 떠올리는 사고방식이에요. 아이디어와 큰 그림을 그리는 데 강하고, 추상적인 개념을 다루는 일에서 빛이 나요.`
+        : `사주에 토(土)·금(金)의 기운이 두드러져, 눈에 보이고 손에 잡히는 사실과 데이터를 먼저 신뢰하는 사고방식이에요. 현실적인 절차와 검증을 중시하고, 구체적인 결과물을 만드는 일에서 강점을 보여요.`
+    },
+    {
+      key: "tf_like", left: "과정지향", right: "결과지향", score: resultProcessScore, color: "#fbbf24",
+      desc: resultProcessScore >= 50
+        ? `금(金)·화(火)의 추진력이 강해, 목표를 정하면 가장 빠르고 확실한 길로 밀어붙여 결과부터 만들어내는 스타일이에요. 완성된 성과로 스스로를 증명하고 싶어 해요.`
+        : `목(木)·수(水)의 흐름이 강해, 결과보다 그 과정에서 무엇을 배우고 어떻게 성장했는지를 더 중요하게 여기는 스타일이에요. 차근차근 쌓아가는 여정 자체에서 의미를 찾아요.`
+    },
+    {
+      key: "jp_like", left: "자유형(판단에 얽매이지 않음)", right: "통제형(계획·관리)", score: controlFreeScore, color: "#a78bfa",
+      desc: controlFreeScore >= 50
+        ? `사주에 관성(정관·편관)의 기운이 식상보다 강해, 규칙과 체계 안에서 안정감을 느끼고 계획한 대로 차근차근 관리해 나가는 통제형이에요. 정해진 틀이 있을 때 오히려 능률이 올라가요.`
+        : `사주에 식상(식신·상관)의 기운이 관성보다 강해, 정해진 틀보다 그때그때의 흐름과 영감을 따라 움직이는 자유형이에요. 계획에 얽매이기보다 상황에 맞춰 유연하게 대응할 때 빛을 발해요.`
+    },
+    {
+      key: "lead_careful", left: "신중형", right: "자기주도형", score: leadCarefulScore, color: "#4ade80",
+      desc: leadCarefulScore >= 50
+        ? `사주에 비겁(비견·겁재)의 기운이 인성보다 강해, 남의 의견에 기대기보다 스스로 판단하고 밀고 나가는 자기주도형이에요. 직접 부딪히며 배우는 것을 선호하고 주체성이 강해요.`
+        : `사주에 인성(편인·정인)의 기운이 비겁보다 강해, 충분히 따져보고 주변의 조언을 들은 뒤에 움직이는 신중형이에요. 성급한 결정보다 숙고를 거친 선택이 후회를 줄여줘요.`
+    },
+  ];
+}
+
+function SajuAxisChart({ axes }: { axes: SajuAxis[] }) {
+  return (
+    <div className="space-y-4">
+      {axes.map(a => (
+        <div key={a.key}>
+          <div className="flex items-center justify-between text-[11px] mb-1.5">
+            <span className={a.score < 50 ? "font-black" : ""} style={{ color: a.score < 50 ? a.color : "rgba(255,255,255,0.35)" }}>{a.left}</span>
+            <span className={a.score >= 50 ? "font-black" : ""} style={{ color: a.score >= 50 ? a.color : "rgba(255,255,255,0.35)" }}>{a.right}</span>
+          </div>
+          <div className="h-2 rounded-full relative overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <div className="absolute left-1/2 top-0 bottom-0 w-px z-10" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="absolute top-0 bottom-0 rounded-full" style={{
+              left: a.score < 50 ? `${a.score}%` : "50%",
+              right: a.score < 50 ? "50%" : `${100 - a.score}%`,
+              background: a.color,
+            }} />
+          </div>
+          <p className="text-xs text-gray-400 leading-relaxed mt-2">{a.desc}</p>
+        </div>
+      ))}
+      <p className="text-[9px] text-right" style={{ color: "rgba(255,255,255,0.25)" }}>※ 50을 기준으로 어느 쪽 기운이 더 강한지 보여주는 상대 지수예요</p>
+    </div>
+  );
+}
+
+// ── 나와 잘 맞는 사주 (상생 관계 기준) ───────────────────────────────────────────
+const EL_GENERATES: Record<Element, Element> = { 목: "화", 화: "토", 토: "금", 금: "수", 수: "목" };
+const EL_GENERATED_BY: Record<Element, Element> = { 화: "목", 토: "화", 금: "토", 수: "금", 목: "수" };
+const ELEMENT_HANJA: Record<Element, string> = { 목: "木", 화: "火", 토: "土", 금: "金", 수: "水" };
+
+function getCompatibleSaju(ilganEl: Element, gender: "male" | "female") {
+  // 여자: 나를 생(生)하는 남자의 오행 / 남자: 내가 생(生)하는 여자의 오행
+  const targetEl = gender === "female" ? EL_GENERATED_BY[ilganEl] : EL_GENERATES[ilganEl];
+  const ganList = Object.entries(CHEONGAN_ELEMENT).filter(([, el]) => el === targetEl).map(([gan]) => gan);
+  const reason = gender === "female"
+    ? `여성의 사주에서는 나를 생(生)해주는 기운, 즉 인성(印星)에 해당하는 오행을 가진 남성과 만났을 때 보살핌과 지지를 받는 흐름이 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})을 생(生)하는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 남성이라면, 나를 키워주고 받쳐주는 인연이 되기 쉬워요.`
+    : `남성의 사주에서는 내가 생(生)해주는 기운, 즉 식상(食傷)에 해당하는 오행을 가진 여성과 만났을 때 자연스럽게 챙겨주고 베푸는 관계가 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})이 생(生)하는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 여성이라면, 내가 자연스럽게 생을 내려주는 좋은 흐름이 만들어져요.`;
+  return { targetEl, ganList, reason };
+}
 
 export default function MbtiPage() {
   const router = useRouter();
@@ -546,6 +657,38 @@ export default function MbtiPage() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed">{io.synthesis}</p>
+                </div>
+              );
+            })()}
+
+            {/* 사주로 보는 5가지 성향 축 */}
+            {sajuResult && (
+              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-1">사주로 보는 나의 성향 축</p>
+                <p className="text-[11px] text-gray-600 mb-4">MBTI 검사 없이도, 사주 안에 새겨진 기질을 5가지 축으로 풀어봤어요</p>
+                <SajuAxisChart axes={calcSajuMbtiAxes(sajuResult)} />
+              </div>
+            )}
+
+            {/* 나와 잘 맞는 사주 */}
+            {sajuResult && (() => {
+              const ilganEl = CHEONGAN_ELEMENT[result.ilgan];
+              const { targetEl, ganList, reason } = getCompatibleSaju(ilganEl, gender);
+              return (
+                <div className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-400/25 rounded-2xl p-5">
+                  <p className="text-xs font-bold tracking-widest text-pink-300 mb-1">💗 나와 잘 맞는 사주</p>
+                  <p className="text-[11px] text-gray-500 mb-3">
+                    {gender === "female" ? "여성 기준 — 나를 생(生)해주는 남자" : "남성 기준 — 내가 생(生)해주는 여자"}
+                  </p>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-3">{reason}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs px-3 py-1.5 rounded-full font-black" style={{ background: `${ELEMENT_COLOR[targetEl]}22`, color: ELEMENT_COLOR[targetEl], border: `1px solid ${ELEMENT_COLOR[targetEl]}44` }}>
+                      {targetEl}({ELEMENT_HANJA[targetEl]}) 기운의 일간
+                    </span>
+                    {ganList.map(g => (
+                      <span key={g} className="text-xs px-2.5 py-1 rounded-full font-bold bg-pink-500/15 text-pink-300 border border-pink-500/30">{g}일간</span>
+                    ))}
+                  </div>
                 </div>
               );
             })()}
