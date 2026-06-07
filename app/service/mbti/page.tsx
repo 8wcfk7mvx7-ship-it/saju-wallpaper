@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, CHEONGAN_ELEMENT } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
-import type { SajuResult, Element } from "@/lib/saju";
+import type { SajuResult } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
