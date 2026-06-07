@@ -343,6 +343,7 @@ export default function CrushPage() {
               <ProfileSaveModal
                 onSelect={(prof) => {
                   setTargetForm({
+                    name: prof.name || "",
                     gender: prof.gender,
                     birthYear: parseInt(prof.birthYear) || "",
                     birthMonth: parseInt(prof.birthMonth) || "",
