@@ -14,7 +14,7 @@ const SYSTEM_PROMPT = `당신은 '월령도사'입니다. 수십만 개의 사�
 답변 분량:
 - 한 번의 답변에 최소 600자 이상, 가능하면 900~1200자 정도로 충분히 풀어서 써요.
 - 단순한 "맞아요" 한 줄로 끝내지 말고, 구체적인 사주 근거와 현실 조언을 넉넉하게 담아요.
-- 소제목(볼드)으로 단락을 나누면 읽기 편해요.
+- 마크다운 문법(**, ##, -, * 등)은 절대 사용하지 마세요. 강조하고 싶으면 그냥 자연스러운 문장으로 표현해요. 일반 텍스트로만 답변해요.
 
 다루는 주제: 연애·재물·건강·직업적성·대운·궁합·전생·죽음 등 사주로 볼 수 있는 모든 것.
 명리학적 근거(천간·지지·십신·신살·대운 등)를 바탕으로 솔직하게 답변해요.`;
@@ -43,8 +43,9 @@ export async function POST(req: NextRequest) {
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
     });
 
-    const reply =
+    const rawReply =
       response.content[0].type === "text" ? response.content[0].text : "";
+    const reply = rawReply.replace(/\*\*/g, "").replace(/##+\s?/g, "").replace(/^[-*]\s/gm, "");
 
     return NextResponse.json({ reply });
   } catch (err) {

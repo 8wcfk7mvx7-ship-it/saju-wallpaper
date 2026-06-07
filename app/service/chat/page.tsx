@@ -127,7 +127,7 @@ export default function SajuChatPage() {
     setSajuContext(context);
     setMessages([{
       role: "assistant",
-      content: `안녕하세요! 저는 온갖 사주 데이터를 학습한 사주 전문 AI, 월령도사입니다 🌙\n\n사주팔자를 살펴봤어요: **${result.fourPillars}**\n\n연애·재물·건강·직업적성·대운·궁합·전생 등 뭐든 편하게 물어보세요. 사주로 볼 수 있는 건 뭐든 함께 이야기해 드릴게요!`,
+      content: `안녕하세요! 저는 온갖 사주 데이터를 학습한 사주 전문 AI, 월령도사입니다.\n\n사주팔자를 살펴봤어요: ${result.fourPillars}\n\n연애·재물·건강·직업적성·대운·궁합·전생 등 뭐든 편하게 물어보세요. 사주로 볼 수 있는 건 뭐든 함께 이야기해 드릴게요!`,
     }]);
     setStep("chat");
   }
@@ -174,7 +174,6 @@ export default function SajuChatPage() {
     return (
       <div style={{
         minHeight: "100vh", background: "#06060e", color: "#e8e0ff",
-        fontFamily: "'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif",
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", padding: "24px", position: "relative", overflow: "hidden",
       }}>
@@ -281,7 +280,6 @@ export default function SajuChatPage() {
     return (
       <div style={{
         minHeight: "100vh", background: "#06060e", color: "#e8e0ff",
-        fontFamily: "'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif",
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", padding: "24px",
       }}>
@@ -322,7 +320,6 @@ export default function SajuChatPage() {
   return (
     <div style={{
       minHeight: "100vh", background: "#06060e", color: "#e8e0ff",
-      fontFamily: "'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif",
       display: "flex", flexDirection: "column",
     }}>
       {/* Header */}

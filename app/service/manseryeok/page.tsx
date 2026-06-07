@@ -261,13 +261,6 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
   );
 }
 
-type CalendarType = "solar" | "lunar";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS  = Array.from({ length: CURRENT_YEAR - 1919 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1);
-
 // ─── 오행 스타일 ───────────────────────────────────────────────────────────────
 const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge: string }> = {
   목: { bg: "rgba(34,197,94,0.10)",  text: "#4ade80", border: "rgba(34,197,94,0.25)",  badge: "rgba(34,197,94,0.15)" },
