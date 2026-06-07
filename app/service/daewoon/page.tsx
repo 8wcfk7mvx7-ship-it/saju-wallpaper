@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY } from "@/lib/saju";
+import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY, getSipseong, getUunseong, getDayPillar } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -252,6 +252,76 @@ const SIPSEONG_DAEWOON: Record<string, { title: string; color: string; desc: str
   },
 };
 
+// ── 운 지수 계산 (평균 50점 기준 0~100점) ───────────────────────────────────────
+type LuckIdx = { label: string; score: number; color: string };
+
+function calcLuckIndices(sipseongCg: string, sipseongJj: string, uunseong: string, gender: "male" | "female"): LuckIdx[] {
+  const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
+    비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
+    편재: "재성", 정재: "재성", 편관: "관성", 정관: "관성", 편인: "인성", 정인: "인성",
+  };
+  const groups: Record<"비겁" | "식상" | "재성" | "관성" | "인성", number> = { 비겁: 50, 식상: 50, 재성: 50, 관성: 50, 인성: 50 };
+  for (const s of [sipseongCg, sipseongJj]) {
+    const g = SIPSEONG_GROUP[s];
+    if (g) groups[g] += 22;
+  }
+
+  const uf = UUNSEONG_FORTUNE[uunseong];
+  const uScore = uf ? uf.score : 5; // 0~10
+  const uDelta = (uScore - 5) * 5; // 약 -25 ~ +25
+
+  let marriage = 50 + uDelta * 0.6;
+  if (gender === "female" && (sipseongCg === "정관" || sipseongJj === "정관")) marriage += 18;
+  if (gender === "male" && (sipseongCg === "정재" || sipseongJj === "정재")) marriage += 18;
+  if (uunseong === "목욕") marriage += 6;
+  if (["묘", "절", "병", "사"].includes(uunseong)) marriage -= 10;
+
+  let birth = 50 + uDelta * 0.5;
+  if (["식신", "상관"].includes(sipseongCg) || ["식신", "상관"].includes(sipseongJj)) birth += 16;
+  if (["장생", "관대", "제왕", "태"].includes(uunseong)) birth += 8;
+  if (["묘", "절", "사"].includes(uunseong)) birth -= 12;
+
+  let change = 50 - uDelta * 0.4;
+  if (["겁재", "상관", "편관"].includes(sipseongCg) || ["겁재", "상관", "편관"].includes(sipseongJj)) change += 14;
+  if (["정인", "정관"].includes(sipseongCg) && ["정인", "정관"].includes(sipseongJj)) change -= 12;
+  if (["목욕", "병", "묘", "절", "태"].includes(uunseong)) change += 8;
+  if (["관대", "건록", "제왕"].includes(uunseong)) change -= 6;
+
+  const clamp = (n: number) => Math.max(4, Math.min(96, Math.round(n)));
+  return [
+    { label: "비겁", score: clamp(groups.비겁), color: "#4ade80" },
+    { label: "식상", score: clamp(groups.식상), color: "#60a5fa" },
+    { label: "재성", score: clamp(groups.재성), color: "#fbbf24" },
+    { label: "관성", score: clamp(groups.관성), color: "#c084fc" },
+    { label: "인성", score: clamp(groups.인성), color: "#e2e8f0" },
+    { label: "결혼 확률", score: clamp(marriage), color: "#f472b6" },
+    { label: "출생·자녀 확률", score: clamp(birth), color: "#34d399" },
+    { label: "변화 지수", score: clamp(change), color: "#fb7185" },
+  ];
+}
+
+function LuckBars({ items, compact }: { items: LuckIdx[]; compact?: boolean }) {
+  return (
+    <div className={compact ? "space-y-1" : "space-y-1.5"}>
+      {items.map(it => (
+        <div key={it.label} className="flex items-center gap-2">
+          <span className="text-[10px] shrink-0" style={{ width: 78, color: "rgba(255,255,255,0.45)" }}>{it.label}</span>
+          <div className="flex-1 h-2 rounded-full relative overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <div className="absolute left-1/2 top-0 bottom-0 w-px z-10" style={{ background: "rgba(255,255,255,0.2)" }} />
+            <div className="h-2 rounded-full transition-all" style={{ width: `${it.score}%`, background: it.color }} />
+          </div>
+          <span className="text-[10px] w-7 text-right font-black" style={{ color: it.color }}>{it.score}</span>
+        </div>
+      ))}
+      {!compact && <p className="text-[9px] text-right mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>※ 평균(50점)을 기준으로 한 상대 지수예요</p>}
+    </div>
+  );
+}
+
+function daysInMonth(year: number, month: number) {
+  return new Date(year, month, 0).getDate();
+}
+
 export default function DaewoonPage() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -272,6 +342,7 @@ export default function DaewoonPage() {
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
   const [openSewoonYear, setOpenSewoonYear] = useState<number | null>(null);
+  const [openIlwoon, setOpenIlwoon] = useState<string | null>(null);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
   const [totalCount] = useState(() => Math.floor(Math.random() * 1500) + 7200);
 
@@ -775,6 +846,12 @@ export default function DaewoonPage() {
                       )}
                     </div>
                   )}
+
+                  {/* 운 지수 차트 */}
+                  <div className="px-4 pb-4 pt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                    <p className="text-[10px] font-black mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>📊 이 시기의 운 지수</p>
+                    <LuckBars items={calcLuckIndices(p.sipseongCg, p.sipseongJj, p.uunseong, gender)} />
+                  </div>
                 </div>
               );
             })}
@@ -821,19 +898,57 @@ export default function DaewoonPage() {
                       <p className="text-[8px] mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>{isOpen ? "▲ 닫기" : "▼ 월별"}</p>
                     </div>
                     {isOpen && (
-                      <div className="mt-1.5 rounded-xl p-2" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${elStyle.border}` }}>
-                        <p className="text-[9px] font-bold text-center mb-1.5" style={{ color: elStyle.text }}>{s.year}년 월주</p>
+                      <div className="mt-1.5 rounded-xl p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${elStyle.border}`, minWidth: 220 }}>
+                        <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>📊 {s.year}년 운 지수</p>
+                        <LuckBars compact items={calcLuckIndices(s.sipseongCg, s.sipseongJj, s.uunseong, gender)} />
+
+                        <p className="text-[9px] font-bold text-center mt-3 mb-1.5" style={{ color: elStyle.text }}>{s.year}년 월주 — 클릭하면 일운까지 보여요</p>
                         <div className="grid grid-cols-3 gap-1">
                           {Array.from({ length: 12 }, (_, mi) => {
                             const mp = getMonthPillar(s.cg, mi + 1);
+                            const mKey = `${s.year}-${mi + 1}`;
+                            const mOpen = openIlwoon === mKey;
                             return (
-                              <div key={mi} className="rounded-lg p-1 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                              <div key={mi}
+                                className="rounded-lg p-1 text-center cursor-pointer"
+                                style={{ background: mOpen ? `${elStyle.bg}aa` : "rgba(255,255,255,0.04)", border: `1px solid ${mOpen ? elStyle.text : "rgba(255,255,255,0.06)"}` }}
+                                onClick={() => setOpenIlwoon(mOpen ? null : mKey)}
+                              >
                                 <p className="text-[8px] text-gray-600">{mi + 1}월</p>
                                 <p className="text-[11px] font-black" style={{ color: elStyle.text }}>{mp.cg}{mp.jj}</p>
                               </div>
                             );
                           })}
                         </div>
+
+                        {/* 일운 — 선택한 달의 날짜별 흐름 */}
+                        {(() => {
+                          const sel = openIlwoon && openIlwoon.startsWith(`${s.year}-`) ? Number(openIlwoon.split("-")[1]) : null;
+                          if (!sel) return null;
+                          const nDays = daysInMonth(s.year, sel);
+                          return (
+                            <div className="mt-3 rounded-xl p-2" style={{ background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                              <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>🗓 {s.year}년 {sel}월 — 일운 흐름</p>
+                              <div className="grid grid-cols-5 gap-1">
+                                {Array.from({ length: nDays }, (_, di) => {
+                                  const dp = getDayPillar(s.year, sel, di + 1);
+                                  const dUun = getUunseong(ilgan, dp.jj);
+                                  const duf = UUNSEONG_FORTUNE[dUun];
+                                  const dScore = duf ? Math.max(4, Math.min(96, Math.round(50 + (duf.score - 5) * 9))) : 50;
+                                  const dColor = dScore >= 65 ? "#4ade80" : dScore <= 38 ? "#f87171" : "#94a3b8";
+                                  return (
+                                    <div key={di} className="rounded-md py-1 text-center" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${dColor}33` }}>
+                                      <p className="text-[7px] text-gray-600">{di + 1}일</p>
+                                      <p className="text-[9px] font-black" style={{ color: dColor }}>{dp.cg}{dp.jj}</p>
+                                      <p className="text-[8px] font-bold" style={{ color: dColor }}>{dScore}</p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-[8px] text-right mt-1.5" style={{ color: "rgba(255,255,255,0.25)" }}>※ 일주 십이운성 기준 종합 컨디션 지수 (평균 50)</p>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
