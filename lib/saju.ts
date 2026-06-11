@@ -263,10 +263,8 @@ const HAKDANG_JJ: Record<string,string> = {
 // 괴강살(魁罡殺): 경진·경술·임진·임술 일주
 const GOEGANG_ILJU = new Set(['경진','경술','임진','임술']);
 
-// 나체도화(裸體桃花): 일간의 목욕지(沐浴地)가 일지와 일치할 때
-const MUBATH_JJ: Record<string,string> = {
-  갑:'자', 을:'사', 병:'유', 정:'신', 무:'유',
-  기:'신', 경:'오', 신:'해', 임:'묘', 계:'인'};
+// 나체도화(裸體桃花): 갑자·정묘·경오·계유 일주 — 일주 자체가 도화+양인의 노골적 결합 구조
+const NACHE_ILJU = new Set(['갑자','정묘','경오','계유']);
 
 // 낙정관살(落井關殺): 연지 그룹별 해당 지지
 // 해자축→辰, 인묘진→未, 사오미→戌, 신유술→丑
@@ -1337,8 +1335,8 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   if (YINYIN_JJ[ilgan]) {
     addSinsal('음인', detailArr.filter(p => p.d.jj === YINYIN_JJ[ilgan]).map(p => p.label));
   }
-  // 나체도화: 일지 = 일간의 목욕지
-  if (dayPillar.jj === MUBATH_JJ[ilgan]) {
+  // 나체도화: 갑자·정묘·경오·계유 일주
+  if (NACHE_ILJU.has(dayPillar.cg + dayPillar.jj)) {
     addSinsal('나체도화', ['일']);
   }
   // 곤랑도화(滾浪桃花): 두 기둥의 천간이 합(合)을 이루면서 동시에 지지가 형(刑)을 이루는 구조

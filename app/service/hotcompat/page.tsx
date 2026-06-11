@@ -148,8 +148,9 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   }
 
   // 도화 기운 더하기
-  const d1 = r1.sinsalList.some(s => ["도화살","홍염살","진도화"].includes(s.name));
-  const d2 = r2.sinsalList.some(s => ["도화살","홍염살","진도화"].includes(s.name));
+  const DOHWA_NAMES = ["도화살","홍염살","진도화","나체도화","곤랑도화","녹방도화"];
+  const d1 = r1.sinsalList.some(s => DOHWA_NAMES.includes(s.name));
+  const d2 = r2.sinsalList.some(s => DOHWA_NAMES.includes(s.name));
   if (d1 && d2) {
     score += 15;
     highlights.push({ rank: 7, title: "양쪽 모두 도화 기운 보유", color: "#6366f1",
@@ -468,9 +469,14 @@ function HotCompatContent() {
                   <p className="text-xs text-gray-500 mb-1">{label}</p>
                   <p className="text-lg font-black">{r.pillarsDetail.day.cg}{r.pillarsDetail.day.jj}일주</p>
                   <p className="text-xs text-gray-600">{r.pillarsDetail.day.uunseong}</p>
-                  {r.sinsalList.some(s => ["도화살","홍염살","진도화"].includes(s.name)) && (
-                    <p className="text-xs text-rose-400 mt-1">도화 기운 있음</p>
-                  )}
+                  {(() => {
+                    const dohwaNames = r.sinsalList
+                      .filter(s => ["도화살","홍염살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name))
+                      .map(s => s.name);
+                    return dohwaNames.length > 0 ? (
+                      <p className="text-xs text-rose-400 mt-1">{dohwaNames.join(" + ")}</p>
+                    ) : null;
+                  })()}
                 </div>
               ))}
             </div>
@@ -515,13 +521,6 @@ function HotCompatContent() {
           )}
         </div>
 
-        {/* 면책 */}
-        <div className="bg-white/[0.02] border border-white/8 rounded-xl px-4 py-3 mb-6">
-          <p className="text-xs text-gray-600 leading-relaxed text-center">
-            본 분석은 사주 명리학 기반 19금 엔터테인먼트 콘텐츠입니다.<br />
-            만 19세 이상만 이용하세요.
-          </p>
-        </div>
 
         <button onClick={() => { setP1(defaultBirthData("female")); setP2(defaultBirthData("male")); setStep("form"); }}
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
