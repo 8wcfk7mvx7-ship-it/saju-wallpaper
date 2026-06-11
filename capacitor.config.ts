@@ -1,4 +1,4 @@
-import type { CapacitorConfig } from "@capacitor/core";
+import type { CapacitorConfig } from "@capacitor/cli";
 
 // 웹앱(Vercel)을 그대로 네이티브 WebView로 감싸는 설정.
 // server.url을 라이브 도메인으로 지정하면, 웹을 배포할 때마다
