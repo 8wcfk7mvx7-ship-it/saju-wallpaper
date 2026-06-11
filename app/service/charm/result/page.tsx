@@ -12,6 +12,7 @@ import {
 } from "@/lib/charmEngine";
 import { generateOrderId } from "@/lib/toss";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
+import StarShower from "@/components/StarShower";
 
 export const dynamic = "force-dynamic";
 
@@ -130,6 +131,7 @@ function CharmResultContent() {
   const [grade, setGrade] = useState<CharmGradeResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [showering, setShowering] = useState(false);
   const [showPayCTA, setShowPayCTA] = useState(false);
   const [birthYear, setBirthYear] = useState(0);
   const [birthMonth, setBirthMonth] = useState(0);
@@ -191,6 +193,7 @@ function CharmResultContent() {
 
   return (
     <main className="min-h-screen bg-[#080810] text-white">
+      <StarShower active={showering} />
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-pink-900/20 blur-[140px]" />
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
@@ -457,15 +460,16 @@ function CharmResultContent() {
                   {blueberries >= CHARM_PRICE ? (
                     <button
                       onClick={() => {
+                        setShowering(true);
                         const next = blueberries - CHARM_PRICE;
                         localStorage.setItem("sp_blueberries", String(next));
                         sessionStorage.setItem("charmPaid", "true");
                         setBlueberries(next);
-                        setIsPaid(true);
+                        setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                       }}
                       className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
                     >
-                      ✦ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+                      ✦ 별조각 뿌리고 보기 ({CHARM_PRICE.toLocaleString()}개)
                     </button>
                   ) : (
                     <button
@@ -536,15 +540,16 @@ function CharmResultContent() {
             {blueberries >= CHARM_PRICE ? (
               <button
                 onClick={() => {
+                  setShowering(true);
                   const next = blueberries - CHARM_PRICE;
                   localStorage.setItem("sp_blueberries", String(next));
                   sessionStorage.setItem("charmPaid", "true");
                   setBlueberries(next);
-                  setIsPaid(true);
+                  setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                 }}
                 className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl text-base shadow-2xl shadow-indigo-900/50 transition-all active:scale-[0.97]"
               >
-                ✦ 별조각 {CHARM_PRICE.toLocaleString()}개로 즉시 열기
+                ✦ 별조각 뿌리고 보기 ({CHARM_PRICE.toLocaleString()}개)
               </button>
             ) : (
               <button

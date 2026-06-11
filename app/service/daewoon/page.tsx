@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import StarShower from "@/components/StarShower";
 import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY, getSipseong, getUunseong, getDayPillar } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
@@ -424,6 +425,7 @@ export default function DaewoonPage() {
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [showering, setShowering] = useState(false);
   const [openSewoonYear, setOpenSewoonYear] = useState<number | null>(null);
   const [openIlwoon, setOpenIlwoon] = useState<string | null>(null);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1800);
@@ -576,6 +578,7 @@ export default function DaewoonPage() {
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
         <BackButton />
+        <StarShower active={showering} />
         <div className="max-w-lg mx-auto px-5 py-10 pb-24">
 
           <div className="mb-8">
@@ -1088,15 +1091,16 @@ export default function DaewoonPage() {
               {blueberries >= PRICE ? (
                 <button
                   onClick={() => {
+                    setShowering(true);
                     const next = blueberries - PRICE;
                     localStorage.setItem("sp_blueberries", String(next));
                     sessionStorage.setItem("daewoonPaid", "true");
                     setBlueberries(next);
-                    setIsPaid(true);
+                    setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                   }}
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 font-black text-white text-base shadow-xl hover:opacity-90 transition-opacity"
                 >
-                  ✦ 별조각 {PRICE.toLocaleString()}개로 즉시 열기
+                  ✦ 별조각 뿌리고 보기 ({PRICE.toLocaleString()}개)
                 </button>
               ) : (
                 <button

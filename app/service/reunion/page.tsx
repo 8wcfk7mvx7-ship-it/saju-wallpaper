@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +59,7 @@ export default function ReunionPage() {
   const [result, setResult] = useState<ReunionResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [showering, setShowering] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -283,6 +285,7 @@ export default function ReunionPage() {
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
         <BackButton />
+        <StarShower active={showering} />
         <div className="w-full max-w-sm mx-auto space-y-5">
 
           {/* 스코어 카드 */}
@@ -352,16 +355,17 @@ export default function ReunionPage() {
               {blueberries >= 3900 ? (
                 <button
                   onClick={() => {
+                    setShowering(true);
                     const next = blueberries - 3900;
                     localStorage.setItem("sp_blueberries", String(next));
                     localStorage.setItem(PAID_KEY, "true");
                     setBlueberries(next);
-                    setIsPaid(true);
+                    setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                   }}
                   className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98] mb-2"
                   style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 6px 24px rgba(99,102,241,0.4)" }}
                 >
-                  ✦ 별조각 3,900개로 즉시 열기
+                  ✦ 별조각 뿌리고 보기 (3,900개)
                 </button>
               ) : (
                 <button
@@ -369,7 +373,7 @@ export default function ReunionPage() {
                   className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
                   style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 6px 24px rgba(234,88,12,0.4)" }}
                 >
-                  전체 분석 보기 — ₩3,900
+                  결제하기 — ₩3,900
                 </button>
               )}
               <p className="text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>일회성 결제 · 영구 보관</p>

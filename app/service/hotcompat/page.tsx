@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import StarShower from "@/components/StarShower";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -165,15 +166,15 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
 
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
-  { min: 90, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
+  { min: 100, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
     verdict: "사주에 새겨진 인연입니다. 이 조합, 운명입니다." },
-  { min: 70, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
+  { min: 80, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
     verdict: "강렬한 성적 끌림이 사주에 나타납니다." },
-  { min: 50, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
+  { min: 60, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
     verdict: "성적 화합이 강합니다. 자연스럽게 이끌립니다." },
-  { min: 30, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
+  { min: 40, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
     verdict: "잘 맞는 케미입니다. 함께할수록 깊어집니다." },
-  { min: 15, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
+  { min: 20, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
     verdict: "노력과 이해가 필요합니다." },
   { min: 0,  grade: "D",  label: "화합 약함", color: "#4f46e5", bg: "rgba(79,70,229,0.07)", border: "rgba(79,70,229,0.18)",
     verdict: "성적 기운의 방향이 많이 다릅니다." },
@@ -198,6 +199,7 @@ function HotCompatContent() {
   const [p2, setP2] = useState<BirthFormData>(defaultBirthData("male"));
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [showering, setShowering] = useState(false);
   const chemRef = useRef<ChemResult | null>(null);
   const r1Ref   = useRef<SajuResult | null>(null);
   const r2Ref   = useRef<SajuResult | null>(null);
@@ -335,6 +337,7 @@ function HotCompatContent() {
   return (
     <main className="min-h-screen bg-[#08010f] text-white">
       <BackButton />
+      <StarShower active={showering} />
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
@@ -382,25 +385,15 @@ function HotCompatContent() {
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
               <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">예상 만족도 (10점 만점)</p>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-bold text-pink-300">여성</span>
-                    <span className="text-sm font-black text-pink-300">{female}점</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-2.5">
-                    <div className="h-full rounded-full" style={{ width: `${female * 10}%`, background: "linear-gradient(90deg, #f472b6, #ec4899)" }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-bold text-sky-300">남성</span>
-                    <span className="text-sm font-black text-sky-300">{male}점</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-2.5">
-                    <div className="h-full rounded-full" style={{ width: `${male * 10}%`, background: "linear-gradient(90deg, #38bdf8, #6366f1)" }} />
-                  </div>
-                </div>
+              <div className="flex justify-between mb-1.5">
+                <span className="text-sm font-bold text-pink-300">여성 {female}점</span>
+                <span className="text-sm font-bold text-sky-300">남성 {male}점</span>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden flex">
+                <div className="h-full flex items-center justify-start pl-2"
+                  style={{ width: `${(female / (female + male)) * 100}%`, background: "linear-gradient(90deg, #ec4899, #f472b6)" }} />
+                <div className="h-full flex items-center justify-end pr-2"
+                  style={{ width: `${(male / (female + male)) * 100}%`, background: "linear-gradient(90deg, #6366f1, #38bdf8)" }} />
               </div>
               <p className="text-xs text-gray-500 mt-3 leading-relaxed">
                 {female > male
@@ -494,16 +487,17 @@ function HotCompatContent() {
               {blueberries >= 4900 ? (
                 <button
                   onClick={() => {
+                    setShowering(true);
                     const next = blueberries - 4900;
                     localStorage.setItem("sp_blueberries", String(next));
                     localStorage.setItem("sp_hotcompat_paid", "true");
                     setBlueberries(next);
-                    setIsPaid(true);
+                    setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                   }}
                   className="w-full px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98] mb-2"
                   style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 16px rgba(99,102,241,0.4)" }}
                 >
-                  ✦ 별조각 4,900개로 즉시 열기
+                  ✦ 별조각 뿌리고 보기 (4,900개)
                 </button>
               ) : (
                 <button
@@ -514,7 +508,7 @@ function HotCompatContent() {
                   className="w-full px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
                   style={{ background: "linear-gradient(135deg, #be123c, #f43f5e)", color: "#fff", boxShadow: "0 4px 16px rgba(244,63,94,0.4)" }}
                 >
-                  전체 보기 — ₩4,900
+                  결제하기 — ₩4,900
                 </button>
               )}
             </div>

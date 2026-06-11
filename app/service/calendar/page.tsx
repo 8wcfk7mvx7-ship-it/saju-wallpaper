@@ -9,6 +9,7 @@ import {
 } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import StarShower from "@/components/StarShower";
 
 export const dynamic = "force-dynamic";
 
@@ -214,6 +215,7 @@ export default function CalendarPage() {
 
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
+  const [showering, setShowering] = useState(false);
 
   // Compute 3 months upfront so handleUnlock can reference them
   const todayDate = new Date();
@@ -439,6 +441,7 @@ export default function CalendarPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <BackButton />
+      <StarShower active={showering} />
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
@@ -649,21 +652,22 @@ export default function CalendarPage() {
                     {blueberries >= 990 ? (
                       <button
                         onClick={() => {
+                          setShowering(true);
                           const next = blueberries - 990;
                           localStorage.setItem("sp_blueberries", String(next));
                           localStorage.setItem("sp_calendar_paid", "true");
                           setBlueberries(next);
-                          setIsPaid(true);
+                          setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
                         }}
                         className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
-                        ✦ 별조각 990개로 즉시 열기
+                        ✦ 별조각 뿌리고 보기 (990개)
                       </button>
                     ) : (
                       <button onClick={handleUnlock}
                         className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
                         style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
-                        ₩990 결제 후 전체 보기
+                        ₩990 결제하기
                       </button>
                     )}
                     <p className="text-[12px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
