@@ -12,9 +12,10 @@ interface Message {
   content: string;
 }
 
-const COST_PER_CHAT = 5;
-const BUNDLE_5 = { count: 5, price: 25, label: "5회권 (25개)" };
-const BUNDLE_10 = { count: 10, price: 50, label: "10회권 (50개)" };
+const COST_PER_CHAT = 1;
+const BUNDLE_1 = { count: 1, price: 1, label: "1회권 (100원)" };
+const BUNDLE_5 = { count: 5, price: 5, label: "5회권 (500원)" };
+const BUNDLE_10 = { count: 10, price: 10, label: "10회권 (1,000원)" };
 
 function getStars(): number {
   if (typeof window === "undefined") return 0;
@@ -227,7 +228,7 @@ export default function SajuChatPage() {
             {[
               { icon: "💬", title: "무제한 질문", desc: "사주로 볼 수 있는 모든 것, AI가 직접 답합니다" },
               { icon: "🔯", title: "정밀 사주 분석", desc: "사주팔자 입력 후 오행·십신·신살 완전 분석" },
-              { icon: "✦", title: "별조각 5개 / 회", desc: `현재 잔액 ${stars}개` },
+              { icon: "✦", title: "별조각 1개 / 회 (100원)", desc: `현재 잔액 ${stars}개` },
             ].map(item => (
               <div key={item.title} style={{
                 display: "flex", alignItems: "center", gap: 14,
@@ -413,7 +414,7 @@ export default function SajuChatPage() {
               ✦ 별조각이 부족합니다 (현재 {stars}개)
             </p>
             <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-              {[BUNDLE_5, BUNDLE_10].map((b) => (
+              {[BUNDLE_1, BUNDLE_5, BUNDLE_10].map((b) => (
                 <button
                   key={b.count}
                   onClick={() => buyBundle(b.price)}
@@ -452,7 +453,7 @@ export default function SajuChatPage() {
               sendMessage();
             }
           }}
-          placeholder="무엇이든 물어보세요 (✦5개 소모)"
+          placeholder="무엇이든 물어보세요 (✦1개 소모)"
           rows={1}
           style={{
             flex: 1, background: "rgba(255,255,255,0.06)",

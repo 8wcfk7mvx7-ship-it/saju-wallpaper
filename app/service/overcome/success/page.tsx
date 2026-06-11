@@ -54,13 +54,13 @@ const SINSAL_OVERCOME: Record<string, {
 const ELEMENT_OVERCOME: Record<string, {
   color: string; icon: string; overDesc: string; lackDesc: string;
   overFix: string; lackFix: string; chakColor: string; direction: string;
-  numbers: string; objects: string; food: string; healthTip: string;
+  numbers: string; objects: string; food: string; healthTip: string; activity: string;
 }> = {
-  목: { color:"#16a34a",icon:"🌿",overDesc:"고집이 끝이 없습니다. 분노가 자주 올라옵니다. 간 건강이 나빠집니다.",lackDesc:"의욕이 없습니다. 결단을 못 내립니다. 시작을 자꾸 미룹니다.",overFix:"흰색·은색 계열을 가까이 하세요. 서쪽 방향으로 앉으세요.",lackFix:"초록색을 인테리어에 넣으세요. 동쪽 방향으로 앉으세요.",chakColor:"초록색, 연두색",direction:"동쪽",numbers:"3, 8",objects:"관엽식물, 나무 소품",food:"신맛 — 귤, 레몬, 키위",healthTip:"간·담낭을 챙기세요. 절주 필수." },
-  화: { color:"#dc2626",icon:"🔥",overDesc:"급합니다. 잠을 못 잡니다. 심장이 두근거립니다.",lackDesc:"표현을 못 합니다. 소극적으로 변합니다.",overFix:"파란색 계열을 들이세요. 수영, 차가운 음료.",lackFix:"붉은색을 인테리어에 넣으세요. 촛불 명상.",chakColor:"붉은색, 주황색",direction:"남쪽",numbers:"2, 7",objects:"촛불, 붉은 꽃",food:"쓴맛 — 커피, 녹차, 씀바귀",healthTip:"심장·혈압·눈을 챙기세요." },
-  토: { color:"#92400e",icon:"🏔️",overDesc:"고집이 세지고 완고해집니다. 소화가 잘 안 됩니다.",lackDesc:"믿음을 주지 못합니다. 불안정한 느낌이 강합니다.",overFix:"초록색·나무 소품을 들이세요. 신맛 음식.",lackFix:"황토 소재를 집에 넣으세요. 단맛 음식.",chakColor:"황토색, 노란색",direction:"중앙",numbers:"5, 10",objects:"황토 소품, 도자기",food:"단맛 — 고구마, 꿀, 대추",healthTip:"소화기·비장·위를 챙기세요." },
-  금: { color:"#7c3aed",icon:"⚔️",overDesc:"너무 냉정해집니다. 완벽주의로 주변이 힘들어합니다.",lackDesc:"의지력이 떨어집니다. 결단을 못 내립니다.",overFix:"붉은색을 가까이 하세요. 활동적인 취미.",lackFix:"흰색·실버 계열을 들이세요. 서쪽 방향을 활용하세요.",chakColor:"흰색, 은색",direction:"서쪽",numbers:"4, 9",objects:"금속 소품, 시계",food:"매운맛 — 마늘, 생강, 고추",healthTip:"폐·대장·피부를 챙기세요." },
-  수: { color:"#0369a1",icon:"🌊",overDesc:"우울감이 옵니다. 신장이 무거워집니다.",lackDesc:"지혜가 흐려집니다. 건망증이 생깁니다.",overFix:"황토색을 들이세요. 단맛 음식.",lackFix:"파란색·검은색을 인테리어에 넣으세요. 북쪽을 활용하세요.",chakColor:"파란색, 검은색",direction:"북쪽",numbers:"1, 6",objects:"수족관, 파란 소품",food:"짠맛 — 해산물, 된장, 미역",healthTip:"신장·방광·뼈를 챙기세요." },
+  목: { color:"#16a34a",icon:"🌿",overDesc:"고집이 끝이 없습니다. 분노가 자주 올라옵니다. 간 건강이 나빠집니다.",lackDesc:"의욕이 없습니다. 결단을 못 내립니다. 시작을 자꾸 미룹니다.",overFix:"흰색·은색 계열을 가까이 하세요. 서쪽 방향으로 앉으세요.",lackFix:"초록색을 인테리어에 넣으세요. 동쪽 방향으로 앉으세요.",chakColor:"초록색, 연두색",direction:"동쪽",numbers:"3, 8",objects:"관엽식물, 나무 소품",food:"신맛 — 귤, 레몬, 키위",healthTip:"간·담낭을 챙기세요. 절주 필수.",activity:"숲·공원 산책, 등산, 식물 가꾸기, 아침 스트레칭" },
+  화: { color:"#dc2626",icon:"🔥",overDesc:"급합니다. 잠을 못 잡니다. 심장이 두근거립니다.",lackDesc:"표현을 못 합니다. 소극적으로 변합니다.",overFix:"파란색 계열을 들이세요. 수영, 차가운 음료.",lackFix:"붉은색을 인테리어에 넣으세요. 촛불 명상.",chakColor:"붉은색, 주황색",direction:"남쪽",numbers:"2, 7",objects:"촛불, 붉은 꽃",food:"쓴맛 — 커피, 녹차, 씀바귀",healthTip:"심장·혈압·눈을 챙기세요.",activity:"노래·춤·공연 관람, 사람들과 어울리는 모임, 햇볕 쬐기" },
+  토: { color:"#92400e",icon:"🏔️",overDesc:"고집이 세지고 완고해집니다. 소화가 잘 안 됩니다.",lackDesc:"믿음을 주지 못합니다. 불안정한 느낌이 강합니다.",overFix:"초록색·나무 소품을 들이세요. 신맛 음식.",lackFix:"황토 소재를 집에 넣으세요. 단맛 음식.",chakColor:"황토색, 노란색",direction:"중앙",numbers:"5, 10",objects:"황토 소품, 도자기",food:"단맛 — 고구마, 꿀, 대추",healthTip:"소화기·비장·위를 챙기세요.",activity:"명상, 요가, 텃밭·화분 가꾸기, 규칙적인 산책" },
+  금: { color:"#7c3aed",icon:"⚔️",overDesc:"너무 냉정해집니다. 완벽주의로 주변이 힘들어합니다.",lackDesc:"의지력이 떨어집니다. 결단을 못 내립니다.",overFix:"붉은색을 가까이 하세요. 활동적인 취미.",lackFix:"흰색·실버 계열을 들이세요. 서쪽 방향을 활용하세요.",chakColor:"흰색, 은색",direction:"서쪽",numbers:"4, 9",objects:"금속 소품, 시계",food:"매운맛 — 마늘, 생강, 고추",healthTip:"폐·대장·피부를 챙기세요.",activity:"헬스·근력 운동, 정리정돈, 무술·격투 운동" },
+  수: { color:"#0369a1",icon:"🌊",overDesc:"우울감이 옵니다. 신장이 무거워집니다.",lackDesc:"지혜가 흐려집니다. 건망증이 생깁니다.",overFix:"황토색을 들이세요. 단맛 음식.",lackFix:"파란색·검은색을 인테리어에 넣으세요. 북쪽을 활용하세요.",chakColor:"파란색, 검은색",direction:"북쪽",numbers:"1, 6",objects:"수족관, 파란 소품",food:"짠맛 — 해산물, 된장, 미역",healthTip:"신장·방광·뼈를 챙기세요.",activity:"독서, 수영, 글쓰기·일기, 충분한 수면" },
 };
 
 type Stage = "confirming" | "done" | "error";
@@ -219,7 +219,8 @@ function SuccessContent() {
                   <p className="text-xs text-gray-400 mb-3 whitespace-pre-line">{d.overDesc}</p>
                   <div className="text-xs text-gray-300">
                     <p className="mb-1"><span className="text-gray-500">극복: </span>{d.overFix}</p>
-                    <p><span className="text-gray-500">건강: </span>{d.healthTip}</p>
+                    <p className="mb-1"><span className="text-gray-500">건강: </span>{d.healthTip}</p>
+                    <p><span className="text-gray-500">활동·행동: </span>{d.activity}</p>
                   </div>
                 </div>
               );
@@ -247,6 +248,7 @@ function SuccessContent() {
                       <div><span className="text-gray-500">건강 </span><span className="text-white font-semibold">{d.healthTip}</span></div>
                       <div className="col-span-2"><span className="text-gray-500">물건 </span><span className="text-white font-semibold">{d.objects}</span></div>
                       <div className="col-span-2"><span className="text-gray-500">음식 </span><span className="text-white font-semibold">{d.food}</span></div>
+                      <div className="col-span-2"><span className="text-gray-500">활동·행동 </span><span className="text-white font-semibold">{d.activity}</span></div>
                     </div>
                   </div>
                 </div>
