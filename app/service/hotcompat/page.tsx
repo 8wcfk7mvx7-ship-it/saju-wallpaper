@@ -181,6 +181,15 @@ const GRADES = [
 
 function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GRADES[GRADES.length - 1]; }
 
+// 부족한 오행을 보강해 속궁합 케미를 끌어올리는 컨설팅
+const BOOST_TIP: Record<string, { icon: string; color: string; tip: string }> = {
+  목: { icon: "🌿", color: "#16a34a", tip: "스킨십 전 가벼운 산책이나 스트레칭으로 몸을 풀어보세요. 초록색 침구·조명을 더하면 긴장이 풀리고 분위기가 부드러워집니다." },
+  화: { icon: "🔥", color: "#dc2626", tip: "조명을 따뜻한 톤(주황·붉은 계열)으로 바꾸고, 음악이나 대화로 분위기를 먼저 달궈보세요. 화 기운이 보강되면 표현력과 열정이 살아납니다." },
+  토: { icon: "🏔️", color: "#92400e", tip: "급하게 진행하지 말고 충분한 스킨십과 대화로 신뢰를 먼저 쌓으세요. 안정감이 채워질수록 케미가 깊어집니다." },
+  금: { icon: "⚔️", color: "#7c3aed", tip: "정리된 침실, 깨끗한 향(은은한 향수·디퓨저)을 더하면 집중도가 올라갑니다. 금 기운 보강은 절제된 긴장감을 만들어 매력을 키웁니다." },
+  수: { icon: "🌊", color: "#0369a1", tip: "샤워나 목욕 등 물과 관련된 시간을 함께 가져보세요. 어둡고 차분한 조명, 충분한 수분 섭취가 수 기운을 채워 감성적 케미를 끌어올립니다." },
+};
+
 // ── 메인 ─────────────────────────────────────────────────────────────────────
 function HotCompatContent() {
   const router = useRouter();
@@ -407,6 +416,35 @@ function HotCompatContent() {
         {/* 케미 분석 결과 — 페이월 */}
         <div className="relative mb-4">
           <div className={isPaid ? "" : "blur-sm select-none pointer-events-none"}>
+            {/* 속궁합 보강법 */}
+            {(() => {
+              type Element = "목"|"화"|"토"|"금"|"수";
+              const elements: Element[] = ["목","화","토","금","수"];
+              const lacking = Array.from(new Set([...(r1.lacking ?? []), ...(r2.lacking ?? [])])) as Element[];
+              const targets = (lacking.length > 0 ? lacking : elements.slice(0, 2)).slice(0, 2);
+              return (
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+                  <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">속궁합을 더 끌어올리는 보강법</p>
+                  <p className="text-xs text-gray-600 mb-4 leading-relaxed">두 사람의 사주에서 부족한 오행을 보강하면 케미가 더 살아납니다.</p>
+                  <div className="space-y-3">
+                    {targets.map(el => {
+                      const t = BOOST_TIP[el];
+                      return (
+                        <div key={el} className="flex items-start gap-3 rounded-xl px-4 py-3 border"
+                          style={{ backgroundColor: t.color + "12", borderColor: t.color + "30" }}>
+                          <span className="text-xl shrink-0">{t.icon}</span>
+                          <div>
+                            <p className="text-sm font-bold mb-0.5" style={{ color: t.color }}>{el}(五行) 기운 보강</p>
+                            <p className="text-xs text-gray-400 leading-relaxed">{t.tip}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
             {chem.highlights.length > 0 ? (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
                 <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">발견된 성적 케미 요소</p>
