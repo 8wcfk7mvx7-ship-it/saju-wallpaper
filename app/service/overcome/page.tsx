@@ -43,7 +43,7 @@ export default function OvercomePage() {
       productType: "report", useJajasi: form.useJajasi,
     });
     sessionStorage.setItem("overcomeData", JSON.stringify({
-      form: { year: fy, month: fm, day: fd, gender: form.gender },
+      form: { name: form.name || "사용자", year: fy, month: fm, day: fd, hour: form.birthHour, gender: form.gender },
       result,
     }));
   }
@@ -71,27 +71,8 @@ export default function OvercomePage() {
     setError("");
     setLoading(true);
     try {
-      let fy = Number(form.birthYear), fm = Number(form.birthMonth), fd = Number(form.birthDay);
-      if (form.calendarType === "lunar") {
-        try {
-          const KLC = (await import("korean-lunar-calendar")).default;
-          const klc = new KLC();
-          klc.setLunarDate(fy, fm, fd, form.isLeapMonth);
-          const sol = klc.getSolarCalendar();
-          if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
-        } catch {}
-      }
-      const result = analyzeSaju({
-        birthYear: fy, birthMonth: fm, birthDay: fd,
-        birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-        name: form.name || "사용자", gender: form.gender, birthPlace: form.city || "서울", style: "auto",
-        productType: "report", useJajasi: form.useJajasi,
-      });
+      await buildResultAndStore();
       const orderId = `overcome_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-      sessionStorage.setItem("overcomeData", JSON.stringify({
-        form: { year: fy, month: fm, day: fd, gender: form.gender },
-        result,
-      }));
       router.push(`/service/overcome/pay?orderId=${orderId}&amount=990`);
     } catch {
       setError("분석 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -193,7 +174,7 @@ export default function OvercomePage() {
         >
           {loading ? (
             <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />분석 중...</>
-          ) : "분석하고 결제하기 →"}
+          ) : "분석하기 →"}
         </button>
         <p className="text-center text-xs text-gray-600 mt-3">결제 금액 ₩990 · 토스페이 / 카드</p>
 

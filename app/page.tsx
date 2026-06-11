@@ -572,10 +572,10 @@ const SERVICES: {
     viral: "역마살·귀문관살도 방향 맞으면 최강 무기입니다",
     desc: "내 신살과 오행 불균형을 제대로 알고 극복하는 완벽 가이드. 나쁜 사주도 방향 틀면 달라집니다.",
     tags: ["신살 극복", "오행 보완", "개운법"],
-    href: "/service/overcome", badge: "완전 무료",
+    href: "/service/overcome", badge: "Special",
     color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "무료", "운명·대운"],
+    categories: ["전체", "운명·대운", "Special"],
   },
   {
     id: "calendar", emoji: "📅",
