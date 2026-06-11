@@ -26,6 +26,17 @@ const CHEONGAN_HAP_MAP: Record<string, { partner: string; name: string; hanja: s
   계: { partner: "무", name: "무계합", hanja: "戊癸合", desc: "무정지합(無情之合) — 겉은 차갑지만 속이 뜨거운 조합.", score: 20 },
 };
 
+// 지지 육합(地支六合) — 속궁합에서 가장 중요하게 보는 요소.
+// 일지가 육합이면 가장 끈끈하고 안정적인 신체적·정서적 밀착 케미가 형성됨.
+const JIJI_YUKHAP_LIST: { a: string; b: string; name: string; result: string; desc: string; score: number }[] = [
+  { a: "자", b: "축", name: "자축합(子丑合)", result: "토(土)", desc: "음습한 물과 단단한 흙이 만나 끈끈하게 엉겨 붙는 합. 한번 붙으면 잘 떨어지지 않는, 가장 안정적이고 깊은 신체적 밀착감을 줍니다.", score: 50 },
+  { a: "인", b: "해", name: "인해합(寅亥合)", result: "목(木)", desc: "큰 나무가 깊은 물에 뿌리내리는 합. 서로를 키워주고 감싸주는 따뜻하고 다정한 스킨십 케미입니다.", score: 48 },
+  { a: "묘", b: "술", name: "묘술합(卯戌合)", result: "화(火)", desc: "도화의 묘와 강한 술이 만나 불을 피우는 합. 보면 볼수록 불타오르는 강한 매력과 집착에 가까운 끌림.", score: 50 },
+  { a: "진", b: "유", name: "진유합(辰酉合)", result: "금(金)", desc: "흙과 보석이 서로를 빛나게 하는 합. 서로의 가치를 알아봐주며 깊이 신뢰하는 끈끈한 궁합.", score: 45 },
+  { a: "사", b: "신", name: "사신합(巳申合)", result: "수(水)", desc: "합이면서 동시에 형(刑)의 성질도 품은 애증의 합. 밀고 당기는 자극이 강하고, 한번 엮이면 쉽게 못 끊어내는 운명적 케미.", score: 47 },
+  { a: "오", b: "미", name: "오미합(午未合)", result: "화(火)/태양과 땅", desc: "뜨거운 태양과 그것을 품는 대지의 합. 정서적으로도 육체적으로도 서로에게 가장 따뜻하게 녹아드는 궁합입니다.", score: 49 },
+];
+
 const JIJI_CHUNG_LIST: { a: string; b: string; name: string; desc: string; score: number }[] = [
   { a: "자", b: "오", name: "자오충(子午沖)", desc: "극과 극의 전기 케미. 차가운 물(水)과 뜨거운 불(火)의 충돌. 거부할 수 없는 강렬한 자극. 함께 있으면 항상 짜릿합니다.", score: 35 },
   { a: "묘", b: "유", name: "묘유충(卯酉沖)", desc: "두 도화살 지지의 충돌. 서로의 매력을 끊임없이 자극합니다. 보기만 해도 끌리는 섹시한 긴장감.", score: 28 },
@@ -62,6 +73,16 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   let hapDesc: string | null = null;
   let chungName: string | null = null;
   let chungDesc: string | null = null;
+
+  // 0순위(최우선): 일지 육합 — 속궁합에서 가장 중시하는 요소
+  for (const y of JIJI_YUKHAP_LIST) {
+    if ((ij1 === y.a && ij2 === y.b) || (ij1 === y.b && ij2 === y.a)) {
+      score += y.score;
+      highlights.push({ rank: 0, title: `일지 ${y.name} → ${y.result}`, color: "#fb7185", desc: y.desc });
+      if (!hapName) { hapName = y.name; hapDesc = y.desc; }
+      break;
+    }
+  }
 
   // 1순위: 정임암합의 정점 — 丁亥일주 + 壬午일주
   const isAmhap = (
@@ -231,7 +252,7 @@ function HotCompatContent() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">사주 궁합</span>
           </h1>
           <p className="text-gray-400 text-base mb-12 leading-relaxed">
-            정임합 · 자오충 · 인오술합까지<br />
+            지지 육합 · 정임합 · 자오충까지<br />
             <span className="text-gray-200 font-medium">두 사람 사이 성적 케미의 진짜 순위</span>
           </p>
           <div className="w-full space-y-3 mb-10 text-left">
