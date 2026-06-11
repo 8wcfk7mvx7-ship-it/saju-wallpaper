@@ -1,0 +1,22 @@
+{
+  "name": "Summer Palace - AI 사주 명리 분석",
+  "short_name": "Summer Palace",
+  "description": "사주팔자 명리학 기반 AI 분석 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06060e",
+  "theme_color": "#06060e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/mascot.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/mascot.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import AutoLogout from "@/components/AutoLogout";
 import SiteHeader from "@/components/SiteHeader";
+import MobileBottomNav from "@/components/MobileBottomNav";
+import NativeBridge from "@/components/NativeBridge";
 
 const chosun = localFont({
   src: "./fonts/ChosunilboMyungjo.woff",
@@ -25,6 +27,20 @@ export const metadata: Metadata = {
     siteName: "Summer Palace",
     url: "https://summerpalace.ai.kr",
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Summer Palace",
+  },
+};
+
+export const viewport = {
+  themeColor: "#06060e",
+  viewportFit: "cover" as const,
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 const jsonLd = {
@@ -75,8 +91,12 @@ export default function RootLayout({
       </head>
       <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
         <AutoLogout />
+        <NativeBridge />
         <SiteHeader />
-        {children}
+        <div style={{ paddingBottom: "calc(56px + env(safe-area-inset-bottom))" }} className="sm:pb-0">
+          {children}
+        </div>
+        <MobileBottomNav />
       </body>
     </html>
   );

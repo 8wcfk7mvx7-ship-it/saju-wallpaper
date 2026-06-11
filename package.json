@@ -6,10 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cap:sync": "cap sync",
+    "cap:ios": "cap open ios",
+    "cap:android": "cap open android"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
+    "@capacitor/splash-screen": "^7.0.4",
+    "@capacitor/status-bar": "^7.0.4",
     "@fullstackfamily/manseryeok": "^1.0.8",
     "@hoshin/saju-mcp-server": "github:hjsh200219/fortuneteller",
     "@supabase/supabase-js": "^2.105.4",
@@ -24,6 +32,7 @@
     "resend": "^6.12.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
