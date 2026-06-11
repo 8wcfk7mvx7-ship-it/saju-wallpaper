@@ -1,34 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-function AdSenseBlock() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-    const timer = setTimeout(() => {
-      try {
-        // @ts-expect-error adsbygoogle
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch {}
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-  if (!mounted) return <div className="w-full h-[120px]" />;
-  return (
-    <div className="w-full max-w-sm mx-auto">
-      {/* ▼ AdSense 승인 후 data-ad-client, data-ad-slot 값을 실제 값으로 교체 */}
-      <ins
-        className="adsbygoogle"
-        style={{ display: "block" }}
-        data-ad-client="ca-pub-여기에입력"
-        data-ad-slot="여기에입력"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
-    </div>
-  );
-}
+import AdBanner from "@/components/AdBanner";
 
 const LOADING_MESSAGES_KO = [
   "사주팔자를 계산하고 있어요...",
@@ -178,7 +151,7 @@ export default function LoadingPage() {
           />
         </div>
 
-        <AdSenseBlock />
+        <AdBanner />
 
         {/* 사주 팁 */}
         <div className="bg-indigo-900/30 border border-indigo-500/20 rounded-2xl p-5">

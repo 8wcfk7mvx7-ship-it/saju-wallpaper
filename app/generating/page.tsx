@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import AdBanner from "@/components/AdBanner";
 
 // ─────────────────────────────────────────────
 // 타입
@@ -12,44 +13,6 @@ interface Step {
   icon: string;
   status: "waiting" | "running" | "done" | "error";
   duration?: number; // 예상 ms
-}
-
-// ─────────────────────────────────────────────
-// AdSense 컴포넌트 — 클라이언트에서만 렌더링
-// ─────────────────────────────────────────────
-function AdSenseBlock() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // 마운트 후 adsbygoogle 초기화
-    const timer = setTimeout(() => {
-      try {
-        // @ts-expect-error adsbygoogle
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch {}
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // SSR 단계에서는 플레이스홀더만 렌더링 (hydration 충돌 방지)
-  if (!mounted) {
-    return <div className="w-full max-w-sm mx-auto my-4 h-16" />;
-  }
-
-  return (
-    <div className="w-full max-w-sm mx-auto my-4">
-      {/* ▼ AdSense 승인 후 아래 값을 실제 코드로 교체 */}
-      <ins
-        className="adsbygoogle"
-        style={{ display: "block", textAlign: "center" }}
-        data-ad-layout="in-article"
-        data-ad-format="fluid"
-        data-ad-client="ca-pub-여기에입력"
-        data-ad-slot="여기에입력"
-      />
-    </div>
-  );
 }
 
 // ─────────────────────────────────────────────
@@ -356,7 +319,7 @@ function GeneratingContent() {
         <div className="w-full max-w-sm">
           <p className="text-xs text-gray-600 text-center mb-2">AI 생성에는 약 1-2분이 소요됩니다 ☕</p>
           {/* 광고 1: 배너 */}
-          <AdSenseBlock />
+          <AdBanner />
 
           {/* 사주 팁 카드 (광고 사이 컨텐츠) */}
           <div className="bg-white/3 border border-white/8 rounded-xl p-4 my-4 text-center">
@@ -367,7 +330,7 @@ function GeneratingContent() {
           </div>
 
           {/* 광고 2 */}
-          <AdSenseBlock />
+          <AdBanner />
         </div>
       )}
     </div>

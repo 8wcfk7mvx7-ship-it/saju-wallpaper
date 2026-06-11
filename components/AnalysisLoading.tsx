@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import AdBanner from "@/components/AdBanner";
 
 const SAJU_TIPS = [
   "일간(日干)은 사주에서 나 자신을 상징합니다",
@@ -10,32 +11,6 @@ const SAJU_TIPS = [
   "충(沖)은 나쁜 것만이 아닙니다 — 강한 자극과 케미의 원천이기도 합니다",
 ];
 
-function AdSenseBlock() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-    const t = setTimeout(() => {
-      try {
-        // @ts-expect-error adsbygoogle
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch {}
-    }, 100);
-    return () => clearTimeout(t);
-  }, []);
-  if (!mounted) return <div className="h-14 w-full" />;
-  return (
-    <div className="w-full max-w-xs mx-auto my-3">
-      <ins
-        className="adsbygoogle"
-        style={{ display: "block", textAlign: "center" }}
-        data-ad-layout="in-article"
-        data-ad-format="fluid"
-        data-ad-client="ca-pub-여기에입력"
-        data-ad-slot="여기에입력"
-      />
-    </div>
-  );
-}
 
 const ROTATING_MSGS = [
   "오행 에너지를 계산하는 중...",
@@ -140,7 +115,7 @@ export default function AnalysisLoading({ subject, duration = 2800, onDone }: Pr
         </div>
 
         {/* AdSense */}
-        <AdSenseBlock />
+        <AdBanner />
 
         {/* 사주 팁 */}
         <div className="mt-3 px-4 py-3 rounded-2xl text-center"
