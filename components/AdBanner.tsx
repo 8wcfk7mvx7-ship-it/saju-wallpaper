@@ -57,7 +57,7 @@ export function AdFitBanner({
 // data-ad-client / data-ad-slot 값은 애드센스 콘솔에서 발급받은 실제 값으로 교체하세요.
 export function AdSenseBanner({
   slot = "여기에입력",
-  client = "ca-pub-여기에입력",
+  client = "ca-pub-6039288229459228",
 }: {
   slot?: string;
   client?: string;
