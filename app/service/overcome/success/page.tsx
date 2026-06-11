@@ -71,6 +71,7 @@ function SuccessContent() {
   const paymentKey = params.get("paymentKey") || "";
   const orderId = params.get("orderId") || "";
   const amount = Number(params.get("amount") || 990);
+  const isStarPayment = params.get("star") === "true";
 
   const [stage, setStage] = useState<Stage>("confirming");
   const [errorMsg, setErrorMsg] = useState("");
@@ -81,7 +82,7 @@ function SuccessContent() {
   const [dayJj, setDayJj] = useState("");
 
   useEffect(() => {
-    if (!paymentKey || !orderId) {
+    if (!isStarPayment && (!paymentKey || !orderId)) {
       setErrorMsg("결제 정보가 올바르지 않습니다.");
       setStage("error");
       return;
@@ -102,6 +103,7 @@ function SuccessContent() {
           setDayCg(r.pillarsDetail.day.cg);
           setDayJj(r.pillarsDetail.day.jj);
         }
+        if (isStarPayment) { setStage("done"); return; }
         const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
         await fetch("/api/payment/confirm", {
           method: "POST",
@@ -114,7 +116,7 @@ function SuccessContent() {
       }
     }
     run();
-  }, [paymentKey, orderId, amount]);
+  }, [paymentKey, orderId, amount, isStarPayment]);
 
   if (stage === "error") {
     return (

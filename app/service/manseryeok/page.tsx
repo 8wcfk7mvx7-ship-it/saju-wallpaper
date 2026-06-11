@@ -611,6 +611,46 @@ function ResultView({
           &nbsp;·&nbsp;일지 12운성: <span className="font-bold" style={{ color: UUNSEONG_PEAK.has(pd.day.uunseong) ? "#fbbf24" : UUNSEONG_WEAK.has(pd.day.uunseong) ? "#f87171" : "white" }}>{pd.day.uunseong}</span>
         </div>
 
+        {/* 한눈에 보기 — 4주 요약 테이블 */}
+        <div className="mt-4 overflow-x-auto rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+          <table className="w-full text-center" style={{ borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                <th className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)", width: "15%" }}></th>
+                {pillars.map(({ label }) => (
+                  <th key={label} className="text-[10px] font-black py-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { row: "십신", get: (d: typeof pd.year) => d.sipseongCg ? <span style={{ color: sipseongColorByIlgan(ilgan, d.sipseongCg) }}>{d.sipseongCg}</span> : "—" },
+                { row: "천간", get: (d: typeof pd.year) => <span className="font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[d.cg] || "토"].text }}>{d.cg}</span> },
+                { row: "지지", get: (d: typeof pd.year) => <span className="font-black" style={{ color: EL_STYLE[jijiElement(d.jj)].text }}>{d.jj}</span> },
+                { row: "십신", get: (d: typeof pd.year) => d.sipseongJj ? <span style={{ color: sipseongColorByIlgan(ilgan, d.sipseongJj) }}>{d.sipseongJj}</span> : "—" },
+                { row: "지장간", get: (d: typeof pd.year) => (JIJANGAN_DISPLAY[d.jj] || []).map(j => j.stem).join("") || "—" },
+                { row: "12운성", get: (d: typeof pd.year) => d.uunseong || "—" },
+                {
+                  row: "신살", get: (d: typeof pd.year, label: string) => {
+                    const pl = label === "년주" ? "연" : label === "월주" ? "월" : label === "일주" ? "일" : "시";
+                    const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl)).map(s => s.name);
+                    return names.length ? names.join(", ") : "—";
+                  }
+                },
+              ].map((rowDef, ri) => (
+                <tr key={ri} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <td className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)" }}>{rowDef.row}</td>
+                  {pillars.map(({ label, d }) => (
+                    <td key={label} className="text-[10px] font-bold py-1.5 px-0.5" style={{ color: "rgba(255,255,255,0.75)" }}>
+                      {rowDef.get(d, label)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {/* 궁성론 — 각 기둥 의미 */}
         <div className="mt-4 space-y-2">
           <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>궁성론 (宮星論) — 각 기둥이 나타내는 영역</p>

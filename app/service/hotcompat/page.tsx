@@ -362,6 +362,48 @@ function HotCompatContent() {
           <p className="text-sm font-bold" style={{ color: grade.color }}>→ {grade.verdict}</p>
         </div>
 
+        {/* 만족도 그래프 — 여성/남성 체감 차이 */}
+        {(() => {
+          const seed = (chem.hapName ? chem.hapName.length * 17 : 0) + chem.score;
+          const diff = (seed % 5);
+          const skewToFemale = seed % 2 === 0;
+          let female = Math.min(9, Math.max(1, Math.round(chem.score / 12) + (skewToFemale ? diff : -diff)));
+          let male = Math.min(9, Math.max(1, Math.round(chem.score / 12) + (skewToFemale ? -diff : diff)));
+          if (female === male) { if (skewToFemale) female = Math.min(9, female + 1); else male = Math.min(9, male + 1); }
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">예상 만족도 (10점 만점)</p>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-bold text-pink-300">여성</span>
+                    <span className="text-sm font-black text-pink-300">{female}점</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2.5">
+                    <div className="h-full rounded-full" style={{ width: `${female * 10}%`, background: "linear-gradient(90deg, #f472b6, #ec4899)" }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-bold text-sky-300">남성</span>
+                    <span className="text-sm font-black text-sky-300">{male}점</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2.5">
+                    <div className="h-full rounded-full" style={{ width: `${male * 10}%`, background: "linear-gradient(90deg, #38bdf8, #6366f1)" }} />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-3 leading-relaxed">
+                {female > male
+                  ? "이 궁합은 여성 쪽이 더 큰 만족을 느끼는 케미예요. 남성은 상대를 더 적극적으로 리드하고 배려할수록 케미가 살아납니다."
+                  : female < male
+                  ? "이 궁합은 남성 쪽이 더 큰 만족을 느끼는 케미예요. 여성은 표현을 조금 더 적극적으로 할수록 케미가 살아납니다."
+                  : "두 사람의 체감 만족도가 비슷한 균형 잡힌 케미입니다."}
+              </p>
+            </div>
+          );
+        })()}
+
         {/* 케미 분석 결과 — 페이월 */}
         <div className="relative mb-4">
           <div className={isPaid ? "" : "blur-sm select-none pointer-events-none"}>

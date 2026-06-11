@@ -4,8 +4,11 @@ import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju } from "@/lib/saju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import { useEffect } from "react";
 
 export const dynamic = "force-dynamic";
+
+const STAR_PRICE = 10; // ✦10개 = 1,000원 (100원=1개 환율 기준, ₩990 상당)
 
 type Step = "splash" | "input";
 
@@ -15,7 +18,53 @@ export default function OvercomePage() {
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [stars, setStars] = useState(0);
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 2800);
+
+  useEffect(() => {
+    setStars(parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10) || 0);
+  }, []);
+
+  async function buildResultAndStore() {
+    let fy = Number(form.birthYear), fm = Number(form.birthMonth), fd = Number(form.birthDay);
+    if (form.calendarType === "lunar") {
+      try {
+        const KLC = (await import("korean-lunar-calendar")).default;
+        const klc = new KLC();
+        klc.setLunarDate(fy, fm, fd, form.isLeapMonth);
+        const sol = klc.getSolarCalendar();
+        if (sol?.year) { fy = sol.year; fm = sol.month; fd = sol.day; }
+      } catch {}
+    }
+    const result = analyzeSaju({
+      birthYear: fy, birthMonth: fm, birthDay: fd,
+      birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
+      name: form.name || "사용자", gender: form.gender, birthPlace: form.city || "서울", style: "auto",
+      productType: "report", useJajasi: form.useJajasi,
+    });
+    sessionStorage.setItem("overcomeData", JSON.stringify({
+      form: { year: fy, month: fm, day: fd, gender: form.gender },
+      result,
+    }));
+  }
+
+  async function handlePayWithStars() {
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) { setError("생년월일을 모두 선택해주세요."); return; }
+    if (stars < STAR_PRICE) { setError(`별조각이 부족합니다 (현재 ${stars}개 / 필요 ${STAR_PRICE}개)`); return; }
+    setError("");
+    setLoading(true);
+    try {
+      await buildResultAndStore();
+      const next = stars - STAR_PRICE;
+      localStorage.setItem("sp_blueberries", String(next));
+      setStars(next);
+      const orderId = `overcome_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      router.push(`/service/overcome/success?star=true&orderId=${orderId}`);
+    } catch {
+      setError("분석 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setLoading(false);
+    }
+  }
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) { setError("생년월일을 모두 선택해주세요."); return; }
@@ -147,6 +196,22 @@ export default function OvercomePage() {
           ) : "분석하고 결제하기 →"}
         </button>
         <p className="text-center text-xs text-gray-600 mt-3">결제 금액 ₩990 · 토스페이 / 카드</p>
+
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-600">또는</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        <button
+          onClick={handlePayWithStars}
+          disabled={loading || !form.birthYear || !form.birthMonth || !form.birthDay}
+          className="w-full py-4 rounded-2xl font-bold text-base text-white transition-all active:scale-[0.97] disabled:opacity-40 flex items-center justify-center gap-2"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+        >
+          ✦ 별조각으로 결제하기 ({STAR_PRICE}개)
+        </button>
+        <p className="text-center text-xs text-gray-600 mt-2">보유 별조각 {stars}개</p>
       </div>
     </main>
   );
