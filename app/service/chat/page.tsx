@@ -128,7 +128,7 @@ export default function SajuChatPage() {
     setSajuContext(context);
     setMessages([{
       role: "assistant",
-      content: `안녕하세요! 저는 온갖 사주 데이터를 학습한 사주 전문 AI, 월령도사입니다.\n\n사주팔자를 살펴봤어요: ${result.fourPillars}\n\n연애·재물·건강·직업적성·대운·궁합·전생 등 뭐든 편하게 물어보세요. 사주로 볼 수 있는 건 뭐든 함께 이야기해 드릴게요!`,
+      content: `안녕! 나는 온갖 사주 데이터를 학습한 사주 전문 AI, 월령도사야.\n\n사주팔자 살펴봤어: ${result.fourPillars}\n\n연애·재물·건강·직업적성·대운·궁합·전생 등 뭐든 편하게 물어봐. 사주로 볼 수 있는 건 다 같이 이야기해볼게!`,
     }]);
     setStep("chat");
   }
