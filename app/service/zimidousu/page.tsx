@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
-import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, getMyeonggungJiji } from "@/lib/zimidousu";
+import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex } from "@/lib/zimidousu";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -18,7 +18,7 @@ export default function ZimidousuPage() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
-  const [result, setResult] = useState<{ myeonggungJj: string; lunarDay: number } | null>(null);
+  const [result, setResult] = useState<{ myeonggungJj: string; singungJj: string; myeonggungIdx: number; lunarDay: number } | null>(null);
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -35,8 +35,11 @@ export default function ZimidousuPage() {
         if (lun?.month) { lunarMonth = lun.month; lunarDay = lun.day; }
       }
     } catch {}
+    const hIdx = hourToJijiIndex(form.birthHour);
+    const myeonggungIdx = getMyeonggungIndex(lunarMonth, hIdx);
     const myeonggungJj = getMyeonggungJiji(lunarMonth, form.birthHour);
-    setResult({ myeonggungJj, lunarDay });
+    const singungJj = getSingungJiji(lunarMonth, form.birthHour);
+    setResult({ myeonggungJj, singungJj, myeonggungIdx, lunarDay });
     setStep("loading");
   }
 
@@ -145,6 +148,7 @@ export default function ZimidousuPage() {
   const starKey = candidates[result.lunarDay % candidates.length];
   const star = MAIN_STARS[starKey];
   const myeonggungPalace = PALACES[0];
+  const palaceJiji = getPalaceJiji(result.myeonggungIdx);
 
   return (
     <main className="min-h-screen bg-[#0c0816] text-white">
@@ -158,6 +162,19 @@ export default function ZimidousuPage() {
           <h1 className="text-2xl font-black leading-snug">
             명궁(命宮) — {myeonggungJj}({JIJI_HANJA[myeonggungJj]})궁
           </h1>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-center">
+            <p className="text-xs font-bold text-purple-300 mb-1">명궁(命宮)</p>
+            <p className="text-lg font-black">{myeonggungJj}({JIJI_HANJA[myeonggungJj]})</p>
+            <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">선천적 기질·성격의 중심</p>
+          </div>
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-center">
+            <p className="text-xs font-bold text-fuchsia-300 mb-1">신궁(身宮)</p>
+            <p className="text-lg font-black">{result.singungJj}({JIJI_HANJA[result.singungJj]})</p>
+            <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">후천적 노력·환경의 방향</p>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-purple-950/60 to-fuchsia-950/40 border border-purple-700/30 rounded-3xl p-6 mb-5 text-center">
@@ -186,12 +203,20 @@ export default function ZimidousuPage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
           <p className="text-sm font-bold text-gray-300 mb-3">자미두수 12궁(宮) 한눈에 보기</p>
           <div className="grid grid-cols-2 gap-2">
-            {PALACES.map((p, i) => (
-              <div key={i} className={`rounded-xl p-3 ${i === 0 ? "bg-purple-900/30 border border-purple-700/40" : "bg-white/[0.02] border border-white/5"}`}>
-                <p className="text-xs font-bold text-gray-200">{p.name} ({p.hanja})</p>
-                <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">{p.desc}</p>
-              </div>
-            ))}
+            {PALACES.map((p, i) => {
+              const jj = palaceJiji[i];
+              const isBody = jj === result.singungJj;
+              return (
+                <div key={i} className={`rounded-xl p-3 ${i === 0 ? "bg-purple-900/30 border border-purple-700/40" : "bg-white/[0.02] border border-white/5"}`}>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className="text-xs font-bold text-gray-200">{p.name} ({p.hanja})</p>
+                    <span className="text-[11px] text-purple-300 font-bold shrink-0 ml-1">{jj}({JIJI_HANJA[jj]})</span>
+                  </div>
+                  {isBody && <p className="text-[10px] text-fuchsia-400 font-bold mb-0.5">★ 신궁(身宮)</p>}
+                  <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">{p.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
 

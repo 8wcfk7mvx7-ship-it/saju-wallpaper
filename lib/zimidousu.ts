@@ -158,6 +158,21 @@ export function getMyeonggungJiji(lunarMonth: number, hour: number | null): stri
   return JIJI[getMyeonggungIndex(lunarMonth, hIdx)];
 }
 
+// 신궁(身宮) 산출 — 寅에서 시작해 음력 월수, 시지 모두 순행으로 더함
+export function getSingungIndex(lunarMonth: number, hourJijiIndex: number): number {
+  const base = 2; // 寅
+  return (base + (lunarMonth - 1) + hourJijiIndex) % 12;
+}
+
+export function getSingungJiji(lunarMonth: number, hour: number | null): string {
+  const hIdx = hourToJijiIndex(hour);
+  return JIJI[getSingungIndex(lunarMonth, hIdx)];
+}
+// 명궁을 기준으로 12궁이 순행 배치된다고 보고, 각 궁의 지지를 반환
+export function getPalaceJiji(myeonggungIndex: number): string[] {
+  return Array.from({ length: 12 }, (_, i) => JIJI[(myeonggungIndex + i) % 12]);
+}
+
 // 명궁 지지의 오행에 대응하는 대표 주성 목록
 export const ELEMENT_TO_STARS: Record<"목" | "화" | "토" | "금" | "수", string[]> = {
   목: ["천기", "탐랑"],
