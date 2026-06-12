@@ -24,13 +24,16 @@ interface Props {
   subject: string;
   duration?: number;
   onDone: () => void;
+  /** 순환 메시지 커스터마이즈 (생략 시 기본 메시지) */
+  messages?: string[];
 }
 
-export default function AnalysisLoading({ subject, duration = 2800, onDone }: Props) {
+export default function AnalysisLoading({ subject, duration = 2800, onDone, messages }: Props) {
   const [started, setStarted] = useState(false);
   const [pct, setPct] = useState(0);
   const [msgIdx, setMsgIdx] = useState(0);
   const [tipIdx, setTipIdx] = useState(0);
+  const rotatingMsgs = messages ?? ROTATING_MSGS;
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
@@ -54,7 +57,7 @@ export default function AnalysisLoading({ subject, duration = 2800, onDone }: Pr
 
   // 메시지 순환
   useEffect(() => {
-    const t = setInterval(() => setMsgIdx(i => (i + 1) % ROTATING_MSGS.length), 950);
+    const t = setInterval(() => setMsgIdx(i => (i + 1) % rotatingMsgs.length), 950);
     return () => clearInterval(t);
   }, []);
 
@@ -92,7 +95,7 @@ export default function AnalysisLoading({ subject, duration = 2800, onDone }: Pr
             {subject}을 열심히 분석 중입니다...
           </p>
           <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-            {ROTATING_MSGS[msgIdx]}
+            {rotatingMsgs[msgIdx]}
           </p>
         </div>
 

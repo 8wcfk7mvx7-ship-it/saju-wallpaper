@@ -258,14 +258,18 @@ function HotCompatContent() {
           <div className="absolute bottom-[-20%] left-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">19금</div>
+          <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">⚠ 19금 · 보고 후회할 수 있음</div>
           <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            19금<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">사주 궁합</span>
+            우리의<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">속궁합은?</span>
           </h1>
-          <p className="text-gray-400 text-base mb-12 leading-relaxed">
+          <p className="text-gray-400 text-base mb-2 leading-relaxed">
+            남들은 다 확인했는데<br />
+            <span className="text-gray-200 font-medium">나만 모르고 있던 우리 사이의 진짜 온도</span>
+          </p>
+          <p className="text-gray-600 text-sm mb-12">
             지지 육합 · 정임합 · 자오충까지<br />
-            <span className="text-gray-200 font-medium">두 사람 사이 성적 케미의 진짜 순위</span>
+            두 사람 사이 성적 케미의 진짜 순위
           </p>
           <div className="w-full space-y-3 mb-10 text-left">
             {[
@@ -322,7 +326,14 @@ function HotCompatContent() {
 
   // ── 로딩 ────────────────────────────────────────────────────────────────
   if (step === "loading") {
-    return <AnalysisLoading subject="두 사람의 성적 케미" duration={2800} onDone={() => setStep("result")} />;
+    return <AnalysisLoading subject="우리의 속궁합" duration={2800} onDone={() => setStep("result")}
+      messages={[
+        "두 사람의 합·충 관계를 대조하는 중...",
+        "혹시 다른 사람이랑 더 잘 맞지 않을지 확인하는 중...",
+        "이 정도면 평균 이상인지 비교하는 중...",
+        "둘 중 누가 더 많이 끌리고 있는지 계산하는 중...",
+      ]}
+    />;
   }
 
   // ── 결과 ────────────────────────────────────────────────────────────────
