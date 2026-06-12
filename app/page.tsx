@@ -1266,19 +1266,6 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* ── 매력 서비스 링크 ── */}
-        <section className="mb-10">
-          <button
-            onClick={() => router.push("/service/19plus")}
-            className="w-full rounded-xl px-4 py-3 text-xs flex items-center justify-center gap-2 transition-all"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}
-          >
-            <span>🔞</span>
-            <span>성인 전용 서비스는 별도 페이지에서 확인하세요</span>
-            <span>→</span>
-          </button>
-        </section>
-
         {/* ── 바이럴 띠 배너 ── */}
         <section className="mb-16 -mx-4 sm:-mx-6">
           <div className="relative py-12 sm:py-16 px-6 sm:px-12 text-center overflow-hidden"
