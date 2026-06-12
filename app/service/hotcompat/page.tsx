@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, type SajuResult, isGanyeoJidong, GANYEO_JIDONG_LOVE } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -159,6 +159,15 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     score += 8;
     highlights.push({ rank: 8, title: "한쪽 도화 기운 보유", color: "#6366f1",
       desc: "한쪽이 강한 도화 기운을 가지고 있어 먼저 매력을 느끼게 됩니다." });
+  }
+
+  // 간여지동 — 합이 형성될 때 매력이 이성에게 강하게 발현되는 구조
+  const g1 = isGanyeoJidong(ig1, ij1);
+  const g2 = isGanyeoJidong(ig2, ij2);
+  if ((g1 || g2) && (hapName || (highlights.length > 0 && highlights.some(h => h.rank <= 4)))) {
+    score += 6;
+    highlights.push({ rank: 9, title: `${g1 && g2 ? "두 사람 모두" : "한쪽이"} 간여지동 — 합으로 매력 발현`, color: "#f472b6",
+      desc: GANYEO_JIDONG_LOVE.hapTrigger });
   }
 
   highlights.sort((a, b) => a.rank - b.rank);

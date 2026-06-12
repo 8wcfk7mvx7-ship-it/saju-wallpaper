@@ -43,6 +43,43 @@ export interface YongsinResult {
   desc: string;
 }
 
+export interface JijiRelation {
+  a: number; // 기둥 인덱스
+  b: number;
+  jjA: string;
+  jjB: string;
+  type: "육합" | "삼합" | "충" | "형" | "파" | "해";
+}
+
+// 4기둥(년/월/일/시)의 지지 배열을 받아 둘씩 짝지어 육합·삼합·충·형·파·해 관계를 찾아낸다.
+export function getJijiRelations(jjs: string[]): JijiRelation[] {
+  const YUKHAP: [string, string][] = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
+  const CHUNG: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
+  const PA: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
+  const HAE: [string, string][] = [["자","미"],["축","오"],["인","사"],["묘","진"],["신","해"],["유","술"]];
+  const HYEONG: [string, string][] = [["자","묘"],["인","사"],["사","신"],["신","인"],["축","술"],["술","미"],["미","축"]];
+  const SAMHAP_PAIRS: [string, string][] = [["인","오"],["오","술"],["인","술"],["사","유"],["유","축"],["사","축"],["신","자"],["자","진"],["신","진"],["해","묘"],["묘","미"],["해","미"]];
+
+  const matches = (pairs: [string, string][], x: string, y: string) =>
+    pairs.some(([p, q]) => (p === x && q === y) || (p === y && q === x));
+
+  const relations: JijiRelation[] = [];
+  for (let i = 0; i < jjs.length; i++) {
+    for (let j = i + 1; j < jjs.length; j++) {
+      const a = jjs[i], b = jjs[j];
+      if (!a || !b) continue;
+      if (matches(YUKHAP, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "육합" });
+      if (matches(SAMHAP_PAIRS, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "삼합" });
+      if (matches(CHUNG, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "충" });
+      if (matches(HYEONG, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "형" });
+      if (matches(PA, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "파" });
+      if (matches(HAE, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "해" });
+    }
+  }
+  return relations;
+}
+
+
 export interface SajuResult {
   scores: ElementScore; rawScores: ElementScore;
   dominant: Element[]; lacking: Element[];
@@ -2400,6 +2437,21 @@ export const GANYEO_JIDONG_ILJU: Record<string, GanyeoJidongTrait> = {
     stubbornness: 3,
     keywords: ["직관","감수성","경계설정","냉온차이"],
   },
+};
+
+// 간여지동과 이성운/궁합 — 흔한 통설("남자복/여자복이 없다")에 대한 명리학적 재해석
+export const GANYEO_JIDONG_LOVE = {
+  disclaimer: "간여지동을 곧바로 '이성운이 약하다'로 연결하는 건 논리적으로 몇 단계를 건너뛴 해석이에요. 간여지동 자체는 이성운의 좋고 나쁨을 직접 가리키는 표식이 아니에요.",
+  charm: "오히려 간여지동은 매력자본을 풍부하게 내포한 구조예요. 여기서 매력이란 '내가 뿜어내는 에너지와 기질이 타인에게 흡인력으로 작용한다'는 의미입니다. 자아가 뚜렷한 만큼 존재감 자체가 강한 인상을 남겨요.",
+  hapTrigger: "이 매력은 천간합이나 지지합이 형성될 때 특히 이성에게 강하게 발현돼요. 평소엔 무덤덤해 보여도, 합이 닿는 상대 앞에서는 숨겨둔 매력이 자연스럽게 드러나는 경우가 많아요.",
+  bigeopMany: "비겁(比劫)이 유독 많은 사주(같은 오행이 여러 개 겹친 경우)는 '남자복·여자복이 없다'기보다, 본인의 자아와 기준이 워낙 확고해서 눈에 차는 상대를 만나기 어려운 쪽에 가까워요. 그래서 연애보다 친구·자기 일에서 더 큰 즐거움을 느끼는 경향이 나타나기도 해요.",
+  notRequired: "비겁이 많을수록 '반드시 결혼해야 행복하다'는 틀에서 자유로운 편이에요. 명리학적으로도 결혼이 모든 사주에 정해진 정답은 아니며, 사회가 정답이라 정해둔 기준과 명리학의 해석이 항상 일치하지는 않아요.",
+  coupleGanyeo: "간여지동인 두 사람이 부부가 되면, 서로의 강한 자아와 영역을 있는 그대로 인정하고 존중할 수 있어 진실하고 깊은 신뢰의 관계로 이어지는 경우가 많아요.",
+  extraFacts: [
+    "일지(배우자 자리)가 간여지동이면 배우자 자리에도 강한 자아가 자리해, 부부가 서로의 영역과 결정권을 침범하지 않는 '따로 또 같이'형 관계일 때 오래갑니다.",
+    "독립성과 추진력이 강해 1인 기업·전문직·프리랜서처럼 스스로 판단하고 책임지는 일에서 두각을 나타내는 경우가 많아요.",
+    "에너지를 한 방향으로 강하게 쏟는 만큼, 과로나 스트레스성 질환(해당 오행과 연결된 장기)에 평소보다 신경 쓰는 것이 좋아요.",
+  ],
 };
 
 // 간여지동 헬퍼: 해당 일주가 간여지동인지 확인

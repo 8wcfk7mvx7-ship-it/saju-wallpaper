@@ -9,7 +9,8 @@ import {
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
-  JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition,
+  JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, getJijiRelations,
+  GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, isGanyeoJidong,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
   type SajuResult, type Element,
@@ -611,6 +612,32 @@ function ResultView({
           &nbsp;·&nbsp;일지 12운성: <span className="font-bold" style={{ color: UUNSEONG_PEAK.has(pd.day.uunseong) ? "#fbbf24" : UUNSEONG_WEAK.has(pd.day.uunseong) ? "#f87171" : "white" }}>{pd.day.uunseong}</span>
         </div>
 
+        {/* 지지 관계 한눈에 보기 — 육합/삼합/충/형/파/해 */}
+        {(() => {
+          const relations = getJijiRelations(pillars.map(p => p.d.jj));
+          if (relations.length === 0) return null;
+          const REL_STYLE: Record<string, { color: string; bg: string }> = {
+            육합: { color: "#34d399", bg: "rgba(52,211,153,0.1)" },
+            삼합: { color: "#34d399", bg: "rgba(52,211,153,0.1)" },
+            충:   { color: "#f87171", bg: "rgba(248,113,113,0.1)" },
+            형:   { color: "#f87171", bg: "rgba(248,113,113,0.1)" },
+            파:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
+            해:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
+          };
+          return (
+            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+              {relations.map((r, i) => {
+                const st = REL_STYLE[r.type];
+                return (
+                  <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
+                    {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {r.jjA}{r.jjB} {r.type}
+                  </span>
+                );
+              })}
+            </div>
+          );
+        })()}
+
         {/* 한눈에 보기 — 4주 요약 테이블 */}
         <div className="mt-4 overflow-x-auto rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
           <table className="w-full text-center" style={{ borderCollapse: "collapse" }}>
@@ -830,6 +857,46 @@ function ResultView({
           </div>
         </Section>
       )}
+
+      {/* ④-a 간여지동 · 이성운 */}
+      {isGanyeoJidong(ilgan, pd.day.jj) && (() => {
+        const gz = GANYEO_JIDONG_ILJU[iljuKey];
+        const love = GANYEO_JIDONG_LOVE;
+        return (
+          <Section title="간여지동(干與支同) · 이성운" accent="#f472b6">
+            <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>{GANYEO_JIDONG_GENERAL.desc}</p>
+            {gz && (
+              <div className="rounded-xl px-4 py-3 mb-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>{iljuKey}일주 · 고집 강도 {gz.stubbornness}/5</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{gz.specific}</p>
+              </div>
+            )}
+            <p className="text-[10px] font-bold mb-2" style={{ color: "#f472b6" }}>그래서 — &quot;남자복/여자복이 없다&quot;는 말, 진짜일까?</p>
+            <div className="space-y-2.5">
+              {[
+                love.disclaimer,
+                love.charm,
+                love.hapTrigger,
+                love.bigeopMany,
+                love.notRequired,
+                love.coupleGanyeo,
+              ].map((text, i) => (
+                <div key={i} className="rounded-xl px-4 py-3" style={{ background: "rgba(244,114,182,0.05)", border: "1px solid rgba(244,114,182,0.12)" }}>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{text}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] font-bold mt-4 mb-2" style={{ color: "#f472b6" }}>간여지동 — 알아두면 좋은 특징</p>
+            <ul className="space-y-1.5">
+              {love.extraFacts.map((f, i) => (
+                <li key={i} className="text-xs leading-relaxed flex gap-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  <span style={{ color: "#f472b6" }}>·</span>{f}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        );
+      })()}
 
       {/* ④-b 외향성·내향성 분석 */}
       {(() => {
