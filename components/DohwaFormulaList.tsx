@@ -46,6 +46,7 @@ export default function DohwaFormulaList({ result }: { result: SajuResult }) {
               <p className="text-xs font-bold text-white mb-1">{m.name} ({f.hanja}) — {m.pillars.join("·")}주</p>
               <p className="text-[11px] text-gray-500 mb-1.5 leading-relaxed">성립 공식: {f.formula}</p>
               <p className="text-sm text-gray-300 leading-relaxed mb-1.5">{f.effect}</p>
+              <p className="text-xs text-violet-300/90 leading-relaxed mb-1.5">💬 {f.mz}</p>
               <p className="text-xs text-amber-300/90 leading-relaxed">{getNote(m.name, m.pillars, result)}</p>
             </div>
           );
