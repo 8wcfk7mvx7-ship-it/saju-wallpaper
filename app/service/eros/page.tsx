@@ -30,6 +30,7 @@ import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import AdultGate from "@/components/AdultGate";
 import SipseongInsight from "@/components/SipseongInsight";
+import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
@@ -689,6 +690,7 @@ function ErosContent() {
           </div>
         </div>
 
+        <DohwaFormulaList result={result} />
         <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
 
         {/* 면책 */}

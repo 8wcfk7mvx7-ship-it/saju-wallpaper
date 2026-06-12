@@ -14,6 +14,7 @@ import { generateOrderId } from "@/lib/toss";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import StarShower from "@/components/StarShower";
 import SipseongInsight from "@/components/SipseongInsight";
+import DohwaFormulaList from "@/components/DohwaFormulaList";
 
 export const dynamic = "force-dynamic";
 
@@ -517,6 +518,7 @@ function CharmResultContent() {
           </>
         )}
 
+        {result && <DohwaFormulaList result={result} />}
         {result && <SipseongInsight result={result} title="매력 너머 — 사주 속 핵심 기운" />}
 
         {/* 결과 면책 */}
