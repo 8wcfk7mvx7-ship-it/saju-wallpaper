@@ -545,6 +545,17 @@ const SERVICES: {
     categories: ["전체", "무료", "라이프"],
   },
   {
+    id: "sidejob", emoji: "💼",
+    title: "나도 투잡 가능한 사주일까?",
+    viral: "누구는 부업으로 월급보다 더 벌고, 누구는 본업도 흔들린다",
+    desc: "식상의 힘으로 보는 투잡 가능성, 욕심내면 위험한 구조, 나에게 맞는 부업 유형까지.",
+    tags: ["투잡", "부업", "식상"],
+    href: "/service/sidejob", badge: "완전 무료",
+    color: "#34d399", badgeBg: "rgba(5,150,105,0.85)",
+    border: "rgba(52,211,153,0.3)", glow: "rgba(52,211,153,0.12)",
+    categories: ["전체", "무료", "금전·투자", "라이프"],
+  },
+  {
     id: "eros", emoji: "🌹",
     title: "나의 성적 매력은?",
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
