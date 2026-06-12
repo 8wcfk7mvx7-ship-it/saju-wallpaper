@@ -35,8 +35,23 @@ export interface SinsalItem {
   category: 'lucky' | 'unlucky' | 'neutral';
 }
 
+// 신강/신약 8단계 세분류 (지수 0~100 기준)
+export const SIN_STRENGTH_LEVELS = ["극약", "태약", "신약", "중화신약", "중화신강", "신강", "태강", "극왕"] as const;
+export type SinStrengthLevel = typeof SIN_STRENGTH_LEVELS[number];
+
+// 각 단계의 상한선(%) — 마지막 극왕은 상한 없음
+const SIN_STRENGTH_THRESHOLDS = [12, 22, 35, 47.5, 60, 72, 85];
+
+export function classifySinStrength(percent: number): SinStrengthLevel {
+  for (let i = 0; i < SIN_STRENGTH_THRESHOLDS.length; i++) {
+    if (percent < SIN_STRENGTH_THRESHOLDS[i]) return SIN_STRENGTH_LEVELS[i];
+  }
+  return SIN_STRENGTH_LEVELS[SIN_STRENGTH_LEVELS.length - 1];
+}
+
 export interface YongsinResult {
   strength: "신강" | "신약" | "중화";
+  percent: number; // 신강/신약 지수 (0~100, 50이 정중앙)
   yongshin: Element;   // 용신 — 사주 균형의 핵심 오행
   heeshin: Element;    // 희신 — 용신을 생해주는 오행
   gishin: Element;     // 기신 — 용신을 극하는 오행
@@ -912,7 +927,9 @@ function computeYongshin(
   heeshin ??= GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
   const gishin  = CONTROLLED_BY[yongshin] as Element; // 용신을 극하는 → 기신
 
-  return { strength, yongshin, heeshin, gishin, desc };
+  const percent = Math.max(0, Math.min(100, (jiwonAdj / total) * 100));
+
+  return { strength, percent, yongshin, heeshin, gishin, desc };
 }
 
 export function analyzeSaju(input: SajuInput): SajuResult {

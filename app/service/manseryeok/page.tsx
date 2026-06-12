@@ -13,6 +13,7 @@ import {
   GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, isGanyeoJidong,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
+  SIN_STRENGTH_LEVELS, classifySinStrength,
   type SajuResult, type Element,
 } from "@/lib/saju";
 
@@ -776,6 +777,26 @@ function ResultView({
                   <p className="text-lg font-black" style={{ color: item.color }}>{item.value || "—"}</p>
                 </div>
               ))}
+            </div>
+            {/* 신강/신약 지수 일자 그래프 */}
+            <div className="mb-4 rounded-xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] font-bold" style={{ color: "rgba(255,255,255,0.4)" }}>신강/신약 지수</p>
+                <p className="text-sm font-black" style={{ color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" }}>
+                  {classifySinStrength(ys.percent)} ({ys.percent.toFixed(1)}%)
+                </p>
+              </div>
+              <div className="relative h-2 rounded-full overflow-visible mb-1.5" style={{ background: "linear-gradient(to right, #60a5fa, #4ade80, #4ade80, #f87171)" }}>
+                <div className="absolute top-0 bottom-0 w-0.5 bg-white/30" style={{ left: "50%" }} />
+                <div className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white" style={{ left: `${ys.percent}%`, transform: "translate(-50%, -50%)", background: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" }} />
+              </div>
+              <div className="grid grid-cols-8 text-center mt-3">
+                {SIN_STRENGTH_LEVELS.map(level => (
+                  <p key={level} className="text-[9px] font-bold leading-tight" style={{ color: classifySinStrength(ys.percent) === level ? "#fff" : "rgba(255,255,255,0.3)" }}>
+                    {level}
+                  </p>
+                ))}
+              </div>
             </div>
             {/* 조후용신 */}
             {johu && (
