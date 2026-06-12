@@ -578,6 +578,17 @@ const SERVICES: {
     categories: ["전체", "무료", "라이프"],
   },
   {
+    id: "newyear", emoji: "🐎",
+    title: "2026·2027 신년운세",
+    viral: "병오년·정미년, 내 사주와 부딪히는 진짜 흐름은?",
+    desc: "일간·일지·용신 기준으로 다가올 두 해의 합·충·생·극을 분석해, 순풍인지 역풍인지 알려드립니다.",
+    tags: ["신년운세", "병오년", "정미년"],
+    href: "/service/newyear", badge: "완전 무료",
+    color: "#fb7185", badgeBg: "rgba(190,18,60,0.85)",
+    border: "rgba(251,113,133,0.3)", glow: "rgba(251,113,133,0.12)",
+    categories: ["전체", "무료", "라이프"],
+  },
+  {
     id: "eros", emoji: "🌹",
     title: "나의 성적 매력은?",
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
