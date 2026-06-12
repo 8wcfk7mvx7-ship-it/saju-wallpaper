@@ -980,6 +980,47 @@ export default function GunghapPage(){
               );
             })()}
 
+            {/* 우리의 마찰 원인은? */}
+            {(()=>{
+              const negEvents = result.pillars.flatMap(pl=>pl.events.filter(e=>e.score<0).map(e=>({...e,label:pl.label})));
+              negEvents.sort((a,b)=>a.score-b.score);
+              const top = negEvents.slice(0,3);
+              if(top.length===0 && result.johu.score>=0) return null;
+              const FRICTION_ADVICE: Record<string,string> = {
+                충:"서로 다른 방향으로 끌어당기는 힘입니다. 같은 목표를 두고도 방식이 정반대라 부딪힙니다. 결정 전에 '왜 그렇게 생각해?'를 먼저 물어보는 습관이 갈등을 줄여줍니다.",
+                원진:"이유 없이 서운하고 답답한 감정이 쌓이는 관계입니다. 작은 말투 하나에도 예민해질 수 있으니, 감정이 격해졌을 땐 즉시 대화하지 말고 시간을 두는 게 낫습니다.",
+                해:"서로의 좋은 의도가 엇갈려서 오해로 번지는 구조입니다. 말보다 행동으로, 행동보다 명확한 말로 확인하는 게 도움이 됩니다.",
+                파:"꾸준히 쌓아온 것이 예상치 못한 순간에 흔들리는 기운입니다. 큰 결정(이사, 동거, 재정 합치기 등)은 충분히 시간을 두고 결정하세요.",
+                형:"날카로운 신경전이 발생하기 쉬운 조합입니다. 피곤하거나 컨디션이 안 좋을 때 대화는 잠시 미루는 게 현명합니다.",
+                암충:"겉으로는 멀쩡한데 속으로 미묘하게 안 맞는 부분이 있습니다. 평소엔 괜찮다가 특정 주제(돈, 가족 등)에서만 갑자기 부딪힐 수 있습니다.",
+              };
+              return (
+                <div style={{borderRadius:15,padding:'16px',marginBottom:12,
+                  background:'rgba(238,90,36,0.06)',border:'1px solid rgba(238,90,36,0.2)'}}>
+                  <p style={{fontSize:13,fontWeight:900,color:'#ff9f43',marginBottom:4}}>⚡ 우리의 마찰 원인은?</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:10,lineHeight:1.5}}>
+                    두 사람의 사주에서 가장 강하게 부딪히는 지점과, 그걸 다루는 방법입니다.
+                  </p>
+                  {top.length===0 ? (
+                    <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.6,margin:0}}>
+                      {result.johu.desc}<br/>큰 충돌 요소는 적지만, 같은 기운끼리는 자극이 부족해 자칫 권태로워질 수 있으니 의도적으로 새로운 자극을 만들어보세요.
+                    </p>
+                  ):top.map((ev,i)=>(
+                    <div key={i} style={{marginBottom:i<top.length-1?10:0,paddingBottom:i<top.length-1?10:0,
+                      borderBottom:i<top.length-1?'1px solid rgba(255,255,255,0.06)':'none'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4}}>
+                        <span style={{fontSize:10,background:gradeColors[ev.type]||'#666',color:'#fff',borderRadius:3,padding:'1px 5px',fontWeight:700}}>{ev.type}</span>
+                        <span style={{fontSize:12,fontWeight:800,color:'rgba(255,255,255,0.7)'}}>{(ev as any).label} — {ev.desc}</span>
+                      </div>
+                      <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.6,margin:0}}>
+                        {FRICTION_ADVICE[ev.type]||"서로 다른 기운이 부딪히는 지점입니다. 차이를 인정하고 거리를 조절하는 것이 핵심입니다."}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
             <div style={{marginBottom:12}}>
               <SipseongInsight result={result.r1} title={`${p1.name}의 핵심 기운`} />
               <SipseongInsight result={result.r2} title={`${p2.name}의 핵심 기운`} />
