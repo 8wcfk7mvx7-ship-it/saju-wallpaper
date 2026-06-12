@@ -6,6 +6,7 @@ import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -978,6 +979,11 @@ export default function GunghapPage(){
                 </div>
               );
             })()}
+
+            <div style={{marginBottom:12}}>
+              <SipseongInsight result={result.r1} title={`${p1.name}의 핵심 기운`} />
+              <SipseongInsight result={result.r2} title={`${p2.name}의 핵심 기운`} />
+            </div>
 
             {/* 공유 */}
             <div style={{background:'rgba(255,107,107,0.06)',border:'1px solid rgba(255,107,107,0.15)',borderRadius:12,padding:'12px',marginBottom:12,textAlign:'center'}}>

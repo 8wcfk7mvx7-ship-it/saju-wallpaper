@@ -7,6 +7,7 @@ import type { SajuResult } from "@/lib/saju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import SipseongInsight from "@/components/SipseongInsight";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 
 const CY_MB = new Date().getFullYear();
@@ -669,6 +670,8 @@ export default function MbtiPage() {
                 <SajuAxisChart axes={calcSajuMbtiAxes(sajuResult)} />
               </div>
             )}
+
+            {sajuResult && <SipseongInsight result={sajuResult} title="MBTI 너머 — 사주 속 핵심 기운" />}
 
             {/* 나와 잘 맞는 사주 */}
             {sajuResult && (() => {
