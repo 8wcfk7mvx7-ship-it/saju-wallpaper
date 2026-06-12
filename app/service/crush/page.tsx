@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import SipseongInsight from "@/components/SipseongInsight";
 
 function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
   const [copied, setCopied] = useState(false);
@@ -638,6 +639,8 @@ export default function CrushPage() {
             사주 궁합 전체 분석 →
           </button>
         </div>
+
+        {targetSaju && <SipseongInsight result={targetSaju} title="이 사람의 핵심 기운" />}
 
         <ShareButton />
         <button onClick={() => setStep("input")} className="w-full mt-3 py-3 rounded-xl text-sm font-semibold transition"

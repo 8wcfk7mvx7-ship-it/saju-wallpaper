@@ -29,6 +29,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import AdultGate from "@/components/AdultGate";
+import SipseongInsight from "@/components/SipseongInsight";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
@@ -687,6 +688,8 @@ function ErosContent() {
             ))}
           </div>
         </div>
+
+        <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
 
         {/* 면책 */}
         <div className="bg-white/[0.02] border border-white/8 rounded-xl px-4 py-3 mb-6">
