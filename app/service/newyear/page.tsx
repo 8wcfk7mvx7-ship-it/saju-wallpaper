@@ -18,6 +18,9 @@ const JIJI_CHUNG: [string, string][] = [["자", "오"], ["축", "미"], ["인", 
 const GENERATES: Record<Element, Element> = { 목: "화", 화: "토", 토: "금", 금: "수", 수: "목" };
 const CONTROLS: Record<Element, Element> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
 
+// 음력 월별 절기 오행 (월령) — 1/2월=목, 3/6/9/12월=토, 4/5월=화, 7/8월=금, 10/11월=수
+const MONTH_EL: Element[] = ["목", "목", "토", "화", "화", "토", "금", "금", "토", "수", "수", "토"];
+
 interface YearInfo { year: number; cg: string; jj: string; label: string; hanja: string; }
 const YEARS: YearInfo[] = [
   { year: 2026, cg: "병", jj: "오", label: "병오년", hanja: "丙午年" },
@@ -81,6 +84,18 @@ function analyzeYear(r: SajuResult, y: YearInfo) {
   }
 
   return lines;
+}
+
+function analyzeMonths(r: SajuResult) {
+  const yongshinEl = r.yongshin.yongshin;
+  const heeshinEl = r.yongshin.heeshin;
+  const gishinEl = r.yongshin.gishin;
+  return MONTH_EL.map((el, i) => {
+    let tone: "good" | "neutral" | "warn" = "neutral";
+    if (el === yongshinEl || el === heeshinEl) tone = "good";
+    else if (el === gishinEl) tone = "warn";
+    return { month: i + 1, el, tone };
+  });
 }
 
 export default function NewYearPage() {
@@ -213,6 +228,8 @@ export default function NewYearPage() {
   if (!r) return null;
   const y = YEARS[yearIdx];
   const lines = analyzeYear(r, y);
+  const months = analyzeMonths(r);
+  const monthDot = { good: "bg-emerald-400", neutral: "bg-white/20", warn: "bg-rose-400" };
   const toneColor = { good: "text-emerald-300", neutral: "text-sky-300", warn: "text-rose-300" };
   const toneBg = { good: "border-emerald-700/20", neutral: "border-white/10", warn: "border-rose-700/20" };
 
@@ -263,6 +280,20 @@ export default function NewYearPage() {
             <p className="text-sm text-gray-300 leading-relaxed">{l.desc}</p>
           </div>
         ))}
+
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-gray-300 mb-1">월별 흐름 한눈에 보기 (음력 기준)</p>
+          <p className="text-xs text-gray-500 mb-3">각 달의 기운이 내 용신·희신·기신과 만나는지 표시했습니다. 초록은 순풍, 빨강은 신중 모드.</p>
+          <div className="grid grid-cols-6 gap-2">
+            {months.map((mo) => (
+              <div key={mo.month} className="flex flex-col items-center gap-1 bg-white/[0.02] border border-white/5 rounded-xl py-2.5">
+                <span className="text-xs font-bold text-gray-300">{mo.month}월</span>
+                <span className={`w-2 h-2 rounded-full ${monthDot[mo.tone]}`} />
+                <span className="text-[10px] text-gray-500">{mo.el}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 mt-5">
           <button onClick={() => router.push("/service/daewoon")}
