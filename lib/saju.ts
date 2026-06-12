@@ -849,6 +849,7 @@ function computeYongshin(
 
   let strength: "신강" | "신약" | "중화";
   let yongshin: Element;
+  let heeshin: Element | undefined;
   let desc: string;
 
   if (jiwonAdj > total * 0.55) {
@@ -859,8 +860,10 @@ function computeYongshin(
     desc = `일간 ${ilgan}의 기운이 강합니다(신강·身强). ${isDG?"월지 득령(得令)으로 기운이 왕성해요. ":""}강한 에너지를 발산·활용하는 ${yongshin}(${yongshin}) 기운이 용신이에요. 식상·재성·관성을 활용하는 삶이 유리해요.`;
   } else if (jiwonAdj < total * 0.40) {
     strength = "신약";
-    // 약한 일간 → 인성 > 비겁 중 가장 부족한 것
-    yongshin = scores[inseongEl] <= scores[ilganEl] ? inseongEl : ilganEl;
+    // 신약은 일간을 직접 생조하는 인성(印星)을 우선 용신으로 본다.
+    // 단, 인성이 비겁의 절반에도 못 미칠 만큼 빈약하면 비겁(일간과 같은 오행)을 용신으로 삼는다.
+    yongshin = scores[inseongEl] >= scores[ilganEl] * 0.5 ? inseongEl : ilganEl;
+    heeshin = yongshin === inseongEl ? ilganEl : inseongEl; // 희신: 인성·비겁 중 용신이 되지 못한 나머지
     desc = `일간 ${ilgan}의 기운이 약합니다(신약·身弱). ${!isDG?"월지 실령(失令)으로 기운이 쇠약해요. ":""}나를 도와주는 ${yongshin}(${yongshin}) 기운이 용신이에요. 인성·비겁을 보강하는 환경이 유리해요.`;
   } else {
     strength = "중화";
@@ -869,7 +872,7 @@ function computeYongshin(
     desc = `일간의 기운이 중화(中和)에 가깝어요. 가장 부족한 ${yongshin}(${yongshin}) 기운을 보충해 균형을 유지하는 것이 좋어요.`;
   }
 
-  const heeshin = GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
+  heeshin ??= GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
   const gishin  = CONTROLLED_BY[yongshin] as Element; // 용신을 극하는 → 기신
 
   return { strength, yongshin, heeshin, gishin, desc };
