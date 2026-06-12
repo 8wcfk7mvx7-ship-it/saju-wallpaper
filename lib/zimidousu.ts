@@ -10,6 +10,12 @@ export interface ZimiPalace {
   desc: string;
 }
 
+// 12지지의 한자 표기 — 명궁/신궁/12궁 표시에 공통으로 사용
+export const JIJI_HANJA: Record<string, string> = {
+  자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳",
+  오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥",
+};
+
 export const PALACES: ZimiPalace[] = [
   { name: "명궁", hanja: "命宮", desc: "타고난 본질, 인생 전체를 관통하는 캐릭터의 핵심. 다른 11개 궁의 출발점이 되는 가장 중요한 자리예요." },
   { name: "형제궁", hanja: "兄弟宮", desc: "형제자매·동료와의 관계, 그리고 가까운 사람들과 협력하는 방식을 보여줘요." },

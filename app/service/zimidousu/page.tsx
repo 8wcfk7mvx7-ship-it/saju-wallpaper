@@ -3,16 +3,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
-import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex } from "@/lib/zimidousu";
+import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex } from "@/lib/zimidousu";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
-
-const JIJI_HANJA: Record<string, string> = {
-  자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳",
-  오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥",
-};
 
 export default function ZimidousuPage() {
   const router = useRouter();

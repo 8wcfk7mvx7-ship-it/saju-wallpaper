@@ -2,15 +2,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
-const CHEONGAN_EL: Record<string, Element> = {
-  갑: "목", 을: "목", 병: "화", 정: "화", 무: "토", 기: "토", 경: "금", 신: "금", 임: "수", 계: "수",
-};
 const CHEONGAN_HAP: Record<string, string> = { 갑: "기", 을: "경", 병: "신", 정: "임", 무: "계", 기: "갑", 경: "을", 신: "병", 임: "정", 계: "무" };
 const CHEONGAN_CHUNG: Record<string, string> = { 갑: "경", 을: "신", 병: "임", 정: "계", 경: "갑", 신: "을", 임: "병", 계: "정" };
 const JIJI_YUKHAP: [string, string][] = [["자", "축"], ["인", "해"], ["묘", "술"], ["진", "유"], ["사", "신"], ["오", "미"]];
@@ -33,7 +30,7 @@ function analyzeYear(r: SajuResult, y: YearInfo) {
   const yongshinEl = r.yongshin.yongshin;
   const heeshinEl = r.yongshin.heeshin;
   const gishinEl = r.yongshin.gishin;
-  const yearCgEl = CHEONGAN_EL[y.cg];
+  const yearCgEl = CHEONGAN_ELEMENT[y.cg];
 
   const lines: { title: string; desc: string; tone: "good" | "neutral" | "warn" }[] = [];
 
@@ -47,7 +44,7 @@ function analyzeYear(r: SajuResult, y: YearInfo) {
   }
 
   // 일간-세운 오행 상생상극
-  const ilganEl = CHEONGAN_EL[ilgan];
+  const ilganEl = CHEONGAN_ELEMENT[ilgan];
   if (GENERATES[yearCgEl] === ilganEl) {
     lines.push({ title: "세운의 기운이 나를 채워주는 흐름", tone: "good",
       desc: `${y.year}년의 ${y.cg}(${yearCgEl}) 기운이 일간 ${ilgan}(${ilganEl})을 생(生)해줍니다. 외부에서 도움이나 기회가 들어오기 쉬운 흐름으로, 새로운 시도를 했을 때 주변의 지원을 받기 좋은 해입니다.` });
