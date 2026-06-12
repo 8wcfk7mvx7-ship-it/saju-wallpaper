@@ -64,6 +64,12 @@ export const DOHWA_SINSAL_FORMULA: Record<string, { hanja: string; formula: stri
   },
 };
 
+// 일간별 매력이 가장 빛나는 시간대 — 화(火) 오행은 낮/밤에 따라 매력 발현 양상이 다름
+export const ILGAN_TIME_CHARM: Record<string, { time: string; desc: string }> = {
+  병: { time: "낮", desc: "병화는 태양 그 자체라, 사람들이 모이는 낮 시간 · 활동적인 자리에서 매력이 가장 강하게 빛나요. 밝은 에너지와 존재감으로 자연스럽게 분위기를 주도하는 인기인이 됩니다." },
+  정: { time: "밤", desc: "정화는 은은한 촛불·달빛 같은 기운이라, 조명이 낮아지고 분위기가 차분해지는 밤 시간에 진짜 매력이 드러나요. 낮보다 밤에 만났을 때 훨씬 인상이 깊고 매력적인 인물로 기억됩니다." },
+};
+
 export const JIJANGAN_DISPLAY: Record<string, Array<{ stem: string; role: "여기" | "중기" | "정기" }>> = {
   자: [{ stem: "임", role: "여기" }, { stem: "계", role: "정기" }],
   축: [{ stem: "계", role: "여기" }, { stem: "신", role: "중기" }, { stem: "기", role: "정기" }],
