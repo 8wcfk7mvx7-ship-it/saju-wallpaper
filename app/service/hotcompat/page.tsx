@@ -268,15 +268,15 @@ function HotCompatContent() {
             <span className="text-gray-200 font-medium">나만 모르고 있던 우리 사이의 진짜 온도</span>
           </p>
           <p className="text-gray-600 text-sm mb-12">
-            지지 육합 · 정임합 · 자오충까지<br />
-            두 사람 사이 성적 케미의 진짜 순위
+            친구들은 이미 다 해봤다는 그 테스트<br />
+            우리 둘만 아직 모르고 있던 진짜 순위
           </p>
           <div className="w-full space-y-3 mb-10 text-left">
             {[
-              ["정임암합(丁亥+壬午)", "사주 최강 성적 암합 — 운명처럼 끌리는 조합", "#f43f5e"],
-              ["자오충(子午沖)", "극과 극의 전기 케미 — 거부 불가능한 자극", "#f97316"],
-              ["정임합(丁壬合)", "음란지합 — 성적 화합이 가장 강한 천간합", "#ec4899"],
-              ["인오술합(寅午戌)", "삼합 화국 — 열정이 폭발하는 조합", "#fbbf24"],
+              ["혹시 나만 더 좋아하는 거 아닐까?", "둘 중 누가 더 끌리고 있는지, 숨겨진 온도차를 확인하세요", "#f43f5e"],
+              ["남들이랑 비교하면 우리는?", "또래 평균보다 위인지 아래인지 — 보면 안심되거나, 불안해질 수 있음", "#f97316"],
+              ["전 애인이랑 비교당하는 기분?", "이번엔 진짜 다른지, 데이터로 확인할 차례", "#ec4899"],
+              ["같이 있을 때 그 짜릿함, 진짜였을까?", "느낌만으로는 알 수 없던 둘 사이의 폭발력 지수", "#fbbf24"],
             ].map(([title, desc, color]) => (
               <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
                 <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: color }} />
