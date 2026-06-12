@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
-import { SIPSEONG_DESC, JIJANGAN_DISPLAY } from "@/lib/saju2";
+import { analyzeSaju, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
+import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -135,27 +135,17 @@ export default function ChildPage() {
   const ilgan = r.pillarsDetail.day.cg;
   const isFemale = form.gender === "female";
 
+  // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
-    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
-    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
-    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+    r.pillarsDetail.year.sipseongCg,
+    r.pillarsDetail.month.sipseongCg,
+    r.pillarsDetail.hour?.sipseongCg,
   ].filter(Boolean) as string[];
   const counts: Record<string, number> = {};
   sipseongList.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
+  const totalCount = (key: string) => counts[key] || 0;
 
-  // 지장간(地藏干)까지 포함 — 연주·월주·일주·시주 4개 지지 속 숨은 천간까지 모두 반영
-  const allJj = [
-    r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj,
-    ...(r.pillarsDetail.hour ? [r.pillarsDetail.hour.jj] : []),
-  ];
-  const hiddenSipseongList = allJj.flatMap(jj =>
-    (JIJANGAN_DISPLAY[jj] || []).map(j => getSipseong(ilgan, j.stem))
-  );
-  const hiddenCounts: Record<string, number> = {};
-  hiddenSipseongList.forEach(s => { hiddenCounts[s] = (hiddenCounts[s] || 0) + 1; });
-  const totalCount = (key: string) => (counts[key] || 0) + (hiddenCounts[key] || 0);
-
-  // 여성: 식상(식신·상관) = 자녀, 남성: 관성(정관·편관) = 자녀 — 천간+지장간 모두 반영
+  // 여성: 식상(식신·상관) = 자녀, 남성: 관성(정관·편관) = 자녀
   const childKeys = isFemale ? ["식신", "상관"] : ["정관", "편관"];
   const childCount = childKeys.reduce((sum, k) => sum + totalCount(k), 0);
   const level = CHILD_LEVEL.find(l => childCount >= l.min) ?? CHILD_LEVEL[CHILD_LEVEL.length - 1];

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -135,28 +135,17 @@ export default function WealthPage() {
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
 
-  // 천간(원국) 기준 십성
+  // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
-    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
-    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
-    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+    r.pillarsDetail.year.sipseongCg,
+    r.pillarsDetail.month.sipseongCg,
+    r.pillarsDetail.hour?.sipseongCg,
   ].filter(Boolean) as string[];
-
-  // 지장간(地藏干)까지 포함한 십성 — 4개 지지 속 숨은 천간을 모두 펼쳐서 계산
-  const allJj = [
-    r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj,
-    ...(r.pillarsDetail.hour ? [r.pillarsDetail.hour.jj] : []),
-  ];
-  const hiddenSipseongList = allJj.flatMap(jj =>
-    (JIJANGAN_DISPLAY[jj] || []).map(j => getSipseong(ilgan, j.stem))
-  );
 
   const counts: Record<string, number> = {};
   sipseongList.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
-  const hiddenCounts: Record<string, number> = {};
-  hiddenSipseongList.forEach(s => { hiddenCounts[s] = (hiddenCounts[s] || 0) + 1; });
 
-  const totalCount = (key: string) => (counts[key] || 0) + (hiddenCounts[key] || 0);
+  const totalCount = (key: string) => counts[key] || 0;
   const jaeseongCount = totalCount("정재") + totalCount("편재");
   const sikSangCount = totalCount("식신") + totalCount("상관");
   const inseongCount = totalCount("정인") + totalCount("편인");

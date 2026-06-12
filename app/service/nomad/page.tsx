@@ -2,8 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
-import { JIJANGAN_DISPLAY } from "@/lib/saju2";
+import { analyzeSaju, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -175,26 +174,19 @@ export default function NomadPage() {
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
 
+  // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
-    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
-    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
-    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+    r.pillarsDetail.year.sipseongCg,
+    r.pillarsDetail.month.sipseongCg,
+    r.pillarsDetail.hour?.sipseongCg,
   ].filter(Boolean) as string[];
-
-  const allJj = [
-    r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj,
-    ...(r.pillarsDetail.hour ? [r.pillarsDetail.hour.jj] : []),
-  ];
-  const hiddenSipseongList = allJj.flatMap(jj =>
-    (JIJANGAN_DISPLAY[jj] || []).map(j => getSipseong(ilgan, j.stem))
-  );
 
   const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
     비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
     정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
   };
   const groupCounts: Record<string, number> = { 비겁: 0, 식상: 0, 재성: 0, 관성: 0, 인성: 0 };
-  [...sipseongList, ...hiddenSipseongList].forEach(s => {
+  sipseongList.forEach(s => {
     const g = SIPSEONG_GROUP[s];
     if (g) groupCounts[g] += 1;
   });
