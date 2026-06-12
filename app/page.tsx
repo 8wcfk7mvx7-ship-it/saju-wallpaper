@@ -567,6 +567,17 @@ const SERVICES: {
     categories: ["전체", "무료", "금전·투자", "라이프"],
   },
   {
+    id: "zimidousu", emoji: "🔮",
+    title: "나의 명궁과 대표 주성은?",
+    viral: "사주가 오행을 본다면, 자미두수는 별의 자리로 캐릭터를 본다",
+    desc: "음력 생월·생시로 명궁을 산출하고, 14주성 중 나를 대표하는 별의 성격·진로·연애 스타일을 확인하세요.",
+    tags: ["자미두수", "명궁", "주성"],
+    href: "/service/zimidousu", badge: "완전 무료",
+    color: "#c084fc", badgeBg: "rgba(126,34,206,0.85)",
+    border: "rgba(192,132,252,0.3)", glow: "rgba(192,132,252,0.12)",
+    categories: ["전체", "무료", "라이프"],
+  },
+  {
     id: "eros", emoji: "🌹",
     title: "나의 성적 매력은?",
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
