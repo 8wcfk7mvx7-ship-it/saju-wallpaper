@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, isGanyeoJidong, GANYEO_JIDONG_LOVE, type SajuResult } from "@/lib/saju";
 import { JIJANGAN_DISPLAY } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -183,6 +183,23 @@ export default function SoloPage() {
   // 비혼 시 신경 써야 할 부분
   const hasMuJae = totalCount("정재") + totalCount("편재") === 0;
 
+  // 일간별 '베풀고 나누는' 기질 순위 (1위에 가까울수록 잘 퍼주는 편)
+  const GIVING_RANK = ["병","갑","경","정","무","을","신","기","임","계"];
+  const GIVING_DESC: Record<string, string> = {
+    병: "내 것이 곧 모두의 것이라는 마음이 기본값이에요. 분위기를 띄우고 베푸는 데 망설임이 없는 편입니다.",
+    갑: "한번 마음을 준 사람에게는 손해를 따지지 않고 먼저 내어주는 경향이 있어요. 통이 크다는 평을 자주 듣습니다.",
+    경: "의리를 중요하게 여겨서, 내 사람이라고 생각되면 아낌없이 챙겨주는 편이에요.",
+    정: "조용히, 그러나 꾸준히 나누는 타입이에요. 생색내지 않고 챙겨주는 게 특징입니다.",
+    무: "넓은 마음으로 다 받아주고 베푸는 편이라, 주변에 의지하는 사람이 많아질 수 있어요.",
+    을: "섬세하게 상대의 필요를 먼저 알아채고 채워주는 스타일이에요.",
+    신: "깐깐해 보여도 마음을 연 사람에게는 의외로 세심하게 잘 챙겨줍니다.",
+    기: "현실적인 선 안에서 필요한 만큼 잘 나누는, 균형 잡힌 베풂이에요.",
+    임: "필요할 때 통 크게 쏘는 스타일이지만, 평소엔 계산이 빠른 쪽이에요.",
+    계: "신중하게 따져보고 나누는 편이라, 베풂의 빈도 자체는 낮은 쪽입니다.",
+  };
+  const givingRankIdx = GIVING_RANK.indexOf(ilgan);
+  const givingRank = givingRankIdx >= 0 ? givingRankIdx + 1 : 10;
+
   // 취미 추천 — 비견/겁재, 식상 강도에 따라 2개 선택
   const hobbyIdx = (bigeopCount + sikSangCount) % HOBBY_BANK.length;
   const recommendedHobbies = [HOBBY_BANK[hobbyIdx], HOBBY_BANK[(hobbyIdx + 3) % HOBBY_BANK.length]];
@@ -239,6 +256,30 @@ export default function SoloPage() {
             <p className="text-sm text-gray-300 leading-relaxed">
               사주 전체의 신강·신약을 보면 일간이 신약한 편인데, 배우자 자리에 해당하는 기운이 사주 곳곳에 여러 개 자리하고 있습니다. 이런 구조에서는 관계 속에서 본인의 에너지가 상대에게 계속 흘러가기 쉬워, 결혼 후 체력적·정서적으로 쉽게 소진되는 경향이 나타날 수 있습니다. 만약 결혼을 선택한다면, 의식적으로 '나만의 회복 시간'을 확보하는 구조를 미리 만들어두는 것이 중요합니다.
             </p>
+          </div>
+        )}
+
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-pink-300 mb-1">연애 관계에서 — 나누고 베푸는 기질 ({givingRank}/10위)</p>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            {GIVING_DESC[ilgan]}
+            {givingRank <= 3
+              ? " 다만 좋아하는 사람 앞에서는 손해를 따지지 않고 다 내어주는 편이라, 상대를 가릴 때는 '받는 것에도 익숙한 사람'인지 함께 보는 게 좋습니다."
+              : ""}
+          </p>
+        </div>
+
+        {isGanyeoJidong(ilgan, r.pillarsDetail.day.jj) && (
+          <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-rose-300 mb-1">{isFemale ? "남자복" : "여자복"}이 없는 걸까? — 간여지동(干與支同)</p>
+            <div className="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <p>{GANYEO_JIDONG_LOVE.disclaimer}</p>
+              <p>{GANYEO_JIDONG_LOVE.charm}</p>
+              <p>{GANYEO_JIDONG_LOVE.hapTrigger}</p>
+              {bigeopCount >= 2 && <p>{GANYEO_JIDONG_LOVE.bigeopMany}</p>}
+              <p>{GANYEO_JIDONG_LOVE.notRequired}</p>
+              <p className="text-rose-300 font-bold">{GANYEO_JIDONG_LOVE.coupleGanyeo}</p>
+            </div>
           </div>
         )}
 
