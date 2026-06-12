@@ -534,6 +534,17 @@ const SERVICES: {
     categories: ["전체", "무료", "라이프", "연애·궁합"],
   },
   {
+    id: "career", emoji: "🧭",
+    title: "내 사주에 맞는 진짜 적성은?",
+    viral: "남들 따라 고른 전공, 남들 다 가는 직장 — 사주는 처음부터 알고 있었다",
+    desc: "용신과 격국으로 보는 나에게 맞는 분야, 강점과 함정까지 한 번에 진단합니다.",
+    tags: ["적성", "진로", "용신"],
+    href: "/service/career", badge: "완전 무료",
+    color: "#818cf8", badgeBg: "rgba(67,56,202,0.85)",
+    border: "rgba(129,140,248,0.3)", glow: "rgba(129,140,248,0.12)",
+    categories: ["전체", "무료", "라이프"],
+  },
+  {
     id: "eros", emoji: "🌹",
     title: "나의 성적 매력은?",
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
