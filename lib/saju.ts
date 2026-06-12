@@ -1339,10 +1339,11 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   if (NACHE_ILJU.has(dayPillar.cg + dayPillar.jj)) {
     addSinsal('나체도화', ['일']);
   }
-  // 곤랑도화(滾浪桃花): 두 기둥의 천간이 합(合)을 이루면서 동시에 지지가 형(刑)을 이루는 구조
+  // 곤랑도화(滾浪桃花): 두 기둥의 천간이 합(合)을 이루면서 동시에 지지가 자묘형(子卯刑, 왕지형)을 이루는 구조
+  // (예: 병자일주+신묘시, 갑자일주+기묘시, 계무일주+무자시 등 — 천간합 + 자묘형)
   {
     const HAP_PAIRS = [["갑","기"],["을","경"],["병","신"],["정","임"],["무","계"]];
-    const HYEONG_PAIRS = [["자","묘"],["인","사"],["사","신"],["인","신"],["축","술"],["술","미"],["축","미"],["진","진"],["오","오"],["유","유"],["해","해"]];
+    const HYEONG_PAIRS = [["자","묘"]];
     const isHap = (a:string,b:string) => HAP_PAIRS.some(([x,y]) => (a===x&&b===y)||(a===y&&b===x));
     const isHyeong = (a:string,b:string) => HYEONG_PAIRS.some(([x,y]) => (a===x&&b===y)||(a===y&&b===x));
     let gonglangFound: string[] = [];
