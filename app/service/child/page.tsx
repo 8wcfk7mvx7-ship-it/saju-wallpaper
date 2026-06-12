@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
-import { SIPSEONG_DESC } from "@/lib/saju2";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
+import { SIPSEONG_DESC, JIJANGAN_DISPLAY } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -143,10 +143,42 @@ export default function ChildPage() {
   const counts: Record<string, number> = {};
   sipseongList.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
 
-  // 여성: 식상(식신·상관) = 자녀, 남성: 관성(정관·편관) = 자녀
+  // 지장간(地藏干)까지 포함 — 연주·월주·일주·시주 4개 지지 속 숨은 천간까지 모두 반영
+  const allJj = [
+    r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj,
+    ...(r.pillarsDetail.hour ? [r.pillarsDetail.hour.jj] : []),
+  ];
+  const hiddenSipseongList = allJj.flatMap(jj =>
+    (JIJANGAN_DISPLAY[jj] || []).map(j => getSipseong(ilgan, j.stem))
+  );
+  const hiddenCounts: Record<string, number> = {};
+  hiddenSipseongList.forEach(s => { hiddenCounts[s] = (hiddenCounts[s] || 0) + 1; });
+  const totalCount = (key: string) => (counts[key] || 0) + (hiddenCounts[key] || 0);
+
+  // 여성: 식상(식신·상관) = 자녀, 남성: 관성(정관·편관) = 자녀 — 천간+지장간 모두 반영
   const childKeys = isFemale ? ["식신", "상관"] : ["정관", "편관"];
-  const childCount = childKeys.reduce((sum, k) => sum + (counts[k] || 0), 0);
+  const childCount = childKeys.reduce((sum, k) => sum + totalCount(k), 0);
   const level = CHILD_LEVEL.find(l => childCount >= l.min) ?? CHILD_LEVEL[CHILD_LEVEL.length - 1];
+
+  // 격국(십성 구조) — 무비겁/무재/쟁재/무관 등 사주 전체 패턴
+  const patterns = analyzeSipseongPatterns(r.pillarsDetail);
+
+  // 월지(月支) 조후 — 자녀운이 계절적으로 어떤 환경에서 자라는지
+  const monthJj = r.pillarsDetail.month.jj;
+  const SEASON_CHILD: Record<string, string> = {
+    인: "봄", 묘: "봄", 진: "봄",
+    사: "여름", 오: "여름", 미: "여름",
+    신: "가을", 유: "가을", 술: "가을",
+    해: "겨울", 자: "겨울", 축: "겨울",
+  };
+  const season = SEASON_CHILD[monthJj] ?? "환절기";
+  const SEASON_CHILD_DESC: Record<string, string> = {
+    봄: "월지가 봄(생장의 기운)에 해당해 새로운 것을 키우고 돌보는 에너지가 강한 사주입니다. 아이를 키우는 과정 자체에서 성장과 활력을 느끼기 쉬운 환경입니다.",
+    여름: "월지가 여름(확산·발산의 기운)에 해당해 에너지가 외부로 뻗어나가는 사주입니다. 육아처럼 에너지를 한 곳에 집중해야 하는 상황에서는 의식적인 페이스 조절이 필요합니다.",
+    가을: "월지가 가을(수확·결실의 기운)에 해당해 결과와 성과를 중시하는 사주입니다. 아이의 성장 과정을 결과보다 과정으로 바라보는 연습이 육아 만족도를 크게 높여줍니다.",
+    겨울: "월지가 겨울(응축·휴식의 기운)에 해당해 안으로 에너지를 모으는 사주입니다. 활동적인 육아보다 차분하고 정서적으로 깊은 교감 중심의 육아 스타일이 잘 맞습니다.",
+    환절기: "월지가 환절기 기운에 해당해 변화에 유연하게 적응하는 사주입니다. 아이의 성장 단계마다 육아 방식을 유연하게 바꿔나가는 것이 잘 맞습니다.",
+  };
 
   const mainChildKey = childKeys.reduce((a, b) => (counts[b] || 0) > (counts[a] || 0) ? b : a, childKeys[0]);
   const childDesc = SIPSEONG_DESC[mainChildKey];
@@ -180,6 +212,24 @@ export default function ChildPage() {
           <p className="text-xl font-black leading-snug mb-1" style={{ color: level.color }}>{level.label}</p>
           <p className="text-sm text-gray-300 leading-relaxed">{level.desc}</p>
         </div>
+
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-cyan-300 mb-1">월지({monthJj}) 조후 — {season} 기운의 사주</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{SEASON_CHILD_DESC[season]}</p>
+        </div>
+
+        {patterns.length > 0 && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-fuchsia-300 mb-2">사주 구조(격국)로 보는 육아 변수</p>
+            {patterns.slice(0, 2).map(p => (
+              <div key={p.name} className="mb-2 last:mb-0">
+                <p className="text-xs font-bold text-white mb-0.5">{p.name} ({p.hanja})</p>
+                <p className="text-sm text-gray-300 leading-relaxed mb-1">{p.desc}</p>
+                <p className="text-xs text-emerald-300">▶ {p.advice}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-emerald-300 mb-1">아이가 나에게 주는 의미</p>

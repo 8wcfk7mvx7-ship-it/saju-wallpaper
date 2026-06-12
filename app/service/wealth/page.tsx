@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
+import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -135,28 +135,87 @@ export default function WealthPage() {
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
 
+  // 천간(원국) 기준 십성
   const sipseongList = [
     r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
     r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
     r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
   ].filter(Boolean) as string[];
+
+  // 지장간(地藏干)까지 포함한 십성 — 4개 지지 속 숨은 천간을 모두 펼쳐서 계산
+  const allJj = [
+    r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj,
+    ...(r.pillarsDetail.hour ? [r.pillarsDetail.hour.jj] : []),
+  ];
+  const hiddenSipseongList = allJj.flatMap(jj =>
+    (JIJANGAN_DISPLAY[jj] || []).map(j => getSipseong(ilgan, j.stem))
+  );
+
   const counts: Record<string, number> = {};
   sipseongList.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
-  const jaeseongCount = (counts["정재"] || 0) + (counts["편재"] || 0);
+  const hiddenCounts: Record<string, number> = {};
+  hiddenSipseongList.forEach(s => { hiddenCounts[s] = (hiddenCounts[s] || 0) + 1; });
+
+  const totalCount = (key: string) => (counts[key] || 0) + (hiddenCounts[key] || 0);
+  const jaeseongCount = totalCount("정재") + totalCount("편재");
+  const sikSangCount = totalCount("식신") + totalCount("상관");
+  const inseongCount = totalCount("정인") + totalCount("편인");
+  const bigeopCount = totalCount("비견") + totalCount("겁재");
   const hasMuJae = jaeseongCount === 0;
 
   const topSipseong = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topDesc = topSipseong ? SIPSEONG_DESC[topSipseong] : null;
 
-  // 재물 새는 구조 — 상관 多 or 비겁 多
-  const sangkwanCount = counts["상관"] || 0;
-  const bigeopCount = (counts["비견"] || 0) + (counts["겁재"] || 0);
+  // 재물 새는 구조 — 상관 多 or 비겁 多 (지장간 포함)
   let moneyCombo: { name: string; hanja: string; desc: string; advice: string } | null = null;
-  if (sangkwanCount >= 2) moneyCombo = SIPSEONG_MONEY_COMBO["상관생재"];
+  if (totalCount("상관") >= 2) moneyCombo = SIPSEONG_MONEY_COMBO["상관생재"];
   else if (bigeopCount >= 2) moneyCombo = SIPSEONG_MONEY_COMBO["일주극재"];
 
-  const lacking = r.lacking[0] ?? "토";
-  const boost = ELEMENT_BOOST[lacking];
+  // 식상생재(食傷生財) — 식상이 재성을 생해주는 구조인지
+  const hasSikSangSaengJae = sikSangCount >= 1 && jaeseongCount >= 1;
+  // 재극인(財剋印) — 재성이 인성을 극하는 구조인지 (재물 욕심이 학습·문서운을 깎아먹는 패턴)
+  const hasJaeGeukIn = jaeseongCount >= 2 && inseongCount >= 1;
+
+  // 용신(用神)이 십성 구조상 어떤 그룹에 해당하는지
+  const ELEMENT_TO_CG: Record<Element, string> = { 목: "갑", 화: "병", 토: "무", 금: "경", 수: "임" };
+  const yongshinEl = r.yongshin.yongshin;
+  const yongshinSipseong = getSipseong(ilgan, ELEMENT_TO_CG[yongshinEl]);
+  const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
+    비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
+    정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
+  };
+  const yongshinGroup = SIPSEONG_GROUP[yongshinSipseong] ?? "재성";
+
+  const GROUP_WEALTH_ADVICE: Record<string, { title: string; desc: string }> = {
+    식상: {
+      title: "식상(食傷)을 살려 재물을 만드는 구조",
+      desc: hasSikSangSaengJae
+        ? "용신이 식상 계열이면서 사주 안에 재성도 함께 있습니다. 즉 식상생재(食傷生財) 구조가 성립합니다 — 본인의 재능·아이디어·콘텐츠·기술을 직접 돈으로 연결할 때 재물운이 가장 강하게 작동합니다. 남이 만든 시스템에 들어가 월급을 받는 구조보다, 내가 만든 결과물이 곧 수익이 되는 구조(전문직, 콘텐츠, 1인 사업, 프리랜서)에서 재물운이 크게 열립니다."
+        : "용신이 식상 계열입니다. 식신·상관의 기운, 즉 표현력·기술·생산력을 적극적으로 쓸 때 재물운이 따라옵니다. 다만 사주 안에 재성이 아직 약하므로, 식상으로 만든 가치를 실제 수익 구조(상품화·계약·플랫폼 입점 등)로 연결하는 단계를 의식적으로 만들어야 재물로 전환됩니다.",
+    },
+    재성: {
+      title: "재성(財星)이 직접 용신인 구조",
+      desc: "재물 자체가 용신이라, 적극적으로 돈을 벌고 굴리는 활동(영업, 투자, 사업, 부동산 등)이 사주 흐름과 정확히 맞아떨어집니다. 다만 재성이 용신이라는 건 그만큼 재물에 대한 욕심과 기복도 크다는 뜻이라, 분산투자·자동이체 같은 안전장치를 함께 마련해야 들어온 재물이 오래 유지됩니다.",
+    },
+    관성: {
+      title: "관성(官星)을 통해 재물이 들어오는 구조",
+      desc: "용신이 관성 계열이라, 재물이 조직·직책·사회적 신뢰를 통해 안정적으로 들어오는 흐름입니다. 직접 사업·투자로 승부하기보다, 자격·직급·평판을 쌓아 그것이 곧 수입으로 연결되는 구조(승진, 전문직 자격, 공동체 내 신뢰)가 재물운을 가장 안정적으로 키워줍니다.",
+    },
+    인성: {
+      title: "인성(印星)을 통해 재물의 기반을 다지는 구조",
+      desc: hasJaeGeukIn
+        ? "용신은 인성 계열인데 재성이 강해 재극인(財剋印) 구조가 함께 나타납니다 — 돈 욕심이 앞서면 오히려 공부·자격·후원 같은 인성의 기운을 깎아먹어 장기적인 재물 기반이 약해질 수 있습니다. 단기적인 돈벌이보다 자격·학위·전문성 같은 '나의 가치'를 먼저 쌓는 쪽에 우선순위를 둘 때 재물이 훨씬 오래 따라옵니다."
+        : "용신이 인성 계열입니다. 공부·자격·문서·후원 같은 인성의 기운을 먼저 채워야 재물의 그릇이 커집니다. 당장의 수익보다 전문성과 신용을 쌓는 투자(교육, 자격증, 학습)가 장기적으로 훨씬 큰 재물로 돌아옵니다.",
+    },
+    비겁: {
+      title: "비겁(比劫)의 협력을 통해 재물을 키우는 구조",
+      desc: bigeopCount >= 2 && jaeseongCount >= 1
+        ? "용신이 비겁 계열인데 재성과 비겁이 함께 자리하고 있어, 혼자보다 동업·협업·공동 투자 형태에서 재물이 커지는 구조입니다. 다만 비겁이 강하면 재물을 나눠야 하는 상황도 함께 따라오니, 동업 시 지분·역할을 명확히 문서화하는 것이 중요합니다."
+        : "용신이 비겁 계열입니다. 혼자 끌어안고 키우기보다, 믿을 만한 동료·파트너와 함께 일을 벌릴 때 재물의 그릇이 커지는 구조입니다. 사람과의 신뢰 관계 자체가 재물운의 핵심 자산이 됩니다.",
+    },
+  };
+  const wealthAdvice = GROUP_WEALTH_ADVICE[yongshinGroup];
+
 
   return (
     <main className="min-h-screen bg-[#0a0805] text-white">
@@ -187,11 +246,28 @@ export default function WealthPage() {
           )}
         </div>
 
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-amber-300 mb-1">
+            사주 구조 진단 — {r.yongshin.strength} · 용신 &apos;{yongshinEl}&apos; ({yongshinSipseong})
+          </p>
+          <p className="text-xs text-gray-500 mb-2">{r.yongshin.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            월주·연주를 포함한 사주 전체의 조후(調候)와 신강·신약을 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.
+          </p>
+        </div>
+
         {moneyCombo && (
           <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
             <p className="text-sm font-bold text-rose-300 mb-1">⚠ 돈이 새는 구조 — {moneyCombo.name} ({moneyCombo.hanja})</p>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">{moneyCombo.desc}</p>
             <p className="text-xs text-emerald-300 font-bold">▶ 처방: {moneyCombo.advice}</p>
+          </div>
+        )}
+
+        {wealthAdvice && (
+          <div className="bg-gradient-to-br from-amber-950/50 to-orange-950/30 border border-amber-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-amber-300 mb-1">재물운 높이는 법 — {wealthAdvice.title}</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{wealthAdvice.desc}</p>
           </div>
         )}
 
@@ -204,9 +280,9 @@ export default function WealthPage() {
         )}
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-          <p className="text-sm font-bold mb-1" style={{ color: boost.color }}>재물운 높이는 법 — 부족한 오행 &apos;{lacking}&apos; 보강</p>
-          <p className="text-xs text-gray-500 mb-2">추천 아이템: {boost.item}</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{boost.tip}</p>
+          <p className="text-sm font-bold mb-1" style={{ color: ELEMENT_BOOST[yongshinEl].color }}>보조 처방 — 용신 오행 &apos;{yongshinEl}&apos; 보강 아이템</p>
+          <p className="text-xs text-gray-500 mb-2">추천 아이템: {ELEMENT_BOOST[yongshinEl].item}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{ELEMENT_BOOST[yongshinEl].tip}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
