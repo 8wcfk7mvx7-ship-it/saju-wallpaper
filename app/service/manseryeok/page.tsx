@@ -642,13 +642,13 @@ function ResultView({
           );
         })()}
 
-        {/* 한눈에 보기 — 4주 요약 테이블 */}
+        {/* 한눈에 보기 — 4주 요약 테이블 (시·일·월·년 순) */}
         <div className="mt-4 overflow-x-auto rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
           <table className="w-full text-center" style={{ borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.04)" }}>
                 <th className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)", width: "15%" }}></th>
-                {pillars.map(({ label }) => (
+                {[...pillars].reverse().map(({ label }) => (
                   <th key={label} className="text-[10px] font-black py-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</th>
                 ))}
               </tr>
@@ -664,14 +664,14 @@ function ResultView({
                 {
                   row: "신살", get: (d: typeof pd.year, label: string) => {
                     const pl = label === "년주" ? "연" : label === "월주" ? "월" : label === "일주" ? "일" : "시";
-                    const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl)).map(s => s.name);
+                    const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
                     return names.length ? names.join(", ") : "—";
                   }
                 },
               ].map((rowDef, ri) => (
                 <tr key={ri} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                   <td className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)" }}>{rowDef.row}</td>
-                  {pillars.map(({ label, d }) => (
+                  {[...pillars].reverse().map(({ label, d }) => (
                     <td key={label} className="text-[10px] font-bold py-1.5 px-0.5" style={{ color: "rgba(255,255,255,0.75)" }}>
                       {rowDef.get(d, label)}
                     </td>
