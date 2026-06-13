@@ -9,7 +9,8 @@ import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/componen
 
 export const dynamic = "force-dynamic";
 
-const PRICE = 990;
+const PRICE = 1000;
+const BLUEBERRY_PRICE = 10;
 const CURRENT_YEAR = 2026;
 
 const KR_CITY_BY_ELEMENT: Record<string, {
@@ -153,7 +154,6 @@ type Step = "splash" | "form" | "loading" | "result";
 export default function PlacePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
-  const [name, setName] = useState("");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [birthCity, setBirthCity] = useState("");
   const [currentCity, setCurrentCity] = useState("");
@@ -161,11 +161,22 @@ export default function PlacePage() {
   const [selectedEl, setSelectedEl] = useState("");
   const [currentCityEl, setCurrentCityEl] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+
+  function handleBlueberryUnlock() {
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    if ((isNaN(bb) ? 0 : bb) < BLUEBERRY_PRICE) {
+      alert(`블루베리가 부족합니다. 현재 ${isNaN(bb) ? 0 : bb}개 / 필요 ${BLUEBERRY_PRICE}개`);
+      return;
+    }
+    localStorage.setItem("sp_blueberries", String(bb - BLUEBERRY_PRICE));
+    setUnlocked(true);
+  }
   const [counter] = useState(() => Math.floor(Math.random() * 120) + 87);
   const [totalCount] = useState(() => Math.floor(Math.random() * 5000) + 18000);
 
   async function handleFormSubmit() {
-    if (!name.trim()) {
+    if (!form.name.trim()) {
       setFormError("이름을 입력해주세요.");
       return;
     }
@@ -199,7 +210,7 @@ export default function PlacePage() {
         birthYear: fy, birthMonth: fm, birthDay: fd,
         birthHour: form.birthHour,
         birthMinute: form.birthMinute,
-        name: name || "나", gender: form.gender, birthPlace: form.city || "서울",
+        name: form.name || "나", gender: form.gender, birthPlace: form.city || "서울",
         style: "auto", productType: "report", useJajasi: form.useJajasi,
       });
       const el = r.yongshin.yongshin || r.lacking[0] || "토";
@@ -215,7 +226,7 @@ export default function PlacePage() {
 
 
   if (step === "loading") return (
-    <AnalysisLoading subject={`${name ? name + "님의 " : ""}운명의 도시`} onDone={() => setStep("result")} />
+    <AnalysisLoading subject={`${form.name ? form.name + "님의 " : ""}운명의 도시`} onDone={() => setStep("result")} />
   );
 
   const displayEl = selectedEl || yongshinEl || "토";
@@ -332,15 +343,7 @@ export default function PlacePage() {
           <p className="text-xs text-white/35 mb-8">사주를 분석해 내 기운과 맞는 도시를 찾습니다</p>
 
           <div className="space-y-5">
-            {/* 이름 */}
-            <div>
-              <label className="block text-xs text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-amber-400">*</span></label>
-              <input
-                type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder="홍길동 (필수)"
-                className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
-              />
-            </div>
+            <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             {/* 태어난 도시 */}
             <div>
@@ -351,8 +354,6 @@ export default function PlacePage() {
                 className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-500/50"
               />
             </div>
-
-            <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             {/* 현재 사는 도시 */}
             <div>
@@ -389,7 +390,7 @@ export default function PlacePage() {
           <div className="flex items-center gap-3 mb-5 p-4 rounded-2xl" style={{ background: `${elInfo?.color}10`, border: `1px solid ${elInfo?.color}30` }}>
             <span className="text-3xl">{elInfo?.emoji}</span>
             <div className="flex-1">
-              <p className="text-xs text-white/40 mb-0.5">{name ? `${name}님 용신 기준` : "용신 기준"}</p>
+              <p className="text-xs text-white/40 mb-0.5">{form.name ? `${form.name}님 용신 기준` : "용신 기준"}</p>
               <p className="text-base font-black" style={{ color: elInfo?.color }}>{elInfo?.label} 기운을 보강하는 곳</p>
               <p className="text-xs text-white/30 mt-0.5">{elInfo?.keyword}</p>
             </div>
@@ -460,7 +461,7 @@ export default function PlacePage() {
             </h2>
             <div className="space-y-3">
               {krData.cities.map((city, i) => {
-                const isBlurred = i < 2;
+                const isBlurred = i < 2 && !unlocked;
                 return (
                   <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
                     <div style={{ filter: isBlurred ? "blur(5px)" : "none", userSelect: isBlurred ? "none" : "auto", pointerEvents: isBlurred ? "none" : "auto" }}>
@@ -504,7 +505,7 @@ export default function PlacePage() {
             </div>
             <div className="space-y-3">
               {worldData.countries.map((country, i) => {
-                const isBlurred = i < 2;
+                const isBlurred = i < 2 && !unlocked;
                 return (
                   <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
                     <div style={{ filter: isBlurred ? "blur(5px)" : "none", userSelect: isBlurred ? "none" : "auto", pointerEvents: isBlurred ? "none" : "auto" }}>
@@ -558,8 +559,15 @@ export default function PlacePage() {
               }}
               className="w-full py-5 font-black text-white text-base hover:opacity-90 transition-opacity"
               style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}>
-              🔓 1·2순위 전체 공개 + PDF — ₩{PRICE.toLocaleString()}
+              🔓 1·2순위 전체 공개 — ₩{PRICE.toLocaleString()}
             </button>
+            {!unlocked && (
+              <button
+                onClick={handleBlueberryUnlock}
+                className="w-full py-3 font-bold text-white/70 text-sm hover:opacity-90 transition-opacity bg-white/5 border-t border-white/10">
+                🫐 블루베리 {BLUEBERRY_PRICE}개로 보기
+              </button>
+            )}
             <p className="text-center text-xs text-white/25 mt-3">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
           </div>
         </div>

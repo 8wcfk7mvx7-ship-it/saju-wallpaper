@@ -1357,7 +1357,7 @@ function ResultView({
 // ─── 메인 페이지 ──────────────────────────────────────────────────────────────
 export default function ManseryeokPage() {
   const [birthForm, setBirthForm] = useState<BirthFormData>(defaultBirthData("female"));
-  const [name, setName] = useState("");
+
   const [gender, setGender] = useState<"male" | "female">("female");
   const [result, setResult] = useState<SajuResult | null>(null);
   const [calcInput, setCalcInput] = useState<{ year: number; month: number; day: number; birthHour: number | null } | null>(null);
@@ -1396,7 +1396,7 @@ export default function ManseryeokPage() {
       birthYear: year, birthMonth: month, birthDay: day,
       birthHour: birthForm.birthHour,
       birthMinute: birthForm.birthMinute,
-      name: name || "사주",
+      name: birthForm.name || "사주",
       gender: birthForm.gender,
       birthPlace: birthForm.city || "서울",
       style: "auto",
@@ -1432,7 +1432,7 @@ export default function ManseryeokPage() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <ResultView
           result={result}
-          form={{ name, gender: birthForm.gender, birthPlace: birthForm.city || "서울" }}
+          form={{ name: birthForm.name, gender: birthForm.gender, birthPlace: birthForm.city || "서울" }}
           birthHour={calcInput.birthHour}
           birthYear={calcInput.year}
           birthMonth={calcInput.month}
@@ -1514,15 +1514,6 @@ export default function ManseryeokPage() {
           backdropFilter: "blur(20px)",
         }}>
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* 이름 */}
-            <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2" style={{ color: "#a78bfa" }}>이름 <span className="text-xs font-normal normal-case" style={{ color: "rgba(255,255,255,0.3)" }}>(선택)</span></label>
-              <input type="text" placeholder="홍길동" value={name}
-                onChange={e => setName(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none"
-                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.3)", animation: "inputGlow2 3s ease-in-out infinite", transition: "border-color 0.3s" }} />
-            </div>
-
             <BirthInputForm value={birthForm} onChange={setBirthForm} accent="#7c3aed" />
 
             <button type="submit"
