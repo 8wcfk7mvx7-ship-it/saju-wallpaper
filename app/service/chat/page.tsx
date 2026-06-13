@@ -322,6 +322,9 @@ export default function SajuChatPage() {
           <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.25)", marginTop: 14 }}>
             별조각이 부족하면 홈에서 충전하세요
           </p>
+          <p style={{ textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 8, lineHeight: 1.6 }}>
+            AI가 부적절하거나 비도덕적인 질문으로 판단하여 답변을 거부하는 경우에도 차감된 별조각은 환불되지 않습니다.
+          </p>
         </div>
       </div>
     );

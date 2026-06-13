@@ -33,7 +33,7 @@ const UI: Record<Lang, {
     servicesHeading: "지금 바로 확인하세요",
     reviewsHeading: "실제 이용 후기",
     bannerCta: "배경화면 만들기 →",
-    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "금전·투자", "운명·대운": "운명·대운", "라이프": "라이프", "Special": "Special", "매력": "매력" },
+    catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "직업·금전", "운명·대운": "운세·대운", "라이프": "라이프", "Special": "프리미엄", "매력": "매력" },
     start: "시작",
     charging: "별조각 충전",
   },
@@ -76,11 +76,11 @@ const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "전체",    icon: "☯",  desc: "전체 서비스" },
   { key: "무료",    icon: "",   desc: "무료 서비스" },
   { key: "연애·궁합", icon: "💑", desc: "연애·궁합" },
-  { key: "금전·투자", icon: "💰", desc: "금전·재물운" },
-  { key: "운명·대운", icon: "⏳", desc: "대운·세운" },
+  { key: "금전·투자", icon: "💰", desc: "직업·금전" },
+  { key: "운명·대운", icon: "⏳", desc: "운세·대운" },
   { key: "라이프",  icon: "🌿",  desc: "라이프스타일" },
   { key: "매력",    icon: "💋",  desc: "이성·매력" },
-  { key: "Special", icon: "👑", desc: "프리미엄" },
+  { key: "Special", icon: "👑", desc: "프리미엄 콘텐츠" },
 ];
 
 // ── 후기 데이터 ───────────────────────────────────────────────────────────────
@@ -432,7 +432,7 @@ const SERVICES: {
     desc: "연애·재물·대운·궁합·직업·전생까지. 사주로 볼 수 있는 건 전부 답합니다. 질문 1회 = 100원 (별조각 1개)",
     tags: ["AI 역술", "전체 상담", "무제한 질문"], href: "/service/chat", badge: "AI",
     color: "#c4b5fd", badgeBg: "rgba(124,58,237,0.95)", border: "rgba(139,92,246,0.6)", glow: "rgba(124,58,237,0.3)",
-    categories: ["전체", "운명·대운", "라이프", "연애·궁합"],
+    categories: ["전체", "운명·대운", "라이프", "연애·궁합", "매력", "금전·투자"],
   },
   {
     id: "saju", emoji: "🔮",
@@ -542,7 +542,7 @@ const SERVICES: {
     href: "/service/career", badge: "완전 무료",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
-    categories: ["전체", "무료", "라이프"],
+    categories: ["전체", "무료", "금전·투자"],
   },
   {
     id: "sidejob", emoji: "💼",
@@ -564,7 +564,7 @@ const SERVICES: {
     href: "/service/nomad", badge: "완전 무료",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
-    categories: ["전체", "무료", "금전·투자", "라이프"],
+    categories: ["전체", "무료", "금전·투자"],
   },
   {
     id: "zimidousu", emoji: "🔮",

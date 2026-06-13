@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, ILGAN_INNER_OUTER, SIKSANG_DIRECTION, detectSamhapBanghap } from "@/lib/saju";
+import { analyzeSaju, detectSamhapBanghap } from "@/lib/saju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,8 @@ interface ElementTaste {
   books: TasteItem[];
   music: string[];
   travel: string[];
+  hobbies: string[];
+  notFor: string;
 }
 
 const ELEMENT_TASTE: Record<string, ElementTaste> = {
@@ -43,6 +45,8 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
     ],
     music: ["록/인디", "얼터너티브", "힙합(파이팅 계열)", "영화 OST"],
     travel: ["트레킹·산악", "배낭여행", "신도시 탐방", "동남아 자유여행"],
+    hobbies: ["등산·클라이밍", "마라톤·러닝", "스타트업/사이드 프로젝트", "어학·자기계발 스터디", "원예·식물 키우기"],
+    notFor: "정적이고 반복적인 루틴 작업이나, 결과가 더디게 나오는 활동은 답답하게 느껴져 오래 지속하기 어려울 수 있어요.",
   },
   화: {
     color: "#dc2626",
@@ -62,6 +66,8 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
     ],
     music: ["팝·발라드", "R&B", "케이팝", "재즈 팝"],
     travel: ["유럽 감성 여행", "예술도시(파리·피렌체)", "국내 소도시", "축제·공연 관광"],
+    hobbies: ["악기 연주·노래", "사진·영상 촬영", "춤·퍼포먼스", "맛집 탐방·홈카페", "공연·전시 관람"],
+    notFor: "혼자 조용히 분석하거나 장기간 인내해야 하는 활동은 흥미가 빨리 식어 지루하게 느껴질 수 있어요.",
   },
   토: {
     color: "#92400e",
@@ -81,6 +87,8 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
     ],
     music: ["어쿠스틱 팝", "힐링 음악", "포크", "잔잔한 OST"],
     travel: ["시골·농촌 체험", "국내 온천·힐링 숙박", "제주도", "일본 소도시"],
+    hobbies: ["요리·베이킹", "텃밭·반려식물 가꾸기", "도자기·공예", "캠핑·차박", "명상·요가"],
+    notFor: "급변하는 환경이나 즉흥적인 결정이 필요한 활동은 부담스럽게 느껴져 스트레스를 받을 수 있어요.",
   },
   금: {
     color: "#7c3aed",
@@ -100,6 +108,8 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
     ],
     music: ["클래식", "재즈", "인디 팝", "일렉트로닉(미니멀)"],
     travel: ["도시 호텔링", "미술관·박물관 투어", "유럽 건축 탐방", "일본 도쿄·교토"],
+    hobbies: ["헬스·웨이트 트레이닝", "재테크·투자 공부", "사격·검도 등 정밀 스포츠", "미니멀 라이프·정리", "와인·위스키 테이스팅"],
+    notFor: "정리되지 않고 즉흥적·산만한 환경의 활동은 거슬리고 비효율적으로 느껴져 흥미를 잃기 쉬워요.",
   },
   수: {
     color: "#0369a1",
@@ -121,6 +131,8 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
     ],
     music: ["인디 팝·로파이", "재즈 발라드", "앰비언트", "케이팝 감성 발라드"],
     travel: ["바다·해안가 여행", "온천·스파 힐링", "섬 여행(발리·하와이)", "비오는 날 여행"],
+    hobbies: ["글쓰기·일기", "수영·다이빙", "독서·영화 감상", "타로·점성술 탐구", "악기 감상·플레이리스트 만들기"],
+    notFor: "지나치게 경쟁적이거나 감정을 드러내야 하는 활동은 부담스럽고 소진되는 느낌이 들 수 있어요.",
   },
 };
 
@@ -161,7 +173,7 @@ export default function TastePage() {
   const [ilgan, setIlgan] = useState<string>("임");
   const [name, setName] = useState("나");
   const [pillarsDetail, setPillarsDetail] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"movies" | "books" | "music" | "travel">("movies");
+  const [activeTab, setActiveTab] = useState<"movies" | "books" | "music" | "travel" | "hobbies">("movies");
 
   useEffect(() => {
     const t = setTimeout(() => setShowBtn(true), 2500);
@@ -379,6 +391,7 @@ export default function TastePage() {
             { key: "books" as const, label: "📚 책" },
             { key: "music" as const, label: "🎵 음악" },
             { key: "travel" as const, label: "✈️ 여행" },
+            { key: "hobbies" as const, label: "🎯 취미" },
           ].map(tab => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition border ${activeTab === tab.key ? "text-white border-white/20 bg-white/10" : "text-gray-500 border-white/5 bg-white/[0.02] hover:bg-white/5"}`}>
@@ -461,44 +474,26 @@ export default function TastePage() {
           </div>
         )}
 
-        {/* 겉모습 vs 속마음 */}
-        {(() => {
-          const io = ILGAN_INNER_OUTER[ilgan];
-          if (!io) return null;
-          return (
-            <div className="mt-6 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">{ilgan}일간 — 겉모습 vs 속마음</p>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div className="rounded-xl p-3" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>타인이 보는 나</p>
-                  <p className="text-sm font-bold text-white">{io.outer}</p>
+        {/* 취미 탭 */}
+        {activeTab === "hobbies" && (
+          <div>
+            <p className="text-xs text-gray-500 mb-4">{element} 오행에게 잘 맞는 취미생활</p>
+            <div className="space-y-3">
+              {taste.hobbies.map((h, i) => (
+                <div key={i} className="flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-xl p-4">
+                  <span className="text-xl">{["🎯","🎨","🎲","🧩","🎪"][i]}</span>
+                  <span className="text-sm text-gray-200">{h}</span>
                 </div>
-                <div className="rounded-xl p-3" style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fb923c" }}>내면의 진짜 욕구</p>
-                  <p className="text-sm font-bold text-white">{io.inner}</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-400 leading-relaxed">{io.synthesis}</p>
+              ))}
             </div>
-          );
-        })()}
+          </div>
+        )}
 
-        {/* 오행별 에너지 표현 방향 */}
-        {(() => {
-          const el = element as "목"|"화"|"토"|"금"|"수";
-          const sd = SIKSANG_DIRECTION[el];
-          if (!sd) return null;
-          return (
-            <div className="mt-4 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">{element} 오행 — 에너지 표현 방향</p>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs px-3 py-1 rounded-full font-bold" style={{ background: `${taste.color}22`, color: taste.color, border: `1px solid ${taste.color}44` }}>{element} → {sd.siksangEl}</span>
-                <span className="text-xs text-gray-400">{sd.direction}의 방향</span>
-              </div>
-              <p className="text-sm text-gray-300 leading-relaxed">{sd.desc}</p>
-            </div>
-          );
-        })()}
+        {/* 안 맞을 수 있는 것 */}
+        <div className="mt-4 bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-2">이런 건 안 맞을 수 있어요</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{taste.notFor}</p>
+        </div>
 
         {/* 삼합·방합 취향 기질 */}
         {(() => {
