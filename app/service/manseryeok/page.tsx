@@ -16,7 +16,7 @@ import {
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO, ILGAN_AFFECTION_STYLE } from "@/lib/saju2";
 import { getSipseongGroupByElement } from "@/lib/saju";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
@@ -860,6 +860,12 @@ function ResultView({
             <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>{yangYin.split(":")[1]?.trim() || yangYin}</p>
             <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{yangYinLove}</p>
           </div>
+          {ILGAN_AFFECTION_STYLE[ilgan] && (
+            <div className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(244,114,182,0.06)", border: "1px solid rgba(244,114,182,0.15)" }}>
+              <p className="text-[10px] font-bold mb-1" style={{ color: "#f9a8d4" }}>애정 표현 방식</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{ILGAN_AFFECTION_STYLE[ilgan]}</p>
+            </div>
+          )}
           <div className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
             <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>핵심 내면 걱정</p>
             <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{coreWorry}</p>
