@@ -10,7 +10,7 @@ import {
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, getJijiRelations,
-  GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, isGanyeoJidong,
+  GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, GANYEO_JIDONG_STRENGTHS, isGanyeoJidong,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
@@ -904,6 +904,15 @@ function ResultView({
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{gz.specific}</p>
               </div>
             )}
+            <p className="text-[10px] font-bold mb-2" style={{ color: "#fbbf24" }}>&quot;간여지동은 팔자가 드세다&quot;? — 이 기운이 무기가 되는 이유</p>
+            <div className="space-y-2.5 mb-4">
+              {GANYEO_JIDONG_STRENGTHS.map((item, i) => (
+                <div key={i} className="rounded-xl px-4 py-3" style={{ background: "rgba(251,191,36,0.05)", border: "1px solid rgba(251,191,36,0.12)" }}>
+                  <p className="text-xs font-bold mb-1" style={{ color: "#fbbf24" }}>{i + 1}. {item.title}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{item.body}</p>
+                </div>
+              ))}
+            </div>
             <p className="text-[10px] font-bold mb-2" style={{ color: "#f472b6" }}>그래서 — &quot;남자복/여자복이 없다&quot;는 말, 진짜일까?</p>
             <div className="space-y-2.5">
               {[
