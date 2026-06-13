@@ -520,7 +520,7 @@ const SERVICES: {
     href: "/service/child", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "무료", "라이프", "연애·궁합"],
+    categories: ["전체", "무료", "라이프", "연애·궁합", "매력"],
   },
   {
     id: "solo", emoji: "🛋️",
@@ -531,7 +531,7 @@ const SERVICES: {
     href: "/service/solo", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "무료", "라이프", "연애·궁합"],
+    categories: ["전체", "무료", "라이프", "연애·궁합", "매력"],
   },
   {
     id: "career", emoji: "🧭",
@@ -630,7 +630,7 @@ const SERVICES: {
     href: "/service/mbti", badge: "완전 무료",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "라이프"],
+    categories: ["전체", "무료", "연애·궁합", "라이프", "매력"],
   },
   {
     id: "stock", emoji: "📈",
