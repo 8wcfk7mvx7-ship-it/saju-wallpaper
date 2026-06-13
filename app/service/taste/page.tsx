@@ -147,7 +147,6 @@ export default function TastePage() {
   const [counter] = useState(() => Math.floor(Math.random() * 500) + 2800);
 
   // 입력 폼 상태
-  const [formName, setFormName] = useState("");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
 
   // 결과 상태
@@ -163,7 +162,7 @@ export default function TastePage() {
   }, []);
 
   async function handleAnalyze() {
-    if (!formName.trim()) {
+    if (!form.name.trim()) {
       alert("이름을 입력해주세요.");
       return;
     }
@@ -190,13 +189,13 @@ export default function TastePage() {
       const r = analyzeSaju({
         birthYear: y, birthMonth: m, birthDay: d,
         birthHour: form.birthHour, birthMinute: form.birthMinute,
-        name: formName || "나", gender: form.gender,
+        name: form.name || "나", gender: form.gender,
         birthPlace: form.city || "서울", style: "auto", productType: "report",
         useJajasi: form.useJajasi,
       });
       setElement(r.dominant[0] || "수");
       setIlgan(r.pillarsDetail.day.cg || "임");
-      setName(formName || "나");
+      setName(form.name || "나");
       setPillarsDetail(r.pillarsDetail);
       setActiveTab("movies");
       setStep("main");
@@ -306,17 +305,6 @@ export default function TastePage() {
           </div>
 
           <div className="space-y-5">
-            {/* 이름 */}
-            <div>
-              <label className="text-xs text-gray-500 block mb-1.5">이름 <span className="text-amber-400">*</span></label>
-              <input
-                value={formName}
-                onChange={e => setFormName(e.target.value)}
-                placeholder="홍길동 (필수)"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition"
-              />
-            </div>
-
             <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             <button onClick={handleAnalyze} disabled={!ready}
@@ -355,7 +343,7 @@ export default function TastePage() {
             {name}의 취향 분석
           </h1>
           <p className="text-gray-400 text-sm">
-            {element}({["목","화","토","금","수"].find(e=>e===element) || element}) 오행 · {ilgan}일간 — {taste.personality}
+            {element} 오행 · {ilgan}일간 — {taste.personality}
           </p>
         </div>
 
