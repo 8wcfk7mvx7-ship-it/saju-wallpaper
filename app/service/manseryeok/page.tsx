@@ -16,6 +16,7 @@ import {
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
+import { ILGAN_SHADOW } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -882,6 +883,7 @@ function ResultView({
               { label: "연애 스타일", text: iljuInfo.love, color: "#f472b6" },
               { label: "적합 직업·커리어", text: iljuInfo.career, color: "#34d399" },
               { label: "주의할 점", text: iljuInfo.caution, color: "#f87171" },
+              ...(ILGAN_SHADOW[ilgan] ? [{ label: `그림자 기질 — ${ILGAN_SHADOW[ilgan].title}`, text: ILGAN_SHADOW[ilgan].desc, color: "#9ca3af" }] : []),
             ].map(item => (
               <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <p className="text-[10px] font-bold mb-1" style={{ color: item.color }}>{item.label}</p>
