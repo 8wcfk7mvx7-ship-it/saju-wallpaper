@@ -16,7 +16,7 @@ import {
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -891,6 +891,13 @@ function ResultView({
               </div>
             ))}
           </div>
+          {ILGAN_BOUNDARY[ilgan] && (
+            <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "rgba(248,113,113,0.05)", border: "1px solid rgba(248,113,113,0.12)" }}>
+              <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>독하게 살아야 살아남는 사주 — {ILGAN_BOUNDARY[ilgan].title}</p>
+              <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>{ILGAN_BOUNDARY[ilgan].desc}</p>
+              <p className="text-xs font-bold" style={{ color: "#34d399" }}>▶ {ILGAN_BOUNDARY[ilgan].advice}</p>
+            </div>
+          )}
           {ILGAN_PLACES[ilgan] && (
             <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>인생이 안 풀린다면 — {ilgan}일간에게 맞는 환경</p>
