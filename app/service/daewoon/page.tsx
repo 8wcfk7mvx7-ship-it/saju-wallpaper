@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
-import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY, getSipseong, getUunseong, getDayPillar } from "@/lib/saju";
+import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY, getSipseong, getUunseong, getDayPillar, getJijiRelations, CHEONGAN_ELEMENT } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -96,6 +96,59 @@ const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }
   금: { bg: "#0f0e2e", text: "#a5b4fc", border: "#1e1b4b" },
   수: { bg: "#0a1f3a", text: "#60a5fa", border: "#0c2a4a" },
 };
+
+// 천간합(쌍의 첫번째가 결과 오행/색 기준), 천간충(쌍의 첫번째가 충을 당해 약해지는 쪽 — 그 오행 색을 사용)
+const CG_HAP_PAIRS: { a: string; b: string; result: string }[] = [
+  { a: "갑", b: "기", result: "토" },
+  { a: "을", b: "경", result: "금" },
+  { a: "병", b: "신", result: "수" },
+  { a: "정", b: "임", result: "목" },
+  { a: "무", b: "계", result: "화" },
+];
+const CG_CHUNG_PAIRS: [string, string][] = [["갑", "경"], ["을", "신"], ["병", "임"], ["정", "계"]];
+
+const JIJI_REL_STYLE: Record<string, { label: string; color: string }> = {
+  육합: { label: "육합", color: "#4ade80" },
+  삼합: { label: "삼합", color: "#34d399" },
+  충: { label: "충", color: "#f87171" },
+  형: { label: "형", color: "#c084fc" },
+  파: { label: "파", color: "#fb923c" },
+  해: { label: "해", color: "#9ca3af" },
+  원진: { label: "원진", color: "#f472b6" },
+};
+
+// 세운(또는 대운) 한 기둥과 원국 4기둥 사이의 합충형파 관계를 모두 찾는다
+function getYearRelations(natal: { cg: string; jj: string }[], target: { cg: string; jj: string }) {
+  const results: { label: string; color: string; desc: string }[] = [];
+
+  // 천간합/충
+  for (const p of natal) {
+    for (const hap of CG_HAP_PAIRS) {
+      if ((p.cg === hap.a && target.cg === hap.b) || (p.cg === hap.b && target.cg === hap.a)) {
+        const color = ELEMENT_COLOR[hap.result]?.text || "#fbbf24";
+        results.push({ label: `${hap.a}${hap.b}합`, color, desc: `원국 ${p.cg}와 ${target.cg}이 합을 이뤄 ${hap.result} 기운이 강해져요.` });
+      }
+    }
+    for (const [a, b] of CG_CHUNG_PAIRS) {
+      if ((p.cg === a && target.cg === b) || (p.cg === b && target.cg === a)) {
+        const color = ELEMENT_COLOR[CHEONGAN_ELEMENT[a]]?.text || "#f87171";
+        results.push({ label: `${a}${b}충`, color, desc: `원국 ${p.cg}와 ${target.cg}이 충돌해요. ${a}(${CHEONGAN_ELEMENT[a]}) 기운이 흔들려요.` });
+      }
+    }
+  }
+
+  // 지지 관계 (육합·삼합·충·형·파·해·원진)
+  const jjs = [...natal.map(p => p.jj), target.jj];
+  const targetIdx = jjs.length - 1;
+  for (const rel of getJijiRelations(jjs)) {
+    if (rel.a !== targetIdx && rel.b !== targetIdx) continue;
+    const otherJj = rel.a === targetIdx ? rel.jjA : rel.jjB;
+    const style = JIJI_REL_STYLE[rel.type];
+    results.push({ label: `${otherJj}${target.jj} ${style.label}`, color: style.color, desc: `원국 지지 ${otherJj}와 ${target.jj}이 ${style.label} 관계예요.` });
+  }
+
+  return results;
+}
 
 const SIPSEONG_COLOR: Record<string, string> = {
   비견:"#4ade80", 겁재:"#f87171", 식신:"#60a5fa", 상관:"#fb923c",
@@ -422,6 +475,7 @@ export default function DaewoonPage() {
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
   const [monthJj, setMonthJj] = useState("");
+  const [natalPillars, setNatalPillars] = useState<{ cg: string; jj: string }[]>([]);
   const [step, setStep] = useState<"splash" | "entry" | "loading" | "preview">("splash");
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
@@ -479,6 +533,12 @@ export default function DaewoonPage() {
       const sw = calcSewoon(y, r.pillarsDetail.day.cg);
       setIlgan(r.pillarsDetail.day.cg);
       setMonthJj(mp.jj);
+      setNatalPillars([
+        { cg: r.pillarsDetail.year.cg, jj: r.pillarsDetail.year.jj },
+        { cg: r.pillarsDetail.month.cg, jj: r.pillarsDetail.month.jj },
+        { cg: r.pillarsDetail.day.cg, jj: r.pillarsDetail.day.jj },
+        ...(r.pillarsDetail.hour ? [{ cg: r.pillarsDetail.hour.cg, jj: r.pillarsDetail.hour.jj }] : []),
+      ]);
       setDaewoon(dw);
       setSewoon(sw);
       setStep("loading");
@@ -1006,6 +1066,25 @@ export default function DaewoonPage() {
                       <div className="mt-1.5 rounded-xl p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${elStyle.border}`, minWidth: 220 }}>
                         <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>📊 {s.year}년 운 지수</p>
                         <LuckBars compact items={calcLuckIndices(s.sipseongCg, s.sipseongJj, s.uunseong, gender)} />
+
+                        {/* 원국과의 합충형파 한눈에 보기 */}
+                        {(() => {
+                          const rels = getYearRelations(natalPillars, { cg: s.cg, jj: s.jj });
+                          if (rels.length === 0) return null;
+                          return (
+                            <div className="mt-3">
+                              <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>🔀 원국과의 합충형파</p>
+                              <div className="space-y-1">
+                                {rels.map((r, ri) => (
+                                  <div key={ri} className="rounded-lg px-2 py-1.5" style={{ background: `${r.color}1a`, border: `1px solid ${r.color}44` }}>
+                                    <span className="text-[10px] font-black" style={{ color: r.color }}>{r.label}</span>
+                                    <span className="text-[9px] ml-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>{r.desc}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         <p className="text-[9px] font-bold text-center mt-3 mb-1.5" style={{ color: elStyle.text }}>{s.year}년 월주 — 클릭하면 일운까지 보여요</p>
                         <div className="grid grid-cols-3 gap-1">
