@@ -1032,6 +1032,11 @@ export default function MainPage() {
         {/* ── 히어로 섹션 ── */}
         <section className="py-16 sm:py-24 text-center relative" style={{ overflow: "visible" }}>
           {/* 마스코트 */}
+          <div className="absolute pointer-events-none select-none sm:hidden"
+            style={{ right: -10, top: -10, width: 110, padding: 8, overflow: "visible" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/mascot.png" alt="사주 마스코트" style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 8px 32px rgba(147,51,234,0.4))" }} />
+          </div>
           <div className="absolute pointer-events-none select-none hidden sm:block"
             style={{ right: -20, bottom: -20, width: 260, padding: 24, overflow: "visible" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
