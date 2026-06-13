@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
-import { analyzeSaju, type SajuResult, isGanyeoJidong, GANYEO_JIDONG_LOVE } from "@/lib/saju";
+import { analyzeSaju, type SajuResult, isGanyeoJidong, GANYEO_JIDONG_LOVE, WONJIN_PAIRS } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -168,6 +168,21 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     score += 6;
     highlights.push({ rank: 9, title: `${g1 && g2 ? "두 사람 모두" : "한쪽이"} 간여지동 — 합으로 매력 발현`, color: "#f472b6",
       desc: GANYEO_JIDONG_LOVE.hapTrigger });
+  }
+
+  // 원진(怨嗔) — 같은 자리(년/월/일/시)의 지지가 서로 원진 관계면 미묘한 원망·서운함이 쌓이기 쉬움
+  const hj1 = r1.pillarsDetail.hour?.jj;
+  const hj2 = r2.pillarsDetail.hour?.jj;
+  const samePos: [string | undefined, string | undefined, string][] = [
+    [yj1, yj2, "연지"], [mj1, mj2, "월지"], [ij1, ij2, "일지"], [hj1, hj2, "시지"],
+  ];
+  for (const [a, b, label] of samePos) {
+    if (!a || !b) continue;
+    if (WONJIN_PAIRS.some(([p, q]) => (p === a && q === b) || (p === b && q === a))) {
+      score -= 8;
+      highlights.push({ rank: 10, title: `${label} ${a}${b} 원진(怨嗔)`, color: "#c084fc",
+        desc: "끌림은 있지만 사소한 말이나 행동에도 서운함과 원망이 쌓이기 쉬운 조합입니다. 서로의 가치관 차이를 인정하고 직접 대화로 풀어내는 노력이 필요해요." });
+    }
   }
 
   highlights.sort((a, b) => a.rank - b.rank);

@@ -63,8 +63,9 @@ export interface JijiRelation {
   b: number;
   jjA: string;
   jjB: string;
-  type: "육합" | "삼합" | "충" | "형" | "파" | "해";
+  type: "육합" | "삼합" | "충" | "형" | "파" | "해" | "원진";
 }
+
 
 // 4기둥(년/월/일/시)의 지지 배열을 받아 둘씩 짝지어 육합·삼합·충·형·파·해 관계를 찾아낸다.
 export function getJijiRelations(jjs: string[]): JijiRelation[] {
@@ -89,6 +90,7 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
       if (matches(HYEONG, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "형" });
       if (matches(PA, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "파" });
       if (matches(HAE, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "해" });
+      if (matches(WONJIN_PAIRS, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "원진" });
     }
   }
   return relations;
@@ -278,7 +280,7 @@ const BAEHO_ILJU = new Set(['갑진','을미','병술','정축','무진','기미
 // 귀문관살: 지지 쌍 (어느 방향이든)
 const GWIMUN_PAIRS = [['자','유'],['축','오'],['인','미'],['묘','신'],['진','해'],['사','술']];
 // 원진살: 지지 쌍
-const WONJIN_PAIRS = [['자','미'],['축','오'],['인','유'],['묘','신'],['진','해'],['사','술']];
+export const WONJIN_PAIRS: [string, string][] = [['자','미'],['축','오'],['인','유'],['묘','신'],['진','해'],['사','술']];
 // 천주귀인: 일간 기준 지지
 const CHEONJU_JJ: Record<string,string> = {
   갑:'사', 을:'오', 병:'사', 정:'유', 무:'해',

@@ -624,6 +624,7 @@ function ResultView({
             형:   { color: "#f87171", bg: "rgba(248,113,113,0.1)" },
             파:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
             해:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
+            원진: { color: "#c084fc", bg: "rgba(192,132,252,0.1)" },
           };
           return (
             <div className="mt-3 flex flex-wrap justify-center gap-1.5">
