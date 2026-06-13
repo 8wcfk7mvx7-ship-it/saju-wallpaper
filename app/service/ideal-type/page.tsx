@@ -187,6 +187,7 @@ export default function IdealTypePage() {
             <p className="text-sm font-bold text-violet-300 mb-1">그 사람의 사주 속 연애 기운 — {topSipseong} ({topDesc.hanja})</p>
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
+            <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ 이 사람의 그림자 면: {topDesc.shadow}</p>
           </div>
         )}
 

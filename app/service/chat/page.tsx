@@ -3,7 +3,7 @@ import BackButton from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL } from "@/lib/saju2";
 
 type Step = "gate" | "input" | "chat";
 
@@ -104,8 +104,32 @@ export default function SajuChatPage() {
       if (pd.sipseongJj) sipseongSet.add(pd.sipseongJj);
     }
     const sipseongDesc = [...sipseongSet]
-      .map(ss => SIPSEONG_DESC[ss] ? `${ss}(${SIPSEONG_DESC[ss].hanja}): ${SIPSEONG_DESC[ss].short}` : null)
-      .filter(Boolean).join(", ");
+      .map(ss => SIPSEONG_DESC[ss] ? `${ss}(${SIPSEONG_DESC[ss].hanja}): ${SIPSEONG_DESC[ss].short} / 그림자면: ${SIPSEONG_DESC[ss].shadow}` : null)
+      .filter(Boolean).join("\n");
+
+    // 일간 오행 기반 활동 리듬
+    const ilganElement = result.dominant[0]; // fallback
+    const dayCg = result.pillarsDetail.day.cg;
+    const ilganElementMap: Record<string, string> = {
+      갑:"목", 을:"목", 병:"화", 정:"화", 무:"토", 기:"토", 경:"금", 신:"금", 임:"수", 계:"수",
+    };
+    const rhythmKey = ilganElementMap[dayCg] || ilganElement;
+    const rhythm = ELEMENT_DAILY_RHYTHM[rhythmKey];
+
+    // 효신살 (일지 = 편인)
+    const dayJj = result.pillarsDetail.day.sipseongJj;
+    const hasHyoshin = dayJj === "편인";
+
+    // 독립 후 성공형 사주 조건 체크 (천간/지지/십성/신살 일부 매칭)
+    const cgList = Object.values(result.pillarsDetail).map((p: any) => p.cg);
+    const jjList = Object.values(result.pillarsDetail).map((p: any) => p.jj);
+    const indMatchCg = INDEPENDENCE_FORTUNE.conditions[0].items.filter(i => cgList.some(c => i.includes(c)));
+    const indMatchJj = INDEPENDENCE_FORTUNE.conditions[1].items.filter(i => jjList.some(j => i.includes(j)));
+    const indMatchSs = INDEPENDENCE_FORTUNE.conditions[2].items.filter(i => sipseongSet.has(i));
+    const indMatchSinsal = INDEPENDENCE_FORTUNE.conditions[3].items.filter(i => sinsalNames.includes(i));
+    const independenceNote = (indMatchCg.length + indMatchJj.length + indMatchSs.length + indMatchSinsal.length) >= 3
+      ? `독립 후 성공형 사주 경향이 있어요 (해당 요소: ${[...indMatchCg, ...indMatchJj, ...indMatchSs, ...indMatchSinsal].join(", ")}). ${INDEPENDENCE_FORTUNE.summary}`
+      : "";
 
     // 재물 구조 콤보 감지
     const moneyComboKeys = Object.keys(SIPSEONG_MONEY_COMBO);
@@ -122,6 +146,9 @@ export default function SajuChatPage() {
       `신살: ${sinsalNames}`,
       `십신 요약: ${sipseongDesc || "없음"}`,
       detectedCombos ? `재물구조: ${detectedCombos}` : "",
+      rhythm ? `활동 리듬(${rhythmKey} 기운, ${rhythm.type}): ${rhythm.desc}` : "",
+      hasHyoshin ? `효신살(${HYOSHIN_SAL.hanja}): ${HYOSHIN_SAL.desc}` : "",
+      independenceNote,
       `성별: ${form.gender === "male" ? "남" : "여"}`,
     ].filter(Boolean).join("\n");
 

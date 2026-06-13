@@ -169,7 +169,7 @@ const SINSAL_NAMES = ["역마살","화개살","겁살","재살","천살","지살
 // 신살 메타 정보
 const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neutral'; desc:string}> = {
   // 12신살
-  역마살:   {hanja:"驛馬殺", category:"neutral",  desc:"이동·변화·해외 인연이 강해요. 한곳에 정착하기 어려운 기운이에요"},
+  역마살:   {hanja:"驛馬殺", category:"neutral",  desc:"이동·변화·해외 인연이 강해요. 다만 내가 원해서가 아니라 상황에 떠밀려 움직이게 되는 '타의에 의한 이동'의 기운이라, 한곳에 정착하기 어려워요"},
   도화살:   {hanja:"桃花殺", category:"neutral",  desc:"이성에게 매력적이며 인기가 많아요. 풍류 기질이 있답니다"},
   장성살:   {hanja:"將星殺", category:"lucky",    desc:"강한 통솔력과 지도자 기질을 타고났어요"},
   화개살:   {hanja:"華蓋殺", category:"neutral",  desc:"고독함이 있으나 예술·종교·철학에 뛰어난 재능이 있어요"},
@@ -177,7 +177,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   겁살:     {hanja:"劫殺",   category:"unlucky",  desc:"빼앗기거나 예기치 못한 손실이 생길 수 있어요"},
   재살:     {hanja:"災殺",   category:"unlucky",  desc:"사고·재난을 조심해야 해요"},
   천살:     {hanja:"天殺",   category:"unlucky",  desc:"하늘의 살기. 관재·구설·어른과의 갈등이 생기기 쉬워요"},
-  지살:     {hanja:"地殺",   category:"neutral",  desc:"이동·출장이 잦고 활동 범위가 넓어요"},
+  지살:     {hanja:"地殺",   category:"neutral",  desc:"역마살처럼 이동을 뜻하지만 성격이 달라요. 역마가 타의에 의한 이동이라면, 지살은 내가 원해서 주도적으로 움직이거나 새 일을 시작하는 기운이에요. 활동 범위가 넓고 변화를 스스로 만들어가요"},
   년살:     {hanja:"年殺",   category:"unlucky",  desc:"함지살이라고도 해요. 주색·풍류로 재물이 새기 쉬워요"},
   월살:     {hanja:"月殺",   category:"unlucky",  desc:"고초살이라고도 해요. 고독하고 인덕이 부족해지기 쉬워요"},
   망신살:   {hanja:"亡身殺", category:"unlucky",  desc:"명예 손상이나 구설수에 오르기 쉬워요"},

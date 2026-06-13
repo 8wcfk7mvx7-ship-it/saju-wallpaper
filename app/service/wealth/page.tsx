@@ -272,6 +272,7 @@ export default function WealthPage() {
             <p className="text-sm font-bold text-violet-300 mb-1">사주에서 가장 강한 기운 — {topSipseong} ({topDesc.hanja})</p>
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
+            <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ {topDesc.shadow}</p>
           </div>
         )}
 
