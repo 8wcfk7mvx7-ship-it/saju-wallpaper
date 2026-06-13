@@ -4,7 +4,7 @@ import Link from "next/link";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
-  detectSamhapBanghap, analyzeSipseongPatterns, detectChunganChung,
+  detectSamhapBanghap, analyzeSipseongPatterns, detectByeongjon, detectChunganChung,
   HAP_CHUNG_CHARACTER,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
@@ -516,6 +516,7 @@ function ResultView({
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
   const samhapResults = detectSamhapBanghap(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
+  const byeongjonPatterns = detectByeongjon(pd);
   const chunganChung = detectChunganChung(pd);
   const hapCount = samhapResults.filter(s => s.type === "삼합" || s.type === "반합").length;
   const chungCount = (result.sinsalList || []).filter(s => s.name?.includes("충")).length;
@@ -1074,9 +1075,9 @@ function ResultView({
         <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality}</p>
       </Section>
 
-      {/* 십성 구조 패턴: 무비겁·무재·쟁재 */}
-      {sipseongPatterns.length > 0 && (
-        <Section title="십성 구조 분석 — 무비겁·무재·쟁재·무관" accent="#fb923c">
+      {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}
+      {(sipseongPatterns.length > 0 || byeongjonPatterns.length > 0) && (
+        <Section title="특이구조 — 십성·병존" accent="#fb923c">
           <div className="space-y-3">
             {sipseongPatterns.map(p => (
               <div key={p.name} className="rounded-xl px-4 py-3" style={{ background: "rgba(251,146,60,0.06)", border: "1px solid rgba(251,146,60,0.18)" }}>
@@ -1102,6 +1103,16 @@ function ResultView({
                       : "남성에게 관성은 자식·명예·조직을 의미해요. 무관이라도 이성운 자체와는 큰 관련이 없지만, 조직보다 자유로운 관계 방식을 선호하는 편이에요."}
                   </p>
                 )}
+              </div>
+            ))}
+            {byeongjonPatterns.map(p => (
+              <div key={p.name} className="rounded-xl px-4 py-3" style={{ background: "rgba(251,146,60,0.06)", border: "1px solid rgba(251,146,60,0.18)" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(251,146,60,0.15)", color: "#fb923c" }}>{p.name}</span>
+                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{p.hanja}</span>
+                </div>
+                <p className="text-sm leading-relaxed mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>{p.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(251,146,60,0.8)" }}>{p.advice}</p>
               </div>
             ))}
           </div>

@@ -3198,6 +3198,81 @@ export function analyzeSipseongPatterns(pillarsDetail: SajuResult["pillarsDetail
   return patterns;
 }
 
+const CG_BYEONGJON_DESC: Record<string, string> = {
+  "갑": "변화와 경쟁심이 강해지고 고집이 세지는 경향이 있어요.",
+  "을": "예민함이 커지고 인간관계에서 스트레스를 받기 쉬워요.",
+  "병": "열정이 과해져 욱하는 성향이나 사고·구설을 조심해야 해요.",
+  "정": "신경이 과민해지고 감정 기복이 커질 수 있어요.",
+  "무": "고독함과 우직함이 동시에 강해지는 구조예요.",
+  "기": "의심과 변덕이 늘어나 마음이 잘 흔들릴 수 있어요.",
+  "경": "강한 결단력과 동시에 사고·수술 등을 조심해야 할 기운이에요.",
+  "신": "손재(損財)나 시비·다툼이 생기기 쉬운 구조예요.",
+  "임": "이동·변동이 많아지고 색정(色情)으로 인한 풍파를 조심해야 해요.",
+  "계": "눈물 많고 풍파가 따르는, 감정의 기복이 큰 구조예요.",
+};
+
+const JJ_BYEONGJON_DESC: Record<string, string> = {
+  "자": "역마성이 강해져 이동·변화가 많은 구조예요.",
+  "축": "고집과 인내심이 동시에 강해지는 구조예요.",
+  "인": "추진력이 매우 강해져 일을 벌이는 일이 많아져요.",
+  "묘": "예민함과 손재주가 동시에 두드러지는 구조예요.",
+  "진": "변화와 변동이 잦고 기복이 큰 구조예요.",
+  "사": "은근한 경쟁심과 신경과민이 강해지는 구조예요.",
+  "오": "열정과 조급함이 동시에 커지는 구조예요.",
+  "미": "고집과 답답함이 동시에 강해지는 구조예요.",
+  "신": "재주와 예리함이 강해지지만 시비도 늘어나요.",
+  "유": "예민함과 결벽 성향이 강해지는 구조예요.",
+  "술": "의리와 고집이 동시에 강해지는 구조예요.",
+  "해": "이동수와 다정함이 동시에 강해지는 구조예요.",
+};
+
+export interface ByeongjonPattern {
+  name: string;
+  hanja: string;
+  desc: string;
+  advice: string;
+}
+
+export function detectByeongjon(pillarsDetail: SajuResult["pillarsDetail"]): ByeongjonPattern[] {
+  const allPillars = [
+    pillarsDetail.year, pillarsDetail.month, pillarsDetail.day,
+    ...(pillarsDetail.hour ? [pillarsDetail.hour] : []),
+  ];
+
+  const result: ByeongjonPattern[] = [];
+
+  const cgCount: Record<string, number> = {};
+  const jjCount: Record<string, number> = {};
+  for (const p of allPillars) {
+    cgCount[p.cg] = (cgCount[p.cg] || 0) + 1;
+    jjCount[p.jj] = (jjCount[p.jj] || 0) + 1;
+  }
+
+  for (const [cg, n] of Object.entries(cgCount)) {
+    if (n >= 2 && CG_BYEONGJON_DESC[cg]) {
+      result.push({
+        name: `${cg}${cg}병존`,
+        hanja: "竝存",
+        desc: `천간에 ${cg}이 ${n}개 겹쳐 있는 '${cg}${cg}병존' 구조예요. 해당 천간의 기운이 강하게 증폭돼요.`,
+        advice: CG_BYEONGJON_DESC[cg],
+      });
+    }
+  }
+
+  for (const [jj, n] of Object.entries(jjCount)) {
+    if (n >= 2 && JJ_BYEONGJON_DESC[jj]) {
+      result.push({
+        name: `${jj}${jj}병존`,
+        hanja: "竝存",
+        desc: `지지에 ${jj}이 ${n}개 겹쳐 있는 '${jj}${jj}병존' 구조예요. 해당 지지의 기운이 강하게 증폭돼요.`,
+        advice: JJ_BYEONGJON_DESC[jj],
+      });
+    }
+  }
+
+  return result;
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // 신약·신강 대응 방식 + 합·충 성격 + 천간충 건강
 // ══════════════════════════════════════════════════════════════════════════════
