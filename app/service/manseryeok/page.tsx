@@ -5,6 +5,7 @@ import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/componen
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
   detectSamhapBanghap, analyzeSipseongPatterns, detectByeongjon, detectChunganChung,
+  JOHU_YONGSHIN, getSeasonByMonth,
   HAP_CHUNG_CHARACTER,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
@@ -755,22 +756,10 @@ function ResultView({
 
       {/* ② 격국 · 용신 */}
       {(() => {
-        // 조후용신 계산
-        const johuMap: Record<string, { yongshin: string; heeshin: string; desc: string }> = {
-          사: { yongshin:"수", heeshin:"금", desc:"월지 사화(巳) → 조열(燥熱) → 조후용신: 수(水), 희신: 금(金)" },
-          오: { yongshin:"수", heeshin:"금", desc:"월지 오화(午) → 조열(燥熱) → 조후용신: 수(Water), 희신: 금(金)" },
-          미: { yongshin:"수", heeshin:"금", desc:"월지 미토(未) → 조열(燥熱) → 조후용신: 수(水), 희신: 금(金)" },
-          해: { yongshin:"화", heeshin:"목", desc:"월지 해수(亥) → 한랭(寒冷) → 조후용신: 화(火), 희신: 목(木)" },
-          자: { yongshin:"화", heeshin:"목", desc:"월지 자수(子) → 한랭(寒冷) → 조후용신: 화(Fire), 희신: 목(木)" },
-          축: { yongshin:"화", heeshin:"목", desc:"월지 축토(丑) → 한랭(寒冷) → 조후용신: 화(火), 희신: 목(木)" },
-          인: { yongshin:"화", heeshin:"토", desc:"월지 인목(寅) → 온난 → 희신: 화(火)" },
-          묘: { yongshin:"화", heeshin:"토", desc:"월지 묘목(卯) → 온난 → 희신: 화(Fire)" },
-          진: { yongshin:"화", heeshin:"토", desc:"월지 진토(辰) → 온난 → 희신: 화(火)" },
-          신: { yongshin:"화", heeshin:"수", desc:"월지 신금(申) → 서늘 → 희신: 화(火), 기신: 토(土)" },
-          유: { yongshin:"화", heeshin:"수", desc:"월지 유금(酉) → 서늘 → 희신: 화(Fire), 기신: 토(土)" },
-          술: { yongshin:"화", heeshin:"수", desc:"월지 술토(戌) → 서늘 → 희신: 화(火), 기신: 토(土)" },
-        };
-        const johu = johuMap[monthJj];
+        // 조후용신 계산 (일간 × 계절 기반)
+        const season = getSeasonByMonth(monthJj);
+        const johuRaw = JOHU_YONGSHIN[ilgan]?.[season];
+        const johu = johuRaw ? { yongshin: johuRaw.primary, heeshin: johuRaw.secondary, desc: johuRaw.desc } : null;
         const ys = result.yongshin;
         // 억부용신과 다른 경우 노트
         const jysDiff = johu && johu.yongshin !== ys.yongshin;
@@ -800,7 +789,7 @@ function ResultView({
             {/* 조후용신 */}
             {johu && (
               <div className="mb-4 rounded-xl px-4 py-3" style={{ background: jysDiff ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${jysDiff ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.06)"}` }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: jysDiff ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>조후용신(調候用神)</p>
+                <p className="text-[10px] font-bold mb-1" style={{ color: jysDiff ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>조후용신(調候用神): {johu.yongshin} · 희신: {johu.heeshin}</p>
                 <p className="text-xs leading-relaxed" style={{ color: jysDiff ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>{johu.desc}</p>
                 {jysDiff && (
                   <p className="text-[10px] mt-1.5 font-bold" style={{ color: "#fbbf24" }}>
