@@ -3,7 +3,8 @@ import BackButton from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL, SIPSEONG_GROUP_EXCESS, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO } from "@/lib/saju2";
+import { getSipseongGroupByElement } from "@/lib/saju";
 
 type Step = "gate" | "input" | "chat";
 
@@ -131,6 +132,27 @@ export default function SajuChatPage() {
       ? `독립 후 성공형 사주 경향이 있어요 (해당 요소: ${[...indMatchCg, ...indMatchJj, ...indMatchSs, ...indMatchSinsal].join(", ")}). ${INDEPENDENCE_FORTUNE.summary}`
       : "";
 
+    // 십성 그룹별 多者 분석 (천간 기준 카운트)
+    const SS_TO_GROUP: Record<string, string> = {
+      비견:"비겁", 겁재:"비겁", 식신:"식상", 상관:"식상", 정재:"재성", 편재:"재성", 정관:"관성", 편관:"관성", 정인:"인성", 편인:"인성",
+    };
+    const groupCounts: Record<string, number> = {};
+    for (const p of Object.values(result.pillarsDetail)) {
+      const pd = p as { sipseongCg?: string };
+      const g = pd.sipseongCg ? SS_TO_GROUP[pd.sipseongCg] : null;
+      if (g) groupCounts[g] = (groupCounts[g] || 0) + 1;
+    }
+    const topGroup = Object.entries(groupCounts).sort((a, b) => b[1] - a[1])[0];
+    const groupExcessNote = topGroup && topGroup[1] >= 3 && SIPSEONG_GROUP_EXCESS[topGroup[0]]
+      ? `${SIPSEONG_GROUP_EXCESS[topGroup[0]].name}: ${SIPSEONG_GROUP_EXCESS[topGroup[0]].desc}`
+      : "";
+
+    // 용신 기반 급소 포인트
+    const yongshinGroup = getSipseongGroupByElement(rhythmKey as any, result.yongshin.yongshin as any);
+    const triggerInfo = YONGSHIN_TRIGGER_POINT[yongshinGroup]
+      ? `${YONGSHIN_TRIGGER_POINT[yongshinGroup].name}: ${YONGSHIN_TRIGGER_POINT[yongshinGroup].desc} (${YONGSHIN_TRIGGER_INTRO})`
+      : "";
+
     // 재물 구조 콤보 감지
     const moneyComboKeys = Object.keys(SIPSEONG_MONEY_COMBO);
     const detectedCombos = moneyComboKeys
@@ -149,6 +171,8 @@ export default function SajuChatPage() {
       rhythm ? `활동 리듬(${rhythmKey} 기운, ${rhythm.type}): ${rhythm.desc}` : "",
       hasHyoshin ? `효신살(${HYOSHIN_SAL.hanja}): ${HYOSHIN_SAL.desc}` : "",
       independenceNote,
+      groupExcessNote,
+      triggerInfo,
       `성별: ${form.gender === "male" ? "남" : "여"}`,
     ].filter(Boolean).join("\n");
 

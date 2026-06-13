@@ -16,7 +16,8 @@ import {
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO } from "@/lib/saju2";
+import { getSipseongGroupByElement } from "@/lib/saju";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -813,6 +814,19 @@ function ResultView({
               </div>
             )}
             <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.65)" }}>{ys.desc}</p>
+            {(() => {
+              const dayIlEl = CHEONGAN_ELEMENT[ilgan] as Element;
+              const group = getSipseongGroupByElement(dayIlEl, ys.yongshin as Element);
+              const trigger = YONGSHIN_TRIGGER_POINT[group];
+              if (!trigger) return null;
+              return (
+                <div className="mb-4 rounded-xl px-4 py-3" style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)" }}>
+                  <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>나의 급소 — {trigger.name}</p>
+                  <p className="text-xs leading-relaxed mb-1.5" style={{ color: "rgba(255,255,255,0.7)" }}>{trigger.desc}</p>
+                  <p className="text-[10px] leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>{YONGSHIN_TRIGGER_INTRO}</p>
+                </div>
+              );
+            })()}
             <div className="space-y-3">
               {(["mindset","boundary","mental","style"] as const).map((key) => {
                 const labels = { mindset:"사고방식", boundary:"대인관계", mental:"멘탈구조", style:"행동스타일" };

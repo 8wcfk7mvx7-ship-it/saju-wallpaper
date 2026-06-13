@@ -347,6 +347,16 @@ const CG_YANG_SET = new Set(["갑","병","무","경","임"]);
 const OHAENG_GENERATES: Record<string, Element> = {목:"화",화:"토",토:"금",금:"수",수:"목"};
 const OHAENG_CONTROLS: Record<string, Element> = {목:"토",토:"수",수:"화",화:"금",금:"목"};
 
+// 일간 오행 기준, 특정 오행이 어떤 십성 그룹(비겁/식상/재성/관성/인성)에 해당하는지
+export function getSipseongGroupByElement(ilganElement: Element, targetElement: Element): string {
+  if (ilganElement === targetElement) return "비겁";
+  if (OHAENG_GENERATES[ilganElement] === targetElement) return "식상";
+  if (OHAENG_CONTROLS[ilganElement] === targetElement) return "재성";
+  if (OHAENG_CONTROLS[targetElement] === ilganElement) return "관성";
+  if (OHAENG_GENERATES[targetElement] === ilganElement) return "인성";
+  return "";
+}
+
 // 절기 시작일 근사값 (인덱스 = 양력 월)
 // 1=소한(6일), 2=입춘(4일), 3=경칩(6일), 4=청명(5일), 5=입하(6일), 6=망종(6일)
 // 7=소서(7일), 8=입추(8일), 9=백로(8일), 10=한로(8일), 11=입동(7일), 12=대설(7일)
