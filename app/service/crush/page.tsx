@@ -26,6 +26,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
   );
 }
 import { useRouter } from "next/navigation";
+import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult } from "@/lib/saju";
 
@@ -422,6 +423,7 @@ export default function CrushPage() {
             style={{ animation: `bounce 1.2s ease ${i * 0.2}s infinite`, animationName: "pulse" }} />
         ))}
       </div>
+      <AdBanner className="max-w-sm" />
     </main>
   );
 

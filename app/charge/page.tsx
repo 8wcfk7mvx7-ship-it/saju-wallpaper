@@ -18,6 +18,18 @@ export default function ChargePage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [justCharged, setJustCharged] = useState<number | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(localStorage.getItem("sp_admin") === "true");
+  }, []);
+
+  function handleCheatCharge() {
+    const next = addBalance(1000000000);
+    setBalance(next);
+    setJustCharged(1000000000);
+  }
+
 
   useEffect(() => {
     setBalance(getBalance());
@@ -73,6 +85,15 @@ export default function ChargePage() {
           </p>
           <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>별조각</p>
         </div>
+
+        {/* 관리자 전용 치트 충전 */}
+        {isAdmin && (
+          <button onClick={handleCheatCharge}
+            className="w-full rounded-2xl p-3 mb-6 text-center text-sm font-bold"
+            style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", color: "#fbbf24" }}>
+            🛠 관리자 치트: 별조각 10억 충전
+          </button>
+        )}
 
         {/* 충전 성공 메시지 */}
         {justCharged !== null && (

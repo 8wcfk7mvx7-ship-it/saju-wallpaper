@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import AdBanner from "@/components/AdBanner";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
@@ -1321,6 +1322,7 @@ export default function ManseryeokPage() {
           <p className="text-white font-bold text-lg mb-2">사주 완전 분석 중...</p>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>격국·용신·일주론·신살·대운 계산 중</p>
         </div>
+        <AdBanner className="max-w-sm" />
       </div>
     );
   }
