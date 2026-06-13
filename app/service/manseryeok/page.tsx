@@ -4,8 +4,8 @@ import Link from "next/link";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
-  detectSamhapBanghap, analyzeSiksang, analyzeSipseongPatterns, detectChunganChung,
-  SINGANG_RESPONSE_STYLE, HAP_CHUNG_CHARACTER, MYUNGRI_PHILOSOPHY,
+  detectSamhapBanghap, analyzeSipseongPatterns, detectChunganChung,
+  HAP_CHUNG_CHARACTER,
   ILGAN_PERSONALITY, ILJU_60,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
@@ -13,7 +13,7 @@ import {
   GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, GANYEO_JIDONG_STRENGTHS, isGanyeoJidong,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
-  SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
+  getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE } from "@/lib/saju2";
@@ -394,7 +394,7 @@ function ShareButton({ targetId = "manseryeok-result", fileName = "내사주_만
       className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
       style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
     >
-      {saving ? "저장 중..." : done ? "✓ 이미지 저장됨" : "⬇ 이미지로 저장하기"}
+      {saving ? "저장 중..." : done ? "이미지 저장됨" : "이미지로 저장하기"}
     </button>
   );
 }
@@ -465,6 +465,25 @@ function ResultView({
   ];
 
   const ilgan = pd.day.cg;
+
+  // 사주 전체에서 가장 많이 나타나는 십성 (일간 자신은 비견으로 카운트되므로 제외하지 않음)
+  const dominantSipseong = (() => {
+    const all = [
+      pillars[0].d.sipseongCg, pillars[0].d.sipseongJj,
+      pillars[1].d.sipseongCg, pillars[1].d.sipseongJj,
+      pillars[2].d.sipseongJj,
+      ...(pd.hour ? [pillars[3].d.sipseongCg, pillars[3].d.sipseongJj] : []),
+    ].filter((s): s is string => !!s);
+    const count: Record<string, number> = {};
+    for (const s of all) count[s] = (count[s] || 0) + 1;
+    let best: string | null = null;
+    let bestN = 0;
+    for (const [s, n] of Object.entries(count)) {
+      if (n > bestN) { best = s; bestN = n; }
+    }
+    return best;
+  })();
+
   const monthJj = pd.month.jj;
   const ilganInfo = ILGAN_PERSONALITY[ilgan];
   const iljuKey = ilgan + pd.day.jj;
@@ -496,11 +515,8 @@ function ResultView({
 
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
   const samhapResults = detectSamhapBanghap(pd);
-  const siksangInfo = analyzeSiksang(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
   const chunganChung = detectChunganChung(pd);
-  const singangKey = result.yongshin.strength === "신강" ? "신강" : "신약";
-  const singangStyle = SINGANG_RESPONSE_STYLE[singangKey];
   const hapCount = samhapResults.filter(s => s.type === "삼합" || s.type === "반합").length;
   const chungCount = (result.sinsalList || []).filter(s => s.name?.includes("충")).length;
   const hapChungChar = hapCount > chungCount ? HAP_CHUNG_CHARACTER.합 : chungCount > 0 ? HAP_CHUNG_CHARACTER.충 : null;
@@ -543,7 +559,7 @@ function ResultView({
         </div>
 
         <div className={`grid gap-1.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3 max-w-[75%] mx-auto"}`}>
-          {pillars.map(({ label, d }) => {
+          {(pd.hour ? pillars : [...pillars].reverse()).map(({ label, d }) => {
             const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
             const jiEl = jijiElement(d.jj);
             const cgStyle = EL_STYLE[cgEl];
@@ -780,26 +796,6 @@ function ResultView({
                 </div>
               ))}
             </div>
-            {/* 신강/신약 지수 일자 그래프 */}
-            <div className="mb-4 rounded-xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] font-bold" style={{ color: "rgba(255,255,255,0.4)" }}>신강/신약 지수</p>
-                <p className="text-sm font-black" style={{ color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" }}>
-                  {classifySinStrength(ys.percent)} ({ys.percent.toFixed(1)}%)
-                </p>
-              </div>
-              <div className="relative h-2 rounded-full overflow-visible mb-1.5" style={{ background: "linear-gradient(to right, #60a5fa, #4ade80, #4ade80, #f87171)" }}>
-                <div className="absolute top-0 bottom-0 w-0.5 bg-white/30" style={{ left: "50%" }} />
-                <div className="absolute top-1/2 w-3 h-3 rounded-full border-2 border-white" style={{ left: `${ys.percent}%`, transform: "translate(-50%, -50%)", background: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" }} />
-              </div>
-              <div className="grid grid-cols-8 text-center mt-3">
-                {SIN_STRENGTH_LEVELS.map(level => (
-                  <p key={level} className="text-[9px] font-bold leading-tight" style={{ color: classifySinStrength(ys.percent) === level ? "#fff" : "rgba(255,255,255,0.3)" }}>
-                    {level}
-                  </p>
-                ))}
-              </div>
-            </div>
             {/* 조후용신 */}
             {johu && (
               <div className="mb-4 rounded-xl px-4 py-3" style={{ background: jysDiff ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${jysDiff ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.06)"}` }}>
@@ -866,7 +862,7 @@ function ResultView({
             {[
               { label: "오행", value: CHEONGAN_ELEMENT[ilgan] || "—", color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text },
               { label: "일주 동물", value: getIljuAnimal(ilgan, pd.day.jj), color: "#fbbf24" },
-              { label: "타고난 성향", value: pd.month.sipseongCg || "—", color: "#a78bfa" },
+              { label: "타고난 성향", value: dominantSipseong || "—", color: "#a78bfa" },
             ].map(item => (
               <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <p className="text-base font-black mb-1" style={{ color: item.color }}>{item.value}</p>
@@ -998,7 +994,6 @@ function ResultView({
           <Section title="외향성·내향성 분석" accent="#a78bfa">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-sm font-black px-3 py-1 rounded-full" style={{ background: "rgba(167,139,250,0.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,0.25)" }}>{label}</span>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>점수 {score > 0 ? "+" : ""}{score} / 3</span>
             </div>
             <div className="relative h-2.5 rounded-full mb-3" style={{ background: "rgba(255,255,255,0.06)" }}>
               <div className="absolute left-0 top-0 h-2.5 rounded-full transition-all" style={{ width: `${barPct}%`, background: barColor }} />
@@ -1077,15 +1072,6 @@ function ResultView({
           })}
         </div>
         <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality}</p>
-        {result.dominant.length > 0 && (
-          <div className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-[10px] font-bold mb-1" style={{ color: "#4ade80" }}>보완 조언</p>
-            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-              용신 <strong style={{ color: EL_STYLE[result.yongshin.yongshin]?.text }}>{result.yongshin.yongshin}</strong> 기운을 일상에서 보강하세요.
-              {result.lacking.length > 0 && ` ${result.lacking.join("·")} 기운이 부족하여 보완이 필요합니다.`}
-            </p>
-          </div>
-        )}
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재 */}
@@ -1100,32 +1086,24 @@ function ResultView({
                 </div>
                 <p className="text-sm leading-relaxed mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>{p.desc}</p>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(251,146,60,0.8)" }}>{p.advice}</p>
+                {p.name === "무재" && (
+                  <p className="text-xs leading-relaxed mt-2 pt-2" style={{ color: "rgba(255,255,255,0.55)", borderTop: "1px solid rgba(251,146,60,0.15)" }}>
+                    <strong style={{ color: "#fb923c" }}>이성운 — </strong>
+                    {form.gender === "female"
+                      ? "여성에게 재성은 시모(媤母)·활동력을 의미해요. 무재라도 이성운 자체와는 큰 관련이 없지만, 재물보다 사람·관계에서 만족을 더 찾는 편이에요."
+                      : "남성에게 재성은 여성·배우자 인연을 의미해요. 무재라면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."}
+                  </p>
+                )}
+                {p.name === "무관" && (
+                  <p className="text-xs leading-relaxed mt-2 pt-2" style={{ color: "rgba(255,255,255,0.55)", borderTop: "1px solid rgba(251,146,60,0.15)" }}>
+                    <strong style={{ color: "#fb923c" }}>이성운 — </strong>
+                    {form.gender === "female"
+                      ? "여성에게 관성은 남성·배우자 인연을 의미해요. 무관이라면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."
+                      : "남성에게 관성은 자식·명예·조직을 의미해요. 무관이라도 이성운 자체와는 큰 관련이 없지만, 조직보다 자유로운 관계 방식을 선호하는 편이에요."}
+                  </p>
+                )}
               </div>
             ))}
-          </div>
-        </Section>
-      )}
-
-      {/* 신약·신강 대응 방식 */}
-      {singangStyle && (
-        <Section title={`${result.yongshin.strength} 사주 — 세상을 대하는 방식`} accent="#38bdf8">
-          <div className="space-y-3">
-            <div className="rounded-xl px-4 py-3" style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.18)" }}>
-              <p className="text-xs font-bold mb-1" style={{ color: "#38bdf8" }}>핵심 기질</p>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{singangStyle.core}</p>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                { label: "사회적 스타일", val: singangStyle.socialStyle },
-                { label: "의사결정 방식", val: singangStyle.decisionStyle },
-                { label: "주의할 점", val: singangStyle.caution },
-              ].map(item => (
-                <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
-                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.val}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </Section>
       )}
@@ -1149,27 +1127,6 @@ function ResultView({
           </div>
         </Section>
       )}
-
-      {/* 식상(食傷) 분석 + 명리철학 */}
-      <Section title="식상(食傷) 분석 · 에너지 발산 구조" accent="#f472b6">
-        <div className={`rounded-xl px-4 py-3 mb-4 ${siksangInfo.hasSiksang ? "" : ""}`}
-          style={{ background: siksangInfo.hasSiksang ? "rgba(52,211,153,0.06)" : "rgba(239,68,68,0.06)", border: `1px solid ${siksangInfo.hasSiksang ? "rgba(52,211,153,0.2)" : "rgba(239,68,68,0.2)"}` }}>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: siksangInfo.hasSiksang ? "rgba(52,211,153,0.15)" : "rgba(239,68,68,0.15)", color: siksangInfo.hasSiksang ? "#34d399" : "#f87171" }}>
-              {siksangInfo.hasSiksang ? "식상 있음" : "무식상(無食傷)"}
-            </span>
-            {siksangInfo.siksangList.length > 0 && (
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{siksangInfo.siksangList.join(" · ")}</span>
-            )}
-          </div>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{siksangInfo.advice}</p>
-        </div>
-        <div className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-[10px] font-bold mb-2" style={{ color: "#a78bfa" }}>명리학이 말하는 개인 맞춤 조언의 원칙</p>
-          <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.55)" }}>{MYUNGRI_PHILOSOPHY.core}</p>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{MYUNGRI_PHILOSOPHY.naturalLaw}</p>
-        </div>
-      </Section>
 
       {/* ⑦ 건강 분석 (오행 건강 + 천간충 건강 신호 통합) */}
       <Section title="건강 분석" accent="#f87171">
@@ -1421,7 +1378,7 @@ export default function ManseryeokPage() {
             나의 운명을<br />펼쳐드립니다
           </h1>
           <p className="text-sm font-bold mb-2" style={{ color: "rgba(255,255,255,0.75)" }}>
-            ✨ 당신의 사주팔자, 완전 무료 해석 ✨
+            당신의 사주팔자, 완전 무료 해석
           </p>
           <p className="text-xs leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
             생년월일시·도시를 입력하면 격국·용신·일주론·신살·대운까지 한 번에 분석해 드립니다
@@ -1455,7 +1412,7 @@ export default function ManseryeokPage() {
                 animation: "pulseGlow2 2.5s ease-in-out infinite",
                 letterSpacing: "0.02em",
               }}>
-              🔮 분석 시작
+              분석 시작
             </button>
           </form>
         </div>
