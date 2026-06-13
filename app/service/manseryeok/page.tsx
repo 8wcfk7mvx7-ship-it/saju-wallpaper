@@ -493,7 +493,7 @@ function ResultView({
   const lackEl = result.lacking[0];
   const coreWorry = OHAENG_CORE_WORRY[domEl as Element];
 
-  const [showRaw, setShowRaw] = useState(false);
+
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
   const samhapResults = detectSamhapBanghap(pd);
   const siksangInfo = analyzeSiksang(pd);
@@ -977,9 +977,9 @@ function ResultView({
         const totalScore = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
         const pct = (el: keyof typeof scores) => Math.round((scores[el] / totalScore) * 100);
         let score = isYang ? 1 : -1;
-        if (pct("화") >= 30) score += 1;
-        if (pct("수") >= 30) score -= 1;
-        if (pct("금") >= 30) score -= 1;
+        if (pct("화") >= 25) score += 1;
+        if (pct("수") >= 25) score -= 1;
+        if (pct("금") >= 25) score -= 1;
         score = Math.max(-3, Math.min(3, score));
         const label =
           score <= -2 ? "강한 내향성" :
@@ -1015,19 +1015,19 @@ function ResultView({
                 <span style={{ color: "rgba(255,255,255,0.4)" }}>기반 기질</span>
                 <span className="ml-2 font-bold" style={{ color: isYang ? "#ef4444" : "#94a3b8" }}>{isYang ? "양간(+1 외향)" : "음간(-1 내향)"}</span>
               </div>
-              {pct("화") >= 30 && (
+              {pct("화") >= 25 && (
                 <div className="rounded-lg px-3 py-2" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
                   <span style={{ color: "rgba(255,255,255,0.4)" }}>화(火) 강세</span>
                   <span className="ml-2 font-bold" style={{ color: "#ef4444" }}>+1 외향</span>
                 </div>
               )}
-              {pct("수") >= 30 && (
+              {pct("수") >= 25 && (
                 <div className="rounded-lg px-3 py-2" style={{ background: "rgba(148,163,184,0.05)", border: "1px solid rgba(148,163,184,0.15)" }}>
                   <span style={{ color: "rgba(255,255,255,0.4)" }}>수(Water) 강세</span>
                   <span className="ml-2 font-bold" style={{ color: "#94a3b8" }}>-1 내향</span>
                 </div>
               )}
-              {pct("금") >= 30 && (
+              {pct("금") >= 25 && (
                 <div className="rounded-lg px-3 py-2" style={{ background: "rgba(248,250,252,0.03)", border: "1px solid rgba(248,250,252,0.1)" }}>
                   <span style={{ color: "rgba(255,255,255,0.4)" }}>금(金) 강세</span>
                   <span className="ml-2 font-bold" style={{ color: "#f8fafc" }}>-1 신중·내향</span>
@@ -1050,20 +1050,9 @@ function ResultView({
         {/* 도넛 차트 + 보정 전/후 토글 */}
         <div className="flex flex-col items-center mb-4">
           <OhaengDonut scores={result.scores} total={total} />
-          <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={showRaw}
-              onChange={e => setShowRaw(e.target.checked)}
-              className="w-3.5 h-3.5 accent-green-400"
-            />
-            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.5)" }}>보정 전 점수 보기</span>
-          </label>
-          {showRaw && (
-            <p className="text-[10px] mt-1.5 px-3 py-1.5 rounded-lg text-center" style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", color: "rgba(255,255,255,0.45)" }}>
-              현재 표시 점수는 <strong style={{ color: "#4ade80" }}>경도·합충 보정 포함</strong> 최종값입니다. 원본 입력(경도/합충 보정 없음) 기준 점수는 별도 저장되지 않습니다.
-            </p>
-          )}
+          <p className="text-[11px] mt-3 px-3 py-1.5 rounded-lg text-center" style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", color: "rgba(255,255,255,0.45)" }}>
+            조후, 궁성, 합충 등을 종합 반영해 보정한 결과입니다.
+          </p>
         </div>
         <div className="space-y-3 mb-4">
           {(["목","화","토","금","수"] as Element[]).map(el => {
@@ -1177,46 +1166,6 @@ function ResultView({
                   <span className="text-xs font-bold" style={{ color: "rgba(248,113,113,0.8)" }}>→ {c.body}</span>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* 삼합 · 방합 */}
-      {samhapResults.length > 0 && (
-        <Section title="삼합(三合) · 방합(方合) — 사주의 에너지 방향" accent="#a78bfa">
-          <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
-            삼합·방합은 지지 에너지가 응축된 구조. 성격·인생 방향의 강력한 기반이 됩니다.
-          </p>
-          <div className="space-y-4">
-            {samhapResults.map(s => (
-              <div key={s.name} className="rounded-xl p-4" style={{ background: `${s.color}0d`, border: `1px solid ${s.color}30` }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-black px-2.5 py-1 rounded-full" style={{ background: s.type === "삼합" ? "rgba(239,68,68,0.15)" : "rgba(99,102,241,0.15)", color: s.type === "삼합" ? "#f87171" : "#818cf8" }}>{s.type}</span>
-                  <span className="font-black text-sm text-white">{s.name}</span>
-                  <span className="text-xs font-bold" style={{ color: s.color }}>{s.title}</span>
-                </div>
-                <p className="text-xs font-bold mb-2" style={{ color: s.color }}>{s.core}</p>
-                <p className="text-xs leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.6)" }}>{s.detail}</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {s.career && (
-                    <div className="rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <p className="text-[10px] font-bold mb-1" style={{ color: "#34d399" }}>커리어 성향</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>{s.career}</p>
-                    </div>
-                  )}
-                  {(s.love || s.loveStyle) && (
-                    <div className="rounded-lg px-3 py-2" style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <p className="text-[10px] font-bold mb-1" style={{ color: "#f472b6" }}>연애 스타일</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>{s.loveStyle || s.love}</p>
-                    </div>
-                  )}
-                  <div className="rounded-lg px-3 py-2" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.12)" }}>
-                    <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{s.caution}</p>
-                  </div>
-                </div>
               </div>
             ))}
           </div>

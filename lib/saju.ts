@@ -3122,12 +3122,26 @@ export interface SipseongPattern {
 }
 
 export function analyzeSipseongPatterns(pillarsDetail: SajuResult["pillarsDetail"]): SipseongPattern[] {
+  const allPillars = [
+    pillarsDetail.year, pillarsDetail.month, pillarsDetail.day,
+    ...(pillarsDetail.hour ? [pillarsDetail.hour] : []),
+  ];
+
+  // 천간충(갑경·을신·병임·정계)에 걸린 천간은 십성 구조 판단에서 무력화된 것으로 보고 제외
+  const CG_CHUNG_PAIRS: [string, string][] = [["갑","경"],["을","신"],["병","임"],["정","계"]];
+  const allCgList = allPillars.map(p => p.cg);
+  const chungedCg = new Set<string>();
+  for (const [a, b] of CG_CHUNG_PAIRS) {
+    if (allCgList.includes(a) && allCgList.includes(b)) { chungedCg.add(a); chungedCg.add(b); }
+  }
+
+  // 천간 십성: 충에 걸린 천간이면 무력화 처리. 지지 십성(지장간)은 그대로 반영.
   const allSipseong = [
-    pillarsDetail.year.sipseongCg, pillarsDetail.year.sipseongJj,
-    pillarsDetail.month.sipseongCg, pillarsDetail.month.sipseongJj,
+    chungedCg.has(pillarsDetail.year.cg) ? null : pillarsDetail.year.sipseongCg, pillarsDetail.year.sipseongJj,
+    chungedCg.has(pillarsDetail.month.cg) ? null : pillarsDetail.month.sipseongCg, pillarsDetail.month.sipseongJj,
     pillarsDetail.day.sipseongCg, pillarsDetail.day.sipseongJj,
-    ...(pillarsDetail.hour ? [pillarsDetail.hour.sipseongCg, pillarsDetail.hour.sipseongJj] : []),
-  ].filter(Boolean);
+    ...(pillarsDetail.hour ? [chungedCg.has(pillarsDetail.hour.cg) ? null : pillarsDetail.hour.sipseongCg, pillarsDetail.hour.sipseongJj] : []),
+  ].filter((s): s is string => !!s);
 
   const has = (ss: string[]) => ss.some(s => allSipseong.includes(s));
   const countOf = (ss: string[]) => allSipseong.filter(s => ss.includes(s)).length;
