@@ -698,7 +698,7 @@ export function toJDN(y: number, m: number, d: number): number {
 }
 
 // 도화살 지지 (연지 삼합그룹 기준)
-function getDohwaJj(yeonji: string): string {
+export function getDohwaJj(yeonji: string): string {
   const yi = JIJI.indexOf(yeonji);
   if ([2,6,10].includes(yi)) return '묘';   // 인오술 → 묘
   if ([11,3,7].includes(yi)) return '자';   // 해묘미 → 자
@@ -3271,6 +3271,60 @@ export function detectByeongjon(pillarsDetail: SajuResult["pillarsDetail"]): Bye
   }
 
   return result;
+}
+
+export interface DohwaTypeResult {
+  name: string;
+  hanja: string;
+  desc: string;
+}
+
+// 도화살의 위치(연/월/일/시)와 형충 여부에 따른 세부 유형 판단
+export function analyzeDohwaTypes(pillarsDetail: SajuResult["pillarsDetail"]): DohwaTypeResult[] {
+  const dohwaJj = getDohwaJj(pillarsDetail.year.jj);
+  const pillars = [
+    { label: "연주", jj: pillarsDetail.year.jj },
+    { label: "월주", jj: pillarsDetail.month.jj },
+    { label: "일주", jj: pillarsDetail.day.jj },
+    ...(pillarsDetail.hour ? [{ label: "시주", jj: pillarsDetail.hour.jj }] : []),
+  ];
+  const has = (label: string) => pillars.find(p => p.label === label)?.jj === dohwaJj;
+
+  const results: DohwaTypeResult[] = [];
+
+  if (has("연주") || has("월주")) {
+    results.push({
+      name: "원내도화", hanja: "墻內桃花",
+      desc: "도화가 연주·월주(가까운 사람·집안 쪽)에 있어요. 가족·지인 사이에서 인기가 많고, 가까운 관계 안에서 매력이 먼저 드러나는 구조예요.",
+    });
+  }
+  if (has("일주")) {
+    results.push({
+      name: "야외도화", hanja: "牆外桃花",
+      desc: "도화가 일주(자기 자신)에 있어요. 사회생활·바깥 활동에서 인기가 많고, 본인 스스로 매력의 중심이 되는 구조예요.",
+    });
+  }
+  if (has("시주")) {
+    results.push({
+      name: "편야도화", hanja: "編野桃花",
+      desc: "도화가 시주(노년·말년)에 있어요. 나이가 들수록 인기가 늘거나, 늦바람·뒤늦은 연애운이 들어오기 쉬운 구조예요.",
+    });
+  }
+
+  const jjs = pillars.map(p => p.jj);
+  const dohwaIdx = pillars.findIndex(p => p.jj === dohwaJj);
+  if (dohwaIdx >= 0) {
+    const rels = getJijiRelations(jjs);
+    const isClashed = rels.some(r => (r.a === dohwaIdx || r.b === dohwaIdx) && (r.type === "충" || r.type === "형"));
+    if (isClashed) {
+      results.push({
+        name: "도삽도화", hanja: "倒揷桃花",
+        desc: "도화 지지가 충(沖) 또는 형(刑)을 맞고 있어요. 인기·매력은 있지만 그로 인한 구설·치정 시비나 감정 기복을 겪기 쉬운 구조예요. 관계의 거리 조절이 중요해요.",
+      });
+    }
+  }
+
+  return results;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
