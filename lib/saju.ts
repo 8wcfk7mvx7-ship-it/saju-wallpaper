@@ -1971,6 +1971,21 @@ export const OHAENG_CAREER: Record<Element, {
 };
 
 // ── 60갑자 일주론 ─────────────────────────────────────────────────────────────
+// 일주(日柱) 동물 — 일지(地支) → 띠 동물, 일간(天干) → 색깔
+export const JIJI_ANIMAL: Record<string, string> = {
+  자: "쥐", 축: "소", 인: "호랑이", 묘: "토끼", 진: "용", 사: "뱀",
+  오: "말", 미: "양", 신: "원숭이", 유: "닭", 술: "개", 해: "돼지",
+};
+const CHEONGAN_COLOR: Record<string, string> = {
+  갑: "푸른", 을: "푸른", 병: "붉은", 정: "붉은", 무: "노란", 기: "노란",
+  경: "흰", 신: "흰", 임: "검은", 계: "검은",
+};
+export function getIljuAnimal(dayCg: string, dayJj: string): string {
+  const color = CHEONGAN_COLOR[dayCg] || "";
+  const animal = JIJI_ANIMAL[dayJj] || "";
+  return `${color} ${animal}`;
+}
+
 export const ILJU_60: Record<string, {
   image: string; uunseong: string; keyword: string;
   personality: string; love: string; career: string; caution: string;

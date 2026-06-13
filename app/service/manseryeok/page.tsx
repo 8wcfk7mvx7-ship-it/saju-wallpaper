@@ -13,7 +13,7 @@ import {
   GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU, GANYEO_JIDONG_LOVE, isGanyeoJidong,
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
-  SIN_STRENGTH_LEVELS, classifySinStrength,
+  SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
 
@@ -854,6 +854,18 @@ function ResultView({
       {/* ④ 60갑자 일주론 */}
       {iljuInfo && (
         <Section title={`일주론 (日柱論) · ${iljuKey}일주 · ${iljuInfo.image}`} accent="#fbbf24">
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {[
+              { label: "오행", value: CHEONGAN_ELEMENT[ilgan] || "—", color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text },
+              { label: "일주 동물", value: getIljuAnimal(ilgan, pd.day.jj), color: "#fbbf24" },
+              { label: "타고난 성향", value: pd.month.sipseongCg || "—", color: "#a78bfa" },
+            ].map(item => (
+              <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-base font-black mb-1" style={{ color: item.color }}>{item.value}</p>
+                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
+              </div>
+            ))}
+          </div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0" style={{ background: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].bg, border: `1px solid ${EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].border}` }}>
               <span className="text-xl font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[ilgan] || "토"].text }}>{iljuKey[0]}</span>
