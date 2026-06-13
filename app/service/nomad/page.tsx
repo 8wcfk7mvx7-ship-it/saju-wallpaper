@@ -8,7 +8,7 @@ import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/componen
 
 export const dynamic = "force-dynamic";
 
-const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string, number>, strength: string) => boolean; desc: string; warn: string }[] = [
+const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string, number>, strength: string) => boolean; desc: string; warn: string; jobs: string[]; action: string; envTitle: string; env: string }[] = [
   {
     id: "사업가형",
     emoji: "🏢",
@@ -16,6 +16,10 @@ const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string
     cond: (c) => (c["식상"] >= 2 && c["재성"] >= 1) && c["관성"] === 0,
     desc: "관성(官星)이 거의 없고 식상과 재성이 함께 강합니다. 위에서 시키는 일을 처리하는 자리에서는 답답함을 느끼기 쉽고, 스스로 기획하고 책임지는 위치에서 비로소 능력이 폭발합니다. 작게라도 '내 이름으로 운영되는' 사업·브랜드·채널을 만들었을 때 만족도와 성과가 모두 올라갑니다.",
     warn: "다만 관성이 없다는 건 외부의 견제와 규칙이 약하다는 뜻이기도 합니다. 세금·계약·법적 절차처럼 '하기 싫지만 반드시 해야 하는 행정'을 미루지 않는 시스템(세무사, 자동화 툴)을 처음부터 만들어두는 것이 사업의 수명을 좌우합니다.",
+    jobs: ["자영업·창업 (요식업, 리테일, 서비스업)", "1인 브랜드·온라인 셀러", "에이전시·대행업 (마케팅, 광고, 컨설팅)", "프랜차이즈 가맹점 운영"],
+    envTitle: "잘 맞는 근무 환경",
+    env: "출퇴근 시간과 의사결정 권한이 100% 본인에게 있는 구조가 가장 잘 맞습니다. 직원을 두고 위임하는 경험을 빨리 쌓을수록 사업이 커질 때 본인이 병목이 되는 것을 막을 수 있습니다.",
+    action: "지금 당장 사업을 키우기보다, 퇴근 후 시간을 활용해 작은 단위(스마트스토어 1개, 인스타 계정 1개)로 '내가 대표인 구조'를 미리 경험해보세요. 행정·세무는 처음부터 외주화하는 습관을 들이는 것이 핵심입니다.",
   },
   {
     id: "디지털노마드형",
@@ -24,6 +28,10 @@ const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string
     cond: (c) => c["식상"] >= 2 && c["인성"] >= 1,
     desc: "식상(食傷)의 표현력·창의성과 인성(印星)의 학습 능력이 함께 강합니다. 정해진 사무실, 정해진 시간에 갇혀 있을 때 에너지가 가장 빠르게 소모되고, 환경을 스스로 바꿔가며 일할 때 오히려 집중력과 창의성이 올라가는 구조입니다. 온라인 기반 콘텐츠·번역·디자인·개발처럼 장소에 구애받지 않는 일에서 강점이 극대화됩니다.",
     warn: "자유로운 환경일수록 스스로 만든 루틴이 없으면 쉽게 무너집니다. '어디서든 일한다'와 '아무 때나 일한다'는 다릅니다. 시간대를 고정한 최소한의 루틴을 만들어야 자유가 오히려 생산성으로 이어집니다.",
+    jobs: ["콘텐츠 크리에이터·1인 미디어", "프리랜서 개발자·디자이너·번역가", "온라인 강의·전자책 제작", "리모트 근무가 가능한 IT·마케팅 직군"],
+    envTitle: "잘 맞는 근무 환경",
+    env: "재택·리모트, 프리랜서, 또는 워케이션처럼 '장소를 스스로 선택할 수 있는' 형태가 가장 잘 맞습니다. 다만 완전한 무소속보다는, 최소한의 고정 수입(클라이언트 1~2곳)을 확보한 채 자유도를 넓혀가는 방식이 안정적입니다.",
+    action: "하루 중 '반드시 일하는 3시간'을 정해 캘린더에 고정하세요. 장소는 매일 바뀌어도 되지만, 그 시간만큼은 알림을 끄고 한 가지 작업에만 집중하는 연습이 필요합니다.",
   },
   {
     id: "투자가형",
@@ -32,6 +40,10 @@ const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string
     cond: (c, strength) => c["재성"] >= 2 && strength !== "신약",
     desc: "재성(財星)이 두드러지고 신강 또는 중화 사주입니다. 돈을 '버는 것'보다 '굴리는 것'에 대한 감각과 담대함이 있어, 투자·자산 운용에서 또래보다 빠르게 감을 잡는 경우가 많습니다. 본업 외에 자산을 분산해서 운용하는 흐름이 자연스럽게 잘 맞습니다.",
     warn: "재성이 강한 만큼 욕심도 함께 커질 수 있습니다. 특히 신강한 상태에서 재성에만 몰두하면 한 곳에 자산을 몰아넣는 '몰빵' 성향이 나오기 쉬우니, 투자 비중을 미리 정해두고 그 기준을 지키는 것이 핵심입니다.",
+    jobs: ["금융·자산운용·부동산 관련 직군", "본업 + 주식·부동산·코인 등 자산 포트폴리오 운용", "재테크 콘텐츠·정보성 부업", "유통·도매처럼 현금 흐름을 직접 굴리는 업종"],
+    envTitle: "잘 맞는 근무 환경",
+    env: "안정적인 본업(또는 사업) 수입을 기반으로 별도의 '운용 계좌'를 가져가는 구조가 잘 맞습니다. 숫자와 데이터를 매일 들여다볼 수 있는 환경일수록 감각이 더 날카로워집니다.",
+    action: "투자에 쓸 자산의 상한선(예: 전체 자산의 20~30%)을 먼저 정하고, 그 범위 안에서만 움직이는 규칙을 글로 적어두세요. 감이 좋을수록 '규칙 없는 베팅'의 유혹이 커진다는 점을 기억해야 합니다.",
   },
   {
     id: "안정추구형",
@@ -40,6 +52,10 @@ const TYPES: { id: string; title: string; emoji: string; cond: (c: Record<string
     cond: (c) => c["관성"] >= 2 || c["인성"] >= 2,
     desc: "관성(官星) 또는 인성(印星)이 강하게 자리하고 있습니다. 정해진 체계와 평판이 쌓이는 환경에서 신뢰와 전문성이 빠르게 축적되는 구조입니다. 사업·투자보다는 조직 내에서 자격·경력·직급을 쌓아가는 쪽이 훨씬 안정적이고 큰 성과로 이어집니다.",
     warn: "그렇다고 부업·투자가 안 맞는다는 뜻은 아닙니다. 다만 본업의 안정성을 깨뜨릴 정도의 모험은 피하는 것이 좋고, 사업·투자는 '본업을 지킨 채로' 천천히 비중을 늘려가는 방식이 이 사주에는 훨씬 잘 맞습니다.",
+    jobs: ["대기업·공공기관·전문직 (의료, 법률, 교육)", "자격증·라이센스 기반 전문 직군", "조직 내 관리자·팀장 트랙", "안정적인 장기 근속이 가능한 기업"],
+    envTitle: "잘 맞는 근무 환경",
+    env: "출퇴근, 평가, 승진 체계가 명확한 조직일수록 안정감과 동시에 동기부여를 함께 얻습니다. 이름과 직급이 명함에 분명히 새겨지는 자리일수록 이 사주의 잠재력이 잘 드러납니다.",
+    action: "투자·부업은 '본업 시간의 10% 이내'로 제한하고, 자격증·전문성처럼 시간이 갈수록 가치가 누적되는 영역에 우선 투자하세요. 조급하게 큰 변화를 시도하기보다 꾸준한 누적이 이 사주의 진짜 무기입니다.",
   },
 ];
 
@@ -216,9 +232,31 @@ export default function NomadPage() {
           <p className="text-sm text-gray-300 leading-relaxed text-left">{matched.desc}</p>
         </div>
 
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-emerald-300 mb-3">🧭 {matched.envTitle}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{matched.env}</p>
+        </div>
+
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-amber-300 mb-3">💼 어울리는 일·직업 분야</p>
+          <div className="grid grid-cols-1 gap-2">
+            {matched.jobs.map((j, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm text-gray-300 leading-relaxed">
+                <span className="text-amber-400 mt-0.5">·</span>
+                <span>{j}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-rose-300 mb-1">⚠ 이 유형이 흔히 무너지는 지점</p>
           <p className="text-sm text-gray-300 leading-relaxed">{matched.warn}</p>
+        </div>
+
+        <div className="bg-white/[0.03] border border-cyan-700/20 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-cyan-300 mb-1">✅ 오늘부터 해볼 수 있는 실천</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{matched.action}</p>
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
