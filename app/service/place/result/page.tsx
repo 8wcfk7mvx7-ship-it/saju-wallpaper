@@ -50,6 +50,15 @@ const KR_CITY_BY_ELEMENT: Record<string, {
   },
 };
 
+// 광역시 핵심 거주지 — 오행별로 기운이 강한 동네
+const METRO_DISTRICTS_BY_ELEMENT: Record<string, string[]> = {
+  목: ["인천 부평·계양", "청주", "창원 성산·의창"],
+  화: ["부산 서면·동래", "대구 동성로·중구", "광주 충장로·구도심", "제주 시내", "포항 영일대"],
+  토: ["대구 수성·범어", "대전 둔산·유성", "세종", "창원 성산·의창"],
+  금: ["대전 원도심·중구", "광주 상무·첨단", "울산 삼산·남구"],
+  수: ["부산 해운대·광안리", "인천 송도·청라", "울산 동구 바닷가", "제주 서귀포·해변", "포항 영일대"],
+};
+
 const WORLD_BY_ELEMENT: Record<string, {
   countries: { name: string; flag: string; reason: string; cities: string }[];
 }> = {
@@ -219,6 +228,19 @@ function PlaceResultContent() {
             <p className="text-xs text-amber-300/80 leading-relaxed">⚠️ {krData.avoid}</p>
           </div>
         </div>
+
+        {/* 광역시 핵심 거주지 */}
+        {METRO_DISTRICTS_BY_ELEMENT[el] && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 mb-6">
+            <p className="text-xs text-gray-500 font-semibold mb-2">🏙️ 광역시 핵심 거주지 — {elInfo.label} 기운이 강한 동네</p>
+            <div className="flex flex-wrap gap-2">
+              {METRO_DISTRICTS_BY_ELEMENT[el].map(d => (
+                <span key={d} className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: `${elInfo.color}1a`, color: elInfo.color, border: `1px solid ${elInfo.color}40` }}>{d}</span>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-500 leading-relaxed mt-2">이미 거주 중인 광역시 안에서 이사·이주를 고민한다면, 이 동네들이 {elInfo.label} 기운을 보강하기 좋은 곳입니다.</p>
+          </div>
+        )}
 
         {/* 해외 전체 */}
         <h2 className="text-sm font-bold text-gray-300 mb-3">🌍 추천 해외 국가 (전체 공개)</h2>
