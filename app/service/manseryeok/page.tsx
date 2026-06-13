@@ -1150,28 +1150,6 @@ function ResultView({
         </Section>
       )}
 
-      {/* 천간충 건강 경고 */}
-      {chunganChung.length > 0 && (
-        <Section title="천간충(天干沖) — 건강 주의 신호" accent="#f87171">
-          <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>
-            사주 천간 간 충이 발생하면 특정 신체 부위에 취약성이 나타납니다.
-          </p>
-          <div className="space-y-3">
-            {chunganChung.map(c => (
-              <div key={c.pair.join("")} className="rounded-xl px-4 py-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(248,113,113,0.15)", color: "#f87171" }}>
-                    {c.pair[0]}·{c.pair[1]} 충
-                  </span>
-                  <span className="text-xs font-bold" style={{ color: "rgba(248,113,113,0.8)" }}>→ {c.body}</span>
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
       {/* 식상(食傷) 분석 + 명리철학 */}
       <Section title="식상(食傷) 분석 · 에너지 발산 구조" accent="#f472b6">
         <div className={`rounded-xl px-4 py-3 mb-4 ${siksangInfo.hasSiksang ? "" : ""}`}
@@ -1193,8 +1171,8 @@ function ResultView({
         </div>
       </Section>
 
-      {/* ⑦ 건강 분석 */}
-      <Section title="오행 건강 분석" accent="#f87171">
+      {/* ⑦ 건강 분석 (오행 건강 + 천간충 건강 신호 통합) */}
+      <Section title="건강 분석" accent="#f87171">
         <div className="space-y-4">
           {[domEl, lackEl].filter(Boolean).slice(0, 2).map(el => {
             const h = OHAENG_HEALTH[el as Element];
@@ -1218,6 +1196,24 @@ function ResultView({
               </div>
             );
           })}
+          {chunganChung.length > 0 && (
+            <div>
+              <p className="text-xs font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>천간충(天干沖) — 건강 주의 신호</p>
+              <div className="space-y-3">
+                {chunganChung.map(c => (
+                  <div key={c.pair.join("")} className="rounded-xl px-4 py-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(248,113,113,0.15)", color: "#f87171" }}>
+                        {c.pair[0]}·{c.pair[1]} 충
+                      </span>
+                      <span className="text-xs font-bold" style={{ color: "rgba(248,113,113,0.8)" }}>→ {c.body}</span>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{c.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </Section>
 
