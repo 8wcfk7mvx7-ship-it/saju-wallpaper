@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -250,6 +250,13 @@ export default function WealthPage() {
             <p className="text-sm font-bold text-rose-300 mb-1">⚠ 돈이 새는 구조 — {moneyCombo.name} ({moneyCombo.hanja})</p>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">{moneyCombo.desc}</p>
             <p className="text-xs text-emerald-300 font-bold">▶ 처방: {moneyCombo.advice}</p>
+          </div>
+        )}
+
+        {OVERSEAS_WEALTH_ILGAN[ilgan] && (
+          <div className="bg-gradient-to-br from-sky-950/50 to-indigo-950/30 border border-sky-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-sky-300 mb-1">타지에서 돈 크게 버는 사주 TOP {OVERSEAS_WEALTH_ILGAN[ilgan].rank} — {OVERSEAS_WEALTH_ILGAN[ilgan].title}</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{OVERSEAS_WEALTH_ILGAN[ilgan].desc}</p>
           </div>
         )}
 
