@@ -419,9 +419,9 @@ export default function SajuChatPage() {
                 width: 32, height: 32, borderRadius: "50%",
                 background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 16, flexShrink: 0, marginRight: 8, marginTop: 2,
+                fontSize: 16, flexShrink: 0, marginRight: 8, marginTop: 2, overflow: "hidden",
               }}>
-                🔮
+                <img src="/mascot.png" alt="월령도사" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
             )}
             <div style={{
@@ -445,9 +445,9 @@ export default function SajuChatPage() {
             <div style={{
               width: 32, height: 32, borderRadius: "50%",
               background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, overflow: "hidden",
             }}>
-              🔮
+              <img src="/mascot.png" alt="월령도사" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div style={{
               background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)",
