@@ -93,6 +93,20 @@ export const OVERSEAS_WEALTH_ILGAN: Record<string, { rank: number; title: string
     desc: "경금은 단련될수록 값이 오르는 쇠예요. 익숙한 자리에 머물면 무뎌지기 쉽지만, 낯선 환경에서 제대로 부딪치고 단련될수록 날이 서요. 고생한 자리에서 보상이 크게 돌아오는 구조라, 타지·해외에서 재성(財星)이 깨어나는 흐름을 보이는 경우가 많아요." },
 };
 
+// 일간별 기운에 맞는 국내/해외 장소 — 답답할 때 환경을 바꿔보면 좋은 곳
+export const ILGAN_PLACES: Record<string, { domestic: string[]; overseas: string[] }> = {
+  갑: { domestic: ["부산", "통영", "여수"], overseas: ["동남아", "하와이", "사이판"] },
+  을: { domestic: ["대구", "경주", "포항"], overseas: ["사막 지역", "멕시코", "이집트"] },
+  병: { domestic: ["대구", "광주", "부산"], overseas: ["동남아", "사이판", "두바이"] },
+  정: { domestic: ["부산", "통영", "여수"], overseas: ["태국", "베트남", "필리핀"] },
+  무: { domestic: ["대구", "경주", "안동"], overseas: ["두바이", "이집트", "모로코"] },
+  기: { domestic: ["부산", "광주", "대구"], overseas: ["사막 지역", "두바이", "사이판"] },
+  경: { domestic: ["부산", "광주", "대구"], overseas: ["태국", "베트남", "두바이"] },
+  신: { domestic: ["대구", "경주", "부산"], overseas: ["사막 지역", "이집트", "모로코"] },
+  임: { domestic: ["강릉", "속초", "동해"], overseas: ["홋카이도", "캐나다 북부", "핀란드"] },
+  계: { domestic: ["강릉", "속초", "양양"], overseas: ["알래스카", "시베리아", "노르웨이"] },
+};
+
 export const ILGAN_TIME_CHARM: Record<string, { time: string; desc: string }> = {
   병: { time: "낮", desc: "병화는 태양 그 자체라, 사람들이 모이는 낮 시간 · 활동적인 자리에서 매력이 가장 강하게 빛나요. 밝은 에너지와 존재감으로 자연스럽게 분위기를 주도하는 인기인이 됩니다." },
   정: { time: "밤", desc: "정화는 은은한 촛불·달빛 같은 기운이라, 조명이 낮아지고 분위기가 차분해지는 밤 시간에 진짜 매력이 드러나요. 낮보다 밤에 만났을 때 훨씬 인상이 깊고 매력적인 인물로 기억됩니다." },

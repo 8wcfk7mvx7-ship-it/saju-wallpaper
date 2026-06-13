@@ -16,7 +16,7 @@ import {
   SIN_STRENGTH_LEVELS, classifySinStrength, getIljuAnimal,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -891,6 +891,21 @@ function ResultView({
               </div>
             ))}
           </div>
+          {ILGAN_PLACES[ilgan] && (
+            <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>인생이 안 풀린다면 — {ilgan}일간에게 맞는 환경</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>🇰🇷 국내</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{ILGAN_PLACES[ilgan].domestic.join(" · ")}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>✈️ 해외</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{ILGAN_PLACES[ilgan].overseas.join(" · ")}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </Section>
       )}
 
