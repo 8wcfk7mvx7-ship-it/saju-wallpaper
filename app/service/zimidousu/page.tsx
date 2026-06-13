@@ -4,37 +4,71 @@ import { useState } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
 import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex } from "@/lib/zimidousu";
+import { calcZiwei, getHourBranchIndex, BRANCHES, type ZiweiResult } from "@/lib/ziwei";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
+
+const STAR_COLOR: Record<string, string> = {
+  자미: "#fbbf24", 천부: "#fbbf24",
+  천기: "#60a5fa", 태음: "#60a5fa", 천량: "#60a5fa",
+  태양: "#f87171", 염정: "#f87171", 칠살: "#f87171",
+  무곡: "#a5b4fc", 천동: "#a5b4fc", 거문: "#a5b4fc",
+  탐랑: "#4ade80", 천상: "#4ade80", 파군: "#4ade80",
+};
+
+// 4x4 그리드 좌표 → 지지 인덱스 매핑 (전통 자미두수 12궁 배치)
+const GRID_BRANCH: (number | null)[][] = [
+  [5, 6, 7, 8],
+  [4, null, null, 9],
+  [3, null, null, 10],
+  [2, 1, 0, 11],
+];
 
 export default function ZimidousuPage() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [result, setResult] = useState<{ myeonggungJj: string; singungJj: string; myeonggungIdx: number; lunarDay: number } | null>(null);
+  const [chart, setChart] = useState<ZiweiResult | null>(null);
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
-    let lunarMonth = m, lunarDay = d;
+    let lunarYear = y, lunarMonth = m, lunarDay = d, isLeap = false;
+    let gapja = { year: "", month: "", day: "" };
     try {
       const KLC = (await import("korean-lunar-calendar")).default;
       const klc = new KLC();
       if (form.calendarType === "lunar") {
-        lunarMonth = m; lunarDay = d;
+        lunarYear = y; lunarMonth = m; lunarDay = d; isLeap = form.isLeapMonth;
+        klc.setLunarDate(y, m, d, isLeap);
       } else {
         klc.setSolarDate(y, m, d);
         const lun = klc.getLunarCalendar();
-        if (lun?.month) { lunarMonth = lun.month; lunarDay = lun.day; }
+        if (lun?.month) { lunarYear = lun.year; lunarMonth = lun.month; lunarDay = lun.day; isLeap = !!lun.intercalation; }
       }
+      gapja = klc.getGapja();
     } catch {}
     const hIdx = hourToJijiIndex(form.birthHour);
     const myeonggungIdx = getMyeonggungIndex(lunarMonth, hIdx);
     const myeonggungJj = getMyeonggungJiji(lunarMonth, form.birthHour);
     const singungJj = getSingungJiji(lunarMonth, form.birthHour);
     setResult({ myeonggungJj, singungJj, myeonggungIdx, lunarDay });
+
+    try {
+      const hourBranchIndex = form.birthHour == null ? 0 : getHourBranchIndex(form.birthHour);
+      const c = calcZiwei({
+        lunarYear, lunarMonth, lunarDay, hourBranchIndex,
+        gender: form.gender,
+        yearGanjaText: gapja.year, monthGanjaText: gapja.month, dayGanjaText: gapja.day,
+      });
+      setChart(c);
+    } catch {
+      setChart(null);
+    }
+
     setStep("loading");
   }
 
@@ -171,6 +205,65 @@ export default function ZimidousuPage() {
             <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">후천적 노력·환경의 방향</p>
           </div>
         </div>
+
+        {/* 전체 명반 — 12궁 + 14주성 배치 */}
+        {chart && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3 mb-5">
+            <p className="text-sm font-bold text-gray-300 mb-1 px-1">자미두수 명반 (命盤)</p>
+            <p className="text-[11px] text-purple-300 mb-3 px-1 font-bold">
+              {chart.yearGanzhi} {chart.monthGanzhi} {chart.dayGanzhi} {chart.hourGanzhi} · {chart.bureauName}
+            </p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {GRID_BRANCH.map((row, ri) =>
+                row.map((branchIdx, ci) => {
+                  if (branchIdx === null) {
+                    if (ri === 1 && ci === 1) {
+                      return (
+                        <div key="center" className="row-span-2 col-span-2 rounded-xl flex flex-col items-center justify-center text-center p-3"
+                          style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                          <p className="text-sm font-black mb-1">{form.name || "나"}</p>
+                          <p className="text-[10px] text-gray-400 mb-2">
+                            {form.gender === "male" ? "남" : "여"} · {chart.bureauName}
+                          </p>
+                          <p className="text-[10px] text-gray-500 leading-relaxed">
+                            {chart.yearGanzhi}<br />{chart.monthGanzhi}<br />{chart.dayGanzhi}<br />{chart.hourGanzhi}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }
+                  const palace = chart.palaces[branchIdx];
+                  return (
+                    <div key={branchIdx} className="rounded-xl p-2 min-h-[100px] flex flex-col"
+                      style={{
+                        background: palace.isLifePalace ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.02)",
+                        border: `1px solid ${palace.isLifePalace ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.06)"}`,
+                      }}>
+                      <div className="flex flex-wrap gap-x-1 mb-1">
+                        {palace.stars.length > 0 ? palace.stars.map(s => (
+                          <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>{s}</span>
+                        )) : <span className="text-[10px] text-gray-700">-</span>}
+                      </div>
+                      <div className="flex-1" />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {palace.isLifePalace && <span className="text-[9px] font-black text-yellow-400 mr-1">命</span>}
+                          {palace.isBodyPalace && <span className="text-[9px] font-black text-fuchsia-400 mr-1">身</span>}
+                          <span className="text-[10px] text-gray-400">{palace.palaceName}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-gray-600">{BRANCHES[branchIdx]}</p>
+                          <p className="text-[8px] text-gray-700">{palace.daeha.from}~{palace.daeha.to}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="bg-gradient-to-br from-purple-950/60 to-fuchsia-950/40 border border-purple-700/30 rounded-3xl p-6 mb-5 text-center">
           <p className="text-purple-300 text-xs font-bold tracking-widest uppercase mb-2">나를 대표하는 주성</p>
