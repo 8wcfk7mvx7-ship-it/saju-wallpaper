@@ -185,6 +185,22 @@ export default function MyPage() {
           </div>
         )}
 
+        {/* 광고 보고 별조각 받기 */}
+        {user && (
+          <button onClick={() => router.push("/ad-reward")}
+            className="w-full mb-5 p-4 rounded-2xl flex items-center justify-between"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">🎬</span>
+              <div className="text-left">
+                <p className="text-sm font-bold text-white">광고 보고 별조각 받기</p>
+                <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>무료로 별조각 충전하기</p>
+              </div>
+            </div>
+            <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
+          </button>
+        )}
+
         {/* 탭 + 콘텐츠 — 로그인 시만 노출 */}
         {!user && (
           <div className="text-center py-12">

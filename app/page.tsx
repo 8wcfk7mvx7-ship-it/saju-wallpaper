@@ -1003,7 +1003,7 @@ export default function MainPage() {
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
             >
               <span>📂</span>
-              <span>보관함</span>
+              <span>마이페이지</span>
             </button>
             {/* 별조각 잔액/충전 — PC only */}
             <button
