@@ -456,7 +456,15 @@ function ErosContent() {
   const 끌림력 = Math.min(100, 40 + (has도화 ? 25 : 0) + (has진도화 ? 25 : 0) + (has역마 ? 10 : 0));
   const 색기력 = Math.min(100, 30 + (has홍염 ? 35 : 0) + (hasMokYok ? 25 : 0) + (haHwa ? 10 : 0));
   const 밀당력 = Math.min(100, 35 + found충.length * 25 + (found천간합.length + found지지합.length) * 15);
+  const 신체매력 = Math.min(100, 45 + (hasMokYok ? 20 : 0) + (haHwa ? 15 : 0) + (has도화 ? 10 : 0) + (has홍염 ? 10 : 0));
   const 요망력 = Math.round((끌림력 + 색기력 + 밀당력) / 3);
+
+  // 오행 조합 매력 코드 (설명 없이 결과 라벨만)
+  const dom = result.dominant;
+  const charmCodes: string[] = [];
+  if (dom.includes("금") && dom.includes("수")) charmCodes.push("금수쌍청 · 차가운 미녀상");
+  if (dom.includes("목") && dom.includes("화")) charmCodes.push("목화통명 · 밝고 따뜻한 인상");
+  if (dom.length === 1 && dom[0] === "수") charmCodes.push("수다자 · 물 같은 분위기");
   const 요망등급 =
     요망력 >= 85 ? "치명적 요망형 — 마주치면 위험" :
     요망력 >= 70 ? "고급 요망형 — 은근하지만 강력" :
@@ -517,6 +525,7 @@ function ErosContent() {
               { label: "끌림력", desc: "가만히 있어도 시선을 끌어당기는 힘", value: 끌림력, color: "#f472b6" },
               { label: "색기력", desc: "분위기·말투에서 흘러나오는 관능적 에너지", value: 색기력, color: "#fb7185" },
               { label: "밀당력", desc: "다가왔다 멀어지며 상대를 더 끌리게 만드는 긴장감", value: 밀당력, color: "#c084fc" },
+              { label: "신체매력", desc: "체형·실루엣에서 드러나는 본능적인 매력", value: 신체매력, color: "#fbbf24" },
             ].map(item => (
               <div key={item.label}>
                 <div className="flex items-center justify-between mb-1">
@@ -530,6 +539,15 @@ function ErosContent() {
               </div>
             ))}
           </div>
+          {charmCodes.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {charmCodes.map(c => (
+                <span key={c} className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-pink-500/15 text-pink-300 border border-pink-500/25">
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ② 나의 외모 */}
