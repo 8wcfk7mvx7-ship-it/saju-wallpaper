@@ -86,6 +86,20 @@ export default function ChargePage() {
           <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>별조각</p>
         </div>
 
+        {/* 광고 보고 별조각 받기 */}
+        <button onClick={() => router.push("/ad-reward")}
+          className="w-full rounded-2xl p-4 mb-6 flex items-center justify-between"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎬</span>
+            <div className="text-left">
+              <p className="text-sm font-bold text-white">광고 보고 별조각 받기</p>
+              <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>무료로 별조각 충전하기</p>
+            </div>
+          </div>
+          <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
+        </button>
+
         {/* 관리자 전용 치트 충전 */}
         {isAdmin && (
           <button onClick={handleCheatCharge}
