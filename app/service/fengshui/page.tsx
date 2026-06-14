@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import ShareImageButton from "@/components/ShareImageButton";
 
 type CategoryFilter = "전체" | "침실" | "재물" | "배치";
 
@@ -109,7 +110,7 @@ export default function FengshuiPage() {
         />
       </div>
 
-      <div className="relative max-w-2xl mx-auto px-4 py-12">
+      <div className="relative max-w-2xl mx-auto px-4 py-12" id="fengshui-result">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold mb-4"
@@ -257,6 +258,7 @@ export default function FengshuiPage() {
         >
           풍수지리는 동양의 전통 지혜입니다. 참고용으로 활용하세요.
         </p>
+        <ShareImageButton targetId="fengshui-result" fileName="풍수" />
       </div>
     </main>
   );

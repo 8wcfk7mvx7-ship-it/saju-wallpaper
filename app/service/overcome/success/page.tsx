@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -147,7 +148,7 @@ function SuccessContent() {
         <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[160px]" style={{ background:"rgba(239,68,68,0.08)" }} />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-20">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-20" id="overcome-result">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
           <span className="text-xs text-green-400/70 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">✓ 결제 완료</span>

@@ -9,6 +9,7 @@ import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
+import ShareImageButton from "@/components/ShareImageButton";
 
 const CY_MB = new Date().getFullYear();
 const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
@@ -379,7 +380,7 @@ export default function MbtiPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-950/40 blur-[140px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="mbti-result">
         <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
         <div className="text-center mb-8">
@@ -699,6 +700,7 @@ export default function MbtiPage() {
             <div className="text-center pt-2">
               <p className="text-xs text-gray-700">본 분석은 사주·MBTI 이론 기반 오락용 콘텐츠입니다. summerpalace.ai.kr</p>
             </div>
+            <ShareImageButton targetId="mbti-result" fileName="사주MBTI" />
           </div>
         )}
       </div>

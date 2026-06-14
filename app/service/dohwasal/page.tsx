@@ -5,6 +5,7 @@ import BackButton from "@/components/BackButton";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -299,7 +300,7 @@ export default function DohwasalPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-rose-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="dohwasal-result">
         <FadeIn delay={0}>
           <div className="text-center mb-8">
             <p className="text-rose-400 text-xs font-bold tracking-widest mb-2">PEACH BLOSSOM</p>
@@ -446,6 +447,7 @@ export default function DohwasalPage() {
             </button>
           </div>
         </FadeIn>
+        <ShareImageButton targetId="dohwasal-result" fileName="도화살" />
       </div>
     </main>
   );

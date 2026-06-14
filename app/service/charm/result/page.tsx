@@ -15,6 +15,7 @@ import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import StarShower from "@/components/StarShower";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -201,7 +202,7 @@ function CharmResultContent() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-32">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-32" id="charm-result">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => router.push("/service/charm")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 분석</button>
@@ -529,6 +530,7 @@ function CharmResultContent() {
         <button onClick={() => router.push("/service/charm")} className="w-full mt-4 py-3 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition">
           다시 분석하기
         </button>
+        <ShareImageButton targetId="charm-result" fileName="매력포인트" />
       </div>
 
       {/* 플로팅 결제 CTA */}

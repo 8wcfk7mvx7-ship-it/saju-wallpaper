@@ -9,6 +9,7 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -598,7 +599,7 @@ export default function GunghapPage(){
             </div>
           </div>
 
-          <div style={{maxWidth:520,margin:'0 auto',padding:'18px 16px 80px'}}>
+          <div style={{maxWidth:520,margin:'0 auto',padding:'18px 16px 80px'}} id={step==='result'?'gunghap-result':undefined}>
             {step==='form'?(
               <>
                 <div style={{textAlign:'center',marginBottom:22}}>
@@ -1042,6 +1043,7 @@ export default function GunghapPage(){
               border:'1px solid rgba(255,255,255,0.08)',background:'transparent',color:'rgba(255,255,255,0.35)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
               다시 하기
             </button>
+            <ShareImageButton targetId="gunghap-result" fileName="궁합" />
               </>
             ))}
           </div>

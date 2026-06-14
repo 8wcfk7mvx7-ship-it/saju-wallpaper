@@ -31,6 +31,7 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -483,7 +484,7 @@ function ErosContent() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="eros-result">
 
 
         {/* 헤더 */}
@@ -761,6 +762,7 @@ function ErosContent() {
           className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>
+        <ShareImageButton targetId="eros-result" fileName="매력살" />
       </div>
     </main>
   );

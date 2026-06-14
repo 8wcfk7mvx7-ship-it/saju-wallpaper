@@ -6,6 +6,7 @@ import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -154,7 +155,7 @@ export default function IdealTypePage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-fuchsia-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="ideal-type-result">
         <div className="text-center mb-8">
           <p className="text-fuchsia-400 text-xs font-bold tracking-widest mb-2">THEIR TRUE IDEAL TYPE</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -201,6 +202,7 @@ export default function IdealTypePage() {
             다시 분석하기
           </button>
         </div>
+        <ShareImageButton targetId="ideal-type-result" fileName="이상형" />
       </div>
     </main>
   );

@@ -7,6 +7,7 @@ import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePick
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
+import ShareImageButton from "@/components/ShareImageButton";
 
 // ─── 드롭다운 피커 ───────────────────────────────────────────────────────────
 function DropdownPicker({
@@ -537,7 +538,7 @@ export default function StockPage() {
         <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-emerald-900/20 blur-[140px]" />
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="stock-result">
         {/* 상단 네비 */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>
@@ -800,6 +801,7 @@ export default function StockPage() {
           <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 오행 이론 기반 순수 오락용 콘텐츠입니다. 실제 투자에 활용하지 마세요.</p>
         </div>
         <button onClick={() => setStep("form")} className="w-full mt-6 py-3 rounded-xl border border-white/10 text-gray-500 hover:text-gray-300 text-sm transition">다시 분석하기</button>
+        <ShareImageButton targetId="stock-result" fileName="주식운" />
       </div>
     </main>
   );

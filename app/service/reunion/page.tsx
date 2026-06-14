@@ -5,6 +5,7 @@ import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -288,7 +289,7 @@ export default function ReunionPage() {
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
         <BackButton />
         <StarShower active={showering} />
-        <div className="w-full max-w-sm mx-auto space-y-5">
+        <div className="w-full max-w-sm mx-auto space-y-5" id="reunion-result">
 
           {/* 스코어 카드 */}
           <div className="rounded-2xl p-6 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -394,6 +395,7 @@ export default function ReunionPage() {
               </button>
             </>
           )}
+          <ShareImageButton targetId="reunion-result" fileName="재회운" />
         </div>
       </main>
     );

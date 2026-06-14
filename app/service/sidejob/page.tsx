@@ -6,6 +6,7 @@ import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/s
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -207,7 +208,7 @@ export default function SidejobPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-emerald-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="sidejob-result">
         <div className="text-center mb-8">
           <p className="text-emerald-400 text-xs font-bold tracking-widest mb-2">SIDE HUSTLE POTENTIAL</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -270,6 +271,7 @@ export default function SidejobPage() {
             다시 분석하기
           </button>
         </div>
+        <ShareImageButton targetId="sidejob-result" fileName="투잡운" />
       </div>
     </main>
   );

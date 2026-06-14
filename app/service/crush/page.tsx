@@ -112,6 +112,7 @@ const CRUSH_SUCCESS: Record<string, {
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 export const dynamic = "force-dynamic";
 
 type Step = "splash" | "input" | "loading" | "result";
@@ -438,7 +439,7 @@ export default function CrushPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <BackButton />
-      <div className="max-w-lg mx-auto px-4 pt-8">
+      <div className="max-w-lg mx-auto px-4 pt-8" id="crush-result">
 
         {/* 헤더 */}
         <div className="text-center mb-8">
@@ -649,6 +650,7 @@ export default function CrushPage() {
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
           다시 분석하기
         </button>
+        <ShareImageButton targetId="crush-result" fileName="짝사랑" />
       </div>
     </main>
   );
