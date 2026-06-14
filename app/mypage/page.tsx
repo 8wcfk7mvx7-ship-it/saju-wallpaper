@@ -49,9 +49,18 @@ export default function MyPage() {
   const [addName, setAddName] = useState("");
 
   useEffect(() => {
-    setUser(parseUser());
-    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
-    setBlueberries(isNaN(bb) ? 0 : bb);
+    const u = parseUser();
+    setUser(u);
+    if (u) {
+      let bb = parseInt(localStorage.getItem("sp_blueberries") ?? "", 10);
+      if (isNaN(bb)) {
+        bb = 864000;
+        localStorage.setItem("sp_blueberries", String(bb));
+      }
+      setBlueberries(bb);
+    } else {
+      setBlueberries(0);
+    }
     try {
       const raw = localStorage.getItem(SAJU_STORAGE_KEY);
       if (raw) setSavedSajus(JSON.parse(raw));
@@ -164,8 +173,8 @@ export default function MyPage() {
           </div>
         )}
 
-        {/* 별조각 잔액 카드 — 로그인 시만 노출 */}
-        {user && (
+        {/* 별조각 잔액 카드 */}
+        {(
           <div className="mb-5 p-4 rounded-2xl flex items-center justify-between"
             style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
             <div className="flex items-center gap-2.5">
@@ -186,7 +195,7 @@ export default function MyPage() {
         )}
 
         {/* 광고 보고 별조각 받기 */}
-        {user && (
+        {(
           <button onClick={() => router.push("/ad-reward")}
             className="w-full mb-5 p-4 rounded-2xl flex items-center justify-between"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -201,17 +210,6 @@ export default function MyPage() {
           </button>
         )}
 
-        {/* 탭 + 콘텐츠 — 로그인 시만 노출 */}
-        {!user && (
-          <div className="text-center py-12">
-            <p className="text-3xl mb-3">🔒</p>
-            <p className="text-sm font-bold text-white mb-1">로그인이 필요해요</p>
-            <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.4)" }}>저장된 사주와 결제 내역은 로그인 후 확인할 수 있어요</p>
-          </div>
-        )}
-
-        {/* 탭 + 콘텐츠 — 로그인 시만 */}
-        {user && <>
         <div className="flex gap-2 mb-5">
           {([
             { key: "saju", label: "저장된 생년월일" },
@@ -353,7 +351,6 @@ export default function MyPage() {
             )}
           </div>
         )}
-        </>}
       </div>
 
       {/* 새 생년월일 입력 모달 */}

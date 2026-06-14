@@ -31,9 +31,18 @@ export default function SiteHeader() {
   }
 
   useEffect(() => {
-    setUser(parseUser());
-    const s = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
-    setStars(isNaN(s) ? 0 : s);
+    const u = parseUser();
+    setUser(u);
+    if (u) {
+      let s = parseInt(localStorage.getItem("sp_blueberries") ?? "", 10);
+      if (isNaN(s)) {
+        s = 864000;
+        localStorage.setItem("sp_blueberries", String(s));
+      }
+      setStars(s);
+    } else {
+      setStars(0);
+    }
   }, [pathname]);
 
   if (SUPPRESS_PATHS.includes(pathname)) return null;

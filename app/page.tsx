@@ -900,8 +900,17 @@ export default function MainPage() {
   useEffect(() => {
     const savedLang = localStorage.getItem("sp_lang") as Lang | null;
     if (savedLang && savedLang in LANGS) setLang(savedLang);
-    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
-    setBlueberries(isNaN(bb) ? 0 : bb);
+    const hasUser = document.cookie.split(";").some(c => c.trim().startsWith("sp_user="));
+    if (hasUser) {
+      let bb = parseInt(localStorage.getItem("sp_blueberries") ?? "", 10);
+      if (isNaN(bb)) {
+        bb = 864000;
+        localStorage.setItem("sp_blueberries", String(bb));
+      }
+      setBlueberries(bb);
+    } else {
+      setBlueberries(0);
+    }
   }, []);
 
   useEffect(() => {
