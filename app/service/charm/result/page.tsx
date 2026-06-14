@@ -70,6 +70,13 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
     const gwanseong = ilgan === "경" ? "병" : "정";
     const susangTugan = pillars.some(p => p.cg === susang);
     const gwanseongTugan = pillars.some(p => p.cg === gwanseong);
+    // 경술처럼 조토(술)가 일주 등에 끼어 있으면 '순도 100% 금수쌍청'보다
+    // '토를 바탕으로 한 금수상생'으로 보는 경우가 많다.
+    if (hasRoot && hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
+      patterns.push({ name:"토를 바탕으로 한 금수상생", hanja:"土金水相生", color:"#cbd5e1",
+        desc:"금(金)과 수(水)가 맞닿아 있지만, 조토(燥土)가 한 축에 자리해 순도 100% 금수쌍청이라기보다 토(土)가 금(金)을 생해주며 그 위에서 금수의 맑은 기운이 흐르는 구조입니다. 차가운 명석함에 묵직한 안정감이 더해진 인상입니다.",
+        charmDesc:"날카로운 두뇌와 카리스마는 그대로 가지면서도, 한 박자 더 든든하고 안정된 무게감이 느껴지는 타입. 이성은 '예리한데 믿음직스럽다'는 인상을 받습니다." });
+    }
     if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
       const hasGwanseong = gwanseongTugan && hwaYugi;
       patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
