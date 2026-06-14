@@ -74,7 +74,6 @@ const UI: Record<Lang, {
 
 const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
   { key: "전체",    icon: "☯",  desc: "전체 서비스" },
-  { key: "무료",    icon: "",   desc: "무료 서비스" },
   { key: "연애·궁합", icon: "💑", desc: "연애·궁합" },
   { key: "금전·투자", icon: "💰", desc: "직업·금전" },
   { key: "운명·대운", icon: "⏳", desc: "운세·대운" },
@@ -502,7 +501,7 @@ const SERVICES: {
     href: "/service/reunion", badge: "",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "연애·궁합"],
+    categories: ["전체", "연애·궁합", "Special"],
   },
   {
     id: "spy", emoji: "🕵️",
@@ -656,7 +655,7 @@ const SERVICES: {
     href: "/service/hotcompat", badge: "",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "연애·궁합", "매력"],
+    categories: ["전체", "연애·궁합", "매력", "Special"],
   },
   {
     id: "charm", emoji: "✨",
@@ -667,7 +666,7 @@ const SERVICES: {
     href: "/service/charm", badge: "",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "연애·궁합", "매력"],
+    categories: ["전체", "연애·궁합", "매력", "Special"],
   },
   {
     id: "mbti", emoji: "🧬",
