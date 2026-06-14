@@ -5,6 +5,7 @@ import BackButton from "@/components/BackButton";
 import { analyzeSaju, analyzeSipseongPatterns, isGanyeoJidong, GANYEO_JIDONG_LOVE, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,18 @@ const HOBBY_BANK = [
   "주말 취미 모임·동호회 — 비슷한 라이프스타일을 가진 새로운 인간관계 넓히기",
   "사이드 프로젝트·소규모 창업 — 퇴근 후 시간을 전부 나의 일에 쏟기",
   "1인 가구 맞춤 인테리어·요리 — 누구의 취향도 고려하지 않고 온전히 나를 위한 공간 만들기",
+  "악기·댄스·미술 같은 표현 취미 — 누구의 평가도 신경 쓰지 않고 온전히 나를 위한 시간 만들기",
+  "캠핑·등산·서핑 등 아웃도어 액티비티 — 일정과 강도를 전부 내 마음대로 정하는 자유 누리기",
+  "필라테스·요가·헬스 등 자기 몸 관리 — 체력과 동시에 자존감을 키우는 루틴 만들기",
+  "와인·커피·맥주 등 미식 클래스 — 디테일한 취향을 깊게 파고들며 나만의 감각 키우기",
+  "독서모임·글쓰기 모임 — 생각을 나누는 사람들과의 느슨하지만 단단한 관계 만들기",
+  "주식·코인·재테크 스터디 — 가정에 묶이지 않은 자산을 온전히 내 방식대로 굴려보기",
+  "사진·영상 촬영 취미 — 혼자만의 시간과 풍경을 기록하며 나만의 아카이브 쌓기",
+  "원데이클래스 투어(도자기·가죽공예·플라워 등) — 새로운 사람·취향을 가볍게 경험해보기",
+  "봉사활동·재능기부 — 가족이 아닌 더 넓은 관계 안에서 의미와 소속감 채우기",
+  "주말 단기 여행·캠핑카 여행 — 매번 다른 풍경으로 일상에 변주를 주는 습관 만들기",
+  "온라인 강의로 새로운 분야 공부하기 — 커리어든 취미든 제약 없이 영역을 넓혀가기",
+  "홈카페·홈바 꾸미기 — 퇴근 후 혼자만의 의식 같은 시간을 만들어 일상의 만족도 높이기",
 ];
 
 export default function SoloPage() {
@@ -229,9 +242,35 @@ export default function SoloPage() {
   const givingRankIdx = GIVING_RANK.indexOf(ilgan);
   const givingRank = givingRankIdx >= 0 ? givingRankIdx + 1 : 10;
 
-  // 취미 추천 — 비견/겁재, 식상 강도에 따라 2개 선택
-  const hobbyIdx = (bigeopCount + sikSangCount) % HOBBY_BANK.length;
-  const recommendedHobbies = [HOBBY_BANK[hobbyIdx], HOBBY_BANK[(hobbyIdx + 3) % HOBBY_BANK.length]];
+  // 결혼 적합도 점수별 설명 — 0.5점 단위로 전부 다른 문구
+  const SCORE_DESC: Record<string, string> = {
+    "1": "비혼 쪽으로 거의 완전히 무게가 실리는 구조입니다. 결혼이라는 제도 자체가 주는 안정감보다, 스스로 만든 자유로운 삶의 방식에서 훨씬 큰 만족과 성취를 느끼는 타입입니다. 결혼을 '해야 한다'는 압박에서 벗어날수록 오히려 인생이 더 잘 풀리는 구조예요.",
+    "1.5": "비혼이 압도적으로 잘 맞는 구조입니다. 누군가와 일상을 맞춰가는 것보다, 내 시간과 공간을 내 마음대로 쓸 수 있을 때 에너지가 훨씬 높아지는 기질이에요. 결혼은 선택 사항일 뿐, 인생의 필수 과제가 아닙니다.",
+    "2": "비혼에 매우 잘 맞는 구조입니다. 혼자 있을 때 오히려 집중력과 추진력이 살아나는 타입이라, 결혼 후 함께하는 시간이 늘어날수록 본래의 강점이 흐려질 가능성이 있습니다. 자율성이 행복의 핵심 변수예요.",
+    "2.5": "비혼 쪽으로 확실히 기울어진 구조입니다. 관계 자체를 거부하는 것이 아니라, '함께 살아야 한다'는 형식보다 '자주 만나지만 각자의 공간은 분리된' 관계가 훨씬 잘 맞는 기질입니다.",
+    "3": "비혼이 더 어울리는 구조이지만, 그렇다고 결혼이 불행을 가져온다는 뜻은 아닙니다. 다만 본인의 속도와 방식을 충분히 존중해주는 관계가 아니라면, 결혼 후 답답함을 느끼기 쉬운 타입이에요.",
+    "3.5": "비혼이 살짝 더 잘 맞는 구조입니다. 누군가와 함께하는 삶도 충분히 가능하지만, 본인만의 루틴과 영역을 확실히 지킬 수 있어야 만족도가 유지되는 타입이에요.",
+    "4": "비혼과 결혼 사이에서 비혼 쪽으로 약간 무게가 실리는 구조입니다. 결혼 자체에 큰 거부감은 없지만, '혼자서도 충분히 잘 산다'는 확신이 강해서 굳이 서두를 필요를 못 느끼는 편이에요.",
+    "4.5": "균형에 아주 가까운 구조이며, 미세하게 비혼 쪽으로 기울어 있습니다. 결혼과 비혼 둘 다 무리 없이 잘 적응할 수 있는 타입이지만, 현재의 자유로운 생활 방식에 이미 만족도가 높을 가능성이 큽니다.",
+    "5": "결혼과 비혼, 어느 쪽으로도 크게 기울지 않는 완전한 균형형입니다. 사주 구조 자체는 둘 다 무난하게 받아들이는 타입이라, 결국 선택은 사주가 아니라 '지금 어떤 삶을 더 원하는가'에 달려 있습니다.",
+    "5.5": "균형에 아주 가까운 구조이며, 미세하게 결혼 쪽으로 기울어 있습니다. 누군가와 함께할 때 정서적으로 더 채워지는 부분이 있지만, 비혼으로 살아도 크게 부족함을 느끼기는 어려운 편이에요.",
+    "6": "결혼 쪽으로 약간 무게가 실리는 구조입니다. 혼자서도 잘 지낼 수 있지만, 곁에 신뢰할 수 있는 사람이 있을 때 삶의 안정감과 동기부여가 한층 올라가는 타입입니다.",
+    "6.5": "결혼이 살짝 더 잘 맞는 구조입니다. 본인의 에너지를 나눌 누군가가 있을 때, 오히려 일과 삶의 균형이 더 잘 맞춰지는 경향이 있어요. 다만 상대와의 합이 점수 차이보다 훨씬 중요한 변수입니다.",
+    "7": "결혼 쪽으로 무게가 실리는 구조입니다. 혼자보다는 함께일 때 더 안정적인 리듬을 찾는 타입이라, 좋은 관계 안에서 정서적 기반이 잡히면 다른 영역(일·재물 등)에서도 시너지가 나기 쉽습니다.",
+    "7.5": "결혼이 꽤 잘 맞는 구조입니다. 누군가와 일상을 공유하고 함께 계획을 세워가는 과정에서 안정감과 성취감을 동시에 느끼는 타입이에요. 다만 '어떤 사람과'가 행복도를 가장 크게 좌우합니다.",
+    "8": "결혼 쪽으로 확실히 기울어진 구조입니다. 관계 안에서 자신의 역할과 책임을 자연스럽게 받아들이는 타입이며, 혼자보다 함께일 때 더 큰 동력을 얻는 경향이 뚜렷합니다.",
+    "8.5": "결혼이 매우 잘 맞는 구조입니다. 가정이라는 틀 안에서 정서적 안정과 삶의 방향성을 동시에 얻는 타입으로, 비혼으로 오래 지낼 경우 오히려 허전함을 느끼기 쉬운 편이에요.",
+    "9": "결혼 쪽으로 거의 완전히 무게가 실리는 구조입니다. 누군가와 함께 가정을 이루고 책임을 나누는 환경에서 본래의 강점(안정감·지속력)이 가장 잘 발현되는 타입이에요. 다만 결혼이 '필수'라는 뜻이 아니라, 잘 맞는 사람을 만났을 때 만족도가 특히 높다는 의미입니다.",
+  };
+  const scoreDesc = SCORE_DESC[String(marriageScore)] ?? SCORE_DESC["5"];
+
+  // 취미 추천 — 사주 구조에서 뽑은 시드값을 기준으로 서로 겹치지 않게 5개 선택
+  const hobbySeed = bigeopCount * 7 + sikSangCount * 5 + spouseCount * 3 + moveCount * 11 + (ilgan.length ? ilgan.charCodeAt(0) : 0);
+  const recommendedHobbies: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const idx = (hobbySeed + i * 4) % HOBBY_BANK.length;
+    if (!recommendedHobbies.includes(HOBBY_BANK[idx])) recommendedHobbies.push(HOBBY_BANK[idx]);
+  }
 
   return (
     <main className="min-h-screen bg-[#0a0612] text-white">
@@ -239,7 +278,7 @@ export default function SoloPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-indigo-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="solo-result">
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MARRIAGE OR SOLO</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -260,11 +299,7 @@ export default function SoloPage() {
               style={{ width: `${(soloScore / 10) * 100}%`, background: "linear-gradient(90deg, #6366f1, #818cf8)" }} />
           </div>
           <p className="text-sm text-gray-300 leading-relaxed mt-4">
-            {marriageScore > soloScore
-              ? "결혼 쪽으로 무게가 더 실리는 구조입니다. 다만 점수 차이가 크지 않다면, 결혼 자체보다 '어떤 사람과' 결혼하느냐가 행복도를 좌우하는 핵심 변수가 됩니다."
-              : marriageScore < soloScore
-              ? "비혼 쪽으로 무게가 더 실리는 구조입니다. 이는 결혼을 못 한다는 뜻이 아니라, 혼자만의 시간과 자율성이 확보될 때 삶의 만족도가 훨씬 크게 올라가는 기질이라는 뜻입니다."
-              : "결혼과 비혼, 어느 쪽으로도 크게 기울지 않는 균형형입니다. 결국 선택은 사주가 아니라 '지금 어떤 삶을 더 원하는가'에 달려 있는 구조입니다."}
+            {scoreDesc}
           </p>
         </div>
 
@@ -383,6 +418,7 @@ export default function SoloPage() {
             다시 분석하기
           </button>
         </div>
+        <ShareImageButton targetId="solo-result" fileName="결혼_비혼_적합도" />
       </div>
     </main>
   );

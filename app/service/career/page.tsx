@@ -197,7 +197,15 @@ export default function CareerPage() {
   const yongshinGroup = SIPSEONG_GROUP[yongshinSipseong] ?? "재성";
   const careerInfo = GROUP_CAREER[yongshinGroup];
 
-  const topSipseong = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
+  // "사주에서 가장 강한 기운"은 만세력 기준대로 천간뿐 아니라 지지(본기)의 십성까지 모두 합산해 판단한다.
+  const topCounts: Record<string, number> = {};
+  [
+    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
+    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
+    r.pillarsDetail.day.sipseongJj,
+    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+  ].filter(Boolean).forEach(s => { topCounts[s as string] = (topCounts[s as string] || 0) + 1; });
+  const topSipseong = Object.entries(topCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topDesc = topSipseong ? SIPSEONG_DESC[topSipseong] : null;
 
   const patterns = analyzeSipseongPatterns(r.pillarsDetail).filter(p => CAREER_RELEVANT_PATTERNS.some(k => p.name.includes(k) || p.hanja?.includes(k)));
