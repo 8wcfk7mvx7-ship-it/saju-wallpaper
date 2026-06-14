@@ -666,7 +666,7 @@ const SERVICES: {
     href: "/service/charm", badge: "",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "연애·궁합", "매력", "Special"],
+    categories: ["전체", "매력", "Special"],
   },
   {
     id: "mbti", emoji: "🧬",
@@ -677,7 +677,7 @@ const SERVICES: {
     href: "/service/mbti", badge: "완전 무료",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
-    categories: ["전체", "무료", "연애·궁합", "라이프"],
+    categories: ["전체", "무료", "라이프"],
   },
   {
     id: "stock", emoji: "📈",
