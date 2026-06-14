@@ -91,11 +91,11 @@ export default function IljinCalendar() {
 
       {/* 이번 달 월주 정보 */}
       <div className="mb-4 px-3 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.55)" }}>
+        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.8)" }}>
           {year}년 {month}월 1일 기준 월주: <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{firstDayMonthPillar.cg}{firstDayMonthPillar.jj}월</span>
         </p>
         {monthChange && (
-          <p className="text-[12px] mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <p className="text-[12px] mt-1" style={{ color: "rgba(255,255,255,0.65)" }}>
             → {monthChange.day}일부터 <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{monthChange.cg}{monthChange.jj}월</span>로 바뀝니다 (절입)
           </p>
         )}
