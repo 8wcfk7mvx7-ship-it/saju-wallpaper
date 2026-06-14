@@ -145,6 +145,12 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
       desc:"금(金)과 목(木)이 상극하는 긴장감 넘치는 사주. 강렬하고 도발적인 카리스마가 흘러나옵니다.",
       charmDesc:"'무서운데 눈을 못 뗀다'는 반응을 자주 듣는 타입. 강한 자기 주관이 이성의 호기심을 폭발시킵니다." });
   }
+  // 화련주옥: 병·정 일간 + 금 기운 강함 → 화가 금을 적절히 단련해 보석처럼 빛나게 하는 격
+  if (["병","정"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
+    patterns.push({ name:"화련주옥", hanja:"火煉珠玉", color:"#fde68a",
+      desc:"화(火)가 금(金)을 적절히 달구어 보석처럼 다듬어내는 사주. 뜨거운 열정이 날카로운 재능과 만나, 거칠던 원석이 세련된 빛을 내는 구조입니다.",
+      charmDesc:"열정적인데 디테일까지 챙기는 타입. 이성은 '에너지도 넘치는데 일도 잘하고 멋도 안다'는 인상을 받습니다." });
+  }
   // 수화기제: 임·계 일간 + 화 기운 강함 → 지혜+열정의 균형
   if (["임","계"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
     patterns.push({ name:"수화기제", hanja:"水火旣濟", color:"#c084fc",
