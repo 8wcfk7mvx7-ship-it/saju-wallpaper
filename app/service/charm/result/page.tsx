@@ -77,6 +77,17 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
         desc:"금(金)과 수(水)가 맞닿아 있지만, 조토(燥土)가 한 축에 자리해 순도 100% 금수쌍청이라기보다 토(土)가 금(金)을 생해주며 그 위에서 금수의 맑은 기운이 흐르는 구조입니다. 차가운 명석함에 묵직한 안정감이 더해진 인상입니다.",
         charmDesc:"날카로운 두뇌와 카리스마는 그대로 가지면서도, 한 박자 더 든든하고 안정된 무게감이 느껴지는 타입. 이성은 '예리한데 믿음직스럽다'는 인상을 받습니다." });
     }
+    // 금백수청(金白水淸): 경·신 일간이 신유술월(가을)에 태어나 임·계수를 보고,
+    // 금과 수가 어느 한쪽으로 치우치지 않고 상정(相停)을 이루는 격.
+    // (겨울철 해자월은 병·정화 통근이 더해져야 하므로 위의 금수쌍청 계열로 본다)
+    const isFallMonth = ["신","유","술"].includes(pd.month.jj);
+    const susangTuganAny = pillars.some(p => p.cg === "임" || p.cg === "계");
+    const geumGiBalanced = sc.금 >= 1.5 && sc.수 >= 1.5;
+    if (hasRoot && isFallMonth && susangTuganAny && geumGiBalanced) {
+      patterns.push({ name:"금백수청", hanja:"金白水淸", color:"#bae6fd",
+        desc:"가을에 태어난 금(金)이 임·계수를 만나 금과 수가 한쪽으로 치우치지 않고 맑게 어우러진 격. 형충의 흔들림 없이 금수가 상정(相停)을 이루면 결백하고 청렴한 인상과 더불어 맑은 총기가 돋보입니다.",
+        charmDesc:"가을 햇살처럼 깔끔하고 정제된 인상. 말과 행동에 잡음이 없고 담백해서, 이성에게 '깨끗하고 신뢰할 수 있는 사람'이라는 첫인상을 강하게 남깁니다." });
+    }
     if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
       const hasGwanseong = gwanseongTugan && hwaYugi;
       patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
