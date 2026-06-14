@@ -16,6 +16,7 @@ import {
   YANG_YIN_TENDENCY, OHAENG_CORE_WORRY, CHEONGAN_ELEMENT, JIJI_BONGI,
   JIJANGAN_DISPLAY,
   getIljuAnimal,
+  detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE } from "@/lib/saju2";
@@ -815,6 +816,27 @@ function ResultView({
                 <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>주의사항</p>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{singangTrait.caution}</p>
               </div>
+            </div>
+          </Section>
+        );
+      })()}
+
+      {/* ②-1 특수 격국 / 병존 */}
+      {(() => {
+        const gagukPatterns = detectGagukPatterns(result);
+        if (gagukPatterns.length === 0) return null;
+        return (
+          <Section title={`특수 격국 · 병존(竝存)`} accent="#f59e0b">
+            <div className="space-y-2.5">
+              {gagukPatterns.map(p => (
+                <div key={p.name} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-sm" style={{ color: p.color }}>{p.name}</span>
+                    <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{p.hanja}</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{p.desc}</p>
+                </div>
+              ))}
             </div>
           </Section>
         );

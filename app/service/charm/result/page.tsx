@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import type { SajuResult } from "@/lib/saju";
-import { getJijiRelations } from "@/lib/saju";
+import { detectGagukPatterns } from "@/lib/saju";
 import {
   ILGAN_CHARM_DB,
   SAL_CHARM_DB,
@@ -42,124 +42,6 @@ const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
   금: { look: "날카롭고 정제된 이목구비. 샤프하고 세련된 도시 느낌. 뼈대가 있고 각진 분위기.", celebs: "이정재, 손현주 / 전지현, 수지, 김태희, 민효린" },
   수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
 };
-
-// ── 格局 패턴 감지 ───────────────────────────────────────────────────────────
-interface GagukPattern {
-  name: string; hanja: string; color: string;
-  desc: string; charmDesc: string;
-}
-function detectGagukPatterns(result: SajuResult): GagukPattern[] {
-  const ilgan = result.pillarsDetail.day.cg;
-  const sc = result.scores;
-  const dom = result.dominant;
-  const lacking = result.lacking;
-  const patterns: GagukPattern[] = [];
-
-  // 금수쌍청: 경·신 일간이 녹왕지에 뿌리를 두고(건록·제왕), 조토(미·술)의 방해가 없으며,
-  // 해자월에 태어나 천간에 식상수(경금→임수, 신금→계수)가 투출하고,
-  // 한랭한 금수를 조후하는 관성 화기(경금→병화, 신금→정화)가 투출하면서 유기(有氣)한 경우에만 인정한다.
-  if (["경","신"].includes(ilgan)) {
-    const pd = result.pillarsDetail;
-    const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
-    const hasRoot = pillars.some(p => p.uunseong === "건록" || p.uunseong === "제왕");
-    const hasJoto = pillars.some(p => p.jj === "미" || p.jj === "술");
-    const isHaejaMonth = ["해","자"].includes(pd.month.jj);
-    const isStrongSu = dom.includes("수") || sc.수 >= 2;
-    const hwaYugi = dom.includes("화") || sc.화 >= 1;
-    // 경금 일간 → 임수 투출 + 병화 정관 투출 / 신금 일간 → 계수 투출 + 정화 정관 투출
-    const susang = ilgan === "경" ? "임" : "계";
-    const gwanseong = ilgan === "경" ? "병" : "정";
-    const susangTugan = pillars.some(p => p.cg === susang);
-    const gwanseongTugan = pillars.some(p => p.cg === gwanseong);
-    // 경술처럼 조토(술)가 일주 등에 끼어 있으면 '순도 100% 금수쌍청'보다
-    // '토를 바탕으로 한 금수상생'으로 보는 경우가 많다.
-    if (hasRoot && hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
-      patterns.push({ name:"토를 바탕으로 한 금수상생", hanja:"土金水相生", color:"#cbd5e1",
-        desc:"금(金)과 수(水)가 맞닿아 있지만, 조토(燥土)가 한 축에 자리해 순도 100% 금수쌍청이라기보다 토(土)가 금(金)을 생해주며 그 위에서 금수의 맑은 기운이 흐르는 구조입니다. 차가운 명석함에 묵직한 안정감이 더해진 인상입니다.",
-        charmDesc:"날카로운 두뇌와 카리스마는 그대로 가지면서도, 한 박자 더 든든하고 안정된 무게감이 느껴지는 타입. 이성은 '예리한데 믿음직스럽다'는 인상을 받습니다." });
-    }
-    // 금백수청(金白水淸) — 삼명통회 기준
-    // ① 경신(庚申)·신유(辛酉) 일주 (건록 일주)
-    // ② 가을철(신유술월) 출생
-    // ③ 시상에 임·계수가 있고, 지지에 해·자수의 무리가 있을 것
-    // ④ 형충파해가 없을 것
-    // ⑤ 금수가 상정(相停)하고, 화·토가 훼방하지 않을 것 (여름철 출생은 해당 안 됨)
-    const isIljuGeonrok = (ilgan === "경" && pd.day.jj === "신") || (ilgan === "신" && pd.day.jj === "유");
-    const isFallMonth = ["신","유","술"].includes(pd.month.jj);
-    const isWinterMonth = ["해","자","축"].includes(pd.month.jj);
-    const isSummerMonth = ["사","오","미"].includes(pd.month.jj);
-    const susangSisang = pd.hour && (pd.hour.cg === "임" || pd.hour.cg === "계");
-    const allJj = pillars.map(p => p.jj);
-    const haejaGroup = allJj.includes("해") || allJj.includes("자");
-    const noHyungChungPaHae = getJijiRelations(allJj).every(r => !["충","형","파","해"].includes(r.type));
-    const geumSuSangjeong = sc.금 >= 1.5 && sc.수 >= 1.5 && sc.화 < 1.5 && sc.토 < 1.5;
-    // 경진·경자·계사·계유·계축 일주가 가을·겨울에 태어나 화상관·토의 극제 없이
-    // 금수상정을 이루면 같은 격으로 인정한다 (봄철은 운행이 서북금수로 흘러야 하므로 제외)
-    const altIljuList = ["경진","경자","계사","계유","계축"];
-    const isAltIlju = altIljuList.includes(`${ilgan}${pd.day.jj}`);
-    const isGeumbaeksuByMain = isIljuGeonrok && isFallMonth && !isSummerMonth && susangSisang && haejaGroup;
-    const isGeumbaeksuByAlt = isAltIlju && (isFallMonth || isWinterMonth);
-    if ((isGeumbaeksuByMain || isGeumbaeksuByAlt) && noHyungChungPaHae && geumSuSangjeong) {
-      patterns.push({ name:"금백수청", hanja:"金白水淸", color:"#bae6fd",
-        desc:"한 마디로 '인생 클린 버전'. 금(金)이 새하얗게, 수(水)가 투명하게 맑은 상태로 만나 형충파해 같은 잡음도 없고, 화·토의 방해도 없이 깨끗하게 흘러가는 조합이에요. 옛 문헌에서는 이 구조를 가진 사람은 시험·승진·평가에서 두각을 드러내고, 글이나 콘텐츠로 이름을 알리는 경우가 많다고 봤어요. 부와 명예를 동시에 가져가는 '엘리트 라인' 사주로 통합니다.",
-        charmDesc:"꾸안꾸로 정제된 분위기, 말과 글에 잡티가 없는 깔끔한 인상. 이성에게는 '이 사람 뭔가 다르다, 능력 있어 보인다'는 인상을 단번에 심어주는 타입이에요." });
-    }
-    if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
-      const hasGwanseong = gwanseongTugan && hwaYugi;
-      patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
-        desc: hasGwanseong
-          ? "금(金)과 수(水)가 맑고 순수하게 배치되고, 한랭한 금수를 관성 화기(火氣)가 따뜻하게 조후해주는 격. 지적 명석함과 냉철한 카리스마에 더해 명성을 누릴 그릇을 타고났습니다."
-          : "금(金)과 수(水)가 맑고 순수하게 배치된 사주. 지적 명석함과 냉철한 카리스마가 타고난 격이나, 화기(火氣) 관성의 조후가 더해지면 그 격이 한층 빛을 발할 수 있습니다.",
-        charmDesc: hasGwanseong
-          ? "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는데, 그 안에 따뜻한 온기까지 갖춘 타입. 이성은 '대화하고 싶다'와 '곁에 있고 싶다'를 동시에 느낍니다."
-          : "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
-    }
-  }
-  // 목화통명: 갑·을 일간 + 화 기운 강함
-  if (["갑","을"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
-    patterns.push({ name:"목화통명", hanja:"木火通明", color:"#fbbf24",
-      desc:"목(木)이 화(火)를 품어 빛이 사방으로 통하는 사주. 지혜와 화려함이 동시에 발산됩니다.",
-      charmDesc:"눈빛이 빛나고 말할 때 에너지가 강하게 뿜어나옵니다. 처음 만난 이성이 '이 사람 특별하다'를 직감합니다." });
-  }
-  // 화토동궁: 병·정 일간 + 토 기운 강함
-  if (["병","정"].includes(ilgan) && (dom.includes("토") || sc.토 >= 2)) {
-    patterns.push({ name:"화토동궁", hanja:"火土同宮", color:"#fb923c",
-      desc:"화(火)와 토(土)가 같은 궁에 함께하는 사주. 따뜻하고 든든한 보호자적 매력이 강합니다.",
-      charmDesc:"곁에 있으면 마음이 편안해지는 타입. 이성이 '이 사람 옆에 있고 싶다'는 안도감을 느낍니다." });
-  }
-  // 수목청기: 임·계 일간 + 목 기운 강함
-  if (["임","계"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
-    patterns.push({ name:"수목청기", hanja:"水木淸氣", color:"#4ade80",
-      desc:"수(水)가 목(木)을 맑게 생해주는 사주. 지혜로움과 생기가 동시에 발산됩니다.",
-      charmDesc:"신선하고 생동감 넘치는 에너지. 이성은 '저 사람 보면 기분이 좋아진다'고 느낍니다." });
-  }
-  // 토금상생: 무·기 일간 + 금 기운 강함
-  if (["무","기"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
-    patterns.push({ name:"토금상생", hanja:"土金相生", color:"#e2e8f0",
-      desc:"토(土)가 금(金)을 생해주는 사주. 안정적이면서도 날카로운 이중 매력이 발현됩니다.",
-      charmDesc:"믿음직스럽고 세련된 분위기. '이 사람이라면 믿을 수 있겠다'는 신뢰 매력이 핵심입니다." });
-  }
-  // 금목교전: 경·신 일간 + 목 기운 강함 → 강렬한 갈등의 카리스마
-  if (["경","신"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
-    patterns.push({ name:"금목교전", hanja:"金木交戰", color:"#f87171",
-      desc:"금(金)과 목(木)이 상극하는 긴장감 넘치는 사주. 강렬하고 도발적인 카리스마가 흘러나옵니다.",
-      charmDesc:"'무서운데 눈을 못 뗀다'는 반응을 자주 듣는 타입. 강한 자기 주관이 이성의 호기심을 폭발시킵니다." });
-  }
-  // 화련주옥: 병·정 일간 + 금 기운 강함 → 화가 금을 적절히 단련해 보석처럼 빛나게 하는 격
-  if (["병","정"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
-    patterns.push({ name:"화련주옥", hanja:"火煉珠玉", color:"#fde68a",
-      desc:"화(火)가 금(金)을 적절히 달구어 보석처럼 다듬어내는 사주. 뜨거운 열정이 날카로운 재능과 만나, 거칠던 원석이 세련된 빛을 내는 구조입니다.",
-      charmDesc:"열정적인데 디테일까지 챙기는 타입. 이성은 '에너지도 넘치는데 일도 잘하고 멋도 안다'는 인상을 받습니다." });
-  }
-  // 수화기제: 임·계 일간 + 화 기운 강함 → 지혜+열정의 균형
-  if (["임","계"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
-    patterns.push({ name:"수화기제", hanja:"水火旣濟", color:"#c084fc",
-      desc:"수(水)와 화(火)가 이미 완성에 이른 균형. 냉철함과 열정이 공존하는 희귀한 매력 구조입니다.",
-      charmDesc:"차가운 듯 따뜻한 반전 매력. 이성이 '도무지 파악이 안 된다'며 계속 신경 쓰게 됩니다." });
-  }
-
-  return patterns;
-}
 
 const CHARM_PRICE = 4900;
 

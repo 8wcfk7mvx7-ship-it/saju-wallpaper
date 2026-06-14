@@ -3685,3 +3685,167 @@ export const OHAENG_ACTIONS: Record<string, { title: string; actions: string[] }
 // 십신(十神) 단문 설명 (Threads 참고)
 // SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY 는 lib/saju2.ts 로 이동됨
 export { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY } from "./saju2";
+
+// ── 格局 패턴 / 병존(竝存) 감지 ──────────────────────────────────────────────
+// 매력 분석(charm)뿐 아니라 만세력 등 사주 원국을 보여주는 모든 곳에서
+// 동일한 기준으로 격국·병존을 판정하기 위한 공용 로직.
+export interface GagukPattern {
+  name: string; hanja: string; color: string;
+  desc: string; charmDesc: string;
+}
+export function detectGagukPatterns(result: SajuResult): GagukPattern[] {
+  const ilgan = result.pillarsDetail.day.cg;
+  const sc = result.scores;
+  const dom = result.dominant;
+  const patterns: GagukPattern[] = [];
+  const pd = result.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+
+  // 금수쌍청: 경·신 일간이 녹왕지에 뿌리를 두고(건록·제왕), 조토(미·술)의 방해가 없으며,
+  // 해자월에 태어나 천간에 식상수(경금→임수, 신금→계수)가 투출하고,
+  // 한랭한 금수를 조후하는 관성 화기(경금→병화, 신금→정화)가 투출하면서 유기(有氣)한 경우에만 인정한다.
+  if (["경","신"].includes(ilgan)) {
+    const hasRoot = pillars.some(p => p.uunseong === "건록" || p.uunseong === "제왕");
+    const hasJoto = pillars.some(p => p.jj === "미" || p.jj === "술");
+    const isHaejaMonth = ["해","자"].includes(pd.month.jj);
+    const isStrongSu = dom.includes("수") || sc.수 >= 2;
+    const hwaYugi = dom.includes("화") || sc.화 >= 1;
+    // 경금 일간 → 임수 투출 + 병화 정관 투출 / 신금 일간 → 계수 투출 + 정화 정관 투출
+    const susang = ilgan === "경" ? "임" : "계";
+    const gwanseong = ilgan === "경" ? "병" : "정";
+    const susangTugan = pillars.some(p => p.cg === susang);
+    const gwanseongTugan = pillars.some(p => p.cg === gwanseong);
+    // 경술처럼 조토(술)가 일주 등에 끼어 있으면 '순도 100% 금수쌍청'보다
+    // '토를 바탕으로 한 금수상생'으로 보는 경우가 많다.
+    if (hasRoot && hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
+      patterns.push({ name:"토를 바탕으로 한 금수상생", hanja:"土金水相生", color:"#cbd5e1",
+        desc:"금(金)과 수(水)가 맞닿아 있지만, 조토(燥土)가 한 축에 자리해 순도 100% 금수쌍청이라기보다 토(土)가 금(金)을 생해주며 그 위에서 금수의 맑은 기운이 흐르는 구조입니다. 차가운 명석함에 묵직한 안정감이 더해진 인상입니다.",
+        charmDesc:"날카로운 두뇌와 카리스마는 그대로 가지면서도, 한 박자 더 든든하고 안정된 무게감이 느껴지는 타입. 이성은 '예리한데 믿음직스럽다'는 인상을 받습니다." });
+    }
+    // 금백수청(金白水淸) — 삼명통회 기준
+    // ① 경신(庚申)·신유(辛酉) 일주 (건록 일주)
+    // ② 가을철(신유술월) 출생
+    // ③ 시상에 임·계수가 있고, 지지에 해·자수의 무리가 있을 것
+    // ④ 형충파해가 없을 것
+    // ⑤ 금수가 상정(相停)하고, 화·토가 훼방하지 않을 것 (여름철 출생은 해당 안 됨)
+    const isIljuGeonrok = (ilgan === "경" && pd.day.jj === "신") || (ilgan === "신" && pd.day.jj === "유");
+    const isFallMonth = ["신","유","술"].includes(pd.month.jj);
+    const isWinterMonth = ["해","자","축"].includes(pd.month.jj);
+    const isSummerMonth = ["사","오","미"].includes(pd.month.jj);
+    const susangSisang = pd.hour && (pd.hour.cg === "임" || pd.hour.cg === "계");
+    const allJj = pillars.map(p => p.jj);
+    const haejaGroup = allJj.includes("해") || allJj.includes("자");
+    const noHyungChungPaHae = getJijiRelations(allJj).every(r => !["충","형","파","해"].includes(r.type));
+    const geumSuSangjeong = sc.금 >= 1.5 && sc.수 >= 1.5 && sc.화 < 1.5 && sc.토 < 1.5;
+    // 경진·경자·계사·계유·계축 일주가 가을·겨울에 태어나 화상관·토의 극제 없이
+    // 금수상정을 이루면 같은 격으로 인정한다 (봄철은 운행이 서북금수로 흘러야 하므로 제외)
+    const altIljuList = ["경진","경자","계사","계유","계축"];
+    const isAltIlju = altIljuList.includes(`${ilgan}${pd.day.jj}`);
+    const isGeumbaeksuByMain = isIljuGeonrok && isFallMonth && !isSummerMonth && susangSisang && haejaGroup;
+    const isGeumbaeksuByAlt = isAltIlju && (isFallMonth || isWinterMonth);
+    if ((isGeumbaeksuByMain || isGeumbaeksuByAlt) && noHyungChungPaHae && geumSuSangjeong) {
+      patterns.push({ name:"금백수청", hanja:"金白水淸", color:"#bae6fd",
+        desc:"한 마디로 '인생 클린 버전'. 금(金)이 새하얗게, 수(水)가 투명하게 맑은 상태로 만나 형충파해 같은 잡음도 없고, 화·토의 방해도 없이 깨끗하게 흘러가는 조합이에요. 옛 문헌에서는 이 구조를 가진 사람은 시험·승진·평가에서 두각을 드러내고, 글이나 콘텐츠로 이름을 알리는 경우가 많다고 봤어요. 부와 명예를 동시에 가져가는 '엘리트 라인' 사주로 통합니다.",
+        charmDesc:"꾸안꾸로 정제된 분위기, 말과 글에 잡티가 없는 깔끔한 인상. 이성에게는 '이 사람 뭔가 다르다, 능력 있어 보인다'는 인상을 단번에 심어주는 타입이에요." });
+    }
+    if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
+      const hasGwanseong = gwanseongTugan && hwaYugi;
+      patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
+        desc: hasGwanseong
+          ? "금(金)과 수(水)가 맑고 순수하게 배치되고, 한랭한 금수를 관성 화기(火氣)가 따뜻하게 조후해주는 격. 지적 명석함과 냉철한 카리스마에 더해 명성을 누릴 그릇을 타고났습니다."
+          : "금(金)과 수(水)가 맑고 순수하게 배치된 사주. 지적 명석함과 냉철한 카리스마가 타고난 격이나, 화기(火氣) 관성의 조후가 더해지면 그 격이 한층 빛을 발할 수 있습니다.",
+        charmDesc: hasGwanseong
+          ? "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는데, 그 안에 따뜻한 온기까지 갖춘 타입. 이성은 '대화하고 싶다'와 '곁에 있고 싶다'를 동시에 느낍니다."
+          : "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
+    }
+  }
+  // 목화통명: 갑·을 일간 + 화 기운 강함
+  if (["갑","을"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
+    patterns.push({ name:"목화통명", hanja:"木火通明", color:"#fbbf24",
+      desc:"목(木)이 화(火)를 품어 빛이 사방으로 통하는 사주. 지혜와 화려함이 동시에 발산됩니다.",
+      charmDesc:"눈빛이 빛나고 말할 때 에너지가 강하게 뿜어나옵니다. 처음 만난 이성이 '이 사람 특별하다'를 직감합니다." });
+  }
+  // 화토동궁: 병·정 일간 + 토 기운 강함
+  if (["병","정"].includes(ilgan) && (dom.includes("토") || sc.토 >= 2)) {
+    patterns.push({ name:"화토동궁", hanja:"火土同宮", color:"#fb923c",
+      desc:"화(火)와 토(土)가 같은 궁에 함께하는 사주. 따뜻하고 든든한 보호자적 매력이 강합니다.",
+      charmDesc:"곁에 있으면 마음이 편안해지는 타입. 이성이 '이 사람 옆에 있고 싶다'는 안도감을 느낍니다." });
+  }
+  // 수목청기: 임·계 일간 + 목 기운 강함
+  if (["임","계"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
+    patterns.push({ name:"수목청기", hanja:"水木淸氣", color:"#4ade80",
+      desc:"수(水)가 목(木)을 맑게 생해주는 사주. 지혜로움과 생기가 동시에 발산됩니다.",
+      charmDesc:"신선하고 생동감 넘치는 에너지. 이성은 '저 사람 보면 기분이 좋아진다'고 느낍니다." });
+  }
+  // 토금상생: 무·기 일간 + 금 기운 강함
+  if (["무","기"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
+    patterns.push({ name:"토금상생", hanja:"土金相生", color:"#e2e8f0",
+      desc:"토(土)가 금(金)을 생해주는 사주. 안정적이면서도 날카로운 이중 매력이 발현됩니다.",
+      charmDesc:"믿음직스럽고 세련된 분위기. '이 사람이라면 믿을 수 있겠다'는 신뢰 매력이 핵심입니다." });
+  }
+  // 금목교전: 경·신 일간 + 목 기운 강함 → 강렬한 갈등의 카리스마
+  if (["경","신"].includes(ilgan) && (dom.includes("목") || sc.목 >= 2)) {
+    patterns.push({ name:"금목교전", hanja:"金木交戰", color:"#f87171",
+      desc:"금(金)과 목(木)이 상극하는 긴장감 넘치는 사주. 강렬하고 도발적인 카리스마가 흘러나옵니다.",
+      charmDesc:"'무서운데 눈을 못 뗀다'는 반응을 자주 듣는 타입. 강한 자기 주관이 이성의 호기심을 폭발시킵니다." });
+  }
+  // 화련주옥: 병·정 일간 + 금 기운 강함 → 화가 금을 적절히 단련해 보석처럼 빛나게 하는 격
+  if (["병","정"].includes(ilgan) && (dom.includes("금") || sc.금 >= 2)) {
+    patterns.push({ name:"화련주옥", hanja:"火煉珠玉", color:"#fde68a",
+      desc:"화(火)가 금(金)을 적절히 달구어 보석처럼 다듬어내는 사주. 뜨거운 열정이 날카로운 재능과 만나, 거칠던 원석이 세련된 빛을 내는 구조입니다.",
+      charmDesc:"열정적인데 디테일까지 챙기는 타입. 이성은 '에너지도 넘치는데 일도 잘하고 멋도 안다'는 인상을 받습니다." });
+  }
+  // 수화기제: 임·계 일간 + 화 기운 강함 → 지혜+열정의 균형
+  if (["임","계"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
+    patterns.push({ name:"수화기제", hanja:"水火旣濟", color:"#c084fc",
+      desc:"수(水)와 화(火)가 이미 완성에 이른 균형. 냉철함과 열정이 공존하는 희귀한 매력 구조입니다.",
+      charmDesc:"차가운 듯 따뜻한 반전 매력. 이성이 '도무지 파악이 안 된다'며 계속 신경 쓰게 됩니다." });
+  }
+
+  // 정(丁) 병존(竝存): 사주 천간에 정화가 2개 이상이고, 또 다른 천간이 2개 이상 짝을 이루어
+  // 같은 글자끼리 서로 호응하는 구조 — 두 글자의 기운이 짙게 작용한다.
+  const allCg = pillars.map(p => p.cg);
+  const cgCount: Record<string, number> = {};
+  allCg.forEach(c => { cgCount[c] = (cgCount[c] || 0) + 1; });
+  if ((cgCount["정"] || 0) >= 2) {
+    const JEONG_BYEONGJON: Record<string, { name: string; hanja: string; color: string; desc: string; charmDesc: string }> = {
+      갑: { name:"정갑병존", hanja:"丁甲竝存", color:"#fde68a",
+        desc:"큰 나무에 꽃이 핀 듯한 유신유화(有薪有華)의 상. 다만 비를 만나면 꽃이 떨어지듯 수(水)가 과하면 결실을 맺기 어려우니, 따뜻한 토양과 적절한 물의 균형이 관건입니다.",
+        charmDesc:"존재감이 환하게 피어나는 타입. 다만 감정의 비가 너무 자주 오면 매력이 흐려질 수 있어, 평정심을 유지할수록 빛이 오래갑니다." },
+      을: { name:"정을병존", hanja:"丁乙竝存", color:"#fef08a",
+        desc:"화초에 꽃이 핀 화초개화(花草介花)의 상. 적당한 토양과 물이 갖추어지면 인덕과 부모복, 재물복까지 고루 따르는 안정적인 구조입니다.",
+        charmDesc:"화사하고 다정한 분위기로 사람을 끌어모으는 타입. 주변의 보살핌과 지지를 잘 받을수록 매력이 더 풍성하게 피어납니다." },
+      병: { name:"정병병존", hanja:"丁丙竝存", color:"#fbbf24",
+        desc:"크고 작은 꽃들이 만발한 화화분분(花華奔奔)의 상. 인덕이 좋고 예술적 감각·표현력이 뛰어나지만, 수기가 지나치면 감정 기복이 커질 수 있습니다.",
+        charmDesc:"존재 자체가 화려하게 빛나는 타입. 표현력이 풍부해 예술·창작 분야에서 매력이 폭발하지만, 감정의 파도를 다스리는 법을 익히면 더욱 안정적으로 빛납니다." },
+      정: { name:"정정병존", hanja:"丁丁竝存", color:"#fca5a5",
+        desc:"두 개의 불, 두 개의 별이 함께 빛나는 양화위염(兩火爲炎)의 상. 목(木)의 기운이 든든하게 받쳐주면 금상첨화로 인덕과 부모복이 커지는 구조입니다.",
+        charmDesc:"은근하지만 꺼지지 않는 두 개의 불씨 같은 매력. 곁에서 함께 타오를 사람을 만나면 그 빛이 오래도록 유지됩니다." },
+      무: { name:"정무병존", hanja:"丁戊竝存", color:"#fdba74",
+        desc:"화로 속의 불 또는 넓은 들판의 불빛인 유화유로(有火有爐)의 상. 홀로면 다소 외롭지만, 다른 화 기운이 더해지면 넓은 들판의 화려한 꽃무리처럼 인덕과 실행력이 크게 살아납니다.",
+        charmDesc:"혼자서도 묵묵히 자기 빛을 내는 타입. 함께할 동료나 인연이 더해질 때 그 매력과 영향력이 훨씬 크게 퍼져나갑니다." },
+      기: { name:"정기병존", hanja:"丁己竝存", color:"#fde047",
+        desc:"작은 정원에 핀 한 송이 꽃, 성타구진(星墮句陳)의 상. 그 자체로는 외로움이 있지만 화·토의 기운이 더 보태지면 의식주가 충분하고 재물복과 인덕까지 따르는 구조입니다.",
+        charmDesc:"잔잔하지만 묘하게 신경 쓰이는 매력. 곁에 든든한 기반과 사람이 쌓일수록 외로움이 풍요로움으로 바뀌어 갑니다." },
+      경: { name:"정경병존", hanja:"丁庚竝存", color:"#fcd34d",
+        desc:"불로 제련하여 보석을 만드는 화련진금(火鍊眞金)의 상. 금 기운이 발달해 있으면 재물이 따르고, 화 기운이 1~2개 더 받쳐주면 최고로 가치 있는 사주가 됩니다.",
+        charmDesc:"원석을 보석으로 다듬어내는 듣기 좋은 카리스마. 다듬어질수록 가치가 올라가는 타입이라, 자기 관리에 신경 쓸수록 매력이 배가됩니다." },
+      신: { name:"정신병존", hanja:"丁辛竝存", color:"#f9a8d4",
+        desc:"보석을 불로 세공하는 화련주옥(火鍊珠玉)의 상. 예쁜 꽃·달빛에 해당하는 정(丁)과 보석에 해당하는 신(辛)이 만나 미남미녀가 많은 구조로, 수 기운이 더해지면 인기·연예·예술·문학에서 큰 능력을 발휘합니다.",
+        charmDesc:"세공된 보석처럼 정제된 비주얼·분위기 매력. 인기와 시선이 자연스럽게 따라붙는 타입으로, 끼를 발산할 무대가 있을수록 빛이 더 납니다." },
+      임: { name:"정임병존", hanja:"丁壬竝存", color:"#93c5fd",
+        desc:"달이 물을 비추는 호수화조(胡水火照)의 상. 사람들의 시선이 머무는 연예·예술·방송·문학 분야에 끼를 발휘하기 좋고, 병화나 정화가 1~2개 더 있으면 외로움도 보완됩니다.",
+        charmDesc:"호수에 비친 달빛 같은 잔잔하고 신비로운 매력. 무대 위에서, 혹은 사람들 앞에서 자연스럽게 시선을 끄는 타입입니다." },
+      계: { name:"정계병존", hanja:"丁癸竝存", color:"#a5b4fc",
+        desc:"별빛이 구름에 가려진 성영투운(星影投雲)의 상. 예쁘지만 외로움이 있는 구조로, 화·수 기운이 더해지면 인덕·재물복·명예운이 따르고 목(木)이 있으면 부동산복까지 넘쳐납니다.",
+        charmDesc:"살짝 가려진 별빛처럼 신비롭고 은은한 매력. 곁에 따뜻한 사람과 자원이 더해질수록 가려진 빛이 환하게 드러납니다." },
+    };
+    Object.entries(JEONG_BYEONGJON).forEach(([cg, info]) => {
+      if (cg === "정" ? (cgCount["정"] || 0) >= 2 : (cgCount[cg] || 0) >= 2) {
+        patterns.push({ name: info.name, hanja: info.hanja, color: info.color, desc: info.desc, charmDesc: info.charmDesc });
+      }
+    });
+  }
+
+  return patterns;
+}
