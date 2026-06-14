@@ -1428,7 +1428,7 @@ export default function MainPage() {
 
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
             <p>상호: 여름궁전(Summer Palace) · 대표: 정다정 · 이메일: smple@outlook.kr</p>
-            <p>통신판매업 신고번호: 제2025-경남-00000호 · 사업자등록번호: 707-28-01614</p>
+            <p>통신판매업 신고번호: 제2025-경남-00000호 · 사업자등록번호: 707-28-01614 · 유선번호: 050-2668-26628</p>
             <p>
               주소: 경상남도 거제시 장평3로2길 40-3, 102 · 카카오채널:&nbsp;
               <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/50 transition-colors underline underline-offset-2">클릭</a>
