@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN } from "@/lib/saju2";
@@ -8,6 +8,12 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay }: { children: React.ReactNode; delay: number }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return <div style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>{children}</div>;
+}
 
 const ELEMENT_BOOST: Record<Element, { item: string; color: string; tip: string }> = {
   목: { item: "초록·청록 계열, 동쪽 방향, 나무·식물", color: "#4ade80", tip: "동쪽 방향에 화분을 두거나 초록색 소품을 활용하면 재물 기운의 흐름이 살아납니다." },
@@ -53,13 +59,18 @@ export default function WealthPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-yellow-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+          <FadeIn delay={0}>
           <div className="inline-block px-3 py-1 rounded-full bg-amber-900/50 border border-amber-700/40 text-amber-300 text-xs font-bold tracking-wider mb-8">
             ⚠ &quot;무재성&quot;, &quot;재물복 없다&quot;는 말 들어본 사람 필수 확인
           </div>
+          </FadeIn>
+          <FadeIn delay={80}>
           <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
             내 사주에<br />
             <span className="text-amber-400">재물운</span>이 있을까?
           </h1>
+          </FadeIn>
+          <FadeIn delay={160}>
           <p className="text-gray-400 text-base mb-2 leading-relaxed">
             벌어도 안 모이고, 모아도 새는 이유.<br />
             <span className="text-gray-300 font-medium">사주에 답이 있습니다.</span>
@@ -67,31 +78,38 @@ export default function WealthPage() {
           <p className="text-gray-600 text-sm mb-12">
             지금 확인 안 하면 평생 모르고 삽니다
           </p>
+          </FadeIn>
 
           <div className="w-full space-y-3 mb-10 text-left">
             {[
               ["재성(財星) 보유 여부", "내 사주에 돈이 들어올 자리가 있는지부터 확인"],
               ["돈이 새는 구조 진단", "상관생재 · 일주극재 등 재물이 빠져나가는 패턴"],
               ["재물운 높이는 구체적 방법", "내 오행에 맞는 색상·방향·습관 처방"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+            ].map(([title, desc], i) => (
+              <FadeIn key={title} delay={220 + i * 70}>
+              <div className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-white">{title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
                 </div>
               </div>
+              </FadeIn>
             ))}
           </div>
 
+          <FadeIn delay={490}>
           <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
             ✦ 완전 무료
           </div>
+          </FadeIn>
 
+          <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
             className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
             내 재물운 확인하기
           </button>
+          </FadeIn>
         </div>
       </main>
     );

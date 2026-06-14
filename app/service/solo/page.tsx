@@ -1,12 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, analyzeSipseongPatterns, isGanyeoJidong, GANYEO_JIDONG_LOVE, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay }: { children: React.ReactNode; delay: number }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return <div style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>{children}</div>;
+}
 
 const HOBBY_BANK = [
   "혼자 떠나는 해외 장기 여행 — 동행 일정에 맞출 필요 없이 원하는 도시에서 원하는 만큼 머무르기",
@@ -38,7 +44,7 @@ export default function SoloPage() {
     resultRef.current = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-      name: "나", gender: form.gender,
+      name: form.name || "나", gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
     setStep("loading");
@@ -53,14 +59,19 @@ export default function SoloPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+          <FadeIn delay={0}>
           <div className="inline-block px-3 py-1 rounded-full bg-indigo-900/50 border border-indigo-700/40 text-indigo-300 text-xs font-bold tracking-wider mb-8">
             ✦ 완전 무료
           </div>
+          </FadeIn>
+          <FadeIn delay={80}>
           <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
             나는<br />
             <span className="text-indigo-400">비혼으로 잘 사는</span><br />
             사주일까?
           </h1>
+          </FadeIn>
+          <FadeIn delay={160}>
           <p className="text-gray-400 text-base mb-2 leading-relaxed">
             결혼한 친구들이 부러울지, 혼자인 내가 더 편할지.<br />
             <span className="text-gray-300 font-medium">사주에 답이 이미 정해져 있습니다.</span>
@@ -68,6 +79,7 @@ export default function SoloPage() {
           <p className="text-gray-600 text-sm mb-12">
             결혼 적합도 vs 비혼 적합도, 숫자로 확인하세요
           </p>
+          </FadeIn>
 
           <div className="w-full space-y-3 mb-10 text-left">
             {[
@@ -75,21 +87,25 @@ export default function SoloPage() {
               ["비혼일 때 더 성공할까?", "혼자일 때 커리어·재물운이 더 커지는 사주인지"],
               ["배우자에게 기 빨리는 사주인지", "결혼이 오히려 나를 갉아먹는 구조는 아닌지"],
               ["비혼 시 신경 써야 할 부분", "재물·직업·인간관계에서 미리 챙겨야 할 것들"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+            ].map(([title, desc], i) => (
+              <FadeIn key={title} delay={220 + i * 70}>
+              <div className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-white">{title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
                 </div>
               </div>
+              </FadeIn>
             ))}
           </div>
 
+          <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
             className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-indigo-700 to-violet-600 hover:from-indigo-600 hover:to-violet-500 text-white shadow-lg shadow-indigo-900/50 transition-all active:scale-[0.98]">
             내 결혼·비혼 적합도 확인하기
           </button>
+          </FadeIn>
         </div>
       </main>
     );
@@ -158,16 +174,37 @@ export default function SoloPage() {
   const sikSangCount = totalCount("식신") + totalCount("상관");
   const strength = r.yongshin.strength;
 
-  // 결혼/비혼 적합도 (10점 만점, 합 10)
-  let marriageScore = 5 + spouseCount * 0.9 - bigeopCount * 0.5 - sikSangCount * 0.4;
-  if (strength === "신약" && spouseCount >= 2) marriageScore -= 0.8; // 신약+배우자성 과다 → 기빨림 경향
-  marriageScore = Math.max(1, Math.min(9, Math.round(marriageScore * 2) / 2));
-  const soloScore = 10 - marriageScore;
+  // 역마살/지살 — 이동·자유 기운
+  const sinsalNames = r.sinsalList.map(s => s.name);
+  const yeokmaCount = sinsalNames.filter(n => n === "역마살").length;
+  const jisalCount = sinsalNames.filter(n => n === "지살").length;
+  const moveCount = yeokmaCount + jisalCount;
+
+  // 재다여성: 여성인데 재성(정재+편재)이 많은 경우 — 재성이 많으면 관성을 생하여 오히려 남자가 끌리거나, 일간이 재성에 치여 신약해지기 쉬움
+  const jaeCount = totalCount("정재") + totalCount("편재");
+  const isJaeDaYeoseong = isFemale && jaeCount >= 2;
 
   // 격국 패턴
   const patterns = analyzeSipseongPatterns(r.pillarsDetail);
   const hasMuGwan = patterns.some(p => p.name.includes("무관"));
   const hasMuBigeop = patterns.some(p => p.name.includes("무비겁"));
+
+  // 완전 독립형: 무관(배우자/통제 기운 자체가 없음) + 비겁 강함 → 누군가의 통제·도움 없이도 스스로 다 해결하는 구조
+  const isFullyIndependent = hasMuGwan && bigeopCount >= 2;
+
+  // 식상 과다 + 신약 → 양육 스트레스에 특히 취약(자기 에너지를 끊임없이 쏟아내는 식상이 신약한 일간을 더 소진시킴)
+  const isChildStressRisk = sikSangCount >= 3 && strength === "신약";
+
+  // 결혼/비혼 적합도 (10점 만점, 합 10)
+  let marriageScore = 5 + spouseCount * 0.9 - bigeopCount * 0.5 - sikSangCount * 0.4;
+  if (strength === "신약" && spouseCount >= 2) marriageScore -= 0.8; // 신약+배우자성 과다 → 기빨림 경향
+  if (moveCount >= 2) marriageScore -= 0.7; // 역마살+지살 多 → 한곳에 정착하기보다 자유로운 이동·연애 선호
+  else if (moveCount >= 1) marriageScore -= 0.3;
+  if (isFullyIndependent) marriageScore -= 0.8; // 완전 독립형 → 결혼 필요성 자체가 낮음
+  if (isJaeDaYeoseong) marriageScore -= 0.5; // 재다여성 → 스스로 경제력을 갖춘 독립적 구조
+  if (isChildStressRisk) marriageScore -= 0.6; // 양육 스트레스 리스크 → 비혼 시 정서적 안정에 유리
+  marriageScore = Math.max(1, Math.min(9, Math.round(marriageScore * 2) / 2));
+  const soloScore = 10 - marriageScore;
 
   // 배우자에게 기 빨리는 사주? — 신약한데 배우자 자리(관성/재성)가 많아 일간을 계속 소모시키는 구조
   const isDrained = strength === "신약" && spouseCount >= 2;
@@ -206,7 +243,7 @@ export default function SoloPage() {
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MARRIAGE OR SOLO</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주, 결혼 vs 비혼 적합도
+            {ilgan}{r.pillarsDetail.day.jj}일주 {form.name || "나"}님의<br />결혼 vs 비혼 적합도
           </h1>
         </div>
 
@@ -241,6 +278,44 @@ export default function SoloPage() {
               : "독립성을 강하게 자극하는 기운은 두드러지지 않습니다. 비혼이 곧 더 큰 성공을 보장하는 구조는 아니며, 오히려 안정적인 관계 속에서 정서적 기반이 확보될 때 더 좋은 성과를 내는 편에 가깝습니다. 다만 그렇다고 비혼이 불리한 것도 아니므로, 본인의 라이프스타일 선호가 더 중요한 변수입니다."}
           </p>
         </div>
+
+        {moveCount >= 1 && (
+          <div className="bg-white/[0.03] border border-sky-700/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-sky-300 mb-1">역마살·지살 — 이동과 자유를 부르는 기운</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {moveCount >= 2
+                ? "역마살과 지살이 함께 자리하고 있어, 한 곳·한 사람에게 묶이기보다 끊임없이 새로운 환경·관계로 이동하려는 기운이 강합니다. 이런 구조에서는 정해진 틀 안에서의 결혼생활보다, 자유롭게 만나고 헤어지고 또 새로운 인연을 만나는 '자유로운 연애'가 훨씬 더 본인의 기질에 맞습니다. 비혼이 오히려 이 기운을 가장 건강하게 쓰는 방법일 수 있어요."
+                : "이동·변화의 기운이 어느 정도 자리하고 있어, 한 사람·한 장소에 완전히 정착하기보다 적당한 거리와 자유를 유지하는 관계 방식이 더 잘 맞는 편입니다. 결혼을 하더라도 너무 밀착된 형태보다는, 각자의 영역을 존중하는 방식이 잘 어울립니다."}
+            </p>
+          </div>
+        )}
+
+        {isFullyIndependent && (
+          <div className="bg-white/[0.03] border border-violet-700/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-violet-300 mb-1">남자(배우자)가 필요 없는, 완전 독립형 사주</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              사주 안에 배우자·통제를 의미하는 관성 기운이 거의 없고, 반면 자기 자신의 힘인 비겁 기운은 강하게 자리하고 있습니다. 이런 구조는 누군가에게 의지하거나 누군가의 보호·통제를 받을 필요 자체가 적은, 스스로 모든 걸 결정하고 만들어가는 타입입니다. 결혼이 '결핍을 채우는 선택'이 되기보다, 오히려 자유를 줄이는 선택이 될 가능성이 큽니다. 비혼으로 살아도 전혀 외롭거나 부족하지 않은, 본인 스스로가 이미 완결된 구조라고 볼 수 있어요.
+            </p>
+          </div>
+        )}
+
+        {isJaeDaYeoseong && (
+          <div className="bg-white/[0.03] border border-amber-700/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-amber-300 mb-1">재다여성(財多女性) — 스스로 돈을 버는 구조</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              여성 사주에서 재성(財星)이 여러 개 자리한 '재다여성' 구조입니다. 재성은 본래 여성에게 '내가 직접 다루는 재물·일'을 의미하는데, 이게 과하면 배우자에게 경제적으로 의존하기보다 스스로 벌고 쓰고 관리하는 쪽으로 무게가 실립니다. 경제적 독립이 이미 기본값인 구조이기 때문에, 결혼이 주는 '경제적 안정'이라는 메리트가 상대적으로 약하게 느껴질 수 있어요. 비혼으로 살아도 재정적으로 흔들릴 일이 적은, 안정적인 구조에 가깝습니다.
+            </p>
+          </div>
+        )}
+
+        {isChildStressRisk && (
+          <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-rose-300 mb-1">육아·양육 스트레스에 취약할 수 있는 구조</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              일간이 신약한 가운데 식상(食傷) 기운이 매우 강한 구조입니다. 식상은 '내 에너지를 밖으로 쏟아내는' 기운인데, 이게 신약한 일간에서 과하게 작용하면 일상적인 소진감이 큰 편입니다. 특히 육아처럼 24시간 끊임없이 에너지를 내어줘야 하는 환경에서는 이 소진이 누적되어 정서적으로 크게 흔들릴 수 있습니다. 아이를 낳고 키우는 것이 잘 맞지 않을 수 있는 구조이므로, 비혼이나 무자녀의 삶이 정신적 안정 측면에서 훨씬 유리할 수 있습니다.
+            </p>
+          </div>
+        )}
 
         {isDrained && (
           <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
