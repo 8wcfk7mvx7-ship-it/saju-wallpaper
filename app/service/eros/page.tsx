@@ -28,7 +28,6 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 }
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import AdultGate from "@/components/AdultGate";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -453,6 +452,17 @@ function ErosContent() {
     }
   }
 
+  // ── 요망력 (끌어당김 · 색기 · 밀당) ─────────────────────────────────────────
+  const 끌림력 = Math.min(100, 40 + (has도화 ? 25 : 0) + (has진도화 ? 25 : 0) + (has역마 ? 10 : 0));
+  const 색기력 = Math.min(100, 30 + (has홍염 ? 35 : 0) + (hasMokYok ? 25 : 0) + (haHwa ? 10 : 0));
+  const 밀당력 = Math.min(100, 35 + found충.length * 25 + (found천간합.length + found지지합.length) * 15);
+  const 요망력 = Math.round((끌림력 + 색기력 + 밀당력) / 3);
+  const 요망등급 =
+    요망력 >= 85 ? "치명적 요망형 — 마주치면 위험" :
+    요망력 >= 70 ? "고급 요망형 — 은근하지만 강력" :
+    요망력 >= 50 ? "잠재 요망형 — 가까워질수록 발현" :
+    "순둥 매력형 — 요망기는 약하지만 진정성으로 어필";
+
   // 배우자궁 십성 & 조후
   const iljiSipseong = pd.day.sipseongJj ?? "";
   const iljiSipseongDesc = ILJI_SIPSEONG[iljiSipseong] ?? null;
@@ -493,6 +503,33 @@ function ErosContent() {
           </div>
           <p className="text-sm text-gray-300 leading-relaxed">{grade.desc}</p>
           <p className="text-sm font-bold mt-2" style={{ color: grade.color }}>→ {grade.oneliner}</p>
+        </div>
+
+        {/* ①-2 요망력 */}
+        <div className="bg-white/[0.03] border border-pink-700/20 rounded-2xl p-5 mb-4">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs text-pink-400 font-bold tracking-widest uppercase">요망력 지수</p>
+            <p className="text-2xl font-black text-pink-300">{요망력}<span className="text-sm text-gray-500">/100</span></p>
+          </div>
+          <p className="text-sm font-bold text-pink-200 mb-3">{요망등급}</p>
+          <div className="space-y-2.5">
+            {[
+              { label: "끌림력", desc: "가만히 있어도 시선을 끌어당기는 힘", value: 끌림력, color: "#f472b6" },
+              { label: "색기력", desc: "분위기·말투에서 흘러나오는 관능적 에너지", value: 색기력, color: "#fb7185" },
+              { label: "밀당력", desc: "다가왔다 멀어지며 상대를 더 끌리게 만드는 긴장감", value: 밀당력, color: "#c084fc" },
+            ].map(item => (
+              <div key={item.label}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-gray-300">{item.label}</span>
+                  <span className="text-xs font-bold" style={{ color: item.color }}>{item.value}</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-1.5 mb-1">
+                  <div className="h-full rounded-full" style={{ width: `${item.value}%`, background: item.color }} />
+                </div>
+                <p className="text-[11px] text-gray-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ② 나의 외모 */}
@@ -712,5 +749,5 @@ function ErosContent() {
 }
 
 export default function ErosPage() {
-  return <AdultGate><ErosContent /></AdultGate>;
+  return <ErosContent />;
 }
