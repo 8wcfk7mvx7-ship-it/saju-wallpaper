@@ -54,11 +54,32 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
   const lacking = result.lacking;
   const patterns: GagukPattern[] = [];
 
-  // 금수쌍청: 경·신 일간 + 수 기운 강함
-  if (["경","신"].includes(ilgan) && (dom.includes("수") || sc.수 >= 2)) {
-    patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
-      desc:"금(金)과 수(水)가 맑고 순수하게 배치된 사주. 지적 명석함과 냉철한 카리스마가 타고납니다.",
-      charmDesc:"두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
+  // 금수쌍청: 경·신 일간이 녹왕지에 뿌리를 두고(건록·제왕), 조토(미·술)의 방해가 없으며,
+  // 해자월에 태어나 천간에 식상수(경금→임수, 신금→계수)가 투출하고,
+  // 한랭한 금수를 조후하는 관성 화기(경금→병화, 신금→정화)가 투출하면서 유기(有氣)한 경우에만 인정한다.
+  if (["경","신"].includes(ilgan)) {
+    const pd = result.pillarsDetail;
+    const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+    const hasRoot = pillars.some(p => p.uunseong === "건록" || p.uunseong === "제왕");
+    const hasJoto = pillars.some(p => p.jj === "미" || p.jj === "술");
+    const isHaejaMonth = ["해","자"].includes(pd.month.jj);
+    const isStrongSu = dom.includes("수") || sc.수 >= 2;
+    const hwaYugi = dom.includes("화") || sc.화 >= 1;
+    // 경금 일간 → 임수 투출 + 병화 정관 투출 / 신금 일간 → 계수 투출 + 정화 정관 투출
+    const susang = ilgan === "경" ? "임" : "계";
+    const gwanseong = ilgan === "경" ? "병" : "정";
+    const susangTugan = pillars.some(p => p.cg === susang);
+    const gwanseongTugan = pillars.some(p => p.cg === gwanseong);
+    if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
+      const hasGwanseong = gwanseongTugan && hwaYugi;
+      patterns.push({ name:"금수쌍청", hanja:"金水雙淸", color:"#93c5fd",
+        desc: hasGwanseong
+          ? "금(金)과 수(水)가 맑고 순수하게 배치되고, 한랭한 금수를 관성 화기(火氣)가 따뜻하게 조후해주는 격. 지적 명석함과 냉철한 카리스마에 더해 명성을 누릴 그릇을 타고났습니다."
+          : "금(金)과 수(水)가 맑고 순수하게 배치된 사주. 지적 명석함과 냉철한 카리스마가 타고난 격이나, 화기(火氣) 관성의 조후가 더해지면 그 격이 한층 빛을 발할 수 있습니다.",
+        charmDesc: hasGwanseong
+          ? "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는데, 그 안에 따뜻한 온기까지 갖춘 타입. 이성은 '대화하고 싶다'와 '곁에 있고 싶다'를 동시에 느낍니다."
+          : "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
+    }
   }
   // 목화통명: 갑·을 일간 + 화 기운 강함
   if (["갑","을"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
