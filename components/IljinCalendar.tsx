@@ -40,6 +40,19 @@ export default function IljinCalendar() {
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   while (cells.length % 7 !== 0) cells.push(null);
 
+  // 이번 달의 월주(月柱) — 1일 기준, 그리고 절입(월이 바뀌는 시점) 탐색
+  const firstDayMonthPillar = getMonthPillar(year, month, 1);
+  let monthChange: { day: number; cg: string; jj: string } | null = null;
+  for (let d = 2; d <= daysInMonth; d++) {
+    const mp = getMonthPillar(year, month, d);
+    if (mp.cg !== firstDayMonthPillar.cg || mp.jj !== firstDayMonthPillar.jj) {
+      monthChange = { day: d, cg: mp.cg, jj: mp.jj };
+      break;
+    }
+  }
+
+  const YEAR_OPTIONS = Array.from({ length: 2030 - 1975 + 1 }, (_, i) => 1975 + i);
+
   return (
     <div className="w-full">
 
@@ -58,13 +71,34 @@ export default function IljinCalendar() {
           <button onClick={prevMonth} disabled={year === 1975 && month === 1}
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
             style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>‹</button>
-          <span className="text-lg font-black min-w-[80px] text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
-            {year}. {String(month).padStart(2, "0")}
-          </span>
+          <div className="flex items-center gap-1">
+            <select value={year} onChange={e => setYear(Number(e.target.value))}
+              className="text-lg font-black text-center rounded-lg px-1 py-0.5"
+              style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              {YEAR_OPTIONS.map(y => <option key={y} value={y} style={{ color: "#000" }}>{y}</option>)}
+            </select>
+            <select value={month} onChange={e => setMonth(Number(e.target.value))}
+              className="text-lg font-black text-center rounded-lg px-1 py-0.5"
+              style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map(m => <option key={m} value={m} style={{ color: "#000" }}>{String(m).padStart(2, "0")}</option>)}
+            </select>
+          </div>
           <button onClick={nextMonth} disabled={year === 2030 && month === 12}
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
             style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>›</button>
         </div>
+      </div>
+
+      {/* 이번 달 월주 정보 */}
+      <div className="mb-4 px-3 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.55)" }}>
+          {year}년 {month}월 1일 기준 월주: <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{firstDayMonthPillar.cg}{firstDayMonthPillar.jj}월</span>
+        </p>
+        {monthChange && (
+          <p className="text-[12px] mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+            → {monthChange.day}일부터 <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{monthChange.cg}{monthChange.jj}월</span>로 바뀝니다 (절입)
+          </p>
+        )}
       </div>
 
       {/* 요일 헤더 */}
