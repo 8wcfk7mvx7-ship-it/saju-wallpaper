@@ -26,7 +26,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
     </button>
   );
 }
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getSexlifeInsights, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
@@ -613,6 +613,25 @@ function ErosContent() {
             </div>
           )}
         </div>
+
+        {/* ③-1 사주로 보는 성향 인사이트 */}
+        {(() => {
+          const sexlifeInsights = getSexlifeInsights(result);
+          if (sexlifeInsights.length === 0) return null;
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">사주로 보는 성향 인사이트</p>
+              <div className="space-y-2.5">
+                {sexlifeInsights.map(ins => (
+                  <div key={ins.title} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-sm font-bold mb-1" style={{ color: ins.color }}>{ins.title}</p>
+                    <p className="text-xs leading-relaxed text-gray-300">{ins.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ④ 암합·지지합 분석 */}
         {(found천간합.length > 0 || found지지합.length > 0) && (

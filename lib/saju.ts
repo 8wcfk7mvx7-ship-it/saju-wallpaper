@@ -3849,3 +3849,79 @@ export function detectGagukPatterns(result: SajuResult): GagukPattern[] {
 
   return patterns;
 }
+
+// ── 성생활(性) 경향 인사이트 ─────────────────────────────────────────────────
+// 일간 신강/신약, 십성(재성·관성·인성) 분포, 오행 우세, 지지 그룹을 토대로
+// 성적 경향을 보여주는 공용 데이터/함수. eros 등 관련 서비스에서 사용.
+export interface SexlifeInsight { title: string; desc: string; color: string }
+
+const SEXLIFE_OHAENG_INSIGHT: Record<Element, SexlifeInsight> = {
+  목: { title: "목(木) 기운 우세 — 솔직 적극형", color: "#4ade80",
+    desc: "감정과 욕구를 숨기지 않고 솔직하게 표현하는 타입. 좋아하면 적극적으로 다가가고, 관계에서도 가장 능동적이고 직진하는 스타일입니다." },
+  화: { title: "화(火) 기운 우세 — 강렬한 첫인상형", color: "#f87171",
+    desc: "처음 끌릴 때의 텐션이 누구보다 강렬합니다. 다만 불꽃처럼 빠르게 타올랐다가 빨리 식는 경향이 있어, 꾸준한 온도 유지가 관건입니다." },
+  토: { title: "토(土) 기운 우세 — 신중·자기완결형", color: "#fbbf24",
+    desc: "주도적으로 먼저 나서기보다는 받아들이는 쪽에 가깝습니다. 표현이 적극적이지 않아 혼자 마음을 정리하는 경우가 많으니, 편하게 표현할 수 있는 분위기가 중요합니다." },
+  금: { title: "금(金) 기운 우세 — 분위기 의존형", color: "#cbd5e1",
+    desc: "분위기와 타이밍에 많이 좌우되는 타입. 마음에 안 들면 단호하게 거리를 두지만, 분위기가 맞으면 한순간에 몰입도가 확 올라갑니다." },
+  수: { title: "수(水) 기운 우세 — 적응력 최강형", color: "#60a5fa",
+    desc: "상대와 상황에 맞춰 유연하게 변하는 적응력이 가장 뛰어난 타입. 한번 빠지면 깊이 몰입하는 만큼, 한 사람·한 관계에 과도하게 의존하지 않도록 균형이 필요합니다." },
+};
+
+const SEXLIFE_JIJI_GROUP_INSIGHT: { jjs: string[]; insight: SexlifeInsight }[] = [
+  { jjs: ["인","신","사","해"], insight: {
+    title: "역마(寅申巳亥) — 호기심 탐구형", color: "#a78bfa",
+    desc: "새로운 경험과 자극에 호기심이 많은 편. 익숙함보다 변화와 다양함을 즐기는 타입입니다." } },
+  { jjs: ["자","오","묘","유"], insight: {
+    title: "도화(子午卯酉) — 취향 확고형", color: "#f9a8d4",
+    desc: "자기만의 취향과 기준이 확실한 타입. 한번 좋아하는 패턴이 생기면 그 방향을 고집하는 경향이 있습니다." } },
+  { jjs: ["진","술","축","미"], insight: {
+    title: "화개(辰戌丑未) — 수용·몰입형", color: "#93c5fd",
+    desc: "스스로 주도하기보다는 분위기에 자연스럽게 따라가며 몰입하는 편. 상대가 리드해줄 때 더 깊이 빠져드는 타입입니다." } },
+];
+
+export function getSexlifeInsights(result: SajuResult): SexlifeInsight[] {
+  const insights: SexlifeInsight[] = [];
+  const pd = result.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+
+  // 십성 카운트
+  const count = (names: string[]) =>
+    pillars.reduce((acc, p) => acc + (names.includes(p.sipseongCg) ? 1 : 0) + (names.includes(p.sipseongJj) ? 1 : 0), 0);
+  const jaeseong = count(["편재", "정재"]);
+  const gwanseong = count(["편관", "정관"]);
+  const inseong = count(["편인", "정인"]);
+  const strength = result.yongshin.strength;
+
+  if (strength === "신약" && jaeseong >= 2) {
+    insights.push({ title: "재다신약(財多身弱) — 맞춤형", color: "#fbbf24",
+      desc: "자기주장보다 상대의 반응과 컨디션을 먼저 살피는 타입. 상대를 만족시키는 데 집중하는 만큼, 본인 욕구 표현에도 신경 쓰는 게 좋습니다." });
+  } else if (strength === "신약" && gwanseong >= 2) {
+    insights.push({ title: "관살旺 신약(官殺旺身弱) — 맞춤형", color: "#f87171",
+      desc: "상대의 기분과 분위기에 맞춰주려는 성향이 강합니다. 관계에서 끌려가는 느낌이 들지 않도록, 본인의 속도와 의사를 표현하는 연습이 도움이 됩니다." });
+  } else if (strength === "신강") {
+    insights.push({ title: "신강(身强) — 주도형", color: "#4ade80",
+      desc: "관계에서 자연스럽게 주도권을 쥐는 타입. 자기 표현이 분명하고, 원하는 방향으로 분위기를 이끌어가는 데 익숙합니다." });
+  } else if (strength === "신약") {
+    insights.push({ title: "신약(身弱) — 수용형", color: "#60a5fa",
+      desc: "주도하기보다 상대에게 맞춰주는 편안한 포지션을 선호하는 타입. 신뢰가 쌓일수록 마음을 더 여는 경향이 있습니다." });
+  }
+
+  if (inseong >= 2) {
+    insights.push({ title: "인성旺(印星旺) — 정서적 교감형", color: "#c4b5fd",
+      desc: "육체적 끌림보다 정서적 교감과 신뢰가 우선인 타입. 마음이 통한다는 느낌이 들 때 비로소 마음을 열게 됩니다." });
+  }
+
+  const domEl = SEXLIFE_OHAENG_INSIGHT[result.dominant[0] as Element];
+  if (domEl) insights.push(domEl);
+
+  const jjList = pillars.map(p => p.jj);
+  for (const g of SEXLIFE_JIJI_GROUP_INSIGHT) {
+    if (jjList.filter(jj => g.jjs.includes(jj)).length >= 2) {
+      insights.push(g.insight);
+      break;
+    }
+  }
+
+  return insights;
+}
