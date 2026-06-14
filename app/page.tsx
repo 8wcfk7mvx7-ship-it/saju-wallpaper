@@ -680,6 +680,17 @@ const SERVICES: {
     categories: ["전체", "무료", "라이프"],
   },
   {
+    id: "firstimpression", emoji: "✨",
+    title: "사주로 보는 나의 첫인상",
+    viral: "맞춤 인상 개선법까지 알려드립니다",
+    desc: "월간(月干) 중심으로 연·월·일·시 천간을 종합해, 남들에게 비치는 첫인상과 오해받기 쉬운 부분, 맞춤 개선법까지 알려드립니다.",
+    tags: ["월간", "첫인상", "인상 개선법"],
+    href: "/service/firstimpression", badge: "완전 무료",
+    color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
+    border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
+    categories: ["전체", "무료", "라이프"],
+  },
+  {
     id: "stock", emoji: "📈",
     title: "사주로 보는 주식 스타일",
     viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
