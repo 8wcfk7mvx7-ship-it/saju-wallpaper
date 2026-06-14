@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import type { SajuResult } from "@/lib/saju";
+import { getJijiRelations } from "@/lib/saju";
 import {
   ILGAN_CHARM_DB,
   SAL_CHARM_DB,
@@ -77,16 +78,31 @@ function detectGagukPatterns(result: SajuResult): GagukPattern[] {
         desc:"금(金)과 수(水)가 맞닿아 있지만, 조토(燥土)가 한 축에 자리해 순도 100% 금수쌍청이라기보다 토(土)가 금(金)을 생해주며 그 위에서 금수의 맑은 기운이 흐르는 구조입니다. 차가운 명석함에 묵직한 안정감이 더해진 인상입니다.",
         charmDesc:"날카로운 두뇌와 카리스마는 그대로 가지면서도, 한 박자 더 든든하고 안정된 무게감이 느껴지는 타입. 이성은 '예리한데 믿음직스럽다'는 인상을 받습니다." });
     }
-    // 금백수청(金白水淸): 경·신 일간이 신유술월(가을)에 태어나 임·계수를 보고,
-    // 금과 수가 어느 한쪽으로 치우치지 않고 상정(相停)을 이루는 격.
-    // (겨울철 해자월은 병·정화 통근이 더해져야 하므로 위의 금수쌍청 계열로 본다)
+    // 금백수청(金白水淸) — 삼명통회 기준
+    // ① 경신(庚申)·신유(辛酉) 일주 (건록 일주)
+    // ② 가을철(신유술월) 출생
+    // ③ 시상에 임·계수가 있고, 지지에 해·자수의 무리가 있을 것
+    // ④ 형충파해가 없을 것
+    // ⑤ 금수가 상정(相停)하고, 화·토가 훼방하지 않을 것 (여름철 출생은 해당 안 됨)
+    const isIljuGeonrok = (ilgan === "경" && pd.day.jj === "신") || (ilgan === "신" && pd.day.jj === "유");
     const isFallMonth = ["신","유","술"].includes(pd.month.jj);
-    const susangTuganAny = pillars.some(p => p.cg === "임" || p.cg === "계");
-    const geumGiBalanced = sc.금 >= 1.5 && sc.수 >= 1.5;
-    if (hasRoot && isFallMonth && susangTuganAny && geumGiBalanced) {
+    const isWinterMonth = ["해","자","축"].includes(pd.month.jj);
+    const isSummerMonth = ["사","오","미"].includes(pd.month.jj);
+    const susangSisang = pd.hour && (pd.hour.cg === "임" || pd.hour.cg === "계");
+    const allJj = pillars.map(p => p.jj);
+    const haejaGroup = allJj.includes("해") || allJj.includes("자");
+    const noHyungChungPaHae = getJijiRelations(allJj).every(r => !["충","형","파","해"].includes(r.type));
+    const geumSuSangjeong = sc.금 >= 1.5 && sc.수 >= 1.5 && sc.화 < 1.5 && sc.토 < 1.5;
+    // 경진·경자·계사·계유·계축 일주가 가을·겨울에 태어나 화상관·토의 극제 없이
+    // 금수상정을 이루면 같은 격으로 인정한다 (봄철은 운행이 서북금수로 흘러야 하므로 제외)
+    const altIljuList = ["경진","경자","계사","계유","계축"];
+    const isAltIlju = altIljuList.includes(`${ilgan}${pd.day.jj}`);
+    const isGeumbaeksuByMain = isIljuGeonrok && isFallMonth && !isSummerMonth && susangSisang && haejaGroup;
+    const isGeumbaeksuByAlt = isAltIlju && (isFallMonth || isWinterMonth);
+    if ((isGeumbaeksuByMain || isGeumbaeksuByAlt) && noHyungChungPaHae && geumSuSangjeong) {
       patterns.push({ name:"금백수청", hanja:"金白水淸", color:"#bae6fd",
-        desc:"가을에 태어난 금(金)이 임·계수를 만나 금과 수가 한쪽으로 치우치지 않고 맑게 어우러진 격. 형충의 흔들림 없이 금수가 상정(相停)을 이루면 결백하고 청렴한 인상과 더불어 맑은 총기가 돋보입니다.",
-        charmDesc:"가을 햇살처럼 깔끔하고 정제된 인상. 말과 행동에 잡음이 없고 담백해서, 이성에게 '깨끗하고 신뢰할 수 있는 사람'이라는 첫인상을 강하게 남깁니다." });
+        desc:"한 마디로 '인생 클린 버전'. 금(金)이 새하얗게, 수(水)가 투명하게 맑은 상태로 만나 형충파해 같은 잡음도 없고, 화·토의 방해도 없이 깨끗하게 흘러가는 조합이에요. 옛 문헌에서는 이 구조를 가진 사람은 시험·승진·평가에서 두각을 드러내고, 글이나 콘텐츠로 이름을 알리는 경우가 많다고 봤어요. 부와 명예를 동시에 가져가는 '엘리트 라인' 사주로 통합니다.",
+        charmDesc:"꾸안꾸로 정제된 분위기, 말과 글에 잡티가 없는 깔끔한 인상. 이성에게는 '이 사람 뭔가 다르다, 능력 있어 보인다'는 인상을 단번에 심어주는 타입이에요." });
     }
     if (hasRoot && !hasJoto && isHaejaMonth && susangTugan && isStrongSu) {
       const hasGwanseong = gwanseongTugan && hwaYugi;
