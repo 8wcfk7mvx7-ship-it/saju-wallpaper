@@ -163,7 +163,6 @@ export default function TastePage() {
   const router = useRouter();
   const [step, setStep] = useState<"splash" | "input" | "main">("splash");
   const [showBtn, setShowBtn] = useState(false);
-  const [counter] = useState(() => Math.floor(Math.random() * 500) + 2800);
 
   // 입력 폼 상태
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
@@ -244,15 +243,6 @@ export default function TastePage() {
               <span className="text-xs font-bold text-amber-300 tracking-widest uppercase">Summer Palace · 취향 분석</span>
             </div>
             <div className="text-5xl drop-shadow-[0_0_40px_rgba(251,191,36,0.4)]">🎬</div>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={100} className="mb-10">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 rounded-full px-4 py-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 pulse" />
-            <span className="text-amber-200 text-sm font-semibold">
-              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 취향 분석 중
-            </span>
           </div>
         </FadeIn>
 
