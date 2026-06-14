@@ -1,6 +1,7 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import LoginOptions from "./LoginOptions";
 
 function parseUser() {
   try {
@@ -19,6 +20,15 @@ export default function SiteHeader() {
   const router = useRouter();
   const [user, setUser] = useState<{ nickname: string; profileImage?: string } | null>(null);
   const [stars, setStars] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  function handleLoginClick() {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      router.push("/login-select");
+    } else {
+      setShowLoginModal(true);
+    }
+  }
 
   useEffect(() => {
     setUser(parseUser());
@@ -76,7 +86,6 @@ export default function SiteHeader() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
           >
-            <span className="text-sm">📁</span>
             <span className="hidden sm:inline">보관함</span>
           </button>
 
@@ -90,20 +99,35 @@ export default function SiteHeader() {
               로그아웃
             </button>
           ) : (
-            <a
-              href="/api/auth/naver?redirect=/"
+            <button
+              onClick={handleLoginClick}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
-              style={{ background: "#03C75A", color: "#fff" }}
+              style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a78bfa" }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
-              </svg>
-              <span className="hidden sm:inline">네이버로 시작하기</span>
-              <span className="sm:hidden">로그인</span>
-            </a>
+              로그인하기
+            </button>
           )}
         </div>
       </div>
+
+      {/* 데스크톱 로그인 선택 팝업 */}
+      {showLoginModal && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.6)" }}
+          onClick={() => setShowLoginModal(false)}
+        >
+          <div
+            className="w-full max-w-sm mx-4 rounded-2xl p-6"
+            style={{ background: "#0c0c18", border: "1px solid rgba(255,255,255,0.1)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-black text-center mb-1 text-white">로그인</h2>
+            <p className="text-sm text-gray-500 text-center mb-6">간편하게 로그인하고 별조각을 안전하게 보관하세요.</p>
+            <LoginOptions onClose={() => setShowLoginModal(false)} />
+          </div>
+        </div>
+      )}
     </header>
   );
 }
