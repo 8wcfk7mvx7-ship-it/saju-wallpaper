@@ -288,7 +288,7 @@ function ErosContent() {
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-rose-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
           <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">19금</div>
           <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
             나의 성적<br />
@@ -337,7 +337,7 @@ function ErosContent() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/35 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">내 정보 입력</h2>
             <p className="text-gray-500 text-sm">시간을 알면 더 정밀한 분석이 가능합니다</p>
@@ -484,7 +484,7 @@ function ErosContent() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="eros-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="eros-result">
 
 
         {/* 헤더 */}

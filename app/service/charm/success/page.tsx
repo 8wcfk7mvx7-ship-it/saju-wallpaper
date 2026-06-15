@@ -279,7 +279,7 @@ function CharmSuccessContent() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
         {/* 성공 배너 */}
         <div className="text-center mb-6">
           <div className="text-5xl mb-3">✅</div>

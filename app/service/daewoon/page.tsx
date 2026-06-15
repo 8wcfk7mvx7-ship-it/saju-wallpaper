@@ -504,7 +504,8 @@ export default function DaewoonPage() {
         </div>
 
 
-        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-2xl mx-auto w-full pb-12" style={{ animation: "fadeInUp 0.7s ease both" }}>
+          <style>{`@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
           <div className="flex items-center gap-2 mb-8">
             <div className="w-2 h-2 rounded-full bg-yellow-400 pulse" />
@@ -573,7 +574,7 @@ export default function DaewoonPage() {
       <main className="min-h-screen bg-[#06060e] text-white">
         <BackButton />
         <StarShower active={showering} />
-        <div className="max-w-lg mx-auto px-5 py-10 pb-24">
+        <div className="max-w-2xl mx-auto px-5 py-10 pb-24">
 
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-3">
@@ -634,7 +635,7 @@ export default function DaewoonPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <BackButton />
-      <div className="max-w-lg mx-auto px-5 py-8 pb-32">
+      <div className="max-w-2xl mx-auto px-5 py-8 pb-32">
 
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-2">
@@ -1001,7 +1002,7 @@ export default function DaewoonPage() {
 
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-2xl mx-auto">
               {blueberries >= PRICE ? (
                 <button
                   onClick={() => {

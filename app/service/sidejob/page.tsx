@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -47,7 +47,7 @@ export default function SidejobPage() {
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-emerald-950/40 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
           <div className="inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-700/40 text-emerald-300 text-xs font-bold tracking-wider mb-8">
             🔥 월급만으로 안 되는 시대, 본업 외 수입 가능할까?
           </div>
@@ -100,7 +100,7 @@ export default function SidejobPage() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-emerald-950/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
             <p className="text-gray-500 text-sm">정확한 분석을 위해 출생 정보를 입력해주세요.</p>
@@ -208,7 +208,7 @@ export default function SidejobPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-emerald-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="sidejob-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="sidejob-result">
         <div className="text-center mb-8">
           <p className="text-emerald-400 text-xs font-bold tracking-widest mb-2">SIDE HUSTLE POTENTIAL</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -256,10 +256,98 @@ export default function SidejobPage() {
           ))}
         </div>
 
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-sky-300 mb-1">용신 기준 — &apos;{yongshinEl}&apos; ({yongshinSipseong})</p>
           <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} 부업을 고를 때도 이 기운과 맞는 분야를 우선 고려하면, 본업과 부업 사이의 에너지 소모가 줄어듭니다.</p>
         </div>
+
+        {/* 재성·식상 세력 심화 분석 */}
+        {(() => {
+          const sipseongStrength = getSipseongStrength(r);
+          const sik = sipseongStrength.find(s => s.group === "식상");
+          const jae = sipseongStrength.find(s => s.group === "재성");
+          const bige = sipseongStrength.find(s => s.group === "비겁");
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-sm font-bold text-emerald-300 mb-3">식상·재성·비겁 세력 — 투잡 체력 진단</p>
+              <div className="space-y-2">
+                {[sik, jae, bige].filter(Boolean).map(s => s && (
+                  <div key={s.group} className="flex items-start gap-2">
+                    <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${
+                      s.status === "강함" ? "bg-emerald-900/50 text-emerald-300" :
+                      s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
+                      s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
+                      "bg-white/5 text-gray-500"
+                    }`}>{s.group} · {s.status}</span>
+                    <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-white/5 leading-relaxed">
+                {sik?.status === "강함" && jae?.status === "강함"
+                  ? `식상과 재성이 모두 강해 — 아이디어를 수익으로 연결하는 흐름이 사주 안에 이미 갖춰진 구조야. 투잡 가능성이 높은 만큼 어떤 부업에 집중할지 선택이 중요해.`
+                  : sik?.status === "강함"
+                  ? `식상 기운이 강해 창작·실행력은 있지만, 재성 세력이 약한 편이라 만든 것을 돈으로 연결하는 과정에서 마무리가 느슨해질 수 있어. 수익화 루트를 미리 정해두는 게 핵심이야.`
+                  : jae?.status === "강함"
+                  ? `재성 기운이 강해 돈에 대한 감각은 예리하지만, 식상 세력이 약하면 새로운 수입원 자체를 만드는 실행력이 부족할 수 있어. 기존 전문성을 레버리지하는 부업이 잘 맞아.`
+                  : `식상·재성 모두 큰 힘이 없어, 무리해서 새로운 수입원을 개척하기보다 안정적으로 본업을 키우는 쪽이 더 잘 맞는 구조일 수 있어.`}
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* 합충 분석 */}
+        {(() => {
+          const allJj = [r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj, r.pillarsDetail.hour?.jj].filter(Boolean) as string[];
+          const jijiRelations = getJijiRelations(allJj);
+          const hapList = jijiRelations.filter(rel => ["육합","삼합","반합"].includes(rel.type));
+          const chungList = jijiRelations.filter(rel => ["충","형"].includes(rel.type));
+          if (hapList.length === 0 && chungList.length === 0) return null;
+          const POS_LABEL = ["년지","월지","일지","시지"];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-sm font-bold text-teal-300 mb-3">합·충으로 보는 투잡 에너지 흐름</p>
+              {hapList.map((rel, i) => (
+                <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
+                  <span className="text-teal-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합을 이뤄 안정적으로 흐르는 구조야. 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이야.
+                </p>
+              ))}
+              {chungList.map((rel, i) => (
+                <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 충돌해 에너지가 분산될 수 있어. 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니 집중력이 중요해.
+                </p>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* 극(克) 분석 */}
+        {(() => {
+          const OHAENG_CONTROLS_LOCAL: Record<string, Element> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
+          const dominantEl = r.dominant[0];
+          const lackingEl = r.lacking[0];
+          const gishinEl = r.yongshin.gishin;
+          const dominantControlsLacking = dominantEl && lackingEl && OHAENG_CONTROLS_LOCAL[dominantEl] === lackingEl;
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
+              <p className="text-sm font-bold text-rose-300 mb-1">오행 극(克) — 에너지 소모 패턴</p>
+              {dominantControlsLacking ? (
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  사주에서 가장 강한 <b>{dominantEl}</b> 기운이 가장 부족한 <b>{lackingEl}</b> 기운을 계속 누르고 있어. 강한 쪽은 더 강해지고 약한 쪽은 더 고갈되는 구조라, 투잡을 할 때도 강한 기운 쪽 일(아이디어 실행·영업 등)에 몰두하다 보면 체력이나 꾸준함을 담당하는 약한 기운이 빠르게 소진돼. 쉬는 날을 강제로 만들어두는 게 핵심이야.
+                </p>
+              ) : (
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  오행들이 비교적 순환하는 구조야. 한쪽으로만 에너지가 집중되지 않아서 투잡을 해도 체력·감정·재물 사이에서 균형을 어느 정도 유지할 수 있는 편이야.
+                </p>
+              )}
+              {gishinEl && (
+                <p className="text-xs text-gray-500 leading-relaxed mt-2 pt-2 border-t border-white/5">
+                  기신(忌神) <b>{gishinEl}</b> 기운이 강해지는 환경(예: 경쟁이 심한 분야, 과도한 관리 업무)에서 부업을 하면 용신이 눌려 오히려 본업까지 흔들릴 수 있어. 기신 기운이 적은 분야를 선택하는 것이 장기적으로 유리해.
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => router.push("/service/career")}

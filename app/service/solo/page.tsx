@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, analyzeSipseongPatterns, isGanyeoJidong, GANYEO_JIDONG_LOVE, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, analyzeSipseongPatterns, isGanyeoJidong, GANYEO_JIDONG_LOVE, getSipseongStrength, getJijiRelations, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -71,7 +71,7 @@ export default function SoloPage() {
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-indigo-950/40 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
           <div className="inline-block px-3 py-1 rounded-full bg-indigo-900/50 border border-indigo-700/40 text-indigo-300 text-xs font-bold tracking-wider mb-8">
             ✦ 완전 무료
@@ -132,7 +132,7 @@ export default function SoloPage() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-indigo-950/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
             <p className="text-gray-500 text-sm">정확한 분석을 위해 출생 정보를 입력해주세요.</p>
@@ -278,7 +278,7 @@ export default function SoloPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-indigo-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="solo-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="solo-result">
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MARRIAGE OR SOLO</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -395,6 +395,64 @@ export default function SoloPage() {
               : "전반적으로 큰 약점이 두드러지지는 않지만, 비혼 생활은 모든 의사결정과 리스크를 혼자 감당해야 한다는 특성이 있습니다. 재물·건강·인간관계 세 영역을 정기적으로 점검하는 습관을 만들어두면 장기적으로 훨씬 안정적인 비혼 생활이 가능합니다."}
           </p>
         </div>
+
+        {/* 관성·식상·인성 세력 — 관계 준비도 */}
+        {(() => {
+          const sipseongStrength = getSipseongStrength(r);
+          const gwan = sipseongStrength.find(s => s.group === "관성");
+          const sik = sipseongStrength.find(s => s.group === "식상");
+          const ins = sipseongStrength.find(s => s.group === "인성");
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-sm font-bold text-indigo-300 mb-3">십성 세력 — 관계 준비도 진단</p>
+              <div className="space-y-2 mb-3">
+                {[gwan, sik, ins].filter(Boolean).map(s => s && (
+                  <div key={s.group} className="flex items-start gap-2">
+                    <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${
+                      s.status === "강함" ? "bg-violet-900/50 text-violet-300" :
+                      s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
+                      s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
+                      "bg-white/5 text-gray-500"
+                    }`}>{s.group} · {s.status}</span>
+                    <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed pt-2 border-t border-white/5">
+                {gwan?.status === "무" || gwan?.status === "약함"
+                  ? `관성(배우자·사회적 책임 기운)이 ${gwan.status}한 구조야. 누군가에게 통제받거나 의존하는 관계보다 스스로 결정하고 움직이는 삶이 더 에너지가 나는 타입이야. 비혼이 심리적으로 훨씬 자연스럽게 느껴질 수 있어.`
+                  : gwan?.status === "강함"
+                  ? `관성이 강해 관계·책임·사회적 연결에 대한 욕구가 크게 자리하고 있어. 완전한 비혼보다 가까운 파트너십 관계를 유지하면서 자유도를 확보하는 방식이 현실적으로 잘 맞을 수 있어.`
+                  : `관성이 보통 수준이라, 결혼·비혼 어느 쪽이든 본인의 라이프스타일 선호와 상대방의 궁합이 훨씬 더 큰 변수야.`}
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* 합충 — 관계 타이밍 신호 */}
+        {(() => {
+          const allJj = [r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj, r.pillarsDetail.hour?.jj].filter(Boolean) as string[];
+          const jijiRelations = getJijiRelations(allJj);
+          const hapList = jijiRelations.filter(rel => ["육합","삼합","반합"].includes(rel.type));
+          const chungList = jijiRelations.filter(rel => ["충","원진"].includes(rel.type));
+          if (hapList.length === 0 && chungList.length === 0) return null;
+          const POS_LABEL = ["년지","월지","일지","시지"];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-sm font-bold text-rose-300 mb-3">합·충으로 보는 관계 흐름</p>
+              {hapList.map((rel, i) => (
+                <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
+                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 합을 이뤄 서로 끌어당기는 에너지가 있어. 인연이 만들어지는 환경이 자연스럽게 조성되는 구조라, 비혼을 선택해도 의미 있는 관계가 끊이지 않을 가능성이 높아.
+                </p>
+              ))}
+              {chungList.map((rel, i) => (
+                <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 충돌하는 기운이 있어. 관계를 안정적으로 유지하기보다 변화와 이별의 흐름이 반복되기 쉬운 구조야. 결혼이든 비혼이든, 관계에 지나치게 집착하기보다 '오고 가는 것'에 유연한 태도가 정서적으로 훨씬 편해.
+                </p>
+              ))}
+            </div>
+          );
+        })()}
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
           <p className="text-sm font-bold text-violet-300 mb-2">결혼하지 않고 추가로 시도하면 좋을 것들</p>

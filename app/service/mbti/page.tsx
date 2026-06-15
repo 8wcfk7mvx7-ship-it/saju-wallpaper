@@ -380,7 +380,7 @@ export default function MbtiPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-950/40 blur-[140px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="mbti-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="mbti-result">
         <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
         <div className="text-center mb-8">

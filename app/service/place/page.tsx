@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, getJohuCareerInsight, getGungseongCareerSummary, getJijiRelations, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -162,6 +162,7 @@ export default function PlacePage() {
   const [currentCityEl, setCurrentCityEl] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
   const [unlocked, setUnlocked] = useState(false);
+  const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
 
   function handleBlueberryUnlock() {
     const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
@@ -216,6 +217,7 @@ export default function PlacePage() {
       const el = r.yongshin.yongshin || r.lacking[0] || "토";
       setYongshinEl(el);
       setSelectedEl(el);
+      setSajuResult(r);
     } catch {
       setYongshinEl("토");
       setSelectedEl("토");
@@ -257,7 +259,7 @@ export default function PlacePage() {
               <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 여름궁전</button>
             </div>
 
-            <div className="max-w-md mx-auto px-6 pt-12 pb-28 text-center">
+            <div className="max-w-xl mx-auto px-6 pt-12 pb-28 text-center">
               <div className="flex flex-col items-center gap-2 mb-8">
                 <div className="inline-flex items-center gap-2 bg-amber-500/12 border border-amber-500/28 rounded-full px-4 py-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block" />
@@ -337,7 +339,7 @@ export default function PlacePage() {
 
       {/* ══ FORM ══ */}
       {step === "form" && (
-        <div className="max-w-lg mx-auto px-5 py-10 pb-20">
+        <div className="max-w-2xl mx-auto px-5 py-10 pb-20">
 
           <h2 className="text-xl font-black text-white mb-1">생년월일 입력</h2>
           <p className="text-xs text-white/35 mb-8">사주를 분석해 내 기운과 맞는 도시를 찾습니다</p>
@@ -383,7 +385,7 @@ export default function PlacePage() {
 
       {/* ══ RESULT ══ */}
       {step === "result" && krData && (
-        <div className="max-w-lg mx-auto px-5 py-10 pb-12">
+        <div className="max-w-2xl mx-auto px-5 py-10 pb-12">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
           {/* 용신 배너 */}
@@ -452,6 +454,64 @@ export default function PlacePage() {
               <p className="text-xs text-white/35 leading-relaxed">💡 {dirData.room}</p>
             </div>
           </div>
+
+          {/* 조후(調候) 분석 */}
+          {sajuResult && (() => {
+            const ilgan = sajuResult.pillarsDetail.day.cg;
+            const monthJj = sajuResult.pillarsDetail.month.jj;
+            const johu = getJohuCareerInsight(ilgan, monthJj);
+            return (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+                <p className="text-sm font-bold text-orange-300 mb-1">조후(調候) — 기온·기운으로 보는 적합한 환경</p>
+                <p className="text-xs text-amber-400/70 mb-2 font-semibold">{johu.climate} 기운</p>
+                <p className="text-sm text-gray-300 leading-relaxed mb-2">{johu.desc}</p>
+                <p className="text-xs text-emerald-300 leading-relaxed">▶ 이런 분위기의 도시가 잘 맞아: {johu.fields}</p>
+              </div>
+            );
+          })()}
+
+          {/* 궁성(宮星) 배치 분석 */}
+          {sajuResult && (() => {
+            const gungseongList = getGungseongCareerSummary(sajuResult.pillarsDetail);
+            if (gungseongList.length === 0) return null;
+            return (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+                <p className="text-sm font-bold text-cyan-300 mb-3">궁성(宮星)으로 보는 환경 적합성</p>
+                <div className="space-y-2">
+                  {gungseongList.slice(0, 3).map((g, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="shrink-0 px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-900/40 text-cyan-300">{g.palaceLabel.split("(")[0]} · {g.sipseong}</span>
+                      <p className="text-xs text-gray-400 leading-relaxed">{g.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 합충 — 이동 타이밍 */}
+          {sajuResult && (() => {
+            const allJj = [sajuResult.pillarsDetail.year.jj, sajuResult.pillarsDetail.month.jj, sajuResult.pillarsDetail.day.jj, sajuResult.pillarsDetail.hour?.jj].filter(Boolean) as string[];
+            const chungList = getJijiRelations(allJj).filter(rel => ["충"].includes(rel.type));
+            const hapList = getJijiRelations(allJj).filter(rel => ["삼합","육합","반합"].includes(rel.type));
+            if (chungList.length === 0 && hapList.length === 0) return null;
+            const POS_LABEL = ["년지","월지","일지","시지"];
+            return (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+                <p className="text-sm font-bold text-violet-300 mb-3">합·충으로 보는 이동 타이밍</p>
+                {hapList.map((rel, i) => (
+                  <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
+                    <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해 현재 환경에 안정적으로 정착하려는 흐름이 있어. 이사·이민을 고려 중이라면 크게 서두르지 않아도 돼.
+                  </p>
+                ))}
+                {chungList.map((rel, i) => (
+                  <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
+                    <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) 충</span> — 충 에너지가 이동·변화를 촉진하는 구조야. 지금 있는 곳보다 새로운 환경으로 옮겼을 때 오히려 기운이 살아나는 타입이야. 추천 도시로의 이사가 실제로 전환점이 될 수 있어.
+                  </p>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* 한국 도시 */}
           <div className="mb-6">

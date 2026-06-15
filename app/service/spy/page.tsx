@@ -26,7 +26,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 }
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getSipseongStrength, getJijiRelations, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -204,7 +204,7 @@ function SpyContent() {
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-red-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-rose-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
           <div className="inline-block px-3 py-1 rounded-full bg-red-900/50 border border-red-700/40 text-red-300 text-xs font-bold tracking-wider mb-8">
             ⚠ 이 분석은 매울 수 있습니다
           </div>
@@ -258,7 +258,7 @@ function SpyContent() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full bg-red-950/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
 
 
           <div className="text-center mb-8">
@@ -382,7 +382,7 @@ function SpyContent() {
           style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-red-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="spy-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="spy-result">
 
 
 
@@ -563,6 +563,74 @@ function SpyContent() {
             </div>
           </div>
         )}
+
+        {/* 식상·관성 세력 — 직관·충성도 심화 분석 */}
+        {(() => {
+          const sipseongStrength = getSipseongStrength(result);
+          const sik = sipseongStrength.find(s => s.group === "식상");
+          const gwan = sipseongStrength.find(s => s.group === "관성");
+          const jae = sipseongStrength.find(s => s.group === "재성");
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">십성 세력 — 이 사람의 연애 본능</p>
+              <div className="space-y-2 mb-3">
+                {[sik, gwan, jae].filter(Boolean).map(s => s && (
+                  <div key={s.group} className="flex items-start gap-2">
+                    <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${
+                      s.status === "강함" ? "bg-red-900/50 text-red-300" :
+                      s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
+                      s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
+                      "bg-white/5 text-gray-500"
+                    }`}>{s.group} · {s.status}</span>
+                    <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-2 border-t border-white/5 space-y-1.5">
+                {sik?.status === "강함" && (
+                  <p className="text-xs text-rose-300/80 leading-relaxed">
+                    ⚠ 식상이 강해 — 표현 욕구가 크고 자기 감정을 밖으로 드러내야 직성이 풀리는 타입이야. 관계 안에서 억눌리면 밖에서 위로를 찾는 패턴이 생기기 쉬워.
+                  </p>
+                )}
+                {gwan?.status === "강함" && (
+                  <p className="text-xs text-sky-300/80 leading-relaxed">
+                    관성이 강해 — 원칙·책임·사회적 시선을 중요하게 생각하는 타입이야. 충동적인 바람보다는 장기적 관계를 유지하는 경향이 있어.
+                  </p>
+                )}
+                {jae?.status === "강함" && (
+                  <p className="text-xs text-amber-300/80 leading-relaxed">
+                    재성이 강해 — 이성에게 매력적으로 다가가는 능력과 다양한 인간관계를 동시에 유지하는 성향이 있어. 한 사람에게만 집중하기보다 넓게 교류하는 패턴이 나타날 수 있어.
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* 합충 — 관계 안정성 */}
+        {(() => {
+          const allJj = [result.pillarsDetail.year.jj, result.pillarsDetail.month.jj, result.pillarsDetail.day.jj, result.pillarsDetail.hour?.jj].filter(Boolean) as string[];
+          const jijiRelations = getJijiRelations(allJj);
+          const hapList = jijiRelations.filter(rel => ["육합","삼합","반합"].includes(rel.type));
+          const chungList = jijiRelations.filter(rel => ["충","원진"].includes(rel.type));
+          if (hapList.length === 0 && chungList.length === 0) return null;
+          const POS_LABEL = ["년지","월지","일지","시지"];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">합·충 — 관계 안정성 흐름</p>
+              {hapList.map((rel, i) => (
+                <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
+                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해져 관계 자체에 끌림의 에너지가 강한 구조야. 한 사람에게 깊게 빠지는 경향이 있고, 그만큼 이별 후 빠져나오는 것도 오래 걸려.
+                </p>
+              ))}
+              {chungList.map((rel, i) => (
+                <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 기둥 간 충돌이 있어 감정 기복이 크고, 안정된 관계보다 자극·갈등·화해의 사이클이 반복되기 쉬운 구조야. 관계 자체가 불안정할 때 외부에서 위안을 찾으려는 충동이 커져.
+                </p>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* 오행 분포 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">

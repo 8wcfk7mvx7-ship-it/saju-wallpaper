@@ -369,7 +369,7 @@ export default function StockPage() {
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-900/25 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-900/20 blur-[130px]" />
         </div>
-        <div className="relative z-10 max-w-md w-full text-center">
+        <div className="relative z-10 max-w-xl w-full text-center">
           <FadeIn delay={0}><div className="text-5xl mb-10 drop-shadow-[0_0_40px_rgba(16,185,129,0.5)]">📈</div></FadeIn>
           <FadeIn delay={100}>
             <div className="flex flex-col items-center gap-2 mb-10">
@@ -421,7 +421,7 @@ export default function StockPage() {
           <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-emerald-900/20 blur-[140px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[120px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 처음으로</button>
             {hasSaved && <span className="text-xs text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">✓ 저장된 사주 불러옴</span>}
@@ -538,7 +538,7 @@ export default function StockPage() {
         <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-emerald-900/20 blur-[140px]" />
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="stock-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="stock-result">
         {/* 상단 네비 */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>

@@ -236,7 +236,7 @@ export default function TastePage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
       </div>
 
-      <div className="relative z-10 max-w-md w-full text-center space-y-0">
+      <div className="relative z-10 max-w-xl w-full text-center space-y-0">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5">
@@ -306,7 +306,7 @@ export default function TastePage() {
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-amber-900/15 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
         </div>
-        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
 
           <div className="text-center mb-8">
             <div className="text-4xl mb-3">🎬</div>
@@ -340,7 +340,7 @@ export default function TastePage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-violet-900/15 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="taste-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="taste-result">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
           <span className="text-xs text-green-400/60 bg-green-500/10 border border-green-500/15 px-2 py-1 rounded-full">무료</span>

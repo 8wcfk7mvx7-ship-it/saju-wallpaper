@@ -145,7 +145,7 @@ function CharmResultContent() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-32" id="charm-result">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-32" id="charm-result">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => router.push("/service/charm")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 분석</button>
@@ -486,7 +486,7 @@ function CharmResultContent() {
           }}
           className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3 bg-gradient-to-t from-[#080810] via-[#080810]/95 to-transparent"
         >
-          <div className="max-w-lg mx-auto">
+          <div className="max-w-2xl mx-auto">
             {blueberries >= CHARM_PRICE ? (
               <button
                 onClick={() => {

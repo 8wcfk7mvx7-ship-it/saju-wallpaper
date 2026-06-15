@@ -322,7 +322,7 @@ export default function CalendarPage() {
 
       <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-base text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-      <div className="relative z-10 max-w-md w-full text-center">
+      <div className="relative z-10 max-w-xl w-full text-center">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
@@ -388,7 +388,7 @@ export default function CalendarPage() {
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
       <BackButton />
       <style>{`select option{background:#0d0d1a;color:#fff}`}</style>
-      <div className="max-w-lg mx-auto px-5 pt-8">
+      <div className="max-w-2xl mx-auto px-5 pt-8">
         <h2 className="text-4xl font-black text-white mb-1">길일·흉일 확인</h2>
         <p className="text-lg mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
 
@@ -442,7 +442,7 @@ export default function CalendarPage() {
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <BackButton />
       <StarShower active={showering} />
-      <div className="max-w-lg mx-auto px-4 pt-8">
+      <div className="max-w-2xl mx-auto px-4 pt-8">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1">

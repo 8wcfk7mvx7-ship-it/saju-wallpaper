@@ -171,7 +171,7 @@ function DaewoonSuccessContent() {
 
   return (
     <main className="min-h-screen bg-[#0d0700] text-white pb-20">
-      <div className="max-w-lg mx-auto px-5 py-8">
+      <div className="max-w-2xl mx-auto px-5 py-8">
         {/* 성공 배너 */}
         <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-4 mb-6 text-center">
           <p className="text-green-400 font-bold">✓ 결제 완료 · 프리미엄 보고서 활성화</p>

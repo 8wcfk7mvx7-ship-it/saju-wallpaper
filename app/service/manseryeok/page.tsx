@@ -1351,7 +1351,7 @@ export default function ManseryeokPage() {
 
   if (result && calcInput) {
     return (
-      <main className="max-w-lg mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8">
         <ResultView
           result={result}
           form={{ name: birthForm.name, gender: birthForm.gender, birthPlace: birthForm.city || "서울" }}
@@ -1397,7 +1397,7 @@ export default function ManseryeokPage() {
         }} />
       ))}
 
-      <main className="relative z-10 max-w-lg mx-auto px-4 py-8">
+      <main className="relative z-10 max-w-2xl mx-auto px-4 py-8">
         {/* 키치 히어로 헤더 */}
         <div className="text-center pt-6 pb-8 px-2">
           <div style={{ animation: "rotateSlow2 18s linear infinite", display: "inline-block", fontSize: 38, marginBottom: 12 }}>☯</div>
