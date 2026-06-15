@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
-  getJijiRelations, sortJijiRelationsByStrength, REL_TYPE_COLOR, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element,
+  getJijiRelations, sortJijiRelationsByStrength, REL_TYPE_COLOR, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -67,6 +67,97 @@ const GROUP_TODAY: Record<string, { 총운: string; 재물: string; 애정: stri
     공부문서: "공부·문서 운에서는 새로운 내용을 받아들이고 이해하는 능력이 좋아지는 날이에요. 독서, 강의 수강, 자격증 공부처럼 '입력' 중심의 학습에 특히 잘 맞습니다.",
   },
 };
+
+// 지지 합충 시각 다이어그램 컴포넌트
+// cols: 명식표 컬럼 배열 (시주→일주→월주→년주→대운→세운→오늘 순)
+// relations: sortJijiRelationsByStrength 처리된 관계 배열
+
+const COL_W = 52; // 각 컬럼 고정 너비(px)
+const COL_GAP = 6; // 컬럼 간격(px)
+const LINE_H = 28; // 각 커넥터 줄의 높이(px)
+const BADGE_R = 22; // 지지 뱃지 반지름(px) — circle diameter
+const HAP_COLOR = "#4ade80";
+const CHUNG_COLOR = "#f87171";
+const HYEONG_COLOR = "#fb923c";
+const PAHAE_COLOR = "#94a3b8";
+const WONJIN_COLOR = "#c084fc";
+
+function relColor(type: JijiRelation["type"]): string {
+  if (type === "육합" || type === "삼합" || type === "반합") return HAP_COLOR;
+  if (type === "충") return CHUNG_COLOR;
+  if (type === "형") return HYEONG_COLOR;
+  if (type === "파" || type === "해") return PAHAE_COLOR;
+  return WONJIN_COLOR;
+}
+
+function colCenterX(idx: number): number {
+  return idx * (COL_W + COL_GAP) + COL_W / 2;
+}
+
+interface DiagramProps {
+  cols: { label: string; jj: string }[];
+  relations: JijiRelation[];
+}
+
+function JijiDiagram({ cols, relations }: DiagramProps) {
+  const totalW = cols.length * COL_W + (cols.length - 1) * COL_GAP;
+  const badgeAreaH = BADGE_R + 8; // top padding + badge
+  const linesH = relations.length * LINE_H + (relations.length > 0 ? 8 : 0);
+  const totalH = badgeAreaH + linesH;
+
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <div style={{ position: "relative", width: totalW, minWidth: totalW, height: totalH + 4 }}>
+        {/* 컬럼 레이블 + 지지 뱃지 */}
+        {cols.map((col, i) => {
+          const cx = colCenterX(i);
+          return (
+            <div key={i} style={{ position: "absolute", left: cx - COL_W / 2, top: 0, width: COL_W, textAlign: "center" }}>
+              <div style={{ fontSize: 9, color: "#6b7280", fontWeight: 700, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {col.label.replace(/\s*\(.*\)/, "")}
+              </div>
+              <div style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: BADGE_R, height: BADGE_R,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.07)",
+                border: "1.5px solid rgba(255,255,255,0.18)",
+                fontSize: 14, fontWeight: 900, color: "#e5e7eb",
+              }}>
+                {col.jj === "-" ? "·" : col.jj}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* 커넥터 라인들 — 강도순 정렬 */}
+        {relations.map((rel, lineIdx) => {
+          const xA = colCenterX(Math.min(rel.a, rel.b));
+          const xB = colCenterX(Math.max(rel.a, rel.b));
+          const y = badgeAreaH + lineIdx * LINE_H + LINE_H / 2;
+          const color = relColor(rel.type);
+          const midX = (xA + xB) / 2;
+
+          return (
+            <svg
+              key={lineIdx}
+              style={{ position: "absolute", left: 0, top: 0, width: totalW, height: totalH + 4, overflow: "visible", pointerEvents: "none" }}
+            >
+              {/* 수평 라인 */}
+              <line x1={xA} y1={y} x2={xB} y2={y} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
+              {/* 양쪽 수직 티끝 */}
+              <line x1={xA} y1={y - 5} x2={xA} y2={y + 5} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
+              <line x1={xB} y1={y - 5} x2={xB} y2={y + 5} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
+              {/* 중앙 레이블 배경 */}
+              <rect x={midX - 14} y={y - 9} width={28} height={18} rx={9} fill="#1a1a2e" stroke={color} strokeWidth={1} strokeOpacity={0.8} />
+              <text x={midX} y={y + 4} textAnchor="middle" fontSize={10} fontWeight={700} fill={color}>{rel.type}</text>
+            </svg>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function TodayFortunePage() {
   const router = useRouter();
@@ -313,27 +404,30 @@ export default function TodayFortunePage() {
         </div>
         </FadeIn>
 
-        {/* 합충형파해 분석 */}
+        {/* 지지 합충 시각 다이어그램 */}
         <FadeIn delay={80}>
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-gray-300 mb-3">전체 합·충·형·파·해 분석</p>
-          {relations.length === 0 && cgRelations.length === 0 ? (
-            <p className="text-sm text-gray-500 leading-relaxed">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
-          ) : (
-            <div className="space-y-2">
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 mb-5 overflow-x-auto">
+          <p className="text-sm font-bold text-gray-300 mb-4">지지 합충형파해 다이어그램</p>
+          <JijiDiagram cols={cols} relations={relations} />
+          {/* 관계 설명 목록 */}
+          {(relations.length > 0 || cgRelations.length > 0) && (
+            <div className="mt-4 space-y-1.5 border-t border-white/10 pt-3">
               {relations.map((rel, i) => (
-                <div key={`jj-${i}`} className="flex items-center gap-2 text-sm">
-                  <span className="font-bold" style={{ color: REL_TYPE_COLOR[rel.type] }}>{rel.type}</span>
-                  <span className="text-gray-300">{allJjLabels[rel.a]}({rel.jjA}) ↔ {allJjLabels[rel.b]}({rel.jjB})</span>
+                <div key={`jj-${i}`} className="flex items-center gap-2 text-xs">
+                  <span className="font-bold shrink-0" style={{ color: REL_TYPE_COLOR[rel.type] }}>{rel.type}</span>
+                  <span className="text-gray-400">{allJjLabels[rel.a]}({rel.jjA}) ↔ {allJjLabels[rel.b]}({rel.jjB})</span>
                 </div>
               ))}
               {cgRelations.map((rel, i) => (
-                <div key={`cg-${i}`} className="flex items-center gap-2 text-sm">
-                  <span className="font-bold" style={{ color: rel.type === "합" ? "#4ade80" : "#f87171" }}>천간{rel.type}</span>
-                  <span className="text-gray-300">{rel.from}({rel.a}) ↔ {rel.to}({rel.b})</span>
+                <div key={`cg-${i}`} className="flex items-center gap-2 text-xs">
+                  <span className="font-bold shrink-0" style={{ color: rel.type === "합" ? "#4ade80" : "#f87171" }}>천간{rel.type}</span>
+                  <span className="text-gray-400">{rel.from}({rel.a}) ↔ {rel.to}({rel.b})</span>
                 </div>
               ))}
             </div>
+          )}
+          {relations.length === 0 && cgRelations.length === 0 && (
+            <p className="text-xs text-gray-500 mt-2">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
           )}
         </div>
         </FadeIn>
