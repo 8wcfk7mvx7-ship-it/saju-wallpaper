@@ -98,8 +98,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
   장생: {
     label:"장생(長生)", score:9, color:"#4ade80",
     desc:"새로운 생명이 태어나듯 에너지가 솟구치는 시기.",
-    narrative:"아기가 세상에 막 나온 것처럼 모든 것이 새롭고 신선하게 느껴지는 구간이다. 몸에 기운이 넘치고 주변 사람들이 자연스럽게 따라오며, 시작하는 것마다 뭔가 될 것 같은 생동감이 있어. 이 시기에 시작한 일, 만난 사람, 내린 결정들이 이후 수십 년의 토대가 돼. 건강 상태가 전반적으로 좋고, 도전에 대한 두려움보다 설렘이 앞선다.",
-    caution:"시작의 기운이 강한 만큼 경험이 쌓이기 전이라 판단이 섣부를 수 있어. 넘치는 에너지로 무리하게 벌이기보다 방향을 잘 잡는 게 관건이다.",
+    narrative:"아기가 세상에 막 나온 것처럼 모든 것이 새롭고 신선하게 느껴지는 구간이에요. 몸에 기운이 넘치고 주변 사람들이 자연스럽게 따라오며, 시작하는 것마다 뭔가 될 것 같은 생동감이 있어요. 이 시기에 시작한 일, 만난 사람, 내린 결정들이 이후 수십 년의 토대가 돼요. 건강 상태가 전반적으로 좋고, 도전에 대한 두려움보다 설렘이 앞서요.",
+    caution:"시작의 기운이 강한 만큼 경험이 쌓이기 전이라 판단이 섣부를 수 있어요. 넘치는 에너지로 무리하게 벌이기보다 방향을 잘 잡는 게 관건이에요.",
     keyword:"시작 · 생명력 · 도전 · 건강"
   },
   목욕: {
@@ -720,7 +720,7 @@ export default function DaewoonPage() {
 
                 {uunsF && (
                   <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.3)" }}>
-                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 당신에게 미치는 영향</p>
+                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {name}님에게 미치는 영향</p>
                     <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}</p>
                   </div>
                 )}
