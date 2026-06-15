@@ -4100,3 +4100,100 @@ export function getSexlifeInsights(result: SajuResult): SexlifeInsight[] {
 
   return insights;
 }
+
+// ── 적성: 조후(調候) 기반 분야 추천 ─────────────────────────────────────
+export interface JohuCareerInsight {
+  climate: "한랭" | "온열" | "건조" | "습윤" | "균형";
+  title: string;
+  desc: string;
+  fields: string;
+}
+
+// 일간 오행 + 월지 계절을 바탕으로 사주의 '기온/습도' 치우침을 진단하고
+// 그 불균형을 보완하거나 활용하기에 좋은 업무 환경/분야를 제안한다.
+export function getJohuCareerInsight(ilgan: string, monthJj: string): JohuCareerInsight {
+  const ilEl = CHEONGAN_ELEMENT[ilgan];
+  const season = getSeasonByMonth(monthJj);
+  const coldElements: Element[] = ["수", "금"];
+  const hotElements: Element[] = ["화", "목"];
+  const isWinter: boolean = season === "겨울";
+  const isSummer: boolean = season === "여름";
+
+  // 한랭(寒冷): 겨울 출생이거나 일간이 차가운 오행(수·금)이면서 여름이 아닌 경우
+  if (isWinter || (coldElements.includes(ilEl) && !isSummer)) {
+    return {
+      climate: "한랭",
+      title: "조후상 한랭(寒冷)한 사주 — 온기를 더하는 환경이 잘 맞아",
+      desc: `${ilgan}일간이 ${season}에 태어나 사주 전체가 차갑고 정적인 기운으로 치우쳐 있어. 이런 사주는 가만히 앉아서 혼자 깊게 파고드는 일은 잘 맞지만, 변화나 활기가 없는 곳에 너무 오래 있으면 의욕이 쉽게 가라앉아. 따뜻한 에너지(화·목)를 채워주는 분야나, 사람들과 활발히 부딪히는 일을 의식적으로 선택하면 훨씬 활력 있게 일할 수 있어.`,
+      fields: "교육·상담·헬스케어·기획처럼 사람과 직접 소통하는 일, 또는 트렌디하고 역동적인 분야(마케팅·이벤트·콘텐츠)",
+    };
+  }
+  // 온열(溫熱): 여름 출생이거나 일간이 화/목이면서 여름인 경우
+  if (isSummer || (hotElements.includes(ilEl) && !isWinter)) {
+    return {
+      climate: "온열",
+      title: "조후상 온열(溫熱)한 사주 — 식혀주는 환경이 잘 맞아",
+      desc: `${ilgan}일간이 ${season}에 태어나 사주 전체가 뜨겁고 급한 기운으로 가득해. 에너지와 추진력은 넘치지만, 그만큼 쉽게 소진되거나 성급한 판단으로 일을 그르치기 쉬워. 차분하고 체계적인 흐름(수·금 기운)을 가진 환경, 즉 데이터·분석·시스템이 갖춰진 곳에서 일하면 본인의 열정이 폭주하지 않고 좋은 결과로 이어져.`,
+      fields: "금융·데이터분석·연구·IT처럼 체계와 논리가 중심인 분야, 혹은 의료·법률처럼 냉정한 판단력이 필요한 전문직",
+    };
+  }
+  // 건조: 토 일간이면서 여름/가을
+  if (ilEl === "토" && (isSummer || season === "가을")) {
+    return {
+      climate: "건조",
+      title: "조후상 건조(乾燥)한 사주 — 수분(유연함)을 더하는 환경이 잘 맞아",
+      desc: `${ilgan}일간이 ${season}에 태어나 단단하고 건조한 기운이 강해. 원칙과 기준이 뚜렷한 건 장점이지만, 너무 뻣뻣하면 변화하는 상황에 대응이 늦어질 수 있어. 유연하고 흐름이 있는 분야(수 기운 - 무역·서비스·콘텐츠 유통)에서 일하면 본래의 단단함이 더 큰 신뢰로 이어져.`,
+      fields: "부동산·건설·행정처럼 토대를 다지는 일에 유연성을 더한 분야, 또는 유통·물류·서비스업",
+    };
+  }
+  // 습윤: 수 일간이면서 봄/여름이 아닌 경우 등 - fallback
+  if (ilEl === "수" && !isSummer) {
+    return {
+      climate: "습윤",
+      title: "조후상 습한(濕) 기운이 도는 사주 — 따뜻하게 데워주는 환경이 잘 맞아",
+      desc: `${ilgan}일간이 ${season}에 태어나 사주에 물기운이 정체되기 쉬운 구조야. 생각이 깊고 신중한 건 강점이지만, 고여있으면 우울감이나 결정 지연으로 이어질 수 있어. 활기차고 따뜻한 분위기(화 기운)의 조직, 또는 적극적으로 표현해야 하는 직무를 선택하면 정체된 기운이 잘 순환돼.`,
+      fields: "영업·교육·엔터테인먼트처럼 사람을 직접 만나고 표현하는 일, 또는 활동량이 많은 야외·현장직",
+    };
+  }
+
+  return {
+    climate: "균형",
+    title: "조후상 비교적 균형 잡힌 사주 — 환경을 크게 가리지 않아",
+    desc: `${ilgan}일간이 ${season}에 태어나 사주의 한온조습이 비교적 균형을 이루고 있어. 특정 환경에 크게 구애받지 않고 적응력이 좋은 편이라, 오히려 본인의 십성 구조(식상·재성·관성·인성)가 보여주는 방향성에 맞춰 분야를 고르는 게 더 중요해.`,
+    fields: "환경적 제약보다 본인의 강점 십성(식상/재성/관성/인성)에 맞는 분야 선택이 핵심",
+  };
+}
+
+// ── 적성: 궁성(宮星)별 십성 배치 요약 ───────────────────────────────────
+export interface GungseongCareerItem {
+  position: "연주" | "월주" | "일지" | "시주";
+  palaceLabel: string;
+  sipseong: string;
+  desc: string;
+}
+
+// 각 기둥(궁)에 자리한 십성을 바탕으로, 그 궁이 의미하는 인생 영역(사회적 뿌리/직업·사회생활/배우자/자녀·노후)에서
+// 어떤 진로 신호가 드러나는지 정리한다. 월주와 일지는 진로(직업/사회생활)에 가장 직결되므로 우선 노출한다.
+export function getGungseongCareerSummary(pd: SajuResult["pillarsDetail"]): GungseongCareerItem[] {
+  const items: GungseongCareerItem[] = [];
+  const PALACE_LABEL: Record<"연주"|"월주"|"일지"|"시주", string> = {
+    연주: "년주(조상·사회적 뿌리)", 월주: "월주(직업·사회생활)",
+    일지: "일지(본인·배우자)", 시주: "시주(자녀·노후)",
+  };
+
+  const entries: Array<{ position: "연주"|"월주"|"일지"|"시주"; sipseong: string | undefined }> = [
+    { position: "연주", sipseong: pd.year?.sipseongCg },
+    { position: "월주", sipseong: pd.month?.sipseongCg },
+    { position: "일지", sipseong: pd.day?.sipseongJj },
+    { position: "시주", sipseong: pd.hour?.sipseongCg },
+  ];
+
+  for (const { position, sipseong } of entries) {
+    if (!sipseong) continue;
+    const desc = getSipsungPositionDesc(position, sipseong);
+    if (!desc) continue;
+    items.push({ position, palaceLabel: PALACE_LABEL[position], sipseong, desc });
+  }
+
+  return items;
+}

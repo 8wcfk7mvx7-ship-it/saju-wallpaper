@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -244,6 +244,30 @@ export default function CareerPage() {
   const gwanseongCount = totalCount("정관") + totalCount("편관");
   const hasSikSangSaengGwan = sikSangCount >= 1 && gwanseongCount >= 1;
 
+  // 합충 분석: 4지지 간의 관계를 모두 구해 진로에 영향을 줄 만한 합/충을 추려낸다
+  const allJj = [r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj, r.pillarsDetail.hour?.jj].filter(Boolean) as string[];
+  const jijiRelations = getJijiRelations(allJj);
+  const POS_LABEL = ["년지", "월지", "일지", "시지"];
+  const hapList = jijiRelations.filter(rel => ["육합", "삼합", "반합"].includes(rel.type));
+  const chungList = jijiRelations.filter(rel => ["충", "형", "파", "해", "원진"].includes(rel.type));
+
+  // 극(克)하는 관계: 사주에서 가장 강한 오행이 가장 약한(부족한) 오행을 극하는지,
+  // 혹은 용신을 극하는 기신 오행이 어떤 십성에 해당하는지 짚어준다
+  const ilganEl = CHEONGAN_ELEMENT[ilgan];
+  const OHAENG_CONTROLS_LOCAL: Record<string, Element> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
+  const dominantEl = r.dominant[0];
+  const lackingEl = r.lacking[0];
+  const dominantControlsLacking = dominantEl && lackingEl && OHAENG_CONTROLS_LOCAL[dominantEl] === lackingEl;
+  const gishinEl = r.yongshin.gishin;
+  const gishinSipseong = gishinEl ? getSipseong(ilgan, ELEMENT_TO_CG[gishinEl]) : null;
+  const gishinGroup = gishinSipseong ? SIPSEONG_GROUP[gishinSipseong] : null;
+
+  // 조후 분석
+  const johu = getJohuCareerInsight(ilgan, r.pillarsDetail.month.jj);
+
+  // 궁성 분석
+  const gungseongList = getGungseongCareerSummary(r.pillarsDetail);
+
   return (
     <main className="min-h-screen bg-[#070a14] text-white">
       <BackButton />
@@ -279,6 +303,74 @@ export default function CareerPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 조후(調候) 분석 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-orange-300 mb-1">조후(調候)로 보는 일하기 좋은 환경 — {johu.climate}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-2">{johu.desc}</p>
+          <p className="text-xs text-emerald-300 leading-relaxed">▶ 추천 분야: {johu.fields}</p>
+        </div>
+
+        {/* 궁성(宮星) 분석 */}
+        {gungseongList.length > 0 && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-cyan-300 mb-3">궁성(宮星)으로 보는 십성 배치</p>
+            <div className="space-y-2">
+              {gungseongList.map((g, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="shrink-0 px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-900/40 text-cyan-300">
+                    {g.palaceLabel} · {g.sipseong}
+                  </span>
+                  <p className="text-xs text-gray-400 leading-relaxed">{g.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 합충(合沖) 분석 */}
+        {(hapList.length > 0 || chungList.length > 0) && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-emerald-300 mb-3">합·충으로 보는 기둥 간 관계</p>
+            {hapList.length > 0 && (
+              <div className="mb-2">
+                {hapList.map((rel, i) => (
+                  <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1">
+                    <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 영역이 서로 끌어당기며 협력하는 구조라, 해당 기둥이 나타내는 영역(예: {rel.a === 1 || rel.b === 1 ? "직업·사회생활" : "주변 환경"})에서 안정적인 관계나 협업이 잘 풀려요.
+                  </p>
+                ))}
+              </div>
+            )}
+            {chungList.length > 0 && (
+              <div>
+                {chungList.map((rel, i) => (
+                  <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1">
+                    <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 영역 사이에 부딪힘이 있어, {rel.a === 1 || rel.b === 1 ? "직업·진로가 한 번에 정착되기보다 몇 번의 변화를 거치며 자리를 잡는 흐름" : "환경 변화에 따라 마음이 흔들릴 수 있는 구간"}이 있을 수 있어요. 변화를 나쁜 신호로 보지 말고, 그 자체를 다음 단계로 가는 과정으로 받아들이는 게 좋아요.
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 극(克) 관계 분석 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-rose-300 mb-1">오행이 서로 극(克)하는 관계</p>
+          {dominantControlsLacking ? (
+            <p className="text-sm text-gray-300 leading-relaxed">
+              사주에서 가장 강한 기운인 <b>{dominantEl}</b>이 가장 부족한 기운인 <b>{lackingEl}</b>을 극(克)하고 있어. 즉 강한 기운이 약한 기운을 계속 누르는 구조라, 부족한 쪽에 해당하는 영역(인간관계·체력·꾸준함 등 {lackingEl} 기운이 상징하는 부분)이 쉽게 소모돼. 일할 때는 강한 기운을 발산하는 일에만 몰두하지 말고, 부족한 기운을 채워주는 활동(휴식·관계 관리)을 의식적으로 배치하는 게 중요해.
+            </p>
+          ) : (
+            <p className="text-sm text-gray-300 leading-relaxed">
+              사주 내 오행들이 한쪽으로 일방적으로 극(克)하기보다 비교적 순환하는 구조야. 특정 영역이 계속 눌리는 일은 적지만, 그만큼 어느 한 분야에 몰입하기보다 여러 역할을 오가며 균형을 맞추는 게 자연스러운 흐름이야.
+            </p>
+          )}
+          {gishinGroup && (
+            <p className="text-xs text-gray-500 leading-relaxed mt-2 pt-2 border-t border-white/5">
+              참고로 용신을 극하는 기신(忌神)은 <b>{gishinEl}</b> 기운, 십성으로는 <b>{SIPSEONG_OF_GROUP_LABEL[gishinGroup]}</b> 계열이야. 이 영역의 일이나 사람에게 너무 휘둘리면 본인의 강점이 가려질 수 있으니, {SIPSEONG_OF_GROUP_LABEL[gishinGroup]}이 주도하는 환경(예: {gishinGroup === "관성" ? "지나치게 경직된 위계 조직" : gishinGroup === "재성" ? "돈 계산이 모든 걸 좌우하는 환경" : gishinGroup === "인성" ? "이론과 형식만 중시하는 환경" : gishinGroup === "식상" ? "끊임없는 변화와 산만한 멀티태스킹" : "과도한 경쟁과 자존심 싸움"})은 적당히 거리를 두는 게 좋아.
+            </p>
+          )}
         </div>
 
         {careerInfo && (
