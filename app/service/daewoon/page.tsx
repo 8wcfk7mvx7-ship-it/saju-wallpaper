@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
@@ -9,69 +9,7 @@ import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
-
-const CY = new Date().getFullYear();
-const YEARS_DW  = Array.from({ length: CY - 1919 }, (_, i) => CY - i);
-const MONTHS_DW = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS_DW   = Array.from({ length: 31 }, (_, i) => i + 1);
-const SIJIN_DW = [
-  { v: "",   label: "모름 (시간 불명)" },
-  { v: "23", label: "자시(子時) 23:00 – 00:59" },
-  { v: "1",  label: "축시(丑時) 01:00 – 02:59" },
-  { v: "3",  label: "인시(寅時) 03:00 – 04:59" },
-  { v: "5",  label: "묘시(卯時) 05:00 – 06:59" },
-  { v: "7",  label: "진시(辰時) 07:00 – 08:59" },
-  { v: "9",  label: "사시(巳時) 09:00 – 10:59" },
-  { v: "11", label: "오시(午時) 11:00 – 12:59" },
-  { v: "13", label: "미시(未時) 13:00 – 14:59" },
-  { v: "15", label: "신시(申時) 15:00 – 16:59" },
-  { v: "17", label: "유시(酉時) 17:00 – 18:59" },
-  { v: "19", label: "술시(戌時) 19:00 – 20:59" },
-  { v: "21", label: "해시(亥時) 21:00 – 22:59" },
-];
-
-function DwPicker({ value, options, onChange, placeholder, suffix }: {
-  value: string; options: {v:string;label:string}[];
-  onChange: (v:string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-  useEffect(() => {
-    if (open && listRef.current && value) {
-      const el = listRef.current.querySelector(`[data-v="${value}"]`);
-      if (el) (el as HTMLElement).scrollIntoView({ block: "center" });
-    }
-  }, [open, value]);
-  const display = options.find(o => o.v === value)?.label ?? "";
-  return (
-    <div ref={ref} className="relative w-full">
-      <div onClick={() => setOpen(!open)}
-        className={`flex items-center justify-between bg-white/5 border rounded-xl px-4 py-3 cursor-pointer transition select-none hover:border-violet-500/60 ${open ? "border-violet-500" : "border-white/10"}`}>
-        <span className={display ? "text-white text-sm" : "text-gray-600 text-sm"}>
-          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
-        </span>
-        <span className={`text-gray-500 text-xs transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </div>
-      {open && (
-        <div ref={listRef} className="absolute z-50 w-full mt-1 bg-[#12121e] border border-white/20 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 200 }}>
-          {options.map(opt => (
-            <div key={opt.v} data-v={opt.v}
-              onClick={() => { onChange(opt.v); setOpen(false); }}
-              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${value === opt.v ? "text-violet-300 bg-violet-900/50 font-semibold" : "text-gray-300 hover:bg-white/8"}`}>
-              {opt.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
 
@@ -461,16 +399,9 @@ function daysInMonth(year: number, month: number) {
 
 export default function DaewoonPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState<"male" | "female">("female");
-  const [birthYear, setBirthYear] = useState(1995);
-  const [birthMonth, setBirthMonth] = useState(6);
-  const [birthDay, setBirthDay] = useState(2);
-  const [birthHour, setBirthHour] = useState<number | null>(11);
-  const [useJajasi, setUseJajasi] = useState(false);
-  const [birthPlace, setBirthPlace] = useState("서울");
-  const [calendarType, setCalendarType] = useState<"solar" | "lunar">("solar");
-  const [isLeapMonth, setIsLeapMonth] = useState(false);
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
+  const { name, gender, birthYear, birthMonth, birthDay, birthHour, useJajasi, calendarType, isLeapMonth } = form;
+  const birthPlace = form.city;
   const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
@@ -493,11 +424,14 @@ export default function DaewoonPage() {
     const saved = loadSajuData();
     if (saved) {
       // 이름은 placeholder로 표시 — 직접 입력하게
-      setGender((saved.gender as "male" | "female") || "female");
-      setBirthYear(saved.birthYear);
-      setBirthMonth(saved.birthMonth);
-      setBirthDay(saved.birthDay);
-      if (saved.birthHour != null) setBirthHour(saved.birthHour);
+      setForm(prev => ({
+        ...prev,
+        gender: (saved.gender as "male" | "female") || "female",
+        birthYear: saved.birthYear,
+        birthMonth: saved.birthMonth,
+        birthDay: saved.birthDay,
+        birthHour: saved.birthHour != null ? saved.birthHour : prev.birthHour,
+      }));
     }
   }, []);
 
@@ -667,118 +601,19 @@ export default function DaewoonPage() {
           </div>
 
           <ProfilePicker onSelect={p => {
-            setName(p.name);
-            setGender(p.gender);
-            setBirthYear(p.birthYear);
-            setBirthMonth(p.birthMonth);
-            setBirthDay(p.birthDay);
-            if (!p.birthHourUnknown && p.birthHour >= 0) setBirthHour(p.birthHour);
-            else setBirthHour(null);
+            setForm(prev => ({
+              ...prev,
+              name: p.name,
+              gender: p.gender,
+              birthYear: p.birthYear,
+              birthMonth: p.birthMonth,
+              birthDay: p.birthDay,
+              birthHour: (!p.birthHourUnknown && p.birthHour >= 0) ? p.birthHour : null,
+            }));
           }} />
 
-          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 space-y-4">
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">이름 (선택)</label>
-              <input
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="홍길동"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">성별</label>
-              <select
-                value={gender}
-                onChange={e => setGender(e.target.value as "male" | "female")}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500 transition"
-              >
-                <option value="female">여성</option>
-                <option value="male">남성</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-gray-500 block mb-2">생년월일</label>
-              <div className="flex gap-2 mb-3">
-                {(["solar", "lunar"] as const).map(t => (
-                  <button key={t} type="button"
-                    onClick={() => setCalendarType(t)}
-                    className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${calendarType === t ? "bg-violet-600 text-white" : "bg-white/5 text-gray-400 border border-white/10"}`}
-                  >
-                    {t === "solar" ? "양력" : "음력"}
-                  </button>
-                ))}
-              </div>
-              {calendarType === "lunar" && (
-                <label className="flex items-center gap-2 text-xs text-gray-400 mb-3 cursor-pointer select-none">
-                  <input type="checkbox" checked={isLeapMonth} onChange={e => setIsLeapMonth(e.target.checked)} className="accent-violet-500" />
-                  윤달
-                </label>
-              )}
-              <div className="grid grid-cols-3 gap-2">
-                <DwPicker
-                  value={String(birthYear)}
-                  options={YEARS_DW.map(y => ({ v: String(y), label: String(y) }))}
-                  onChange={v => setBirthYear(Number(v))}
-                  placeholder="연도" suffix="년"
-                />
-                <DwPicker
-                  value={String(birthMonth)}
-                  options={MONTHS_DW.map(m => ({ v: String(m), label: String(m) }))}
-                  onChange={v => setBirthMonth(Number(v))}
-                  placeholder="월" suffix="월"
-                />
-                <DwPicker
-                  value={String(birthDay)}
-                  options={DAYS_DW.map(d => ({ v: String(d), label: String(d) }))}
-                  onChange={v => setBirthDay(Number(v))}
-                  placeholder="일" suffix="일"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">출생시간 (선택)</label>
-              <DwPicker
-                value={birthHour == null ? "" : String(birthHour)}
-                options={SIJIN_DW}
-                onChange={v => setBirthHour(v === "" ? null : Number(v))}
-                placeholder="출생시간 선택 (선택)"
-              />
-            </div>
-          </div>
-
-          {/* 야자시/조자시 */}
-          {birthHour !== null && (
-            <button
-              type="button"
-              onClick={() => setUseJajasi(v => !v)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition w-full"
-              style={{
-                background: useJajasi ? "rgba(251,191,36,0.1)" : "rgba(255,255,255,0.04)",
-                border: useJajasi ? "1px solid rgba(251,191,36,0.4)" : "1px solid rgba(255,255,255,0.1)",
-                color: useJajasi ? "#fbbf24" : "rgba(255,255,255,0.4)",
-              }}
-            >
-              <span className="w-4 h-4 rounded border flex items-center justify-center shrink-0"
-                style={{ borderColor: useJajasi ? "#fbbf24" : "rgba(255,255,255,0.2)" }}>
-                {useJajasi && <span className="text-[10px] font-black">✓</span>}
-              </span>
-              야자시·조자시 적용 (23시~01시생)
-            </button>
-          )}
-
-          {/* 태어난 도시 */}
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">태어난 도시 (경도 보정)</label>
-            <input
-              type="text"
-              value={birthPlace}
-              onChange={e => setBirthPlace(e.target.value)}
-              placeholder="서울 / 부산 / 대구 등"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-violet-500 transition"
-            />
+          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
+            <BirthInputForm value={form} onChange={setForm} accent="#f59e0b" />
           </div>
 
           <button
@@ -816,7 +651,7 @@ export default function DaewoonPage() {
         </div>
 
         <SaveProfilePrompt
-          name={name} birthYear={birthYear} birthMonth={birthMonth} birthDay={birthDay}
+          name={name} birthYear={Number(birthYear)} birthMonth={Number(birthMonth)} birthDay={Number(birthDay)}
           birthHour={birthHour} birthHourUnknown={birthHour == null} gender={gender}
         />
 
