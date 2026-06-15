@@ -3316,9 +3316,10 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
       score += hit.weight;
 
       // 충(沖) 확인: 같은 천간이 다른 기둥에 있고 그 둘이 충 쌍을 이루면 무력화 경향
+      const otherCgs = pillars.filter(p => p.key !== hit.key).map(p => p.cg);
       const isChunged = CG_CHUNG_PAIRS.some(([a, b]) => {
-        if (hit.cg === a) return cgList.includes(b);
-        if (hit.cg === b) return cgList.includes(a);
+        if (hit.cg === a) return otherCgs.includes(b);
+        if (hit.cg === b) return otherCgs.includes(a);
         return false;
       });
 
@@ -3333,7 +3334,9 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
 
       if (isChunged) {
         score -= 0.6;
-        reasons.push(`${hit.cg}(이)가 ${hit.key === "year" ? "연간" : hit.key === "month" ? "월간" : hit.key === "hour" ? "시간" : "일간"}과 충(沖)을 이뤄 약해지는 경향이 있어요`);
+        const posLabel = (k: string) => k === "year" ? "연간" : k === "month" ? "월간" : k === "hour" ? "시간" : "일간";
+        const partner = pillars.find(p => p.key !== hit.key && CG_CHUNG_PAIRS.some(([a, b]) => (hit.cg === a && p.cg === b) || (hit.cg === b && p.cg === a)));
+        reasons.push(`${posLabel(hit.key)} ${hit.cg}이 ${partner ? posLabel(partner.key) + " " + partner.cg : "다른 천간"}과 충(沖)을 이뤄 약해지는 경향이 있어요`);
       }
       if (sameJiji) {
         score += 0.5;

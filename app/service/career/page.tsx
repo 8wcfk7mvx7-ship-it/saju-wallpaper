@@ -264,6 +264,23 @@ export default function CareerPage() {
           <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
         </div>
 
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-sky-300 mb-3">사주 원국 십성 세력 분석</p>
+          <div className="space-y-2">
+            {sipseongStrength.map(s => (
+              <div key={s.group} className="flex items-start gap-2">
+                <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${
+                  s.status === "강함" ? "bg-emerald-900/50 text-emerald-300" :
+                  s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
+                  s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
+                  "bg-white/5 text-gray-500"
+                }`}>{s.group} · {s.status}</span>
+                <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {careerInfo && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
             <p className="text-sm font-bold text-indigo-300 mb-1">가장 잘 맞는 방향 — {careerInfo.title}</p>
