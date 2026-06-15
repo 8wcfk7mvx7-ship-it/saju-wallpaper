@@ -63,18 +63,46 @@ export interface JijiRelation {
   b: number;
   jjA: string;
   jjB: string;
-  type: "육합" | "삼합" | "충" | "형" | "파" | "해" | "원진";
+  type: "육합" | "삼합" | "반합" | "충" | "형" | "파" | "해" | "원진";
 }
 
+// 지지 관계 색상 — 합(조화)은 초록/청록 계열, 충은 빨강, 형·파·해·원진은 주황/보라 계열로 통일
+export const REL_TYPE_COLOR: Record<string, string> = {
+  육합: "#34d399",
+  삼합: "#34d399",
+  반합: "#6ee7b7",
+  충: "#f87171",
+  형: "#fb923c",
+  파: "#fbbf24",
+  해: "#f59e0b",
+  원진: "#c084fc",
+};
 
-// 4기둥(년/월/일/시)의 지지 배열을 받아 둘씩 짝지어 육합·삼합·충·형·파·해 관계를 찾아낸다.
+// 세력 강도 순서: 강한 것부터 약한 것 순 (삼합 > 육합/반합 > 충 > 형 > 파 > 해 > 원진)
+export const REL_STRENGTH_ORDER: Record<JijiRelation["type"], number> = {
+  삼합: 0,
+  육합: 1,
+  반합: 1,
+  충: 2,
+  형: 3,
+  파: 4,
+  해: 5,
+  원진: 6,
+};
+
+export function sortJijiRelationsByStrength(relations: JijiRelation[]): JijiRelation[] {
+  return [...relations].sort((a, b) => REL_STRENGTH_ORDER[a.type] - REL_STRENGTH_ORDER[b.type]);
+}
+
+// 4기둥(년/월/일/시)의 지지 배열을 받아 둘씩 짝지어 육합·삼합/반합·충·형·파·해·원진 관계를 찾아낸다.
 export function getJijiRelations(jjs: string[]): JijiRelation[] {
   const YUKHAP: [string, string][] = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
   const CHUNG: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
   const PA: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
   const HAE: [string, string][] = [["자","미"],["축","오"],["인","사"],["묘","진"],["신","해"],["유","술"]];
   const HYEONG: [string, string][] = [["자","묘"],["인","사"],["사","신"],["신","인"],["축","술"],["술","미"],["미","축"]];
-  const SAMHAP_PAIRS: [string, string][] = [["인","오"],["오","술"],["인","술"],["사","유"],["유","축"],["사","축"],["신","자"],["자","진"],["신","진"],["해","묘"],["묘","미"],["해","미"]];
+  // 삼합 그룹 — 세 지지가 모두 있어야 "삼합", 둘만 있으면 "반합"
+  const SAMHAP_GROUPS: string[][] = [["인","오","술"],["사","유","축"],["신","자","진"],["해","묘","미"]];
 
   const matches = (pairs: [string, string][], x: string, y: string) =>
     pairs.some(([p, q]) => (p === x && q === y) || (p === y && q === x));
@@ -85,7 +113,14 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
       const a = jjs[i], b = jjs[j];
       if (!a || !b) continue;
       if (matches(YUKHAP, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "육합" });
-      if (matches(SAMHAP_PAIRS, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "삼합" });
+
+      // 삼합/반합 판정: a, b가 같은 삼합 그룹에 속한 두 글자인지 확인
+      const group = SAMHAP_GROUPS.find(g => g.includes(a) && g.includes(b));
+      if (group) {
+        const allPresent = group.every(jj => jjs.includes(jj));
+        relations.push({ a: i, b: j, jjA: a, jjB: b, type: allPresent ? "삼합" : "반합" });
+      }
+
       if (matches(CHUNG, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "충" });
       if (matches(HYEONG, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "형" });
       if (matches(PA, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "파" });
@@ -145,6 +180,19 @@ export const JIJI_BONGI: Record<string, string> = {
   자:"계", 축:"기", 인:"갑", 묘:"을", 진:"무", 사:"병",
   오:"정", 미:"기", 신:"경", 유:"신", 술:"무", 해:"임",
 };
+
+// 오행 스타일 (만세력 명식표 컬러 적용법 — 목=초록, 화=빨강, 토=주황/노랑, 금=흰/회색, 수=파랑)
+export const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge: string }> = {
+  목: { bg: "rgba(34,197,94,0.10)",  text: "#4ade80", border: "rgba(34,197,94,0.25)",  badge: "rgba(34,197,94,0.15)" },
+  화: { bg: "rgba(239,68,68,0.10)",  text: "#f87171", border: "rgba(239,68,68,0.25)",  badge: "rgba(239,68,68,0.15)" },
+  토: { bg: "rgba(245,158,11,0.10)", text: "#fbbf24", border: "rgba(245,158,11,0.25)", badge: "rgba(245,158,11,0.15)" },
+  금: { bg: "rgba(209,213,219,0.10)",text: "#d1d5db", border: "rgba(209,213,219,0.25)",badge: "rgba(209,213,219,0.15)" },
+  수: { bg: "rgba(59,130,246,0.10)", text: "#60a5fa", border: "rgba(59,130,246,0.25)",  badge: "rgba(59,130,246,0.15)" },
+};
+
+export function jijiElement(jj: string): Element {
+  return (CHEONGAN_ELEMENT[JIJI_BONGI[jj] || ""] || "토") as Element;
+}
 
 // 지장간 표시 문자열 (여기-중기-본기 순서)
 const JIJANGAN_STR: Record<string, string> = {
@@ -2535,6 +2583,10 @@ export function isGanyeoJidong(dayCg: string, dayJj: string): boolean {
 const OHAENG_GEUKHAE: Record<string, string> = {
   목: "금", 화: "수", 토: "목", 금: "화", 수: "토",
 };
+// 오행 상생: key를 생(生)하는 오행 (예: 목 -> 목을 생하는 것은 수)
+const OHAENG_SAENG: Record<string, string> = {
+  목: "수", 화: "목", 토: "화", 금: "토", 수: "금",
+};
 const CG_OHAENG: Record<string, string> = {
   갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수",
 };
@@ -3196,6 +3248,126 @@ export function analyzeSipseongPatterns(pillarsDetail: SajuResult["pillarsDetail
   }
 
   return patterns;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 십성 그룹별 "유기적" 세력 분석: 단순 있음/없음이 아니라, 위치·통근·생극·충 관계를 종합해
+// 각 십성 그룹(비겁/식상/재성/관성/인성)의 영향력을 강함/보통/약함/무 로 판단한다.
+// ══════════════════════════════════════════════════════════════════════════════
+export interface SipseongStrengthInfo {
+  group: "비겁" | "식상" | "재성" | "관성" | "인성";
+  status: "강함" | "보통" | "약함" | "무";
+  reason: string;
+}
+
+const SIPSEONG_TO_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
+  비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
+  정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
+};
+
+const SIPSEONG_OF_GROUP: Record<"비겁" | "식상" | "재성" | "관성" | "인성", string[]> = {
+  비겁: ["비견", "겁재"], 식상: ["식신", "상관"], 재성: ["정재", "편재"],
+  관성: ["정관", "편관"], 인성: ["정인", "편인"],
+};
+
+export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
+  const pd = r.pillarsDetail;
+  const pillars = [
+    { key: "year" as const, ...pd.year, weight: 1.0 },
+    { key: "month" as const, ...pd.month, weight: 1.2 },
+    { key: "day" as const, ...pd.day, weight: 1.0 },
+    ...(pd.hour ? [{ key: "hour" as const, ...pd.hour, weight: 0.8 }] : []),
+  ];
+
+  // 천간충 쌍 (갑경, 을신, 병임, 정계)
+  const CG_CHUNG_PAIRS: [string, string][] = [["갑","경"],["을","신"],["병","임"],["정","계"]];
+  const cgList = pillars.map(p => p.cg);
+
+  const results: SipseongStrengthInfo[] = [];
+
+  for (const group of ["비겁", "식상", "재성", "관성", "인성"] as const) {
+    const groupNames = SIPSEONG_OF_GROUP[group];
+
+    // 1) 천간(원국 본기둥)에 해당 십성이 드러난 기둥들
+    const cgHits = pillars.filter(p => groupNames.includes(p.sipseongCg));
+    // 2) 지지 본기(지장간 정기)에 해당 십성이 드러난 기둥들
+    const jjHits = pillars.filter(p => groupNames.includes(p.sipseongJj));
+
+    if (cgHits.length === 0 && jjHits.length === 0) {
+      results.push({ group, status: "무", reason: `사주 안에 ${groupNames.join("·")}이 전혀 없어요.` });
+      continue;
+    }
+
+    if (cgHits.length === 0) {
+      // 지장간(지지 속)에만 있는 경우 — 잠재적 영향력은 있으나 드러나진 않음
+      results.push({
+        group, status: "약함",
+        reason: `${groupNames.join("·")}이 천간에 직접 드러나지 않고 지지 속(지장간)에 숨어 있어 영향력이 약해요.`,
+      });
+      continue;
+    }
+
+    // 천간에 드러난 경우: 통근·충·생극을 종합해 점수화
+    let score = 0;
+    const reasons: string[] = [];
+
+    for (const hit of cgHits) {
+      // 위치 가중치
+      score += hit.weight;
+
+      // 충(沖) 확인: 같은 천간이 다른 기둥에 있고 그 둘이 충 쌍을 이루면 무력화 경향
+      const isChunged = CG_CHUNG_PAIRS.some(([a, b]) => {
+        if (hit.cg === a) return cgList.includes(b);
+        if (hit.cg === b) return cgList.includes(a);
+        return false;
+      });
+
+      // 통근(同柱 지지가 해당 천간 오행을 생/같음으로 지원하는지)
+      const cgEl = CG_OHAENG[hit.cg];
+      const jjEl = JJ_OHAENG[hit.jj] ?? CG_OHAENG[JIJI_BONGI[hit.jj]?.[0] ?? ""];
+      const sameJiji = cgEl === jjEl; // 같은 오행 = 통근
+      // 같은 기둥 지지가 천간을 극하는 경우 (예: 신금 위에 사화)
+      const jjGeuksCg = OHAENG_GEUKHAE[jjEl as string] === cgEl;
+      // 같은 기둥 지지가 천간을 생하는 경우
+      const jjSaengsCg = OHAENG_SAENG[jjEl as string] === cgEl;
+
+      if (isChunged) {
+        score -= 0.6;
+        reasons.push(`${hit.cg}(이)가 ${hit.key === "year" ? "연간" : hit.key === "month" ? "월간" : hit.key === "hour" ? "시간" : "일간"}과 충(沖)을 이뤄 약해지는 경향이 있어요`);
+      }
+      if (sameJiji) {
+        score += 0.5;
+        reasons.push(`같은 기둥의 지지(${hit.jj})가 통근하여 뿌리가 있어요`);
+      } else if (jjGeuksCg) {
+        score -= 0.5;
+        reasons.push(`바로 아래 지지(${hit.jj})가 ${hit.cg}의 기운을 눌러 약화시켜요`);
+      } else if (jjSaengsCg) {
+        score += 0.3;
+        reasons.push(`바로 아래 지지(${hit.jj})가 ${hit.cg}을 생(生)해 힘을 더해줘요`);
+      }
+    }
+
+    // 지지(지장간 본기)에도 같은 그룹이 있으면 약간 가산 (사주 전체에서의 세력)
+    if (jjHits.length > 0) {
+      score += 0.2 * jjHits.length;
+    }
+
+    // 월간/월지가 가장 강한 자리라는 위치적 특성 보너스
+    const inMonth = cgHits.some(h => h.key === "month") || jjHits.some(h => h.key === "month");
+    if (inMonth) {
+      score += 0.3;
+      reasons.push("월주는 사주에서 가장 힘이 강한 자리라 일정한 세력을 유지해요");
+    }
+
+    let status: SipseongStrengthInfo["status"];
+    if (score >= 1.5) status = "강함";
+    else if (score >= 0.5) status = "보통";
+    else status = "약함";
+
+    results.push({ group, status, reason: reasons.length > 0 ? reasons.join(". ") + "." : `${groupNames.join("·")}이 천간에 자리하고 있어요.` });
+  }
+
+  return results;
 }
 
 const CG_BYEONGJON_DESC: Record<string, string> = {

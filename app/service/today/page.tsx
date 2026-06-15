@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
-  getJijiRelations, CHEONGAN_ELEMENT, type SajuResult, type Element,
+  getJijiRelations, sortJijiRelationsByStrength, REL_TYPE_COLOR, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -238,7 +238,7 @@ export default function TodayFortunePage() {
   // 합충형파해 분석 — 원국 4지지 + 대운 + 세운 + 오늘 지지 전체
   const allJjLabels = cols.map(c => c.label);
   const allJjs = cols.map(c => c.jj);
-  const relations = getJijiRelations(allJjs);
+  const relations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
 
   // 천간합·충 — 오늘/세운/대운의 천간이 원국 천간(일간 포함)과 맺는 관계
   const wonguk천간 = [
@@ -271,10 +271,9 @@ export default function TodayFortunePage() {
   // 오늘 지지가 원국/세운/대운 지지와 맺는 충·합 여부 (영역별 해설 보정용)
   const todayRelations = relations.filter(rel => allJjLabels[rel.a] === "오늘" || allJjLabels[rel.b] === "오늘");
   const hasTodayChung = todayRelations.some(rel => rel.type === "충") || cgRelations.some(c => c.from === "오늘" && c.type === "충");
-  const hasTodayHap = todayRelations.some(rel => rel.type === "육합" || rel.type === "삼합") || cgRelations.some(c => c.from === "오늘" && c.type === "합");
+  const hasTodayHap = todayRelations.some(rel => rel.type === "육합" || rel.type === "삼합" || rel.type === "반합") || cgRelations.some(c => c.from === "오늘" && c.type === "합");
 
   const groupContent = GROUP_TODAY[todayGroup];
-  const REL_TYPE_COLOR: Record<string, string> = { 육합: "#4ade80", 삼합: "#34d399", 충: "#f87171", 형: "#fb923c", 파: "#fbbf24", 해: "#a78bfa", 원진: "#f472b6" };
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
@@ -303,8 +302,8 @@ export default function TodayFortunePage() {
             {cols.map((c, i) => (
               <div key={i} className="rounded-lg p-2 text-center"
                 style={{ background: i >= 4 ? "rgba(156,163,175,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${i >= 4 ? "rgba(156,163,175,0.25)" : "rgba(255,255,255,0.06)"}` }}>
-                <p className="text-base font-black">{c.cg}</p>
-                <p className="text-base font-black">{c.jj}</p>
+                <p className="text-base font-black" style={{ color: EL_STYLE[CHEONGAN_ELEMENT[c.cg] || "토"]?.text }}>{c.cg}</p>
+                <p className="text-base font-black" style={{ color: EL_STYLE[jijiElement(c.jj)]?.text }}>{c.jj}</p>
               </div>
             ))}
             {cols.map((c, i) => (

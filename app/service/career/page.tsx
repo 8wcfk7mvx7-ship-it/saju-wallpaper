@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -11,6 +11,10 @@ import ShareImageButton from "@/components/ShareImageButton";
 export const dynamic = "force-dynamic";
 
 const ELEMENT_TO_CG: Record<Element, string> = { 목: "갑", 화: "병", 토: "무", 금: "경", 수: "임" };
+const SIPSEONG_OF_GROUP_LABEL: Record<string, string> = {
+  비겁: "비겁(비견·겁재)", 식상: "식상(식신·상관)", 재성: "재성(정재·편재)",
+  관성: "관성(정관·편관)", 인성: "인성(정인·편인)",
+};
 const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
   비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
   정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
@@ -209,7 +213,32 @@ export default function CareerPage() {
   const topSipseong = Object.entries(topCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topDesc = topSipseong ? SIPSEONG_DESC[topSipseong] : null;
 
-  const patterns = analyzeSipseongPatterns(r.pillarsDetail).filter(p => CAREER_RELEVANT_PATTERNS.some(k => p.name.includes(k) || p.hanja?.includes(k)));
+  // 유기적 십성 세력 분석: 단순 있음/없음이 아니라 통근·충·생극·위치를 종합해 판단
+  const sipseongStrength = getSipseongStrength(r);
+  const strengthByGroup = Object.fromEntries(sipseongStrength.map(s => [s.group, s])) as Record<string, ReturnType<typeof getSipseongStrength>[number]>;
+
+  let patterns = analyzeSipseongPatterns(r.pillarsDetail).filter(p => CAREER_RELEVANT_PATTERNS.some(k => p.name.includes(k) || p.hanja?.includes(k)));
+
+  // "무관/무재/무인/무비겁" 패턴은 유기적 분석 결과가 "무"가 아니면 제거하고,
+  // 약하지만 존재하는 경우엔 그 뉘앙스를 담은 설명으로 대체한다.
+  const PATTERN_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
+    "무비겁(無比劫)": "비겁", "무재(無財)": "재성", "무관(無官)": "관성", "무인(無印)": "인성",
+  };
+  patterns = patterns.flatMap(p => {
+    const group = PATTERN_GROUP[p.name];
+    if (!group) return [p];
+    const info = strengthByGroup[group];
+    if (!info || info.status === "무") return [p];
+    if (info.status === "약함") {
+      return [{
+        ...p,
+        name: p.name.replace("무", "약(弱)").replace(/\(無.+\)/, `(${group} 약함)`),
+        desc: `사주에 ${SIPSEONG_OF_GROUP_LABEL[group]}이 아예 없는 건 아니지만, ${info.reason} 그래도 흐름상 어느 정도의 영향력은 남아있어요.`,
+      }];
+    }
+    // 보통/강함이면 해당 무X 패턴은 제거
+    return [];
+  });
 
   const sikSangCount = totalCount("식신") + totalCount("상관");
   const gwanseongCount = totalCount("정관") + totalCount("편관");
