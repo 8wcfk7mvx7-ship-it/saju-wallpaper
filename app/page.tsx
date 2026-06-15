@@ -1191,6 +1191,17 @@ export default function MainPage() {
             </div>
           </div>
 
+          {/* 신뢰 메시지 */}
+          <p className="text-[13px] leading-relaxed mt-5 max-w-sm mx-auto px-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+            그냥 만든 AI 사주 사이트가 아니에요.<br />
+            취미로 시작했다가 명리학 자격증까지 따고,<br />
+            무료로 이 사람 저 사람 사주를 봐주다 보니<br />
+            만족도가 높아져 어느새 유료 상담까지 하게 된<br />
+            <span style={{ color: "rgba(255,255,255,0.6)" }}>현직 사주 전문가의 임상 데이터</span>가 그대로 담겨 있어요.<br />
+            단순 AI 풀이가 아닌, <span style={{ color: "rgba(255,255,255,0.6)" }}>실제 임상 사주 분석법</span>을 섞어서<br />
+            최고의 결과를 보여드릴게요.
+          </p>
+
         </section>
 
         {/* ── 공지사항 (1줄 롤링) ── */}
