@@ -109,6 +109,21 @@ html.native-app header.sticky.top-0 {
 /* ── CTA 버튼 글로우 ── */
 .cta-btn { animation: pulseGlow 3s ease-in-out infinite; }
 
+/* ── PC 레이아웃: 가로 폭 확장 + 폰트 증가 ── */
+@media (min-width: 768px) {
+  html { font-size: 17px; }
+
+  /* 서비스 결과 페이지 래퍼 */
+  .max-w-2xl { max-width: 860px !important; }
+  .max-w-xl  { max-width: 720px !important; }
+  .max-w-lg  { max-width: 640px !important; }
+}
+
+@media (min-width: 1280px) {
+  html { font-size: 18px; }
+  .max-w-2xl { max-width: 960px !important; }
+}
+
 /* ── 별 반짝임 ── */
 .star-1 { animation: twinkle 2.1s ease-in-out infinite; }
 .star-2 { animation: twinkle 3.3s ease-in-out infinite 0.7s; }

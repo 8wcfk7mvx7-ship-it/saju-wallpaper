@@ -281,13 +281,13 @@ export default function CareerPage() {
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MY APTITUDE</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주, 당신의 적성 진단
+            {ilgan}{r.pillarsDetail.day.jj}일주 {form.name}님의 적성 진단
           </h1>
         </div>
 
         <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 mb-5 text-center">
           <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">사주 구조 진단</p>
-          <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 용신 &apos;{yongshinEl}&apos; ({yongshinSipseong})</p>
+          <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 용신 {yongshinEl} ({yongshinGroup})</p>
           <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
         </div>
 
