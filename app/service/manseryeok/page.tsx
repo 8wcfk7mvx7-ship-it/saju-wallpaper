@@ -19,7 +19,7 @@ import {
   detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -943,6 +943,30 @@ function ResultView({
         );
       })()}
 
+      {/* ②-2 금수쌍청 감지 */}
+      {(() => {
+        const allCg = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean) as string[];
+        const allJj = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean) as string[];
+        const gs = detectGumsuSangcheong(pd.day.cg, pd.month.jj, allCg, allJj);
+        if (gs.level === "해당없음" || !gs.desc) return null;
+        return (
+          <Section title="금수쌍청(金水雙淸)" accent="#38bdf8">
+            <div className="rounded-xl px-4 py-3 mb-3" style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.18)" }}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="font-bold text-sm text-sky-300">{gs.level === "완전체" ? "✦ 금수쌍청 완전체" : "금수쌍청 기질 (미완성)"}</span>
+              </div>
+              <p className="text-xs leading-relaxed text-gray-300">{gs.desc}</p>
+            </div>
+            {gs.careerHint && (
+              <p className="text-xs leading-relaxed text-gray-400 mt-1">{gs.careerHint}</p>
+            )}
+            {gs.missingConditions.length > 0 && gs.level === "미완성" && (
+              <p className="text-xs text-gray-600 mt-2">미충족: {gs.missingConditions.join(" · ")}</p>
+            )}
+          </Section>
+        );
+      })()}
+
       {/* ③ 일간 성격 */}
       {ilganInfo && (
         <Section title={`일간(日干) 심층분석 · ${ilganInfo.short}`} accent="#34d399">
@@ -1144,6 +1168,44 @@ function ResultView({
                 </div>
               )}
             </div>
+          </Section>
+        );
+      })()}
+
+      {/* ④-1 십성별 영화 취향 */}
+      {(() => {
+        if (!dominantSipseong) return null;
+        const movieData = SIPSEONG_MOVIE[dominantSipseong];
+        if (!movieData) return null;
+        return (
+          <Section title="사주로 보는 콘텐츠 취향" accent="#f472b6">
+            <div className="rounded-xl px-4 py-3" style={{ background: "rgba(244,114,182,0.06)", border: "1px solid rgba(244,114,182,0.18)" }}>
+              <p className="text-xs text-gray-500 mb-1">{dominantSipseong} 기질 — 끌리는 서사</p>
+              <p className="text-base font-bold text-pink-300 mb-1.5">"{movieData.movie}" 같은 스타일</p>
+              <p className="text-xs text-gray-300 leading-relaxed mb-1.5">{movieData.reason}</p>
+              <p className="text-[10px] text-pink-400/60">키워드: {movieData.vibe}</p>
+            </div>
+          </Section>
+        );
+      })()}
+
+      {/* ④-2 일지 도화살 여성 특성 */}
+      {(() => {
+        if (form.gender !== "female") return null;
+        const dayJjSinsal = result.sinsalList.filter(s =>
+          ["도화살","진도화","나체도화","홍염살","곤랑도화","녹방도화"].includes(s.name) &&
+          s.pillars.includes("일")
+        );
+        if (dayJjSinsal.length === 0) return null;
+        return (
+          <Section title="배우자궁 도화 — 내 안의 매력" accent="#fb7185">
+            <p className="text-xs text-gray-400 leading-relaxed mb-3">{ILJI_DOHWA_FEMALE_DESC.summary}</p>
+            <div className="space-y-1.5 mb-3">
+              {ILJI_DOHWA_FEMALE_DESC.traits.map((t, i) => (
+                <p key={i} className="text-xs text-gray-300 leading-relaxed">• {t}</p>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed pt-2 border-t border-white/[0.06]">{ILJI_DOHWA_FEMALE_DESC.mechanism}</p>
           </Section>
         );
       })()}

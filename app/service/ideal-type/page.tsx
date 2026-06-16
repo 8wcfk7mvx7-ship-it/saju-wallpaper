@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type SajuResult } from "@/lib/saju";
-import { SIPSEONG_DESC } from "@/lib/saju2";
+import { SIPSEONG_DESC, ILGAN_MALE_IDEAL, isGwaegang, GWAEGANG_MALE_WARNING, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -269,6 +269,28 @@ export default function IdealTypePage() {
   const topSipseong = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topDesc = topSipseong ? SIPSEONG_DESC[topSipseong] : null;
 
+  // 을목 남자 심화
+  const maleIdealData = gender === "male" ? ILGAN_MALE_IDEAL[ilgan] : null;
+
+  // 일지 도화/홍염살 (여성)
+  const dayJjDohwa = gender === "female"
+    ? r.sinsalList.filter(s =>
+        ["도화살","진도화","나체도화","홍염살","곤랑도화","녹방도화"].includes(s.name) &&
+        s.pillars.includes("일")
+      )
+    : [];
+
+  // 십성별 영화 취향
+  const movieData = SIPSEONG_MOVIE[topSipseong ?? ""] ?? null;
+
+  // 괴강살 여부
+  const gwaegangWarning = isGwaegang(ilgan, dayJj) && gender === "male" ? GWAEGANG_MALE_WARNING : null;
+
+  // 금수쌍청
+  const allCgIdeal = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean) as string[];
+  const allJjIdeal = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean) as string[];
+  const gumsuIdeal = detectGumsuSangcheong(ilgan, monthJj, allCgIdeal, allJjIdeal);
+
   return (
     <main className="min-h-screen bg-[#0a0612] text-white">
       <BackButton />
@@ -336,6 +358,33 @@ export default function IdealTypePage() {
           <p className="text-sm text-gray-300 leading-relaxed">{partnerPatternDesc}</p>
         </div>
 
+        {/* 을목 남자 심화 — 이상형 4가지 타입 */}
+        {maleIdealData && (
+          <div className="bg-white/[0.03] border border-emerald-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-emerald-300 mb-2">{ilgan}({ilganEl}) 남자 — 실제로 끌리는 여성 유형</p>
+            <p className="text-xs text-gray-500 leading-relaxed mb-4">{maleIdealData.summary}</p>
+            <div className="space-y-3">
+              {maleIdealData.types.map((t, i) => (
+                <div key={i} className="bg-white/[0.04] rounded-xl px-4 py-3">
+                  <p className="text-sm font-bold text-emerald-200 mb-1">{t.label}</p>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-1.5">{t.reason}</p>
+                  <p className="text-xs text-fuchsia-300/80 leading-relaxed">→ 꼬시는 법: {t.attract}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-amber-400/80 mt-4 pt-3 border-t border-white/[0.06] leading-relaxed">⚠️ {maleIdealData.warn}</p>
+          </div>
+        )}
+
+        {/* 괴강살 경고 */}
+        {gwaegangWarning && (
+          <div className="bg-orange-950/30 border border-orange-600/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-orange-300 mb-2">{gwaegangWarning.title}</p>
+            <p className="text-xs text-gray-300 leading-relaxed mb-2">{gwaegangWarning.desc}</p>
+            <p className="text-xs text-orange-200/70 leading-relaxed">{gwaegangWarning.advice}</p>
+          </div>
+        )}
+
         {/* 외모 이상형 */}
         {looksDesc && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
@@ -362,6 +411,33 @@ export default function IdealTypePage() {
                 </>
               )}
             </p>
+          </div>
+        )}
+
+        {/* 금수쌍청 */}
+        {gumsuIdeal.level !== "해당없음" && gumsuIdeal.desc && (
+          <div className="bg-sky-950/30 border border-sky-600/25 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-sky-300 mb-2">금수쌍청(金水雙淸){gumsuIdeal.level === "완전체" ? " ✦" : " (기질)"}</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{gumsuIdeal.desc}</p>
+          </div>
+        )}
+
+        {/* 일지 도화 여성 특성 */}
+        {dayJjDohwa.length > 0 && (
+          <div className="bg-rose-950/30 border border-rose-500/25 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-rose-300 mb-2">배우자궁 도화 — 집 안에서 더 빛나는 매력</p>
+            <p className="text-xs text-gray-300 leading-relaxed mb-2">{ILJI_DOHWA_FEMALE_DESC.summary}</p>
+            <p className="text-xs text-gray-500 leading-relaxed">{ILJI_DOHWA_FEMALE_DESC.mechanism}</p>
+          </div>
+        )}
+
+        {/* 십성별 영화 취향 */}
+        {movieData && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-pink-300 mb-2">사주로 보는 콘텐츠 취향 — {topSipseong} 기질</p>
+            <p className="text-sm text-white font-bold mb-1">"{movieData.movie}" 같은 서사에 끌려요</p>
+            <p className="text-xs text-gray-400 leading-relaxed mb-1">{movieData.reason}</p>
+            <p className="text-[10px] text-pink-400/60">키워드: {movieData.vibe}</p>
           </div>
         )}
 

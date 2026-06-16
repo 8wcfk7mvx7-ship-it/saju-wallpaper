@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC } from "@/lib/saju2";
+import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSangcheong } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -267,6 +267,12 @@ export default function CareerPage() {
   const gishinSipseong = gishinEl ? getSipseong(ilgan, ELEMENT_TO_CG[gishinEl]) : null;
   const gishinGroup = gishinSipseong ? SIPSEONG_GROUP[gishinSipseong] : null;
 
+  // 금수쌍청 감지
+  const _rpd = r.pillarsDetail;
+  const allCgGumsu = [_rpd.year.cg, _rpd.month.cg, _rpd.day.cg, _rpd.hour?.cg].filter(Boolean) as string[];
+  const allJjGumsu = [_rpd.year.jj, _rpd.month.jj, _rpd.day.jj, _rpd.hour?.jj].filter(Boolean) as string[];
+  const gumsu = detectGumsuSangcheong(ilgan, _rpd.month.jj, allCgGumsu, allJjGumsu);
+
   // 조후 분석
   const johu = getJohuCareerInsight(ilgan, r.pillarsDetail.month.jj);
 
@@ -302,6 +308,15 @@ export default function CareerPage() {
           <p className="text-sm text-gray-300 leading-relaxed mb-2">{johu.desc}</p>
           <p className="text-xs text-emerald-300 leading-relaxed">▶ 추천 분야: {johu.fields}</p>
         </div>
+
+        {/* 금수쌍청 */}
+        {gumsu.level !== "해당없음" && gumsu.desc && (
+          <div className="bg-sky-950/30 border border-sky-600/25 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-sky-300 mb-2">금수쌍청(金水雙淸){gumsu.level === "완전체" ? " ✦" : " (기질)"}</p>
+            <p className="text-sm text-gray-300 leading-relaxed mb-2">{gumsu.desc}</p>
+            {gumsu.careerHint && <p className="text-xs text-sky-200/70 leading-relaxed">{gumsu.careerHint}</p>}
+          </div>
+        )}
 
         {/* 궁성(宮星) 분석 */}
         {gungseongList.length > 0 && (
