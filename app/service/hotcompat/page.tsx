@@ -8,13 +8,25 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
 
-
 export const dynamic = "force-dynamic";
 
+// ── 오행/음양 매핑 ───────────────────────────────────────────────────────────
+const CHEONGAN_ELEMENT: Record<string, string> = {
+  갑:"목", 을:"목", 병:"화", 정:"화", 무:"토", 기:"토", 경:"금", 신:"금", 임:"수", 계:"수"
+};
+const JIJI_ELEMENT: Record<string, string> = {
+  자:"수", 축:"토", 인:"목", 묘:"목", 진:"토", 사:"화", 오:"화", 미:"토", 신:"금", 유:"금", 술:"토", 해:"수"
+};
+const JIJI_EUMYANG: Record<string, "양"|"음"> = {
+  자:"양", 인:"양", 진:"양", 오:"양", 신:"양", 술:"양",
+  축:"음", 묘:"음", 사:"음", 미:"음", 유:"음", 해:"음"
+};
+const CHEONGAN_EUMYANG: Record<string, "양"|"음"> = {
+  갑:"양", 병:"양", 무:"양", 경:"양", 임:"양",
+  을:"음", 정:"음", 기:"음", 신:"음", 계:"음"
+};
 
-
-// ── 성적 케미 분석 로직 ───────────────────────────────────────────────────────
-
+// ── 천간합 ───────────────────────────────────────────────────────────────────
 const CHEONGAN_HAP_MAP: Record<string, { partner: string; name: string; hanja: string; desc: string; score: number }> = {
   갑: { partner: "기", name: "갑기합", hanja: "甲己合", desc: "중정지합(中正之合) — 가장 안정적이고 바른 결합. 성적으로 지속적인 깊은 화합.", score: 20 },
   을: { partner: "경", name: "을경합", hanja: "乙庚合", desc: "인의지합(仁義之合) — 부드러운 덩굴과 강한 금속의 결합. 부드러움이 강함을 감아드는 케미.", score: 15 },
@@ -28,15 +40,14 @@ const CHEONGAN_HAP_MAP: Record<string, { partner: string; name: string; hanja: s
   계: { partner: "무", name: "무계합", hanja: "戊癸合", desc: "무정지합(無情之合) — 겉은 차갑지만 속이 뜨거운 조합.", score: 20 },
 };
 
-// 지지 육합(地支六合) — 속궁합에서 가장 중요하게 보는 요소.
-// 일지가 육합이면 가장 끈끈하고 안정적인 신체적·정서적 밀착 케미가 형성됨.
+// 지지 육합
 const JIJI_YUKHAP_LIST: { a: string; b: string; name: string; result: string; desc: string; score: number }[] = [
   { a: "자", b: "축", name: "자축합(子丑合)", result: "토(土)", desc: "음습한 물과 단단한 흙이 만나 끈끈하게 엉겨 붙는 합. 한번 붙으면 잘 떨어지지 않는, 가장 안정적이고 깊은 신체적 밀착감을 줍니다.", score: 50 },
   { a: "인", b: "해", name: "인해합(寅亥合)", result: "목(木)", desc: "큰 나무가 깊은 물에 뿌리내리는 합. 서로를 키워주고 감싸주는 따뜻하고 다정한 스킨십 케미입니다.", score: 48 },
   { a: "묘", b: "술", name: "묘술합(卯戌合)", result: "화(火)", desc: "도화의 묘와 강한 술이 만나 불을 피우는 합. 보면 볼수록 불타오르는 강한 매력과 집착에 가까운 끌림.", score: 50 },
   { a: "진", b: "유", name: "진유합(辰酉合)", result: "금(金)", desc: "흙과 보석이 서로를 빛나게 하는 합. 서로의 가치를 알아봐주며 깊이 신뢰하는 끈끈한 궁합.", score: 45 },
   { a: "사", b: "신", name: "사신합(巳申合)", result: "수(水)", desc: "합이면서 동시에 형(刑)의 성질도 품은 애증의 합. 밀고 당기는 자극이 강하고, 한번 엮이면 쉽게 못 끊어내는 운명적 케미.", score: 47 },
-  { a: "오", b: "미", name: "오미합(午未合)", result: "화(火)/태양과 땅", desc: "뜨거운 태양과 그것을 품는 대지의 합. 정서적으로도 육체적으로도 서로에게 가장 따뜻하게 녹아드는 궁합입니다.", score: 49 },
+  { a: "오", b: "미", name: "오미합(午未合)", result: "화(火)", desc: "뜨거운 태양과 그것을 품는 대지의 합. 정서적으로도 육체적으로도 서로에게 가장 따뜻하게 녹아드는 궁합입니다.", score: 49 },
 ];
 
 const JIJI_CHUNG_LIST: { a: string; b: string; name: string; desc: string; score: number }[] = [
@@ -48,6 +59,206 @@ const JIJI_CHUNG_LIST: { a: string; b: string; name: string; desc: string; score
   { a: "축", b: "미", name: "축미충(丑未沖)", desc: "안정된 토끼리의 마찰. 중간 강도의 자극.", score: 12 },
 ];
 
+// ── 천간×지지 조합 분석 ──────────────────────────────────────────────────────
+interface CgJjCombo {
+  cg_rel: "합"|"충"|"비견"|"기타";
+  jj_rel: "육합"|"삼합"|"충"|"기타";
+  combo_title: string;
+  combo_desc: string;
+  score_mod: number;
+}
+
+function analyzeCheonganJiji(ig1: string, ij1: string, ig2: string, ij2: string): CgJjCombo {
+  const cgHap = CHEONGAN_HAP_MAP[ig1]?.partner === ig2;
+  const cgChung = (["갑경","경갑","을신","신을","병임","임병","정계","계정"] as string[])
+    .includes(ig1 + ig2);
+  const cgBigyeon = CHEONGAN_ELEMENT[ig1] === CHEONGAN_ELEMENT[ig2];
+
+  const jjYukhap = JIJI_YUKHAP_LIST.some(y => (ij1===y.a&&ij2===y.b)||(ij1===y.b&&ij2===y.a));
+  const jjChung = JIJI_CHUNG_LIST.some(c => (ij1===c.a&&ij2===c.b)||(ij1===c.b&&ij2===c.a));
+  const SAMHAP: string[][] = [["인","오","술"],["신","자","진"],["해","묘","미"],["사","유","축"]];
+  const jjSamhap = SAMHAP.some(g => g.includes(ij1) && g.includes(ij2));
+
+  const cg_rel: "합"|"충"|"비견"|"기타" = cgHap ? "합" : cgChung ? "충" : cgBigyeon ? "비견" : "기타";
+  const jj_rel: "육합"|"삼합"|"충"|"기타" = jjYukhap ? "육합" : jjChung ? "충" : jjSamhap ? "삼합" : "기타";
+
+  if (cg_rel === "합" && jj_rel === "육합") {
+    return { cg_rel, jj_rel, score_mod: 25,
+      combo_title: "천간합 × 일지 육합 — 완벽한 조화",
+      combo_desc: "머리로도, 몸으로도 완벽하게 통하는 조합이에요. 천간에서 서로를 향한 끌림이 강하고, 일지에서도 끈끈하게 밀착되는 구조라 자연스럽게 깊이 녹아들게 됩니다. 이 조합은 100점을 받는 게 어려운 일이 아니에요." };
+  }
+  if (cg_rel === "합" && jj_rel === "삼합") {
+    return { cg_rel, jj_rel, score_mod: 18,
+      combo_title: "천간합 × 일지 삼합 — 열정이 넘치는 관계",
+      combo_desc: "서로에게 끌리는 감정도 강하고, 에너지도 잘 통합니다. 삼합의 뜨거운 기운이 두 사람 사이를 달궈주는 아주 좋은 구조예요." };
+  }
+  if (cg_rel === "합" && jj_rel === "충") {
+    return { cg_rel, jj_rel, score_mod: 5,
+      combo_title: "천간합 × 일지 충 — 끌리지만 자극적인 관계",
+      combo_desc: "마음은 강하게 끌리는데 몸의 리듬이 충돌하는 조합이에요. 잠자리에서 서로의 스타일이 달라 불만이 생길 수 있지만, 천간의 합 덕분에 감정적으로는 계속 붙어 있게 됩니다. 맞춰가는 노력이 필요하지만, 그 과정에서 더 강해지기도 해요." };
+  }
+  if (cg_rel === "충" && jj_rel === "육합") {
+    return { cg_rel, jj_rel, score_mod: 8,
+      combo_title: "천간충 × 일지 육합 — 싸우다 잠자리에서 화해하는 관계",
+      combo_desc: "머리로는 맨날 싸우고 지지고 볶고 헤어지네 마네 하지만, 잠자리에서 엎치락뒤치락하다 보면 다 잊어버리는 수가 있어요. 몸이 맞는 관계라 아무리 싸워도 결국 다시 붙게 됩니다. 일지 육합의 끈끈함이 갈등을 녹여내는 구조예요." };
+  }
+  if (cg_rel === "충" && jj_rel === "삼합") {
+    return { cg_rel, jj_rel, score_mod: 3,
+      combo_title: "천간충 × 일지 삼합 — 말다툼 많지만 열정은 살아있는 관계",
+      combo_desc: "말로는 자주 부딪히고 의견 충돌이 잦지만, 몸이 통하는 에너지가 있어서 쉽게 끝내지 못하는 관계예요. 열정은 꾸준히 살아있습니다." };
+  }
+  if (cg_rel === "충" && jj_rel === "충") {
+    return { cg_rel, jj_rel, score_mod: -8,
+      combo_title: "천간충 × 일지 충 — 도 아니면 모",
+      combo_desc: "생각도 다르고 몸의 리듬도 충돌합니다. 이 조합은 정말 극단적이에요. 처음에 폭발적으로 끌리거나, 아니면 처음부터 전혀 맞지 않거나 둘 중 하나입니다. 잘 풀리면 서로를 완전히 바꿔놓는 강렬한 인연이 되고, 안 풀리면 서로 상처만 남기고 끝나게 됩니다. 감정의 롤러코스터가 심하고 장기 관계를 유지하려면 상당한 노력이 필요해요." };
+  }
+  if (cg_rel === "비견" && jj_rel === "육합") {
+    return { cg_rel, jj_rel, score_mod: 12,
+      combo_title: "같은 오행 × 일지 육합 — 동지이자 연인",
+      combo_desc: "같은 에너지를 공유하면서 일지에서는 끈끈하게 붙는 구조예요. 친구 같은 편안함과 연인의 끌림이 공존합니다." };
+  }
+  if (cg_rel === "비견" && jj_rel === "충") {
+    return { cg_rel, jj_rel, score_mod: -2,
+      combo_title: "천간 동기 × 일지 충",
+      combo_desc: "천간충처럼 격렬한 충돌은 없지만, 일지의 리듬 차이가 잠자리에서 미묘한 불만족으로 이어질 수 있어요." };
+  }
+  if (cg_rel === "합") {
+    return { cg_rel, jj_rel, score_mod: 8,
+      combo_title: "천간합 — 마음이 통하는 관계",
+      combo_desc: "감정적 끌림과 정서적 유대감이 강합니다. 일지 합까지 이루어진다면 더 완벽한 조합이 될 수 있어요." };
+  }
+  if (cg_rel === "충") {
+    return { cg_rel, jj_rel, score_mod: -3,
+      combo_title: "천간충 — 끊임없이 자극하는 관계",
+      combo_desc: "생각과 가치관이 자주 부딪히는 조합이에요. 지속적인 갈등 스트레스가 성적 에너지를 소모시킬 수 있습니다." };
+  }
+  if (jj_rel === "육합") {
+    return { cg_rel, jj_rel, score_mod: 10,
+      combo_title: "일지 육합 — 몸이 통하는 관계",
+      combo_desc: "일지에서 끈끈하게 붙는 구조예요. 신체적 밀착감이 자연스럽게 형성됩니다." };
+  }
+  if (jj_rel === "충") {
+    return { cg_rel, jj_rel, score_mod: -2,
+      combo_title: "일지 충 — 배우자궁이 부딪히는 관계",
+      combo_desc: "배우자궁이 충돌하는 구조예요. 잠자리 스타일의 차이가 생길 수 있습니다." };
+  }
+  return { cg_rel, jj_rel, score_mod: 0, combo_title: "", combo_desc: "" };
+}
+
+// ── 배우자궁 생극 분석 ───────────────────────────────────────────────────────
+interface SaengGukResult {
+  type: "상생"|"상극"|"비화";
+  dir: string;
+  desc: string;
+  satisfactionNote: string;
+}
+
+function analyzeSaengGuk(ij1: string, ij2: string, label1: string, label2: string): SaengGukResult | null {
+  const el1 = JIJI_ELEMENT[ij1];
+  const el2 = JIJI_ELEMENT[ij2];
+  if (!el1 || !el2) return null;
+  if (el1 === el2) {
+    return { type: "비화", dir: "동일 오행", desc: `두 사람의 배우자궁이 같은 ${el1} 오행이에요.`, satisfactionNote: "비슷한 에너지끼리의 만남이라 공감대가 높지만, 자극이 부족할 수 있어요." };
+  }
+  const SAENG: Record<string,string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };
+  const GUK: Record<string,string> = { 목:"토", 토:"수", 수:"화", 화:"금", 금:"목" };
+  if (SAENG[el1] === el2) {
+    return { type: "상생", dir: `${label1}→${label2} 생(生)`, desc: `${label1}의 배우자궁(${el1})이 ${label2}의 배우자궁(${el2})을 생해주는 관계예요.`, satisfactionNote: `생을 받는 ${label2} 쪽이 더 편안하고 만족스럽게 느끼는 구조입니다. ${label1}은 자신이 더 많이 챙겨주는 느낌이 들 수 있어요.` };
+  }
+  if (SAENG[el2] === el1) {
+    return { type: "상생", dir: `${label2}→${label1} 생(生)`, desc: `${label2}의 배우자궁(${el2})이 ${label1}의 배우자궁(${el1})을 생해주는 관계예요.`, satisfactionNote: `생을 받는 ${label1} 쪽이 더 보살핌 받는 느낌으로 만족도가 높습니다. ${label2}는 자연스럽게 리드하는 역할이 됩니다.` };
+  }
+  if (GUK[el1] === el2) {
+    return { type: "상극", dir: `${label1}→${label2} 극(剋)`, desc: `${label1}의 배우자궁(${el1})이 ${label2}의 배우자궁(${el2})을 극하는 관계예요.`, satisfactionNote: `${label1}이 ${label2}를 압도하는 에너지 구조예요. 이 긴장감이 성적 자극이 되기도 하지만, 장기적으로 ${label2}에게 부담이 쌓일 수 있어요.` };
+  }
+  if (GUK[el2] === el1) {
+    return { type: "상극", dir: `${label2}→${label1} 극(剋)`, desc: `${label2}의 배우자궁(${el2})이 ${label1}의 배우자궁(${el1})을 극하는 관계예요.`, satisfactionNote: `${label2}가 ${label1}을 리드하고 압도하는 에너지 구조예요. 강한 리드가 끌림이 되기도 하지만, 장기적으로 ${label1}에게 부담이 쌓일 수 있어요.` };
+  }
+  return null;
+}
+
+// ── 개인 음양/수기운/성욕 분석 ──────────────────────────────────────────────
+interface LibidoResult {
+  waterStrong: boolean;
+  yinyang: "양기 강함"|"음기 강함"|"균형";
+  libidomsg: string;
+  gwanSalWarning: string | null;
+}
+
+function analyzeLibido(r: SajuResult, gender: "male"|"female"): LibidoResult {
+  const pd = r.pillarsDetail;
+  const allJijis = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean) as string[];
+  const allCgs = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean) as string[];
+  const waterCount = allJijis.filter(j => JIJI_ELEMENT[j] === "수").length
+    + allCgs.filter(c => CHEONGAN_ELEMENT[c] === "수").length;
+  const waterStrong = waterCount >= 2;
+
+  const yangCount = allJijis.filter(j => JIJI_EUMYANG[j] === "양").length
+    + allCgs.filter(c => CHEONGAN_EUMYANG[c] === "양").length;
+  const yinCount = allJijis.filter(j => JIJI_EUMYANG[j] === "음").length
+    + allCgs.filter(c => CHEONGAN_EUMYANG[c] === "음").length;
+  const yinyang: "양기 강함"|"음기 강함"|"균형" =
+    yangCount > yinCount + 1 ? "양기 강함" : yinCount > yangCount + 1 ? "음기 강함" : "균형";
+
+  // 관성 과다 체크
+  const allSip = [pd.year.sipseongCg, pd.month.sipseongCg, pd.day.sipseongCg, pd.hour?.sipseongCg,
+                  pd.year.sipseongJj, pd.month.sipseongJj, pd.day.sipseongJj, pd.hour?.sipseongJj]
+                 .filter(Boolean) as string[];
+  const gwanCount = allSip.filter(s => s.includes("관") || s.includes("살")).length;
+  const gwanSalWarning = gwanCount >= 3 && gender === "male"
+    ? "관성이 많고 스트레스를 많이 받는 구조예요. 심리적 압박이 클 때 성욕이 감퇴하거나 발기부전 같은 문제가 나타날 수 있어요. 스트레스 관리가 성생활에도 직결됩니다."
+    : null;
+
+  let libidomsg = "";
+  if (gender === "female") {
+    if (waterStrong) {
+      libidomsg = "수(水) 기운이 강해 자연스러운 색기와 감각적 매력이 있어요. 성적 감수성이 풍부하고 관능적인 분위기를 풍기는 타입입니다.";
+    } else if ((r.lacking ?? []).includes("수")) {
+      libidomsg = "수(水) 기운이 부족한 구조라 성욕이 잘 일어나지 않거나 감각적인 면이 다소 건조하게 느껴질 수 있어요.";
+    } else {
+      libidomsg = "균형 잡힌 성적 에너지를 가지고 있어요.";
+    }
+  } else {
+    if (gwanSalWarning) {
+      libidomsg = "관살이 많은 구조라 외부 스트레스에 민감해요. 성욕이 심리 상태에 크게 영향을 받는 타입입니다.";
+    } else if (waterStrong) {
+      libidomsg = "수(水) 기운이 강해 성적 에너지와 욕구가 충분합니다.";
+    } else if ((r.lacking ?? []).includes("수")) {
+      libidomsg = "수(水) 기운이 약해 성적 에너지가 다소 부족한 구조예요.";
+    } else {
+      libidomsg = "균형 잡힌 성적 에너지를 가지고 있어요.";
+    }
+  }
+
+  return { waterStrong, yinyang, libidomsg, gwanSalWarning };
+}
+
+// ── 섹스리스 위험도 ──────────────────────────────────────────────────────────
+function checkSexlessRisk(r1: SajuResult, r2: SajuResult, g1: "male"|"female", g2: "male"|"female"): string | null {
+  const rF = g1 === "female" ? r1 : r2;
+  const rM = g1 === "male" ? r1 : r2;
+  const pdF = rF.pillarsDetail;
+  const pdM = rM.pillarsDetail;
+
+  const sipF = [pdF.year.sipseongCg, pdF.month.sipseongCg, pdF.day.sipseongCg, pdF.hour?.sipseongCg,
+                pdF.year.sipseongJj, pdF.month.sipseongJj, pdF.day.sipseongJj, pdF.hour?.sipseongJj].filter(Boolean) as string[];
+  const sipM = [pdM.year.sipseongCg, pdM.month.sipseongCg, pdM.day.sipseongCg, pdM.hour?.sipseongCg,
+                pdM.year.sipseongJj, pdM.month.sipseongJj, pdM.day.sipseongJj, pdM.hour?.sipseongJj].filter(Boolean) as string[];
+
+  const femaleHasJae = sipF.some(s => s.includes("재"));
+  const maleGwanCount = sipM.filter(s => s.includes("관") || s.includes("살")).length;
+  const maleSiksangCount = sipM.filter(s => s.includes("식") || s.includes("상")).length;
+
+  if (!femaleHasJae && maleGwanCount >= 3) {
+    return "여성의 재성이 없고 남성에게 관성이 많은 조합이에요. 여성은 성적 욕구가 잘 일어나지 않고, 남성은 스트레스로 인한 성욕 감퇴가 생기기 쉬운 구조입니다. 두 사람 모두 솔직한 대화가 필요해요.";
+  }
+  if (!femaleHasJae && maleSiksangCount === 0) {
+    return "여성의 재성도, 남성의 식상도 사주에서 잘 보이지 않는 구조예요. 남녀 모두 성적인 욕구 표현이 적고 잠자리에 대한 관심 자체가 낮을 수 있어요. 서로 비슷하게 담백한 관계가 될 가능성이 높지만, 점차 섹스리스로 흐르기 쉽습니다.";
+  }
+  return null;
+}
+
+// ── ChemResult 인터페이스 ────────────────────────────────────────────────────
 interface ChemResult {
   score: number;
   highlights: { rank: number; title: string; desc: string; color: string }[];
@@ -55,6 +266,7 @@ interface ChemResult {
   hapDesc: string | null;
   chungName: string | null;
   chungDesc: string | null;
+  cgJjCombo: CgJjCombo;
 }
 
 function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
@@ -76,7 +288,11 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   let chungName: string | null = null;
   let chungDesc: string | null = null;
 
-  // 0순위(최우선): 일지 육합 — 속궁합에서 가장 중시하는 요소
+  // 천간×지지 조합
+  const cgJjCombo = analyzeCheonganJiji(ig1, ij1, ig2, ij2);
+  score += cgJjCombo.score_mod;
+
+  // 0순위: 일지 육합
   for (const y of JIJI_YUKHAP_LIST) {
     if ((ij1 === y.a && ij2 === y.b) || (ij1 === y.b && ij2 === y.a)) {
       score += y.score;
@@ -86,7 +302,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     }
   }
 
-  // 1순위: 정임암합의 정점 — 丁亥일주 + 壬午일주
+  // 1순위: 정임암합 정점
   const isAmhap = (
     (ig1 === "정" && ij1 === "해" && ig2 === "임" && ij2 === "오") ||
     (ig2 === "정" && ij2 === "해" && ig1 === "임" && ij1 === "오")
@@ -96,7 +312,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     highlights.push({ rank: 1, title: "정임암합(丁亥+壬午) — 최강", color: "#f43f5e",
       desc: "사주에서 가장 강렬한 성적 암합. 丁亥일주와 壬午일주의 만남은 천간에서 丁壬합이 이루어지고, 지지에서도 亥-午의 에너지 교류가 형성됩니다. 거부할 수 없는 인연." });
     hapName = "정임암합(丁亥+壬午)";
-    hapDesc = "음란지합(淫亂之合) 중 가장 극적인 조합. 불꽃(丁亥 — 촛불+물)과 강물(壬午 — 강물+불꽃)이 서로를 완성시킵니다.";
+    hapDesc = "음란지합(淫亂之合) 중 가장 극적인 조합.";
   }
 
   // 2순위: 자오충 일지
@@ -108,7 +324,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     if (!chungName) { chungName = c.name; chungDesc = c.desc; }
   }
 
-  // 3순위: 정임합 (일간)
+  // 3순위: 천간합 (일간)
   const hap = CHEONGAN_HAP_MAP[ig1];
   if (hap && hap.partner === ig2) {
     score += hap.score;
@@ -116,7 +332,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     if (!hapName) { hapName = hap.name; hapDesc = hap.desc; }
   }
 
-  // 4순위: 인오술합 (삼합 화국) — 두 사람 사주 합산
+  // 4순위: 삼합 화국
   const allJijis = [ij1, ij2, mj1, mj2, yj1, yj2];
   const hasIn = allJijis.includes("인"), hasO = allJijis.includes("오"), hasSul = allJijis.includes("술");
   if (hasIn && hasO && hasSul) {
@@ -134,13 +350,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     }
   }
 
-  // 기타 천간합 (일간 — 정임 외)
-  if (!hap || hap.partner !== ig2) {
-    const hap2 = CHEONGAN_HAP_MAP[ig1];
-    if (hap2 && hap2.partner !== ig2) {} // no match
-  }
-
-  // 월간 합 (보조)
+  // 월간 합
   const hapM = CHEONGAN_HAP_MAP[mg1];
   if (hapM && hapM.partner === mg2 && !(hap && hap.partner === ig2)) {
     score += Math.floor(hapM.score * 0.4);
@@ -148,7 +358,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
       desc: `사회적 이미지에서도 ${hapM.name}이 형성됩니다. 공개적인 케미도 강합니다.` });
   }
 
-  // 신살 관련 속궁합 하이라이트
+  // 신살
   const SINSAL_NAMES = ["도화살","진도화","나체도화","곤랑도화","녹방도화","홍염살","년살","목욕"];
   const ss1 = r1.sinsalList.filter(s => SINSAL_NAMES.includes(s.name)).map(s => s.name);
   const ss2 = r2.sinsalList.filter(s => SINSAL_NAMES.includes(s.name)).map(s => s.name);
@@ -167,16 +377,16 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
     highlights.push({ rank: 7, title: `${who} 속궁합 관련 신살 보유`, color: "#6366f1", desc: sinsalDesc });
   }
 
-  // 간여지동 — 합이 형성될 때 매력이 이성에게 강하게 발현되는 구조
+  // 간여지동
   const g1 = isGanyeoJidong(ig1, ij1);
   const g2 = isGanyeoJidong(ig2, ij2);
-  if ((g1 || g2) && (hapName || (highlights.length > 0 && highlights.some(h => h.rank <= 4)))) {
+  if ((g1 || g2) && (hapName || highlights.some(h => h.rank <= 4))) {
     score += 6;
     highlights.push({ rank: 9, title: `${g1 && g2 ? "두 사람 모두" : "한쪽이"} 간여지동 — 합으로 매력 발현`, color: "#f472b6",
       desc: GANYEO_JIDONG_LOVE.hapTrigger });
   }
 
-  // 원진(怨嗔) — 같은 자리(년/월/일/시)의 지지가 서로 원진 관계면 미묘한 원망·서운함이 쌓이기 쉬움
+  // 원진
   const hj1 = r1.pillarsDetail.hour?.jj;
   const hj2 = r2.pillarsDetail.hour?.jj;
   const samePos: [string | undefined, string | undefined, string][] = [
@@ -192,28 +402,31 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   }
 
   highlights.sort((a, b) => a.rank - b.rank);
-  return { score: Math.min(score, 100), highlights, hapName, hapDesc, chungName, chungDesc };
+  return { score: Math.min(score, 100), highlights, hapName, hapDesc, chungName, chungDesc, cgJjCombo };
 }
 
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
-  { min: 100, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
+  { min: 95, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
     verdict: "사주에 새겨진 인연입니다. 이 조합, 운명입니다." },
-  { min: 80, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
+  { min: 75, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
     verdict: "강렬한 성적 끌림이 사주에 나타납니다." },
-  { min: 60, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
+  { min: 60, grade: "A+", label: "환장 케미", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.28)",
+    verdict: "서로에게 빠져들 수밖에 없는 궁합이에요." },
+  { min: 45, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
     verdict: "성적 화합이 강합니다. 자연스럽게 이끌립니다." },
-  { min: 40, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
+  { min: 30, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
     verdict: "잘 맞는 케미입니다. 함께할수록 깊어집니다." },
-  { min: 20, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
+  { min: 18, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
     verdict: "노력과 이해가 필요합니다." },
-  { min: 0,  grade: "D",  label: "화합 약함", color: "#4f46e5", bg: "rgba(79,70,229,0.07)", border: "rgba(79,70,229,0.18)",
+  { min: 8,  grade: "D",  label: "화합 약함", color: "#4f46e5", bg: "rgba(79,70,229,0.07)", border: "rgba(79,70,229,0.18)",
     verdict: "성적 기운의 방향이 많이 다릅니다." },
+  { min: 0,  grade: "F",  label: "섹스리스 위험", color: "#64748b", bg: "rgba(100,116,139,0.07)", border: "rgba(100,116,139,0.18)",
+    verdict: "서로의 성적 에너지가 잘 연결되지 않는 구조입니다." },
 ];
 
 function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GRADES[GRADES.length - 1]; }
 
-// 부족한 오행을 보강해 속궁합 케미를 끌어올리는 컨설팅
 const BOOST_TIP: Record<string, { icon: string; color: string; tip: string }> = {
   목: { icon: "🌿", color: "#16a34a", tip: "스킨십 전 가벼운 산책이나 스트레칭으로 몸을 풀어보세요. 초록색 침구·조명을 더하면 긴장이 풀리고 분위기가 부드러워집니다." },
   화: { icon: "🔥", color: "#dc2626", tip: "조명을 따뜻한 톤(주황·붉은 계열)으로 바꾸고, 음악이나 대화로 분위기를 먼저 달궈보세요. 화 기운이 보강되면 표현력과 열정이 살아납니다." },
@@ -278,7 +491,6 @@ function HotCompatContent() {
     setStep("loading");
   }
 
-  // ── 진입 ────────────────────────────────────────────────────────────────
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#08010f] text-white flex flex-col">
@@ -326,7 +538,6 @@ function HotCompatContent() {
     );
   }
 
-  // ── 폼 ──────────────────────────────────────────────────────────────────
   if (step === "form") {
     const ready = p1.birthYear !== "" && p1.birthMonth !== "" && p1.birthDay !== "" && p2.birthYear !== "" && p2.birthMonth !== "" && p2.birthDay !== "";
     return (
@@ -354,7 +565,6 @@ function HotCompatContent() {
     );
   }
 
-  // ── 로딩 ────────────────────────────────────────────────────────────────
   if (step === "loading") {
     return <AnalysisLoading subject="우리의 속궁합" duration={2800} onDone={() => setStep("result")}
       messages={[
@@ -366,7 +576,7 @@ function HotCompatContent() {
     />;
   }
 
-  // ── 결과 ────────────────────────────────────────────────────────────────
+  // ── 결과 ────────────────────────────────────────────────────────────────────
   const r1 = r1Ref.current;
   const r2 = r2Ref.current;
   const chem = chemRef.current;
@@ -375,6 +585,21 @@ function HotCompatContent() {
   const grade = getGrade(chem.score);
   const ig1 = r1.pillarsDetail.day.cg, ij1 = r1.pillarsDetail.day.jj;
   const ig2 = r2.pillarsDetail.day.cg, ij2 = r2.pillarsDetail.day.jj;
+
+  const label1 = p1.gender === "female" ? "여성" : "남성";
+  const label2 = p2.gender === "female" ? "여성" : "남성";
+  const g1 = p1.gender as "male"|"female";
+  const g2 = p2.gender as "male"|"female";
+
+  const saengGuk = analyzeSaengGuk(ij1, ij2, label1, label2);
+  const libido1 = analyzeLibido(r1, g1);
+  const libido2 = analyzeLibido(r2, g2);
+  const sexlessRisk = checkSexlessRisk(r1, r2, g1, g2);
+
+  // 양기 강한 남자 + 음기 강한 여자 여부
+  const maleLibido = g1 === "male" ? libido1 : libido2;
+  const femaleLibido = g1 === "female" ? libido1 : libido2;
+  const yangYinMatch = maleLibido.yinyang === "양기 강함" && femaleLibido.yinyang === "음기 강함";
 
   return (
     <main className="min-h-screen bg-[#08010f] text-white">
@@ -416,48 +641,124 @@ function HotCompatContent() {
           <p className="text-sm font-bold" style={{ color: grade.color }}>→ {grade.verdict}</p>
         </div>
 
-        {/* 만족도 그래프 — 여성/남성 체감 차이 */}
+        {/* 천간×지지 관계 요약 — 항상 노출 */}
+        {chem.cgJjCombo.combo_title && (
+          <div className="bg-white/[0.04] border border-rose-500/20 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-2">배우자궁 × 일간 관계</p>
+            <p className="text-sm font-black text-rose-300 mb-2">{chem.cgJjCombo.combo_title}</p>
+            <p className="text-xs text-gray-400 leading-relaxed">{chem.cgJjCombo.combo_desc}</p>
+          </div>
+        )}
+
+        {/* 만족도 그래프 */}
         {(() => {
-          // 총점을 10점 만점 기준으로 변환 후 ±1~2점 차이만 허용
           const base = Math.min(10, Math.max(4, Math.round(chem.score / 10)));
           const seed = (chem.hapName ? chem.hapName.length * 17 : 0) + chem.score;
           const skewToFemale = seed % 2 === 0;
-          const diff = (seed % 3 === 0) ? 2 : 1; // 최대 2점 차이
+          const diff = (seed % 3 === 0) ? 2 : 1;
           let female = Math.min(10, Math.max(3, base + (skewToFemale ? diff : -diff)));
           let male = Math.min(10, Math.max(3, base + (skewToFemale ? -diff : diff)));
           if (female === male) { if (skewToFemale) female = Math.min(10, female + 1); else male = Math.min(10, male + 1); }
+
+          // 생해주는 쪽이 만족도 낮게 보정
+          if (saengGuk && saengGuk.type === "상생") {
+            if (saengGuk.dir.startsWith(label1)) {
+              female = Math.max(3, female - 1);
+              male = Math.min(10, male + 1);
+            } else {
+              male = Math.max(3, male - 1);
+              female = Math.min(10, female + 1);
+            }
+          }
+
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
               <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">예상 만족도 (10점 만점)</p>
               <div className="flex justify-between mb-1.5">
-                <span className="text-sm font-bold text-pink-300">여성 {female}점</span>
-                <span className="text-sm font-bold text-sky-300">남성 {male}점</span>
+                <span className="text-sm font-bold text-pink-300">{label1} {female}점</span>
+                <span className="text-sm font-bold text-sky-300">{label2} {male}점</span>
               </div>
               <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden flex">
-                <div className="h-full flex items-center justify-start pl-2"
-                  style={{ width: `${(female / (female + male)) * 100}%`, background: "linear-gradient(90deg, #ec4899, #f472b6)" }} />
-                <div className="h-full flex items-center justify-end pr-2"
-                  style={{ width: `${(male / (female + male)) * 100}%`, background: "linear-gradient(90deg, #6366f1, #38bdf8)" }} />
+                <div className="h-full" style={{ width: `${(female / (female + male)) * 100}%`, background: "linear-gradient(90deg, #ec4899, #f472b6)" }} />
+                <div className="h-full" style={{ width: `${(male / (female + male)) * 100}%`, background: "linear-gradient(90deg, #6366f1, #38bdf8)" }} />
               </div>
               <p className="text-xs text-gray-500 mt-3 leading-relaxed">
                 {female > male
-                  ? "이 궁합은 여성 쪽이 더 큰 만족을 느끼는 케미예요. 남성은 상대를 더 적극적으로 리드하고 배려할수록 케미가 살아납니다."
+                  ? `이 궁합은 ${label1} 쪽이 더 큰 만족을 느끼는 케미예요.`
                   : female < male
-                  ? "이 궁합은 남성 쪽이 더 큰 만족을 느끼는 케미예요. 여성은 표현을 조금 더 적극적으로 할수록 케미가 살아납니다."
+                  ? `이 궁합은 ${label2} 쪽이 더 큰 만족을 느끼는 케미예요.`
                   : "두 사람의 체감 만족도가 비슷한 균형 잡힌 케미입니다."}
+                {saengGuk && saengGuk.type === "상생" && ` ${saengGuk.satisfactionNote}`}
               </p>
             </div>
           );
         })()}
 
-        {/* 케미 분석 결과 — 페이월 */}
+        {/* ── 페이월 영역 ── */}
         <div className="relative mb-4">
           <div className={isPaid ? "" : "blur-sm select-none pointer-events-none"}>
+
+            {/* 배우자궁 생극 관계 */}
+            {saengGuk && (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">배우자궁 오행 생극</p>
+                <p className="text-sm font-bold text-amber-300 mb-1">{saengGuk.dir}</p>
+                <p className="text-xs text-gray-400 leading-relaxed mb-1">{saengGuk.desc}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">{saengGuk.satisfactionNote}</p>
+              </div>
+            )}
+
+            {/* 양기×음기 환상 매치 */}
+            {yangYinMatch && (
+              <div className="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-5 mb-4">
+                <p className="text-xs text-rose-400 font-bold tracking-widest uppercase mb-2">양기 × 음기 환상 케미</p>
+                <p className="text-sm text-rose-200 leading-relaxed">양기가 강한 남성이 음기가 강한 여성에게 환장하는 조합이에요. 두 사람은 서로의 에너지가 자연스럽게 보완되어 강한 끌림이 생기는 구조입니다. 음양의 밸런스가 맞아떨어지면 성적 케미가 배가됩니다.</p>
+              </div>
+            )}
+
+            {/* 섹스리스 경고 */}
+            {sexlessRisk && (
+              <div className="bg-yellow-950/30 border border-yellow-600/30 rounded-2xl p-5 mb-4">
+                <p className="text-xs text-yellow-500 font-bold tracking-widest uppercase mb-2">섹스리스 주의</p>
+                <p className="text-xs text-yellow-200/80 leading-relaxed">{sexlessRisk}</p>
+              </div>
+            )}
+
+            {/* 개인 음양/수기운/성욕 분석 */}
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">개인별 성적 에너지 분석</p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: label1, libido: libido1, r: r1 },
+                  { label: label2, libido: libido2, r: r2 },
+                ].map(({ label, libido, r: rr }) => (
+                  <div key={label} className="bg-white/[0.04] rounded-xl p-3">
+                    <p className="text-xs font-bold text-gray-300 mb-2">{label} · {rr.pillarsDetail.day.cg}{rr.pillarsDetail.day.jj}일주</p>
+                    <div className="flex gap-1.5 mb-2 flex-wrap">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full border"
+                        style={{ color: libido.yinyang === "양기 강함" ? "#fbbf24" : libido.yinyang === "음기 강함" ? "#a78bfa" : "#6b7280",
+                                 borderColor: libido.yinyang === "양기 강함" ? "#fbbf2440" : libido.yinyang === "음기 강함" ? "#a78bfa40" : "#6b728040",
+                                 backgroundColor: libido.yinyang === "양기 강함" ? "#fbbf2412" : libido.yinyang === "음기 강함" ? "#a78bfa12" : "#6b728012" }}>
+                        {libido.yinyang}
+                      </span>
+                      {libido.waterStrong && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 text-sky-400">수기운 강함</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-gray-400 leading-relaxed">{libido.libidomsg}</p>
+                    {libido.gwanSalWarning && (
+                      <p className="text-[10px] text-orange-400/80 mt-1.5 leading-relaxed">{libido.gwanSalWarning}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* 속궁합 보강법 */}
             {(() => {
-              type Element = "목"|"화"|"토"|"금"|"수";
-              const elements: Element[] = ["목","화","토","금","수"];
-              const lacking = Array.from(new Set([...(r1.lacking ?? []), ...(r2.lacking ?? [])])) as Element[];
+              type El = "목"|"화"|"토"|"금"|"수";
+              const elements: El[] = ["목","화","토","금","수"];
+              const lacking = Array.from(new Set([...(r1.lacking ?? []), ...(r2.lacking ?? [])])) as El[];
               const targets = (lacking.length > 0 ? lacking : elements.slice(0, 2)).slice(0, 2);
               return (
                 <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
@@ -507,7 +808,7 @@ function HotCompatContent() {
 
             {/* 일주 정보 */}
             <div className="grid grid-cols-2 gap-3 mt-4">
-              {[{ r: r1, label: "첫 번째 사람" }, { r: r2, label: "두 번째 사람" }].map(({ r, label }) => (
+              {[{ r: r1, label: label1 }, { r: r2, label: label2 }].map(({ r, label }) => (
                 <div key={label} className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
                   <p className="text-xs text-gray-500 mb-1">{label}</p>
                   <p className="text-lg font-black">{r.pillarsDetail.day.cg}{r.pillarsDetail.day.jj}일주</p>
@@ -563,7 +864,6 @@ function HotCompatContent() {
             </div>
           )}
         </div>
-
 
         <button onClick={() => { setP1(defaultBirthData("female")); setP2(defaultBirthData("male")); setStep("form"); }}
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
