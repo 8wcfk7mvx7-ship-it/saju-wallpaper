@@ -368,7 +368,10 @@ function ErosContent() {
   const has홍염   = hasSinsal("홍염살");
   const has진도화  = hasSinsal("진도화");
   const has역마   = hasSinsal("역마살");
-  const hasMokYok = result.pillarsDetail.day.uunseong === "목욕";
+  const _rpd = result.pillarsDetail;
+  const hasMokYok = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).some(p => p?.uunseong === "목욕");
+  const erosAllSipseong = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
+  const hasPyeongwan = erosAllSipseong.includes("편관");
   const haHwa     = result.dominant.includes("화");
 
   // 음간(을·정·기·신·계) = 음기 강함
@@ -596,8 +599,14 @@ function ErosContent() {
           </div>
           {hasMokYok && (
             <div className="mt-3 bg-rose-950/30 border border-rose-700/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-rose-300 font-bold mb-1">일지 목욕(沐浴) — 특별 분석</p>
-              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌립니다." : "양기가 강하고 이성을 끌어당기는 에너지가 있습니다."}</p>
+              <p className="text-xs text-rose-300 font-bold mb-1">목욕(沐浴) — 특별 분석</p>
+              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌려. " : "양기가 강하고 이성을 끌어당기는 에너지가 있어. "}패션 감각이 타고나서 약간의 노출도 고급스럽게 소화하고, 어딜 가나 스타일로 시선을 싹쓸이하는 게 자연스럽게 성적 매력으로 연결돼.</p>
+            </div>
+          )}
+          {hasPyeongwan && (
+            <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
+              <p className="text-xs text-purple-300 font-bold mb-1">편관(偏官) — 카리스마 성적 매력</p>
+              <p className="text-xs text-gray-200">편관이 있으면 섹시하면서도 강렬한 인상을 남겨. 말 한마디 없이도 포스가 느껴지고, 압도적인 분위기 자체가 이성을 끌어당기는 에너지가 돼. 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적이야.</p>
             </div>
           )}
           {form.gender === "female" && has수기운강 && (

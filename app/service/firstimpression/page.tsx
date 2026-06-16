@@ -227,6 +227,10 @@ export default function FirstImpressionPage() {
   if (!r) return null;
   const pd = r.pillarsDetail;
 
+  // 편관 감지: 천간/지지 십성 중 하나라도 편관이면
+  const fiAllSipseong = [pd.year, pd.month, pd.day, pd.hour].filter(Boolean).flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
+  const fiHasPyeongwan = fiAllSipseong.includes("편관");
+
   const pillarCgMap: Record<string, string> = {
     month: pd.month.cg,
     day: pd.day.cg,
@@ -255,7 +259,10 @@ export default function FirstImpressionPage() {
         <div className="bg-gradient-to-br from-amber-950/40 to-orange-950/10 border border-amber-700/30 rounded-2xl p-5 mb-5">
           <p className="text-[11px] font-bold tracking-widest text-amber-400 mb-2">월간(月干) {mainCg} · {main.symbol}</p>
           <h2 className="text-xl font-black text-white mb-2">&quot;{main.keyword}&quot;</h2>
-          <p className="text-sm text-gray-300 leading-relaxed mb-4">{main.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-4">
+            {main.desc}
+            {fiHasPyeongwan && " 여기에 편관(偏官)의 기운이 더해져서 말 한마디 안 해도 포스가 느껴지는 압도적인 첫인상이 있어. 함부로 대할 수 없는 분위기 때문에 처음 만난 사람도 자연스럽게 긴장하게 돼. 강렬하면서도 섹시한 인상을 남기는 타입이야."}
+          </p>
           <div className="bg-white/5 rounded-xl px-4 py-3 mb-2">
             <p className="text-xs font-bold text-emerald-300 mb-1">✓ 이렇게 보여요</p>
             <p className="text-xs text-gray-300 leading-relaxed">{main.merit}</p>

@@ -11,6 +11,7 @@ import {
   calcCharmGrade,
   type CharmGradeResult,
 } from "@/lib/charmEngine";
+import { CHARM_TRAITS } from "@/lib/saju2";
 import { generateOrderId } from "@/lib/toss";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import StarShower from "@/components/StarShower";
@@ -129,6 +130,16 @@ function CharmResultContent() {
   const uunseong = result.pillarsDetail.day.uunseong;
   const uuCharm = UUNSEONG_CHARM[uunseong];
 
+  // 목욕: 어느 기둥이든 12운성이 목욕인 경우
+  const pillarsArr = [result.pillarsDetail.year, result.pillarsDetail.month, result.pillarsDetail.day, result.pillarsDetail.hour].filter(Boolean);
+  const hasMokYok = pillarsArr.some(p => p?.uunseong === "목욕");
+  // 편관: 천간/지지 십성 중 편관이 하나라도 있는 경우
+  const allSipseong = pillarsArr.flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
+  const hasPyeongwan = allSipseong.includes("편관");
+
+  const 목욕Trait = CHARM_TRAITS.find(t => t.id === "목욕")!;
+  const 편관Trait = CHARM_TRAITS.find(t => t.id === "편관")!;
+
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
 
   const handlePayment = () => {
@@ -221,7 +232,10 @@ function CharmResultContent() {
                 {idata.charmClass}
               </span>
             </div>
-            <p className="text-sm text-gray-300 leading-relaxed mb-3">{idata.coreMagic}</p>
+            <p className="text-sm text-gray-300 leading-relaxed mb-3">
+              {idata.coreMagic}
+              {hasPyeongwan && ` 여기에 편관(偏官)의 기운까지 더해져서, 말 한마디 안 해도 포스가 느껴지고 함부로 대할 수 없는 압도적인 분위기가 자연스럽게 풍겨나와. 섹시하면서도 강렬한 인상을 남기는 타입이야. ${편관Trait.advice}`}
+            </p>
             <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5 mb-3">
               <p className="text-xs text-gray-500 mb-1">👁 처음 만난 사람 눈에</p>
               <p className="text-sm text-gray-200 leading-relaxed">{idata.firstImpression}</p>
@@ -252,7 +266,20 @@ function CharmResultContent() {
             <div className="w-full bg-white/5 rounded-full h-2 mb-3">
               <div className="h-full rounded-full" style={{ width: `${uuCharm.score}%`, backgroundColor: uuCharm.color }} />
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed">{uuCharm.desc}</p>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              {uuCharm.desc}
+              {hasMokYok && ` ${목욕Trait.desc} ${목욕Trait.advice}`}
+            </p>
+          </div>
+        )}
+
+        {/* ═══ 목욕 매력 (일주 외 기둥) ═══ */}
+        {hasMokYok && uunseong !== "목욕" && (
+          <div className="bg-white/[0.04] border border-violet-500/20 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-violet-400 font-semibold tracking-widest uppercase mb-2">✨ 목욕(沐浴) — 패션·외모 매력</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              {목욕Trait.desc} {목욕Trait.advice}
+            </p>
           </div>
         )}
 
