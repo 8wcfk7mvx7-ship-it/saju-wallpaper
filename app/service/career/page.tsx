@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, detectExcessPatterns } from "@/lib/saju2";
+import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -244,6 +244,11 @@ export default function CareerPage() {
   const gwanseongCount = totalCount("정관") + totalCount("편관");
   const hasSikSangSaengGwan = sikSangCount >= 1 && gwanseongCount >= 1;
 
+  // 비겁 과다 판단: 비견+겁재 합산 3개 이상이면 과다로 본다
+  const bigeobCount = totalCount("비견") + totalCount("겁재");
+  const ilganEl2 = (CHEONGAN_ELEMENT[ilgan] || "목") as string;
+  const bigeobExcessNote = bigeobCount >= 3 ? BIGEOB_EXCESS_DESC[ilganEl2] : null;
+
   // 합충 분석: 4지지 간의 관계를 모두 구해 진로에 영향을 줄 만한 합/충을 추려낸다
   const allJj = [r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.day.jj, r.pillarsDetail.hour?.jj].filter(Boolean) as string[];
   const jijiRelations = getJijiRelations(allJj);
@@ -352,6 +357,11 @@ export default function CareerPage() {
           {gishinGroup && (
             <p className="text-xs text-gray-500 leading-relaxed mt-2 pt-2 border-t border-white/5">
               참고로 용신을 극하는 기신(忌神)은 <b>{gishinEl}</b> 기운, 십성으로는 <b>{SIPSEONG_OF_GROUP_LABEL[gishinGroup]}</b> 계열이야. 이 영역의 일이나 사람에게 너무 휘둘리면 본인의 강점이 가려질 수 있으니, {SIPSEONG_OF_GROUP_LABEL[gishinGroup]}이 주도하는 환경(예: {gishinGroup === "관성" ? "지나치게 경직된 위계 조직" : gishinGroup === "재성" ? "돈 계산이 모든 걸 좌우하는 환경" : gishinGroup === "인성" ? "이론과 형식만 중시하는 환경" : gishinGroup === "식상" ? "끊임없는 변화와 산만한 멀티태스킹" : "과도한 경쟁과 자존심 싸움"})은 적당히 거리를 두는 게 좋아.
+            </p>
+          )}
+          {bigeobExcessNote && (
+            <p className="text-xs text-amber-400/80 leading-relaxed mt-2 pt-2 border-t border-white/5">
+              {bigeobExcessNote}
             </p>
           )}
         </div>

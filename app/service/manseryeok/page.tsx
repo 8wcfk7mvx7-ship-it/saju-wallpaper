@@ -19,7 +19,7 @@ import {
   detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -861,6 +861,63 @@ function ResultView({
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{singangTrait.caution}</p>
               </div>
             </div>
+          </Section>
+        );
+      })()}
+
+      {/* ②-0 오행 상호작용 인사이트 */}
+      {(() => {
+        const ilganEl = (CHEONGAN_ELEMENT[result.pillarsDetail.day.cg] || "목") as string;
+        const roleDB = OHAENG_ROLE_DB[ilganEl];
+        if (!roleDB) return null;
+        const ys = result.yongshin;
+        const isShinyak = ys.strength === "신약";
+        const dominant = result.dominant ?? [];
+        const lacking = result.lacking ?? [];
+
+        // 오행 → 십성 계열 매핑 (일간 기준)
+        const CONTROLS_MAP: Record<string, string> = { 목:"토", 화:"금", 토:"수", 금:"목", 수:"화" };
+        const GENERATED_BY_MAP: Record<string, string> = { 목:"수", 화:"목", 토:"화", 금:"토", 수:"금" };
+        const SAME_EL = ilganEl;
+
+        // 어떤 역할(식상/재성/관성/인성/비겁)인지 오행으로 판별
+        const getRole = (el: string): string => {
+          if (el === SAME_EL) return "비겁";
+          if (el === CONTROLS_MAP[ilganEl]) return "재성";
+          if (CONTROLS_MAP[el] === ilganEl) return "관성";
+          if (el === GENERATED_BY_MAP[ilganEl]) return "인성";
+          return "식상";
+        };
+
+        // dominant/lacking 오행을 기준으로 가장 관련 높은 인사이트 2~3개 선택
+        const shownRoles = new Set<string>();
+        const insights: string[] = [];
+
+        for (const el of dominant) {
+          const role = getRole(el);
+          if (shownRoles.has(role)) continue;
+          const entry = roleDB.find(e => e.role === role);
+          if (!entry) continue;
+          shownRoles.add(role);
+          insights.push(isShinyak ? entry.condition_weak : entry.condition_strong);
+          if (insights.length >= 2) break;
+        }
+        for (const el of lacking) {
+          if (insights.length >= 3) break;
+          const role = getRole(el);
+          if (shownRoles.has(role)) continue;
+          const entry = roleDB.find(e => e.role === role);
+          if (!entry) continue;
+          shownRoles.add(role);
+          insights.push(entry.insight);
+        }
+
+        if (insights.length === 0) return null;
+        return (
+          <Section title="오행 상호작용 인사이트" accent="#c084fc">
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+              {insights.join(" ")}
+            </p>
           </Section>
         );
       })()}
