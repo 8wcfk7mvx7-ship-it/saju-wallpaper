@@ -148,18 +148,23 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
       desc: `사회적 이미지에서도 ${hapM.name}이 형성됩니다. 공개적인 케미도 강합니다.` });
   }
 
-  // 도화 기운 더하기
-  const DOHWA_NAMES = ["도화살","홍염살","진도화","나체도화","곤랑도화","녹방도화"];
-  const d1 = r1.sinsalList.some(s => DOHWA_NAMES.includes(s.name));
-  const d2 = r2.sinsalList.some(s => DOHWA_NAMES.includes(s.name));
-  if (d1 && d2) {
-    score += 15;
-    highlights.push({ rank: 7, title: "양쪽 모두 도화 기운 보유", color: "#6366f1",
-      desc: "두 사람 모두 이성을 끌어당기는 도화 기운이 있습니다. 서로의 매력에 강하게 끌립니다." });
-  } else if (d1 || d2) {
-    score += 8;
-    highlights.push({ rank: 8, title: "한쪽 도화 기운 보유", color: "#6366f1",
-      desc: "한쪽이 강한 도화 기운을 가지고 있어 먼저 매력을 느끼게 됩니다." });
+  // 신살 관련 속궁합 하이라이트
+  const SINSAL_NAMES = ["도화살","진도화","나체도화","곤랑도화","녹방도화","홍염살","년살","목욕"];
+  const ss1 = r1.sinsalList.filter(s => SINSAL_NAMES.includes(s.name)).map(s => s.name);
+  const ss2 = r2.sinsalList.filter(s => SINSAL_NAMES.includes(s.name)).map(s => s.name);
+  const hasSinsal1 = ss1.length > 0;
+  const hasSinsal2 = ss2.length > 0;
+  if (hasSinsal1 || hasSinsal2) {
+    score += hasSinsal1 && hasSinsal2 ? 15 : 8;
+    const who = hasSinsal1 && hasSinsal2 ? "양쪽 모두" : hasSinsal1 ? "한쪽(여)" : "한쪽(남)";
+    const list1 = ss1.join("·");
+    const list2 = ss2.join("·");
+    const sinsalDesc = hasSinsal1 && hasSinsal2
+      ? `여성(${list1}), 남성(${list2}) — 두 사람 모두 속궁합에 영향을 주는 신살이 있어요. 서로의 매력을 더 강하게 느끼는 구조예요.`
+      : hasSinsal1
+      ? `여성에게 ${list1}이 있어요. 상대가 이 사람에게 강하게 끌리는 구조가 만들어져요.`
+      : `남성에게 ${list2}이 있어요. 상대가 이 사람에게 강하게 끌리는 구조가 만들어져요.`;
+    highlights.push({ rank: 7, title: `${who} 속궁합 관련 신살 보유`, color: "#6366f1", desc: sinsalDesc });
   }
 
   // 간여지동 — 합이 형성될 때 매력이 이성에게 강하게 발현되는 구조
@@ -413,12 +418,14 @@ function HotCompatContent() {
 
         {/* 만족도 그래프 — 여성/남성 체감 차이 */}
         {(() => {
+          // 총점을 10점 만점 기준으로 변환 후 ±1~2점 차이만 허용
+          const base = Math.min(10, Math.max(4, Math.round(chem.score / 10)));
           const seed = (chem.hapName ? chem.hapName.length * 17 : 0) + chem.score;
-          const diff = (seed % 5);
           const skewToFemale = seed % 2 === 0;
-          let female = Math.min(9, Math.max(1, Math.round(chem.score / 12) + (skewToFemale ? diff : -diff)));
-          let male = Math.min(9, Math.max(1, Math.round(chem.score / 12) + (skewToFemale ? -diff : diff)));
-          if (female === male) { if (skewToFemale) female = Math.min(9, female + 1); else male = Math.min(9, male + 1); }
+          const diff = (seed % 3 === 0) ? 2 : 1; // 최대 2점 차이
+          let female = Math.min(10, Math.max(3, base + (skewToFemale ? diff : -diff)));
+          let male = Math.min(10, Math.max(3, base + (skewToFemale ? -diff : diff)));
+          if (female === male) { if (skewToFemale) female = Math.min(10, female + 1); else male = Math.min(10, male + 1); }
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
               <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">예상 만족도 (10점 만점)</p>
