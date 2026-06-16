@@ -2,10 +2,11 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getJijiRelations, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import { DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, JINDO_HWA_GUIDE } from "@/lib/saju2";
 
 export const dynamic = "force-dynamic";
 
@@ -478,6 +479,58 @@ export default function DohwasalPage() {
           </FadeIn>
         )}
 
+        {(() => {
+          // 도화살 위치별 의미 + 발현 시기
+          if (myDohwaList.length === 0) return null;
+          // 도화살이 자리한 기둥 위치 수집 (도화살·진도화·나체도화·곤랑도화·녹방도화)
+          const dohwaPillars = [...new Set(myDohwaList.flatMap(s => s.pillars))];
+          if (dohwaPillars.length === 0) return null;
+          // 각 위치별 info 수집
+          const posInfos = dohwaPillars
+            .map(p => ({ pos: p, info: DOHWA_POSITION_INFO[p] }))
+            .filter(x => x.info);
+          if (posInfos.length === 0) return null;
+          // 인접 기둥 간 합 여부 확인 (연-월, 월-일, 일-시 쌍 중 도화 위치 포함 여부)
+          const pillarOrder = ["년", "월", "일", "시"];
+          const branchByLabel: Record<string, string> = {
+            년: pd.year.jj, 월: pd.month.jj, 일: pd.day.jj, 시: pd.hour?.jj ?? "",
+          };
+          const hapPairs: [string,string][] = [["년","월"],["월","일"],["일","시"]];
+          const hasHapExtension = dohwaPillars.some(p => {
+            const idx = pillarOrder.indexOf(p);
+            if (idx < 0) return false;
+            // check adjacent pillars
+            const neighbors = [pillarOrder[idx-1], pillarOrder[idx+1]].filter(Boolean);
+            return neighbors.some(n => {
+              const jjA = branchByLabel[p];
+              const jjN = branchByLabel[n];
+              if (!jjA || !jjN) return false;
+              const rels = getJijiRelations([jjA, jjN]);
+              return rels.some(r => r.type === "육합" || r.type === "삼합" || r.type === "반합");
+            });
+          });
+          // 위치 라벨 한글
+          const posLabel: Record<string, string> = { 년: "연주", 월: "월주", 일: "일주", 시: "시주" };
+          return (
+            <FadeIn delay={260}>
+              <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
+                <p className="text-sm font-bold text-rose-300 mb-2">🗓 도화의 위치 — 의미와 발현 시기</p>
+                <div className="space-y-2.5">
+                  {posInfos.map(({ pos, info }) => (
+                    <div key={pos}>
+                      <p className="text-xs font-bold text-gray-300 mb-0.5">{posLabel[pos] ?? `${pos}주`} 도화</p>
+                      <p className="text-sm text-gray-300 leading-relaxed">{info.meaning} {info.timing}</p>
+                    </div>
+                  ))}
+                </div>
+                {hasHapExtension && (
+                  <p className="text-xs text-rose-300/70 mt-3 leading-relaxed">{DOHWA_HAP_EXTENSION_NOTE}</p>
+                )}
+              </div>
+            </FadeIn>
+          );
+        })()}
+
         <FadeIn delay={280}>
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
             <p className="text-sm font-bold text-amber-300 mb-1">😏 주변 사람들의 반응</p>
@@ -503,6 +556,16 @@ export default function DohwasalPage() {
           <div className="bg-white/[0.03] border border-emerald-700/20 rounded-2xl p-5 mb-5">
             <p className="text-sm font-bold text-emerald-300 mb-1">💡 이 매력을 다루는 법</p>
             <p className="text-sm text-gray-300 leading-relaxed">{type.tip}</p>
+            {type.id === "진도화형" && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <p className="text-sm text-gray-300 leading-relaxed">{JINDO_HWA_GUIDE.intro}</p>
+                <div className="mt-2 space-y-1.5">
+                  {JINDO_HWA_GUIDE.advice.map((a, i) => (
+                    <p key={i} className="text-sm text-gray-400 leading-relaxed">✦ {a}</p>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </FadeIn>
 

@@ -19,7 +19,7 @@ import {
   detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -754,6 +754,51 @@ function ResultView({
               </div>
             ))}
           </div>
+          {/* 도화살 위치별 의미 + 발현 시기 */}
+          {(() => {
+            const dohwaItems = result.sinsalList.filter(s =>
+              ["도화살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name)
+            );
+            if (dohwaItems.length === 0) return null;
+            const dohwaPillars = [...new Set(dohwaItems.flatMap(s => s.pillars))];
+            const posLabel: Record<string, string> = { 년: "연주", 월: "월주", 일: "일주", 시: "시주" };
+            const branchByLabel: Record<string, string> = {
+              년: pd.year.jj, 월: pd.month.jj, 일: pd.day.jj, 시: pd.hour?.jj ?? "",
+            };
+            const pillarOrder = ["년","월","일","시"];
+            const hasHapExtension = dohwaPillars.some(p => {
+              const idx = pillarOrder.indexOf(p);
+              if (idx < 0) return false;
+              const neighbors = [pillarOrder[idx-1], pillarOrder[idx+1]].filter(Boolean);
+              return neighbors.some(n => {
+                const jjA = branchByLabel[p];
+                const jjN = branchByLabel[n];
+                if (!jjA || !jjN) return false;
+                const rels = getJijiRelations([jjA, jjN]);
+                return rels.some(r => r.type === "육합" || r.type === "삼합" || r.type === "반합");
+              });
+            });
+            return (
+              <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "rgba(244,63,94,0.05)", border: "1px solid rgba(244,63,94,0.15)" }}>
+                <p className="text-xs font-bold mb-2" style={{ color: "#fb7185" }}>🌸 도화살 위치별 의미 · 발현 시기</p>
+                <div className="space-y-2">
+                  {dohwaPillars.map(p => {
+                    const info = DOHWA_POSITION_INFO[p];
+                    if (!info) return null;
+                    return (
+                      <div key={p}>
+                        <p className="text-[10px] font-bold mb-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>{posLabel[p] ?? `${p}주`} 도화</p>
+                        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{info.meaning} {info.timing}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                {hasHapExtension && (
+                  <p className="text-[10px] mt-2 leading-relaxed" style={{ color: "rgba(251,113,133,0.7)" }}>{DOHWA_HAP_EXTENSION_NOTE}</p>
+                )}
+              </div>
+            );
+          })()}
         </Section>
       )}
 
