@@ -564,7 +564,7 @@ function ResultView({
         </div>
 
         <div className={`grid gap-1.5 ${pd.hour ? "grid-cols-4" : "grid-cols-3 max-w-[75%] mx-auto"}`}>
-          {(pd.hour ? pillars : [...pillars].reverse()).map(({ label, d }) => {
+          {[...pillars].reverse().map(({ label, d }) => {
             const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";
             const jiEl = jijiElement(d.jj);
             const cgStyle = EL_STYLE[cgEl];
@@ -664,12 +664,12 @@ function ResultView({
 
         {/* 한눈에 보기 — 4주 요약 테이블 (시·일·월·년 순) */}
         <div className="mt-4 overflow-x-auto rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-          <table className="w-full text-center" style={{ borderCollapse: "collapse" }}>
+          <table className="w-full text-center table-fixed" style={{ borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                <th className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)", width: "15%" }}></th>
+                <th className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)", width: "13%" }}></th>
                 {[...pillars].reverse().map(({ label }) => (
-                  <th key={label} className="text-[10px] font-black py-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</th>
+                  <th key={label} className="text-[10px] font-black py-1.5" style={{ color: "rgba(255,255,255,0.5)", width: `${87 / pillars.length}%` }}>{label}</th>
                 ))}
               </tr>
             </thead>
@@ -692,7 +692,7 @@ function ResultView({
                 <tr key={ri} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                   <td className="text-[9px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.3)" }}>{rowDef.row}</td>
                   {[...pillars].reverse().map(({ label, d }) => (
-                    <td key={label} className="text-[10px] font-bold py-1.5 px-0.5" style={{ color: "rgba(255,255,255,0.75)" }}>
+                    <td key={label} className="text-[10px] font-bold py-1.5 px-1" style={{ color: "rgba(255,255,255,0.75)", wordBreak: "keep-all", overflowWrap: "break-word" }}>
                       {rowDef.get(d, label)}
                     </td>
                   ))}
@@ -705,7 +705,7 @@ function ResultView({
         {/* 궁성론 — 각 기둥 의미 */}
         <div className="mt-4 space-y-2">
           <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>궁성론 (宮星論) — 각 기둥이 나타내는 영역</p>
-          {(["년주","월주","일주","시주"] as const).filter((k) => k !== "시주" || !!pd.hour).map(label => {
+          {(["시주","일주","월주","년주"] as const).filter((k) => k !== "시주" || !!pd.hour).map(label => {
             const d = label === "년주" ? pd.year : label === "월주" ? pd.month : label === "일주" ? pd.day : pd.hour!;
             const g = GUNG_DESC[label];
             const cgEl = CHEONGAN_ELEMENT[d.cg] || "토";

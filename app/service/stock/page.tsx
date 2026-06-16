@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type Element } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfilePicker from "@/components/ProfilePicker";
