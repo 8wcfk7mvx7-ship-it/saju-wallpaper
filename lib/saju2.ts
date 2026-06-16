@@ -211,3 +211,102 @@ export const ILGAN_AFFECTION_STYLE: Record<string, string> = {
   계: "괜찮다고, 신경 안 쓴다고 말은 해놓고 정작 혼자 마음에 담아두고 상처받는 타입이에요. 표현을 잘 안 하다 보니 속이 깊어질수록 혼자 끌어안는 경향이 있어요.",
   무: "자기 자신에게 돈 쓰는 건 아까워하면서도, 좋아하는 사람한테 쓰는 건 전혀 아까워하지 않아요. 마음을 쓰는 대상에게는 통이 크게 베풀어요.",
 };
+
+// ─── 사주 과다·편중 패턴 ───────────────────────────────────────────────────
+import type { SajuResult } from './saju';
+
+export interface ExcessPattern {
+  id: string;
+  name: string;
+  hanja: string;
+  shortDesc: string;
+  fullDesc: string;
+  advice: string;
+  fields: string[]; // relevant service page ids
+}
+
+export const EXCESS_PATTERNS: ExcessPattern[] = [
+  {
+    id: 'siksangtaegwa',
+    name: '식상태과',
+    hanja: '食傷太多',
+    shortDesc: '식신과 상관이 사주에서 지나치게 강한 경우',
+    fullDesc: '식신과 상관이 사주 안에서 비중이 크거나 혼잡되어 있어, 일간의 기운을 과도하게 설기시키는 상태야. 신약하면 더욱 불리하게 작용해.',
+    advice: '말과 행동을 신중하게 하고, 과소비 습관을 점검해봐. 근거 없는 자신감보다 차분하게 실력을 쌓는 게 더 중요해.',
+    fields: ['career', 'personality'],
+  },
+  {
+    id: 'jaewangsincheоn',
+    name: '재왕신천',
+    hanja: '財旺身淺',
+    shortDesc: '재성은 강한데 일간이 약한 경우 (부옥빈인)',
+    fullDesc: '재성이 과도하게 강하고 일간이 약해서, 누려야 할 것들이 오히려 부담이 되는 구조야. 부잣집에 사는 가난한 사람처럼, 재물이 있어도 직접 누리기 어려워.',
+    advice: '건강 관리를 최우선으로 해. 재물보다 체력과 정신력을 키우는 데 집중하고, 신뢰할 수 있는 사람과의 관계를 소중히 여겨.',
+    fields: ['wealth', 'health', 'career'],
+  },
+  {
+    id: 'gwansaltaegwa',
+    name: '관살태과',
+    hanja: '官殺太過',
+    shortDesc: '관성의 영향이 지나치게 강한 경우',
+    fullDesc: '관성이 사주 원국에서 차지하는 비중이 너무 커서, 일간이 지나친 압박을 받고 있어. 사회적 역할이나 직업 안정성에 영향을 줄 수 있어.',
+    advice: '무리하게 책임을 떠안지 말고, 안정적인 환경을 우선시해. 법적·사회적 분쟁을 조심하고, 건강 검진을 꾸준히 받는 게 좋아.',
+    fields: ['career', 'health'],
+  },
+  {
+    id: 'jaedangsal',
+    name: '재당살',
+    hanja: '財黨殺',
+    shortDesc: '재성과 관성이 연합해 일간을 위협하는 경우',
+    fullDesc: '재성이 관성을 생조하고, 그 관성이 다시 일간을 극제하는 구조야. 재성이 일간을 위해 일하지 않고 오히려 위협이 되는 상황으로, 근심과 걱정이 끊이지 않을 수 있어.',
+    advice: '중요한 결정을 성급하게 내리지 말고, 재정적·법적 계약 관계를 꼼꼼히 검토해. 가까운 사람의 배신을 조심하고 독립적인 판단력을 키워.',
+    fields: ['wealth', 'career', 'relationships'],
+  },
+];
+
+export function detectExcessPatterns(r: SajuResult): ExcessPattern[] {
+  const pillars = r.pillarsDetail;
+
+  // 천간 + 지지 십성 전체 수집
+  const allSipseong: string[] = [
+    pillars.year.sipseongCg,
+    pillars.year.sipseongJj,
+    pillars.month.sipseongCg,
+    pillars.month.sipseongJj,
+    pillars.day.sipseongJj, // 일간 자신(일주 천간)은 십성 없음, 지지만
+    ...(pillars.hour ? [pillars.hour.sipseongCg, pillars.hour.sipseongJj] : []),
+  ].filter(Boolean) as string[];
+
+  const count = (keys: string[]) =>
+    allSipseong.filter(s => keys.includes(s)).length;
+
+  const siksangCount = count(['식신', '상관']);
+  const jaeseongCount = count(['정재', '편재']);
+  const gwanseongCount = count(['정관', '편관']);
+
+  const isShinyak = r.yongshin.strength === '신약';
+
+  const detected: ExcessPattern[] = [];
+
+  // 식상태과: 식신+상관이 3개 이상이거나, 2개+신약
+  if (siksangCount >= 3 || (siksangCount >= 2 && isShinyak)) {
+    detected.push(EXCESS_PATTERNS.find(p => p.id === 'siksangtaegwa')!);
+  }
+
+  // 재왕신천: 재성 2개 이상 + 신약
+  if (jaeseongCount >= 2 && isShinyak) {
+    detected.push(EXCESS_PATTERNS.find(p => p.id === 'jaewangsincheоn')!);
+  }
+
+  // 관살태과: 관성 2개 이상
+  if (gwanseongCount >= 2) {
+    detected.push(EXCESS_PATTERNS.find(p => p.id === 'gwansaltaegwa')!);
+  }
+
+  // 재당살: 재성 + 관성이 각 1개 이상이고 신약한 경우
+  if (jaeseongCount >= 1 && gwanseongCount >= 1 && isShinyak) {
+    detected.push(EXCESS_PATTERNS.find(p => p.id === 'jaedangsal')!);
+  }
+
+  return detected;
+}

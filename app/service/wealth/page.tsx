@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN, detectExcessPatterns } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -232,6 +232,8 @@ export default function WealthPage() {
   };
   const wealthAdvice = GROUP_WEALTH_ADVICE[yongshinGroup];
 
+  // 과다·편중 패턴 분석 (재물 페이지 관련)
+  const excessPatterns = detectExcessPatterns(r).filter(p => p.fields.includes('wealth'));
 
   return (
     <main className="min-h-screen bg-[#0a0805] text-white">
@@ -300,6 +302,22 @@ export default function WealthPage() {
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
             <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ {topDesc.shadow}</p>
+          </div>
+        )}
+
+        {excessPatterns.length > 0 && (
+          <div className="bg-rose-950/30 border border-rose-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-rose-300 mb-3">⚠ 사주 편중 패턴 — 재물운에서 주의할 점</p>
+            <div className="space-y-4">
+              {excessPatterns.map((p, i) => (
+                <div key={p.id} className={i > 0 ? "pt-4 border-t border-rose-700/20" : ""}>
+                  <p className="text-sm font-bold text-rose-200 mb-0.5">{p.name} ({p.hanja})</p>
+                  <p className="text-xs text-gray-400 mb-1">{p.shortDesc}</p>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-2">{p.fullDesc}</p>
+                  <p className="text-xs text-amber-300 leading-relaxed">▶ {p.advice}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
