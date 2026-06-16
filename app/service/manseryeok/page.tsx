@@ -750,7 +750,6 @@ function ResultView({
                   </span>
                   <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{s.pillars.join("·")}주</span>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{s.desc}</p>
               </div>
             ))}
           </div>
