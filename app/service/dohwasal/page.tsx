@@ -123,6 +123,59 @@ const TYPES: DohwaType[] = [
   },
 ];
 
+// ── 연예인 도화 데이터베이스 ──
+interface CelebrityDohwa {
+  name: string;
+  tags: string[]; // 도화 특성 태그 (typeId와 매핑)
+  desc: string;   // 도화 한줄 설명
+}
+
+const CELEB_DB: CelebrityDohwa[] = [
+  { name: "설리", tags: ["진도화형", "경국지색도화형"], desc: "월지 도화+제왕 동주, 도화 오행 태과의 겹겹이 쌓인 강력한 도화" },
+  { name: "한고은", tags: ["월장도화", "녹방도화형"], desc: "간여지동 천간투출 월장도화 — 담과 국경을 넘어 찾아올 만큼 강력한 도화" },
+  { name: "사나", tags: ["월장도화", "경국지색도화형"], desc: "월장도화+도화 오행 태과, 타고난 국제적 도화기운" },
+  { name: "조이", tags: ["녹방도화형", "도삽도화"], desc: "자수 녹방도화+일지 기준 연지 도삽도화의 품격 있는 인기" },
+  { name: "초아", tags: ["월장도화", "진도화형"], desc: "월장도화에 연지·일지 기준 월지 도화까지 겹친 구조" },
+  { name: "구하라", tags: ["도삽도화", "월장도화", "경국지색도화형"], desc: "일지 기준 연지 도삽도화+월장도화가 동시에 자리한 희귀 구조" },
+  { name: "김희선", tags: ["녹방도화형", "경국지색도화형"], desc: "지장간 3개 전부 천간투출 — 양귀비 도화라 불리는 극강의 녹방도화" },
+  { name: "송혜교", tags: ["진도화형", "도삽도화"], desc: "간여지동 천간투출에 일지와 합이 되는 관성 도화+도삽도화" },
+  { name: "손예진", tags: ["경국지색도화형", "진도화형"], desc: "홍염+도화 동주(기운 강력), 연지 기준 일지 도화" },
+  { name: "제니", tags: ["경국지색도화형", "진도화형"], desc: "홍염+도화 동주에 연지 기준 일지 도화가 더해진 구조" },
+  { name: "한가인", tags: ["경국지색도화형"], desc: "경국지색 도화 + 연지 기준 일지 도화의 전설급 미인 구조" },
+  { name: "고소영", tags: ["월장도화", "진도화형"], desc: "월장도화에 천간투출+제왕 동주 연지 기준 월지 도화" },
+  { name: "정윤희", tags: ["진도화형"], desc: "천간투출 연지 기준 일지 도화의 고전적 미인 구조" },
+  { name: "장미희", tags: ["진도화형", "도삽도화"], desc: "일지와 합이 되는 관성 도화+도삽도화의 한국 미인 원형" },
+  { name: "성유리", tags: ["제왕도화", "도삽도화"], desc: "제왕 도화+일지 기준 연지 도삽도화" },
+  { name: "유진", tags: ["제왕도화", "도삽도화"], desc: "제왕 도화+일지 기준 연지 도삽도화" },
+  { name: "쯔위", tags: ["월장도화", "녹방도화형"], desc: "월장도화+녹방도화 동시 보유의 품격 있는 국제 도화" },
+  { name: "G-DRAGON", tags: ["나체도화형", "곤랑도화형"], desc: "을사일주 나체도화+천간 을경합·지지 사신형 곤랑도화" },
+  { name: "뷔", tags: ["경국지색도화형", "진도화형"], desc: "경국지색 도화에 연지 기준 월지·일지 도화 중첩" },
+  { name: "정국", tags: ["제왕도화", "진도화형"], desc: "제왕 도화+연지 기준 일지 도화" },
+  { name: "송강", tags: ["경국지색도화형", "진도화형"], desc: "경국지색 도화+연지 기준 일지 도화" },
+  { name: "정형돈", tags: ["월장도화", "경국지색도화형"], desc: "월장도화+경국지색 도화, 연지 기준 월지 도화 — 도화가 파급력으로 터진 케이스" },
+  { name: "수진", tags: ["진도화형", "경국지색도화형"], desc: "을묘월+을묘일 진도화 병존, 연지 기준 월지+일지 도화 매우 강력" },
+];
+
+// 유저의 도화 유형에서 연예인 매칭 태그 집합 추출
+function getUserDohwaTags(typeId: string, sinsalNames: string[]): string[] {
+  const tags: string[] = [typeId];
+  // 월장도화: 도화살이 월지에 자리 (sinsalNames에 "도화살"이 있고 pillar 정보는 여기서 직접 체크 어려우므로 타입으로 커버)
+  if (sinsalNames.includes("나체도화")) tags.push("나체도화형");
+  if (sinsalNames.includes("곤랑도화")) tags.push("곤랑도화형");
+  if (sinsalNames.includes("녹방도화")) tags.push("녹방도화형");
+  if (sinsalNames.includes("진도화")) tags.push("진도화형", "도삽도화");
+  if (sinsalNames.includes("도화살")) tags.push("진도화형");
+  // 홍염+도화 동주 → 경국지색 계열
+  if (sinsalNames.includes("홍염살") && sinsalNames.some(n => ["도화살","진도화","나체도화"].includes(n))) {
+    tags.push("경국지색도화형");
+  }
+  return [...new Set(tags)];
+}
+
+function matchCelebs(userTags: string[]): CelebrityDohwa[] {
+  return CELEB_DB.filter(c => c.tags.some(t => userTags.includes(t)));
+}
+
 function FadeIn({ children, delay }: { children: React.ReactNode; delay: number }) {
   const [v, setV] = useState(false);
   useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
@@ -475,6 +528,39 @@ export default function DohwasalPage() {
             </div>
           </FadeIn>
         )}
+
+        {(() => {
+          const userTags = getUserDohwaTags(type.id, sinsalNames);
+          const matched = matchCelebs(userTags);
+          if (matched.length === 0) return null;
+          const names = matched.map(c => c.name);
+          const nameStr = names.length === 1
+            ? `${names[0]}`
+            : `${names.slice(0, -1).join(", ")}, ${names[names.length - 1]}`;
+          return (
+            <FadeIn delay={720}>
+              <div className="bg-gradient-to-br from-rose-950/50 to-fuchsia-950/40 border border-rose-700/25 rounded-2xl p-5 mb-5">
+                <p className="text-sm font-bold text-rose-300 mb-3">✨ 나와 비슷한 도화를 가진 연예인</p>
+                <p className="text-sm text-gray-200 leading-relaxed mb-4">
+                  나와 같은 도화살을 가진 연예인으로는 <span className="text-rose-300 font-bold">{nameStr}</span>이 있어요.
+                </p>
+                <div className="space-y-2 mb-4">
+                  {matched.map((c, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-rose-400 text-xs font-bold shrink-0 pt-0.5">✦ {c.name}</span>
+                      <span className="text-xs text-gray-400 leading-relaxed">{c.desc}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-white/10 pt-3 mt-1">
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    💡 도화살이 강하면 말 한마디, 행동 하나, 만든 것 하나하나가 <span className="text-rose-300 font-semibold">파급력</span>을 띠게 돼. 위에 있는 연예인들처럼 본인이 의도하지 않아도 화제가 되고, 트렌드를 만들고, 사람들의 기억에 오래 남는 게 이 기운의 특징이야. 내 도화 기운을 제대로 알고 활용하면, 콘텐츠든 관계든 사업이든 훨씬 넓은 범위로 영향을 미칠 수 있어.
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+          );
+        })()}
 
         <FadeIn delay={760}>
           <div className="grid grid-cols-2 gap-3">
