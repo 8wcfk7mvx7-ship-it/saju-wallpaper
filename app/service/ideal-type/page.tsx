@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type SajuResult } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -135,14 +135,87 @@ export default function IdealTypePage() {
   // ── 결과 ──
   const r = resultRef.current;
   if (!r) return null;
-  const ilgan = r.pillarsDetail.day.cg;
+  const pd = r.pillarsDetail;
+  const ilgan = pd.day.cg;
+  const ilganEl = CHEONGAN_ELEMENT[ilgan] ?? "토";
   const idealData = IDEAL[ilgan] ?? IDEAL["갑"];
+
+  // 용신 기반 이상형 파트너 에너지 (이유 없이 결과만)
+  const yongshinEl = r.yongshin.yongshin;
+  const YONGSHIN_PARTNER: Record<string, string> = {
+    목: "함께 성장하고 발전해 나가는 파트너에게 끌려요. 꿈과 방향이 있고, 유연하게 변화를 받아들이는 사람이 잘 맞아요.",
+    화: "열정적이고 따뜻한 에너지를 가진 사람에게 마음이 움직여요. 같이 있으면 기운이 올라가는, 밝고 활발한 스타일이 이상형이에요.",
+    토: "안정감과 든든함을 주는 사람이 진짜 이상형이에요. 오래 봐도 믿음이 가고, 말보다 행동으로 신뢰를 쌓는 사람이 잘 맞아요.",
+    금: "명확하고 결단력 있는 사람에게 끌려요. 중심이 잡혀 있고 말이 깔끔한, 흐릿하지 않은 사람이 매력적으로 느껴져요.",
+    수: "깊고 차분한 내면을 가진 사람에게 자연스럽게 끌려요. 겉보다 속이 풍부하고, 감정선이 섬세한 사람이 잘 맞아요.",
+  };
+
+  // 조후 기반 보완 파트너
+  const monthJj = pd.month.jj;
+  const SEASON_JJ: Record<string, string> = { 인:"봄", 묘:"봄", 진:"봄", 사:"여름", 오:"여름", 미:"여름", 신:"가을", 유:"가을", 술:"가을", 해:"겨울", 자:"겨울", 축:"겨울" };
+  const season = SEASON_JJ[monthJj] ?? "봄";
+  const HOT_JJ = new Set(["사","오","미","술"]);
+  const COLD_JJ = new Set(["해","자","축","인"]);
+  const johuPartner = HOT_JJ.has(monthJj)
+    ? `태어난 계절이 뜨거운 편이라, 차분하고 쿨한 기운의 파트너가 자연스럽게 보완이 돼요. 감정적으로 흔들리지 않고 중심을 잡아주는 사람이 곁에 있으면 안정감이 커져요.`
+    : COLD_JJ.has(monthJj)
+    ? `태어난 계절이 차가운 편이라, 따뜻하고 활기찬 에너지의 파트너가 잘 맞아요. 주변을 밝히는 사람, 먼저 말 걸고 분위기를 살려주는 사람이 곁에 있으면 삶이 풍성해져요.`
+    : `사주의 오행이 비교적 균형 잡혀 있어서, 특정 기운보다 나와 '다른 매력'을 가진 사람에게 자연스럽게 끌리는 경향이 있어요.`;
+
+  // 일지(배우자 궁) 분석
+  const dayJj = pd.day.jj;
+  const dayJjSipseong = pd.day.sipseongJj;
+  const SPOUSE_JJ_DESC: Record<string, string> = {
+    자: "깊고 내면이 풍부한", 축: "성실하고 현실적인", 인: "진취적이고 당당한", 묘: "감성적이고 섬세한",
+    진: "든든하고 포용력 있는", 사: "열정적이고 눈빛이 강한", 오: "밝고 존재감 넘치는", 미: "다정하고 배려 깊은",
+    신: "깔끔하고 자기관리 잘하는", 유: "세련되고 미적 감각 있는", 술: "뚝심 있고 충성스러운", 해: "자유롭고 지적인",
+  };
+  const spouseJjDesc = SPOUSE_JJ_DESC[dayJj] ?? "매력적인";
+
+  // 관성/재성 분석 (성별 기반)
+  const gender = form.gender;
+  const strength = getSipseongStrength(r);
+  const gwanseong = strength.find(s => s.group === "관성");
+  const jaeseong = strength.find(s => s.group === "재성");
+  const targetGroup = gender === "female" ? gwanseong : jaeseong;
+  const PARTNER_STATUS_DESC: Record<string, Record<string, string>> = {
+    female: {
+      강함: "관성이 강하게 드러나 있어, 능력 있고 사회적으로 인정받는 파트너를 원해요. 실력과 책임감을 겸비한 사람에게 자연스럽게 끌려요.",
+      보통: "관성이 적절히 있어, 너무 강압적이지 않으면서도 리더십이 있는 파트너를 선호해요. 같이 성장할 수 있는 안정감 있는 사람이 이상형이에요.",
+      약함: "관성이 약하거나 숨어 있어, 지나치게 틀에 박힌 사람보다 자유롭고 유연한 파트너가 잘 맞아요. 규칙보다 감성으로 통하는 사람에게 끌려요.",
+      무: "관성이 없어, 전통적인 남성상보다 대등하게 소통하는 파트너를 원해요. 지배하거나 통제하려는 사람과는 오래가기 어려워요.",
+    },
+    male: {
+      강함: "재성이 강하게 드러나 있어, 현실적이고 실속 있는 파트너에게 끌려요. 내조를 잘하거나 경제 감각이 있는 사람이 이상형이에요.",
+      보통: "재성이 적절히 있어, 너무 의존적이지 않으면서도 삶을 함께 꾸려나갈 수 있는 현실 감각 있는 파트너가 잘 맞아요.",
+      약함: "재성이 약해서, 물질적 조건보다 감성과 교감이 되는 파트너에게 더 끌리는 경향이 있어요. 함께 있으면 편한 사람이 진짜 이상형이에요.",
+      무: "재성이 없어, 이해타산 없이 순수하게 감정으로 만나는 파트너가 맞아요. 현실적 조건보다 마음이 통하는 사람에게 자연스럽게 끌려요.",
+    },
+  };
+  const partnerRelDesc = targetGroup ? (PARTNER_STATUS_DESC[gender]?.[targetGroup.status] ?? "") : "";
+
+  // 외모 이상형 (일간 오행 + 일지 기반)
+  const LOOKS_BY_EL: Record<string, string> = {
+    목: "키가 크거나 날씬한 체형, 자연스럽고 꾸미지 않은 듯한 스타일에 끌려요. 지나치게 화려하거나 인위적인 외모보다 청량하고 자연미 있는 사람이 눈에 들어와요.",
+    화: "눈빛이 강하고 존재감 있는 외모에 끌려요. 개성 있는 스타일이나 에너지가 느껴지는 사람, 표정이 풍부한 사람이 매력적으로 느껴져요.",
+    토: "건강하고 안정감 있는 체형에 끌려요. 지나치게 마르거나 화려하기보다 든든하고 편안한 외모, 따뜻한 인상을 가진 사람이 이상형이에요.",
+    금: "단정하고 깔끔한 스타일에 끌려요. 자기 관리가 잘된 느낌, 옷차림이나 헤어가 흐트러지지 않은 세련된 외모를 가진 사람이 시선을 끌어요.",
+    수: "신비로운 분위기나 조용하면서도 깊은 눈빛을 가진 사람에게 끌려요. 말보다 눈빛으로 말하는 스타일, 묘하게 빠져드는 매력이 있는 사람이 이상형이에요.",
+  };
+  const looksDesc = LOOKS_BY_EL[ilganEl] ?? "";
+
+  // 합이 되는 지지 (배우자 궁합)
+  const allJj = [pd.year.jj, pd.month.jj, pd.day.jj, ...(pd.hour ? [pd.hour.jj] : [])];
+  const jijiRels = getJijiRelations(allJj);
+  const hapRels = jijiRels.filter(r => r.type === "육합" || r.type === "삼합" || r.type === "반합");
+  const chungRels = jijiRels.filter(r => r.type === "충");
+  const JJ_KR: Record<string, string> = { 자:"자(쥐)", 축:"축(소)", 인:"인(호랑이)", 묘:"묘(토끼)", 진:"진(용)", 사:"사(뱀)", 오:"오(말)", 미:"미(양)", 신:"신(원숭이)", 유:"유(닭)", 술:"술(개)", 해:"해(돼지)" };
 
   // 사주 내 가장 많은 십성 → saju2 SIPSEONG_DESC 활용
   const sipseongList = [
-    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
-    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
-    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+    pd.year.sipseongCg, pd.year.sipseongJj,
+    pd.month.sipseongCg, pd.month.sipseongJj,
+    pd.hour?.sipseongCg, pd.hour?.sipseongJj,
   ].filter(Boolean) as string[];
   const counts: Record<string, number> = {};
   sipseongList.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
@@ -159,36 +232,92 @@ export default function IdealTypePage() {
         <div className="text-center mb-8">
           <p className="text-fuchsia-400 text-xs font-bold tracking-widest mb-2">THEIR TRUE IDEAL TYPE</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주, 그 사람이 진짜 끌리는 사람은
+            {ilgan}{pd.day.jj}일주 {form.name}님이 진짜 끌리는 사람
           </h1>
         </div>
 
+        {/* 핵심 요약 */}
         <div className="bg-gradient-to-br from-fuchsia-950/60 to-violet-950/40 border border-fuchsia-700/30 rounded-3xl p-6 mb-5 text-center">
           <p className="text-fuchsia-300 text-xs font-bold tracking-widest uppercase mb-2">한 줄 요약</p>
           <p className="text-xl font-black leading-snug">{idealData.type}</p>
         </div>
 
+        {/* 성격 이상형 — 일간 기반 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-fuchsia-300 mb-2">왜 이런 사람에게 끌릴까?</p>
           <p className="text-sm text-gray-300 leading-relaxed">{idealData.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mt-3">
+            끌리는 핵심 키워드는 <span className="text-fuchsia-300 font-semibold">'{idealData.trait}'</span>이에요.
+            반대로, {idealData.warn}
+          </p>
         </div>
 
+        {/* 용신 기반 파트너 에너지 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-1">✓ 끌리는 핵심 키워드</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{idealData.trait}</p>
+          <p className="text-sm font-bold text-violet-300 mb-2">사주로 보는 이상적인 파트너 에너지</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{YONGSHIN_PARTNER[yongshinEl] ?? ""}</p>
         </div>
 
+        {/* 조후 보정 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-rose-300 mb-1">✗ 피해야 할 상대</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{idealData.warn}</p>
+          <p className="text-sm font-bold text-orange-300 mb-2">조후(調候)로 보는 보완 파트너</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{johuPartner}</p>
         </div>
 
+        {/* 일지 배우자궁 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-cyan-300 mb-2">배우자 자리(일지)가 말해주는 이상형</p>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            배우자 궁인 일지에 <span className="text-cyan-300 font-semibold">{dayJj}({dayJjSipseong ?? "지지"})</span>이 자리해요.
+            이 자리는 무의식적으로 원하는 파트너의 모습을 담고 있는데, {spouseJjDesc} 사람에게 자연스럽게 끌리는 구조예요.
+            {dayJjSipseong && ` ${dayJjSipseong} 기운이 배우자 자리에 있다는 건, 그 에너지를 가진 상대를 통해 삶이 채워지는 패턴을 가졌다는 뜻이에요.`}
+          </p>
+        </div>
+
+        {/* 관성/재성 기반 */}
+        {partnerRelDesc && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-emerald-300 mb-2">{gender === "female" ? "관성(官星)으로" : "재성(財星)으로"} 보는 이상형</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{partnerRelDesc}</p>
+          </div>
+        )}
+
+        {/* 외모 이상형 */}
+        {looksDesc && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-pink-300 mb-2">외적으로 끌리는 스타일</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{looksDesc}</p>
+          </div>
+        )}
+
+        {/* 합충으로 보는 궁합 지지 */}
+        {(hapRels.length > 0 || chungRels.length > 0) && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-amber-300 mb-2">지지 합충으로 보는 궁합</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {hapRels.length > 0 && (
+                <>
+                  사주 안에서 <span className="text-emerald-300 font-semibold">{hapRels.map(h => `${JJ_KR[h.jjA] ?? h.jjA}·${JJ_KR[h.jjB] ?? h.jjB} ${h.type}`).join(", ")}</span>이 형성돼요.
+                  합이 되는 지지를 가진 상대와는 처음부터 편안한 기운이 흘러요.{" "}
+                </>
+              )}
+              {chungRels.length > 0 && (
+                <>
+                  반면 <span className="text-rose-300 font-semibold">{chungRels.map(h => `${JJ_KR[h.jjA] ?? h.jjA}·${JJ_KR[h.jjB] ?? h.jjB} 충`).join(", ")}</span>이 있어,
+                  해당 지지를 일지로 가진 상대와는 서로 자극은 되지만 충돌이 생기기 쉬운 구조예요. 끌리되 오래가기는 에너지가 많이 들어요.
+                </>
+              )}
+            </p>
+          </div>
+        )}
+
+        {/* 사주 속 연애 기운 (최다 십성) */}
         {topDesc && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-            <p className="text-sm font-bold text-violet-300 mb-1">그 사람의 사주 속 연애 기운 — {topSipseong} ({topDesc.hanja})</p>
+            <p className="text-sm font-bold text-violet-300 mb-1">사주 속 연애 기운 — {topSipseong} ({topDesc.hanja})</p>
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
-            <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ 이 사람의 그림자 면: {topDesc.shadow}</p>
+            <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ 그림자 면: {topDesc.shadow}</p>
           </div>
         )}
 
