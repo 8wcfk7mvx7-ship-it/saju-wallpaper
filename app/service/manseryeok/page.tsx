@@ -19,7 +19,7 @@ import {
   detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -1167,23 +1167,6 @@ function ResultView({
                   <span className="ml-2 font-bold" style={{ color: "#f8fafc" }}>-1 신중·내향</span>
                 </div>
               )}
-            </div>
-          </Section>
-        );
-      })()}
-
-      {/* ④-1 십성별 영화 취향 */}
-      {(() => {
-        if (!dominantSipseong) return null;
-        const movieData = SIPSEONG_MOVIE[dominantSipseong];
-        if (!movieData) return null;
-        return (
-          <Section title="사주로 보는 콘텐츠 취향" accent="#f472b6">
-            <div className="rounded-xl px-4 py-3" style={{ background: "rgba(244,114,182,0.06)", border: "1px solid rgba(244,114,182,0.18)" }}>
-              <p className="text-xs text-gray-500 mb-1">{dominantSipseong} 기질 — 끌리는 서사</p>
-              <p className="text-base font-bold text-pink-300 mb-1.5">"{movieData.movie}" 같은 스타일</p>
-              <p className="text-xs text-gray-300 leading-relaxed mb-1.5">{movieData.reason}</p>
-              <p className="text-[10px] text-pink-400/60">키워드: {movieData.vibe}</p>
             </div>
           </Section>
         );

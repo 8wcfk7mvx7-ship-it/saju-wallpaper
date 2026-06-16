@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, detectSamhapBanghap } from "@/lib/saju";
+import { SIPSEONG_MOVIE } from "@/lib/saju2";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
 
@@ -173,6 +174,7 @@ export default function TastePage() {
   const [ilgan, setIlgan] = useState<string>("임");
   const [name, setName] = useState("나");
   const [pillarsDetail, setPillarsDetail] = useState<any>(null);
+  const [dominantSip, setDominantSip] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"movies" | "books" | "music" | "travel" | "hobbies">("movies");
 
   useEffect(() => {
@@ -214,6 +216,14 @@ export default function TastePage() {
       });
       setElement(r.dominant[0] || "수");
       setIlgan(r.pillarsDetail.day.cg || "임");
+      // 가장 많이 등장한 십성 계산
+      const sipCounts: Record<string, number> = {};
+      [r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
+       r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
+       r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj]
+        .filter(Boolean).forEach(s => { if (s) sipCounts[s] = (sipCounts[s] || 0) + 1; });
+      const topSip = Object.entries(sipCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+      setDominantSip(topSip);
       setName(form.name || "나");
       setPillarsDetail(r.pillarsDetail);
       setActiveTab("movies");
@@ -410,6 +420,19 @@ export default function TastePage() {
                 </div>
               </div>
             ))}
+
+            {/* 십성별 서사 취향 */}
+            {dominantSip && SIPSEONG_MOVIE[dominantSip] && (() => {
+              const md = SIPSEONG_MOVIE[dominantSip];
+              return (
+                <div className="bg-white/[0.04] border border-pink-500/20 rounded-2xl p-4 mt-1">
+                  <p className="text-[10px] text-pink-400/70 font-bold tracking-wider mb-1">{dominantSip} 기질 — 내가 끌리는 서사</p>
+                  <p className="font-bold text-pink-200 mb-1">"{md.movie}"</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">{md.reason}</p>
+                  <p className="text-[10px] text-gray-600 mt-1">{md.vibe}</p>
+                </div>
+              );
+            })()}
           </div>
         )}
 
