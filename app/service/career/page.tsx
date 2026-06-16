@@ -291,23 +291,6 @@ export default function CareerPage() {
           <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
         </div>
 
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-sky-300 mb-3">사주 원국 십성 세력 분석</p>
-          <div className="space-y-2">
-            {sipseongStrength.map(s => (
-              <div key={s.group} className="flex items-start gap-2">
-                <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${
-                  s.status === "강함" ? "bg-emerald-900/50 text-emerald-300" :
-                  s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
-                  s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
-                  "bg-white/5 text-gray-500"
-                }`}>{s.group} · {s.status}</span>
-                <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* 조후(調候) 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-orange-300 mb-1">조후(調候)로 보는 일하기 좋은 환경 — {johu.climate}</p>
@@ -318,17 +301,14 @@ export default function CareerPage() {
         {/* 궁성(宮星) 분석 */}
         {gungseongList.length > 0 && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-cyan-300 mb-3">궁성(宮星)으로 보는 십성 배치</p>
-            <div className="space-y-2">
+            <p className="text-sm font-bold text-cyan-300 mb-2">궁성(宮星)으로 보는 십성 배치</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
               {gungseongList.map((g, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="shrink-0 px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-900/40 text-cyan-300">
-                    {g.palaceLabel} · {g.sipseong}
-                  </span>
-                  <p className="text-xs text-gray-400 leading-relaxed">{g.desc}</p>
-                </div>
+                <span key={i}>
+                  <span className="text-cyan-300/80 font-semibold">{g.palaceLabel}에 {g.sipseong}</span>이 자리하고 있어요. {g.desc}{i < gungseongList.length - 1 ? " " : ""}
+                </span>
               ))}
-            </div>
+            </p>
           </div>
         )}
 
@@ -362,7 +342,7 @@ export default function CareerPage() {
           <p className="text-sm font-bold text-rose-300 mb-1">오행이 서로 극(克)하는 관계</p>
           {dominantControlsLacking ? (
             <p className="text-sm text-gray-300 leading-relaxed">
-              사주에서 가장 강한 기운인 <b>{dominantEl}</b>이 가장 부족한 기운인 <b>{lackingEl}</b>을 극(克)하고 있어. 즉 강한 기운이 약한 기운을 계속 누르는 구조라, 부족한 쪽에 해당하는 영역(인간관계·체력·꾸준함 등 {lackingEl} 기운이 상징하는 부분)이 쉽게 소모돼. 일할 때는 강한 기운을 발산하는 일에만 몰두하지 말고, 부족한 기운을 채워주는 활동(휴식·관계 관리)을 의식적으로 배치하는 게 중요해.
+              사주에서 가장 강한 기운인 <b>{dominantEl}</b>이 가장 부족한 기운인 <b>{lackingEl}</b>을 극(克)하고 있어요. 강한 기운이 약한 기운을 계속 누르는 구조라, 부족한 쪽에 해당하는 영역(인간관계·체력·꾸준함 등 {lackingEl} 기운이 상징하는 부분)이 쉽게 소모될 수 있어요. 일할 때는 강한 기운을 발산하는 일에만 몰두하기보다, 부족한 기운을 채워주는 활동(휴식·관계 관리)을 의식적으로 배치하는 게 중요해요.
             </p>
           ) : (
             <p className="text-sm text-gray-300 leading-relaxed">

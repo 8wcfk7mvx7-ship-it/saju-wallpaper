@@ -3288,8 +3288,8 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
   for (const group of ["비겁", "식상", "재성", "관성", "인성"] as const) {
     const groupNames = SIPSEONG_OF_GROUP[group];
 
-    // 1) 천간(원국 본기둥)에 해당 십성이 드러난 기둥들
-    const cgHits = pillars.filter(p => groupNames.includes(p.sipseongCg));
+    // 1) 천간(원국 본기둥)에 해당 십성이 드러난 기둥들 — 일주 천간은 일간 자신이므로 제외
+    const cgHits = pillars.filter(p => p.key !== "day" && groupNames.includes(p.sipseongCg));
     // 2) 지지 본기(지장간 정기)에 해당 십성이 드러난 기둥들
     const jjHits = pillars.filter(p => groupNames.includes(p.sipseongJj));
 
@@ -3302,7 +3302,7 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
       // 지장간(지지 속)에만 있는 경우 — 잠재적 영향력은 있으나 드러나진 않음
       results.push({
         group, status: "약함",
-        reason: `${groupNames.join("·")}이 천간에 직접 드러나지 않고 지지 속(지장간)에 숨어 있어 영향력이 약해요.`,
+        reason: `${groupNames.join("·")}이 천간에 드러나지 않고 지지 본기에만 있어 영향력이 약해요.`,
       });
       continue;
     }
