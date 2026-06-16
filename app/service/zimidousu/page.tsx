@@ -112,6 +112,41 @@ export default function ZimidousuPage() {
             ))}
           </div>
 
+          {/* TOP 10 관심 주제 */}
+          <div className="w-full mb-10 text-left">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] font-black tracking-widest text-purple-400 uppercase">실제 상담에서 가장 많이 묻는 질문</span>
+              <span className="text-[10px] font-black text-fuchsia-400 bg-fuchsia-900/30 border border-fuchsia-700/30 px-2 py-0.5 rounded-full">TOP 10</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {[
+                ["💰", "부자 될 팔자인가"],
+                ["💍", "배우자 수준"],
+                ["💒", "결혼 시기"],
+                ["🌟", "인생 최고 전성기"],
+                ["🏢", "사업가 vs 직장인"],
+                ["✨", "외모·매력"],
+                ["🤝", "귀인복"],
+                ["🔥", "바람기"],
+                ["⚖️", "이혼수"],
+                ["🎤", "유명해질 팔자인가"],
+              ].map(([emoji, label], i) => (
+                <div key={label} className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-3 py-2.5">
+                  <span className="text-[11px] font-black text-purple-400/70 w-4 shrink-0">{i + 1}</span>
+                  <span className="text-sm">{emoji}</span>
+                  <span className="text-xs text-gray-300 font-medium">{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="bg-purple-950/40 border border-purple-700/20 rounded-xl px-4 py-3">
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                사람들이 자미두수에 묻는 순서는 늘 똑같아 —{" "}
+                <span className="text-purple-300 font-bold">돈 → 배우자 → 성공 → 건강 → 성격</span>.{" "}
+                재백궁·관록궁·부처궁·천이궁·복덕궁, 이 5개 궁이 그 질문에 전부 답해줌.
+              </p>
+            </div>
+          </div>
+
           <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
             ✦ 완전 무료
           </div>
@@ -286,6 +321,57 @@ export default function ZimidousuPage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-sky-300 mb-1">{myeonggungPalace.name} ({myeonggungPalace.hanja})이란?</p>
           <p className="text-sm text-gray-300 leading-relaxed">{myeonggungPalace.desc}</p>
+        </div>
+
+        {/* 5대 궁 × 인기 질문 연결 */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-gray-200 mb-1">사람들이 가장 궁금한 건 이 5개 궁에 다 있어</p>
+          <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
+            돈 → 배우자 → 성공 → 건강 → 성격 순서로 묻는 게 자미두수 상담의 공식.
+          </p>
+          <div className="space-y-2.5">
+            {[
+              {
+                name: "재백궁", hanja: "財帛宮", color: "text-yellow-300",
+                border: "border-yellow-700/30", bg: "bg-yellow-900/10",
+                q: "부자 될 팔자인가?",
+                desc: "돈이 어떤 방식으로 들어오는지, 재물운의 안정성, 재테크 스타일까지 여기서 봐.",
+              },
+              {
+                name: "부처궁", hanja: "夫妻宮", color: "text-rose-300",
+                border: "border-rose-700/30", bg: "bg-rose-900/10",
+                q: "배우자 수준 / 결혼 시기 / 바람기 / 이혼수",
+                desc: "이상형이 어떤 사람인지, 결혼 운이 빠른지 늦은지, 관계에서의 갈등 패턴도 드러남.",
+              },
+              {
+                name: "관록궁", hanja: "官祿宮", color: "text-sky-300",
+                border: "border-sky-700/30", bg: "bg-sky-900/10",
+                q: "사업가 체질인가 직장인 체질인가? 유명해질 팔자인가?",
+                desc: "직업 적성, 성취 방식, 사회적 지위의 최고점을 여기서 읽어.",
+              },
+              {
+                name: "천이궁", hanja: "遷移宮", color: "text-emerald-300",
+                border: "border-emerald-700/30", bg: "bg-emerald-900/10",
+                q: "귀인복 / 인생 전성기는 언제?",
+                desc: "밖에서 만나는 사람들의 수준, 귀인이 얼마나 들어오는지, 해외 운도 여기 달려 있어.",
+              },
+              {
+                name: "복덕궁", hanja: "福德宮", color: "text-fuchsia-300",
+                border: "border-fuchsia-700/30", bg: "bg-fuchsia-900/10",
+                q: "외모·매력 / 타고난 복의 그릇",
+                desc: "타고난 분위기와 매력, 삶을 즐기는 방식, 정신적 행복감의 기준점이 여기 있어.",
+              },
+            ].map((p) => (
+              <div key={p.name} className={`rounded-xl px-4 py-3 border ${p.border} ${p.bg}`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-xs font-black ${p.color}`}>{p.name} ({p.hanja})</span>
+                  <span className="text-[10px] text-gray-500">→</span>
+                  <span className="text-[11px] text-gray-300 font-bold">{p.q}</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-relaxed">{p.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
