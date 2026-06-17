@@ -117,40 +117,6 @@ export const dynamic = "force-dynamic";
 
 type Step = "splash" | "input" | "loading" | "result";
 
-const YEAR_OPTS = Array.from({ length: 2026 - 1929 }, (_, i) => 2025 - i);
-const MONTH_OPTS = Array.from({ length: 12 }, (_, i) => i + 1);
-
-function DropPick({ value, opts, onChange, placeholder, suffix }: {
-  value: string; opts: { v: string; label: string }[];
-  onChange: (v: string) => void; placeholder: string; suffix?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const display = opts.find(o => o.v === value)?.label ?? "";
-  return (
-    <div className="relative w-full">
-      <div onClick={() => setOpen(o => !o)}
-        className="flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer select-none text-sm"
-        style={{ borderColor: open ? "#f43f5e" : "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
-        <span className={display ? "text-white" : "text-gray-500"}>
-          {display ? `${display}${suffix ? " " + suffix : ""}` : placeholder}
-        </span>
-        <span className="text-gray-500 text-xs" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
-      </div>
-      {open && (
-        <div className="absolute z-50 w-full mt-1 rounded-xl overflow-y-auto shadow-2xl" style={{ maxHeight: 220, background: "#12121e", border: "1px solid rgba(255,255,255,0.2)" }}>
-          {opts.map(o => (
-            <div key={o.v} onClick={() => { onChange(o.v); setOpen(false); }}
-              className="px-4 py-2.5 text-sm cursor-pointer"
-              style={{ color: value === o.v ? "#f43f5e" : "rgba(255,255,255,0.65)", background: value === o.v ? "rgba(244,63,94,0.1)" : "transparent" }}>
-              {o.label}{suffix ? ` ${suffix}` : ""}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 interface CrushResult {
   idealType: string;
   approach: string;
@@ -168,6 +134,9 @@ async function analyzeCrush(targetData: {
   gender: "male" | "female"; birthPlace: string;
 }, myData?: {
   birthYear: number; birthMonth: number; birthDay: number;
+  birthHour: number | null; birthMinute: number | null;
+  gender: "male" | "female"; birthPlace: string;
+  calType: "solar" | "lunar"; useJajasi: boolean;
 }): Promise<CrushResult> {
   const r = analyzeSaju({
     birthYear: targetData.birthYear,
@@ -199,9 +168,7 @@ export default function CrushPage() {
   const [targetForm, setTargetForm] = useState<BirthFormData>(defaultBirthData("male"));
 
   // 내 정보 (선택)
-  const [myYear, setMyYear] = useState(0);
-  const [myMonth, setMyMonth] = useState(0);
-  const [myDay, setMyDay] = useState(0);
+  const [myForm, setMyForm] = useState<BirthFormData>(defaultBirthData("female"));
 
   const [formError, setFormError] = useState("");
   const [result, setResult] = useState<CrushResult | null>(null);
@@ -247,9 +214,37 @@ export default function CrushPage() {
         style: "auto", productType: "report", useJajasi: targetForm.useJajasi,
       });
       setTargetSaju(sajuR);
+
+      let myData: {
+        birthYear: number; birthMonth: number; birthDay: number;
+        birthHour: number | null; birthMinute: number | null;
+        gender: "male" | "female"; birthPlace: string;
+        calType: "solar" | "lunar"; useJajasi: boolean;
+      } | undefined;
+
+      if (myForm.birthYear && myForm.birthMonth && myForm.birthDay) {
+        let my = myForm.birthYear as number, mm = myForm.birthMonth as number, md = myForm.birthDay as number;
+        if (myForm.calendarType === "lunar") {
+          try {
+            // @ts-ignore
+            const KLC = (await import("korean-lunar-calendar")).default;
+            const cal = new KLC();
+            cal.setLunarDate(my, mm, md, myForm.isLeapMonth);
+            const sol = cal.getSolarCalendar();
+            if (sol?.year) { my = sol.year; mm = sol.month; md = sol.day; }
+          } catch {}
+        }
+        myData = {
+          birthYear: my, birthMonth: mm, birthDay: md,
+          birthHour: myForm.birthHour, birthMinute: myForm.birthMinute,
+          gender: myForm.gender, birthPlace: myForm.city || "서울",
+          calType: myForm.calendarType, useJajasi: myForm.useJajasi,
+        };
+      }
+
       const res = await analyzeCrush(
         { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetBirthTime, calType: targetForm.calendarType, isLeapMonth: targetForm.isLeapMonth, gender: targetForm.gender, birthPlace: targetBirthPlace },
-        myYear && myMonth && myDay ? { birthYear: myYear, birthMonth: myMonth, birthDay: myDay } : undefined,
+        myData,
       );
       setResult(res);
       setStep("result");
@@ -386,15 +381,9 @@ export default function CrushPage() {
           {/* 내 생년월일 (선택) */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-              내 생년월일 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(입력 시 궁합 점수 제공)</span>
+              내 정보 <span className="text-[10px] font-normal normal-case" style={{ color: "rgba(255,255,255,0.25)" }}>(입력 시 궁합 점수 제공)</span>
             </label>
-            <div className="space-y-2">
-              <DropPick value={myYear ? String(myYear) : ""} opts={YEAR_OPTS.map(y => ({ v: String(y), label: String(y) }))} onChange={v => setMyYear(Number(v))} placeholder="내 출생 연도" suffix="년" />
-              <div className="grid grid-cols-2 gap-2">
-                <DropPick value={myMonth ? String(myMonth) : ""} opts={MONTH_OPTS.map(m => ({ v: String(m), label: String(m) }))} onChange={v => setMyMonth(Number(v))} placeholder="월" suffix="월" />
-                <DropPick value={myDay ? String(myDay) : ""} opts={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ v: String(d), label: String(d) }))} onChange={v => setMyDay(Number(v))} placeholder="일" suffix="일" />
-              </div>
-            </div>
+            <BirthInputForm value={myForm} onChange={setMyForm} accent="#fb7185" label="내 정보" showGender={true} />
           </div>
 
           {formError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{formError}</p>}
@@ -451,7 +440,7 @@ export default function CrushPage() {
         </div>
 
         {/* 궁합 점수 (내 생일 입력했을 때만) */}
-        {myYear > 0 && (
+        {myForm.birthYear !== "" && (
           <div className="mb-6 rounded-2xl p-5 text-center"
             style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.25)" }}>
             <p className="text-xs font-semibold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>나와의 궁합 점수</p>

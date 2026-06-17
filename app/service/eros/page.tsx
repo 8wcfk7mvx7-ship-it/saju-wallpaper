@@ -112,13 +112,13 @@ const ILJI_HIDDEN_CHARM: Record<string, { charm: string; weapon: string }> = {
   자: { charm: "알면 알수록 깊어지는 신비로움. 깊은 음기가 자연스럽게 스며나옴.", weapon: "말하지 않아도 느껴지는 깊은 감성" },
   축: { charm: "처음엔 평범해 보이지만 알고 나면 엄청난 내공.", weapon: "기댈 수 있다는 묵직한 안정감" },
   인: { charm: "생명력과 활기. 같이 있으면 이상하게 에너지 충전되는 타입.", weapon: "자유로운 에너지와 도전적인 매력" },
-  묘: { charm: "꽃 같은 부드러움. 봄 바람처럼 자연스럽게 스며드는 매력.", weapon: "도화살 핵심 지지 — 이성을 끌어당기는 꽃 에너지" },
+  묘: { charm: "꽃 같은 부드러움. 봄 바람처럼 자연스럽게 스며드는 매력.", weapon: "이성을 끌어당기는 꽃 에너지" },
   진: { charm: "예측불가능한 다채로운 면. 알면 알수록 새로운 면이 나옴.", weapon: "용의 기운 — 신비롭고 강한 내면" },
   사: { charm: "겉은 조용한데 속이 뜨거운 타입. 가까이 갈수록 열기가 느껴짐.", weapon: "은폐된 강렬한 열정" },
   오: { charm: "존재 자체가 뜨겁고 강렬. 근처에 있으면 이상하게 설레는 타입.", weapon: "오화의 뜨거운 기운 — 본능적으로 끌리게 만듦" },
   미: { charm: "부드럽고 감성적인 여름의 끝 기운. 따뜻하게 감싸주는 느낌.", weapon: "포용력과 감성으로 상대를 녹임" },
   신: { charm: "날카로운데 낭만적. 강인한 겉모습 뒤의 섬세한 감수성.", weapon: "예민한 감각과 강인한 기운의 반전 매력" },
-  유: { charm: "세련되고 고급스러운 기운. 이성을 자연스럽게 끌어당기는 도화 에너지.", weapon: "유금 도화 — 완성된 아름다움의 기운" },
+  유: { charm: "세련되고 고급스러운 기운. 이성을 자연스럽게 끌어당기는 매력.", weapon: "완성된 아름다움의 기운" },
   술: { charm: "은폐된 강렬한 기운. 겉은 조용하지만 안을 알면 전혀 다른 타입.", weapon: "숨겨진 불꽃 — 알아채는 순간 빠져나오기 어려움" },
   해: { charm: "자유롭고 신비로운 기운. 잡힐 듯 잡히지 않는 매력.", weapon: "깊은 수(水)의 음기와 자유로운 에너지의 조합" },
 };
@@ -236,11 +236,11 @@ const 월지_조후: Record<string, string> = {
 
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
-  { min: 86, grade: "S", label: "본능형", color: "#f43f5e", bg: "rgba(244,63,94,0.15)", border: "rgba(244,63,94,0.35)", desc: "치명적인 도화 기운의 소유자. 의도하지 않아도 이성이 먼저 다가옵니다.", oneliner: "근처에 있기만 해도 주변 이성이 흔들립니다." },
+  { min: 86, grade: "S", label: "본능형", color: "#f43f5e", bg: "rgba(244,63,94,0.15)", border: "rgba(244,63,94,0.35)", desc: "타고난 매력이 치명적인 수준입니다. 의도하지 않아도 이성이 먼저 다가옵니다.", oneliner: "근처에 있기만 해도 주변 이성이 흔들립니다." },
   { min: 71, grade: "A", label: "매혹형", color: "#ec4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.30)", desc: "강한 이성 매력을 타고났습니다. 노력하지 않아도 자연스럽게 끌립니다.", oneliner: "이성이 먼저 연락하는 타입입니다." },
   { min: 46, grade: "B", label: "감성형", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.25)", desc: "은근하고 깊은 매력입니다. 처음엔 몰랐다가 시간이 지나면서 중독됩니다.", oneliner: "가까워질수록 빠져드는 타입입니다." },
-  { min: 21, grade: "C", label: "은은형", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.22)", desc: "도화 기운보다는 인격과 내면에서 매력이 나옵니다.", oneliner: "알면 알수록 좋아지는 타입입니다." },
-  { min: 0,  grade: "D", label: "지성형", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)", desc: "타고난 도화 기운은 약하지만, 실력과 능력으로 매력을 만드는 타입입니다.", oneliner: "잘될수록 더 매력적으로 보이는 타입입니다." },
+  { min: 21, grade: "C", label: "은은형", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.22)", desc: "외면보다는 인격과 내면에서 매력이 나옵니다.", oneliner: "알면 알수록 좋아지는 타입입니다." },
+  { min: 0,  grade: "D", label: "지성형", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)", desc: "타고난 매력은 강한 편이 아니지만, 실력과 능력으로 매력을 만드는 타입입니다.", oneliner: "잘될수록 더 매력적으로 보이는 타입입니다." },
 ];
 
 function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GRADES[GRADES.length - 1]; }
@@ -303,12 +303,12 @@ function ErosContent() {
           </p>
           <div className="w-full space-y-3 mb-10 text-left">
             {[
-              ["성적 매력 등급 S~D", "홍염살·진도화·목욕 기반 점수 + 종합 판정"],
-              ["나의 외모 — 일간별", "사주로 보는 내 외모 특징과 분위기"],
-              ["나의 성적 능력·에너지", "음기/양기 분석. 일간+일지 기반"],
-              ["은근한 매력 — 일지별", "이성이 모르게 빠져드는 나의 포인트"],
-              ["이성을 꼬시는 팁", "내 일간에 맞는 맞춤 공략법"],
-              ["월주 분석", "사회적으로 드러나는 외부 이미지"],
+              ["성적 매력 등급 S~D", "타고난 매력 신호를 종합한 점수와 등급"],
+              ["나의 외모", "사주로 보는 내 외모 특징과 분위기"],
+              ["나의 성적 능력·에너지", "타고난 매력과 에너지의 본질"],
+              ["은근한 매력", "이성이 모르게 빠져드는 나의 포인트"],
+              ["이성을 꼬시는 팁", "나에게 맞는 맞춤 공략법"],
+              ["사회적 이미지", "사회적으로 드러나는 외부 이미지"],
             ].map(([title, desc]) => (
               <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 shrink-0" />
@@ -414,10 +414,9 @@ function ErosContent() {
   const outerImage = WOLGGAN_OUTER[wolggan] ?? "사회적으로 안정적이고 신뢰감 있는 이미지.";
 
   const charmSinsals: { name: string; desc: string }[] = [];
-  if (has진도화) charmSinsals.push({ name: "진도화(眞桃花)", desc: "일지 기준 진짜 도화. 이성이 먼저 다가오는 강한 기운입니다." });
-  if (has홍염)   charmSinsals.push({ name: "홍염살(紅艶殺)", desc: "색정적 매력이 강합니다. 이성이 본능적으로 끌리는 기운입니다." });
-  if (has도화)   charmSinsals.push({ name: "도화살(桃花殺)", desc: "자연스럽게 이성을 끌어당기는 에너지입니다." });
-  if (hasMokYok) charmSinsals.push({ name: `일지 목욕(沐浴) — ${ilji}`, desc: "12운성 중 감각과 관능이 가장 강한 위치입니다." });
+  if (has진도화) charmSinsals.push({ name: "진도화(眞桃花)", desc: "이성이 먼저 다가오는 강한 끌림의 기운을 가지고 있습니다." });
+  if (has홍염)   charmSinsals.push({ name: "홍염살(紅艶殺)", desc: "색정적 매력이 강해, 이성이 본능적으로 끌리는 기운입니다." });
+  if (has도화)   charmSinsals.push({ name: "도화살(桃花殺)", desc: "자연스럽게 이성을 끌어당기는 에너지를 타고났습니다." });
 
   const targetGender = form.gender === "female" ? "남자" : "여자";
 
@@ -493,7 +492,7 @@ function ErosContent() {
         {/* 헤더 */}
         <div className="text-center mb-6">
           <div className="inline-block px-2 py-0.5 rounded-full bg-rose-900/40 border border-rose-700/30 text-rose-400 text-[10px] font-bold tracking-wider mb-2">19금</div>
-          <h2 className="text-3xl font-black mb-1">{ilgan}{ilji}일주</h2>
+          <h2 className="text-3xl font-black mb-1">나의 성적 매력</h2>
           <p className="text-gray-400 text-xs">{result.fourPillars}</p>
         </div>
 
@@ -556,234 +555,73 @@ function ErosContent() {
 
         {/* ② 나의 외모 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">나의 외모 — {ilgan}일간</p>
-          <div className="space-y-3">
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">이목구비·인상</p>
-              <p className="text-sm text-gray-200">{app.face}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">체형·실루엣</p>
-              <p className="text-sm text-gray-200">{app.body}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">전체 분위기</p>
-              <p className="text-sm text-gray-200">{app.vibe}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">비슷한 분위기 연예인</p>
-              <p className="text-sm font-semibold" style={{ color: grade.color }}>{app.celeb}</p>
-            </div>
-          </div>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 외모</p>
+          <p className="text-sm text-gray-200 leading-relaxed">
+            {app.face} {app.body} {app.vibe} 비슷한 분위기로는 <span className="font-semibold" style={{ color: grade.color }}>{app.celeb}</span> 같은 이미지가 있습니다.
+          </p>
         </div>
 
-        {/* ③ 나의 성적 능력·에너지 */}
+        {/* ③ 나의 성적 능력·에너지 + 성향 인사이트 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">나의 성적 에너지 — {ilgan}{ilji}일주</p>
-          <div className="space-y-3">
-            <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
-              <p className="text-sm text-gray-200">{sexData.power}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">에너지 성질</p>
-              <p className="text-sm text-gray-200">{sexData.energy}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">스타일</p>
-              <p className="text-sm text-gray-200">{sexData.style}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-rose-400 font-semibold mb-1">낮져밤이 vs 낮이밤져</p>
-              <p className="text-sm text-gray-200">{ILGAN_DAYNIGHT[ilgan]?.[form.gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입."}</p>
-            </div>
-          </div>
-          {hasMokYok && (
-            <div className="mt-3 bg-rose-950/30 border border-rose-700/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-rose-300 font-bold mb-1">목욕(沐浴) — 특별 분석</p>
-              <p className="text-xs text-gray-200">12운성 중 감각과 관능이 가장 강한 위치. {form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌려. " : "양기가 강하고 이성을 끌어당기는 에너지가 있어. "}패션 감각이 타고나서 약간의 노출도 고급스럽게 소화하고, 어딜 가나 스타일로 시선을 싹쓸이하는 게 자연스럽게 성적 매력으로 연결돼.</p>
-            </div>
-          )}
-          {hasPyeongwan && (
-            <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-purple-300 font-bold mb-1">편관(偏官) — 카리스마 성적 매력</p>
-              <p className="text-xs text-gray-200">편관이 있으면 섹시하면서도 강렬한 인상을 남겨. 말 한마디 없이도 포스가 느껴지고, 압도적인 분위기 자체가 이성을 끌어당기는 에너지가 돼. 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적이야.</p>
-            </div>
-          )}
-          {form.gender === "female" && has수기운강 && (
-            <div className="mt-3 bg-blue-950/30 border border-blue-700/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-blue-300 font-bold mb-1">수기운(水氣運) — 명기력(命氣力) 강화</p>
-              <p className="text-xs text-gray-200">수(水)는 흡인·수용·생식의 기운입니다. 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있습니다. 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다.</p>
-            </div>
-          )}
-          {form.gender === "female" && is음간 && has수기운강 && (
-            <div className="mt-3 bg-purple-950/30 border border-purple-700/30 rounded-xl px-4 py-3">
-              <p className="text-xs text-purple-300 font-bold mb-1">음간(陰干) — 음기(陰氣) 집중형</p>
-              <p className="text-xs text-gray-200">음간 일간은 수용·집중·흡수의 기운이 강합니다. 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어, 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다.</p>
-            </div>
-          )}
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 성적 에너지</p>
+          <p className="text-sm text-gray-200 leading-relaxed">
+            {sexData.power} {sexData.energy} {sexData.style} {ILGAN_DAYNIGHT[ilgan]?.[form.gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입입니다."}
+            {hasMokYok && ` 게다가 감각과 관능이 가장 강한 위치를 타고나, ${form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌리고," : "양기가 강하고 이성을 끌어당기는 에너지가 있으며,"} 패션 감각도 타고나 약간의 노출도 고급스럽게 소화하고 어딜 가나 스타일로 시선을 끄는 것이 자연스럽게 성적 매력으로 연결됩니다.`}
+            {hasPyeongwan && " 강한 카리스마가 있어 섹시하면서도 강렬한 인상을 남기는데, 말 한마디 없이도 포스가 느껴지고 압도적인 분위기 자체가 이성을 끌어당기며 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적입니다."}
+            {form.gender === "female" && has수기운강 && " 수(水) 기운도 강해 흡인·수용·생식의 에너지가 풍부한데, 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있어 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다."}
+            {form.gender === "female" && is음간 && has수기운강 && " 받아들이고 흡수하는 기운까지 겹쳐, 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다."}
+            {" "}{getSexlifeInsights(result).map(ins => ins.desc).join(" ")}
+          </p>
         </div>
 
-        {/* ③-1 사주로 보는 성향 인사이트 */}
-        {(() => {
-          const sexlifeInsights = getSexlifeInsights(result);
-          if (sexlifeInsights.length === 0) return null;
-          return (
-            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">사주로 보는 성향 인사이트</p>
-              <div className="space-y-2.5">
-                {sexlifeInsights.map(ins => (
-                  <div key={ins.title} className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-sm font-bold mb-1" style={{ color: ins.color }}>{ins.title}</p>
-                    <p className="text-xs leading-relaxed text-gray-300">{ins.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* ④ 암합·지지합 분석 */}
-        {(found천간합.length > 0 || found지지합.length > 0) && (
+        {/* ④ 암합·지지합·충 분석 */}
+        {(found천간합.length > 0 || found지지합.length > 0 || found충.length > 0) && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">암합(暗合) · 지지합(地支合) 분석</p>
-            <p className="text-xs text-gray-400 mb-4">사주 기둥 사이에 숨겨진 합(合)의 에너지</p>
-            {found천간합.length > 0 && (
-              <div className="mb-3">
-                <p className="text-xs text-rose-400 font-semibold mb-2">천간합(天干合)</p>
-                <div className="space-y-2">
-                  {found천간합.map((h) => (
-                    <div key={h.a+h.b} className="bg-rose-950/20 border border-rose-900/25 rounded-xl px-4 py-3">
-                      <p className="text-sm font-bold text-rose-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
-                      <p className="text-xs text-gray-200">{h.desc}</p>
-                      {(h.a === "정" || h.b === "정") && (
-                        <p className="text-xs text-purple-300 mt-1 font-semibold">★ 정임합이 사주에 숨어있으면 &quot;숨겨진 성적 매력&quot; — 겉으로 드러나지 않지만 가까워지면 폭발합니다.</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {found지지합.length > 0 && (
-              <div>
-                <p className="text-xs text-purple-400 font-semibold mb-2">지지합(地支合)</p>
-                <div className="space-y-2">
-                  {found지지합.map((h) => (
-                    <div key={h.a+h.b} className="bg-purple-950/20 border border-purple-900/25 rounded-xl px-4 py-3">
-                      <p className="text-sm font-bold text-purple-300 mb-0.5">{h.a}{h.b}합 → 합화 {h.합화}</p>
-                      <p className="text-xs text-gray-200">{h.desc}</p>
-                      <p className="text-xs text-gray-300 mt-1">음양이 맞아 자연스럽게 끌리는 기운입니다.</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ⑤ 충 — 성적 긴장 */}
-        {found충.length > 0 && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">충(沖) — 성적 긴장 에너지</p>
-            <p className="text-xs text-amber-500/80 mb-3">충(沖)이 있는 사주는 긴장감과 자극이 강합니다. 정적인 관계보다 역동적이고 자극적인 관계에서 에너지가 살아납니다.</p>
-            <div className="space-y-2">
-              {found충.map((c) => (
-                <div key={c.a+c.b} className="bg-amber-950/20 border border-amber-900/25 rounded-xl px-4 py-3">
-                  <p className="text-sm font-bold text-amber-300 mb-0.5">{c.a}{c.b}충(沖)</p>
-                  <p className="text-xs text-gray-200">{c.desc}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">사주 기둥 사이에 숨겨진 합(合)·충(沖)의 에너지</p>
+            <p className="text-sm text-gray-200 leading-relaxed">
+              {found천간합.map(h => `${h.a}${h.b}합으로 합화 ${h.합화}을 이루어 ${h.desc}`).join(" ")}
+              {found천간합.some(h => h.a === "정" || h.b === "정") && " 특히 정임합이 사주에 숨어있으면 겉으로 드러나지 않는 \"숨겨진 성적 매력\"이 있어, 가까워지면 폭발하는 타입입니다."}
+              {found지지합.length > 0 && " " + found지지합.map(h => `${h.a}${h.b}합으로 합화 ${h.합화}을 이루어 ${h.desc}`).join(" ") + " 음양이 맞아 자연스럽게 끌리는 기운입니다."}
+              {found충.length > 0 && ` 한편 ${found충.map(c => `${c.a}${c.b}충`).join(", ")}이 있어 긴장감과 자극이 강한 편입니다. ` + found충.map(c => c.desc).join(" ") + " 정적인 관계보다 역동적이고 자극적인 관계에서 에너지가 살아납니다."}
+            </p>
           </div>
         )}
 
         {/* ⑥ 배우자궁·조후 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">배우자궁(配偶者宮) 분석</p>
-          <p className="text-xs text-gray-400 mb-4">일지(日支) = 배우자궁. 나의 관계 에너지의 핵심.</p>
-          <div className="space-y-3">
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">배우자궁 — {ilji}</p>
-              <p className="text-sm text-gray-200">{ILJI_HIDDEN_CHARM[ilji]?.charm ?? "알면 알수록 빠져드는 매력"}</p>
-            </div>
-            {iljiSipseongDesc && (
-              <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
-                <p className="text-xs text-rose-400 font-semibold mb-1">십성(十星) — {iljiSipseong}</p>
-                <p className="text-sm text-gray-300">{iljiSipseongDesc}</p>
-              </div>
-            )}
-            {woljiJohu && (
-              <div className="bg-blue-950/20 border border-blue-900/20 rounded-xl px-4 py-3">
-                <p className="text-xs text-blue-400 font-semibold mb-1">조후(調候) — 월지 {pd.month.jj}</p>
-                <p className="text-sm text-gray-300">{woljiJohu}</p>
-              </div>
-            )}
-          </div>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">배우자궁 분석</p>
+          <p className="text-sm text-gray-200 leading-relaxed">
+            {ILJI_HIDDEN_CHARM[ilji]?.charm ?? "알면 알수록 빠져드는 매력입니다."}
+            {iljiSipseongDesc && ` ${iljiSipseongDesc}`}
+            {woljiJohu && ` ${woljiJohu}`}
+          </p>
         </div>
 
-        {/* ⑧ 은근한 매력 (일지) */}
+        {/* ⑧ 은근한 매력 (일지) + 월주 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">은근한 매력 — {ilji}일지</p>
-          <div className="space-y-3">
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">이성이 모르게 빠져드는 이유</p>
-              <p className="text-sm text-gray-200">{hidden.charm}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">나의 은밀한 무기</p>
-              <p className="text-sm font-semibold" style={{ color: grade.color }}>{hidden.weapon}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ⑨ 월주 분석 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">월주 분석 — {result.pillarsDetail.month.cg}{result.pillarsDetail.month.jj}월주</p>
-          <p className="text-xs text-gray-400 mb-3">사회적으로 드러나는 외부 이미지</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{outerImage}</p>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">은근한 매력</p>
+          <p className="text-sm text-gray-200 leading-relaxed">
+            {hidden.charm} 나의 은밀한 무기는 <span className="font-semibold" style={{ color: grade.color }}>{hidden.weapon}</span>입니다. 사회적으로 드러나는 외부 이미지로는, {outerImage}
+          </p>
         </div>
 
         {/* ⑩ 도화 신살 */}
         {charmSinsals.length > 0 && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">사주 속 도화 기운</p>
-            <div className="space-y-3">
-              {charmSinsals.map(({ name, desc }) => (
-                <div key={name} className="flex items-start gap-3 bg-rose-950/20 border border-rose-900/25 rounded-xl px-4 py-3">
-                  <span className="text-rose-400 text-sm mt-0.5 shrink-0">●</span>
-                  <div>
-                    <p className="text-sm font-bold text-rose-300">{name}</p>
-                    <p className="text-xs text-gray-200 mt-0.5">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">타고난 매력 신호</p>
+            <p className="text-sm text-gray-200 leading-relaxed">
+              {charmSinsals.map(({ name, desc }) => `${name} — ${desc}`).join(" ")}
+            </p>
           </div>
         )}
-
         {/* ⑪ 꼬시는 팁 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">{targetGender}를 꼬시는 법</p>
-          <p className="text-xs text-gray-400 mb-4">{ilgan}일간 맞춤 공략법</p>
-          <div className="space-y-2">
-            {tipList.map((tip, i) => (
-              <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl px-4 py-3">
-                <span className="text-rose-400 font-black text-sm shrink-0">{i + 1}</span>
-                <p className="text-sm text-gray-300 leading-relaxed">{tip}</p>
-              </div>
-            ))}
-          </div>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">{targetGender}를 꼬시는 법</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{tipList.join(" ")}</p>
         </div>
 
         <DohwaFormulaList result={result} />
         <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
-
-        {/* 면책 */}
-        <div className="bg-white/[0.02] border border-white/8 rounded-xl px-4 py-3 mb-6">
-          <p className="text-xs text-gray-400 leading-relaxed text-center">
-            본 분석은 사주 명리학 기반 19금 엔터테인먼트 콘텐츠입니다.<br />
-            만 19세 이상만 이용하세요.
-          </p>
-        </div>
 
         <ShareButton />
         <button onClick={() => { setForm(defaultBirthData("female")); setStep("form"); }}

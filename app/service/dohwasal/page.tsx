@@ -87,9 +87,9 @@ const TYPES: DohwaType[] = [
     partner: "선택지가 많을수록 오히려 기준을 단순하게 정하는 것이 도움이 됩니다. '나에게 호감을 표현하는 사람'이 아니라 '내가 힘들 때 곁에 있어주는 사람'을 기준으로 삼아보세요. 특히 동성 친구들 사이에서 평판이 좋은 사람을 곁에 두면 불필요한 시기·구설을 줄일 수 있습니다. 인기에 취해 여러 사람을 동시에 만나는 듯한 태도를 보이면, 정작 진짜 인연이 떠날 수 있다는 점도 기억하세요.",
   },
   {
-    id: "자오묘유도화형",
+    id: "편야도화형",
     emoji: "🌙",
-    title: "사주의 뼈대에 새겨진 — 자오묘유 도화(子午卯酉 桃花, 함지도화)",
+    title: "사주의 뼈대에 새겨진 — 편야도화(遍野桃花, 자오묘유 함지도화)",
     rate: "상위 15%", pct: 15, power: 65,
     desc: "사주의 지지에 자(子)·오(午)·묘(卯)·유(酉) — 이른바 '사정(四正)' 글자가 도화의 자리로 자리한 구조예요. 삼합의 중심 글자가 곧 도화의 기준이 되는, 도화살의 가장 고전적이고 근본적인 형태입니다. 화려함보다는 묘하게 사람을 끌어당기는 '자석 같은 기운'이 은은하게 흐릅니다.",
     jealousy: "특별히 꾸미지 않아도 모임에서 자연스럽게 중심에 서게 되는 타입이에요. 주변에서는 '쟤는 가만히 있어도 분위기를 가져간다'는 말을 자주 합니다.",
@@ -184,7 +184,7 @@ function FadeIn({ children, delay }: { children: React.ReactNode; delay: number 
 }
 
 // 진짜 '도화살' 계열 (홍염살·도화살 자체는 전체 합집합/별도 매력살이라 독립 카테고리로 취급하지 않음)
-const DOHWA_PRIORITY = ["경국지색도화형", "나체도화형", "곤랑도화형", "녹방도화형", "진도화형", "자오묘유도화형"];
+const DOHWA_PRIORITY = ["경국지색도화형", "나체도화형", "곤랑도화형", "녹방도화형", "진도화형", "편야도화형"];
 
 // 자/오/묘/유(사정) 지지가 일지 또는 다른 주 지지에 자리해 '함지도화(자오묘유 도화)'를 이루는지 체크
 const SAJEONG = ["자", "오", "묘", "유"];
@@ -207,7 +207,7 @@ function pickType(sinsalNames: string[], dayBranch?: string, allBranches?: strin
   }
   for (const id of DOHWA_PRIORITY) {
     if (id === "경국지색도화형") continue;
-    if (id === "자오묘유도화형") {
+    if (id === "편야도화형") {
       if (allBranches && hasSajeongDohwa(allBranches)) return TYPES.find(t => t.id === id)!;
       continue;
     }
@@ -383,7 +383,7 @@ export default function DohwasalPage() {
   const pd = r.pillarsDetail;
   const allBranches = [pd.year.jj, pd.month.jj, pd.day.jj, ...(pd.hour ? [pd.hour.jj] : [])];
   const type = pickType(sinsalNames, pd.day.jj, allBranches);
-  const hasDohwa = DOHWA_PRIORITY.some(id => sinsalNames.includes(id.replace("형", "")));
+  const hasDohwa = !["가도화형", "무도화형"].includes(type.id);
   const myDohwaList = r.sinsalList.filter(s =>
     ["도화살", "진도화", "나체도화", "곤랑도화", "녹방도화"].includes(s.name)
   );
@@ -532,65 +532,33 @@ export default function DohwasalPage() {
         })()}
 
         <FadeIn delay={280}>
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-amber-300 mb-1">😏 주변 사람들의 반응</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{type.jealousy}</p>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={360}>
-          <div className="bg-white/[0.03] border border-violet-700/20 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-violet-300 mb-1">⏳ 지금이 그 타이밍일 수 있어요</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{type.fomo}</p>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={440}>
-          <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-rose-300 mb-1">⚠ 주의해야 할 위험 신호</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{type.danger}</p>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={520}>
-          <div className="bg-white/[0.03] border border-emerald-700/20 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-emerald-300 mb-1">💡 이 매력을 다루는 법</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{type.tip}</p>
-            {type.id === "진도화형" && (
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-sm text-gray-300 leading-relaxed">{JINDO_HWA_GUIDE.intro}</p>
-                <div className="mt-2 space-y-1.5">
-                  {JINDO_HWA_GUIDE.advice.map((a, i) => (
-                    <p key={i} className="text-sm text-gray-400 leading-relaxed">✦ {a}</p>
-                  ))}
-                </div>
-              </div>
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5 space-y-4">
+            {myDohwaList.length > 0 && (
+              <p className="text-sm text-gray-300 leading-relaxed">
+                <span className="font-bold text-rose-300">내 사주의 도화 — </span>
+                {myDohwaList.map(s => `${s.pillars.join("·")}지지에 ${s.name}(${s.hanja})을 깔고 있어요`).join(", ")}.
+              </p>
             )}
+            <p className="text-sm text-gray-300 leading-relaxed">
+              <span className="font-bold text-amber-300">😏 주변 사람들의 반응 — </span>{type.jealousy}
+            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              <span className="font-bold text-violet-300">⏳ 타이밍 — </span>{type.fomo}
+            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              <span className="font-bold text-rose-300">⚠ 주의해야 할 위험 신호 — </span>{type.danger}
+            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              <span className="font-bold text-emerald-300">💡 이 매력을 다루는 법 — </span>{type.tip}
+              {type.id === "진도화형" && (
+                <> {JINDO_HWA_GUIDE.intro} {JINDO_HWA_GUIDE.advice.join(" ")}</>
+              )}
+            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              <span className="font-bold text-sky-300">💑 이성을 선택하는 법 — </span>{type.partner}
+            </p>
           </div>
         </FadeIn>
-
-        <FadeIn delay={600}>
-          <div className="bg-white/[0.03] border border-sky-700/20 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-sky-300 mb-1">💑 이성을 선택하는 법</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{type.partner}</p>
-          </div>
-        </FadeIn>
-
-        {myDohwaList.length > 0 && (
-          <FadeIn delay={680}>
-            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-              <p className="text-sm font-bold text-gray-300 mb-3">내 사주에 있는 도화 관련 신살</p>
-              <div className="space-y-2">
-                {myDohwaList.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="text-rose-400 text-xs font-bold shrink-0">{s.name}({s.hanja})</span>
-                    <span className="text-xs text-gray-500 leading-relaxed">— {s.pillars.join("·")}주</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </FadeIn>
-        )}
 
         {(() => {
           const userTags = getUserDohwaTags(type.id, sinsalNames);

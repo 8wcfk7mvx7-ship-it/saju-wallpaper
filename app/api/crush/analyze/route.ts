@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 - 인성 유무: ${hasInseong ? "있음" : "없음"}
 ${sipseongDescs ? `\n## 십신 심화 데이터\n${sipseongDescs}` : ""}
 ${moneyComboText ? `\n## 재물 구조\n${moneyComboText}` : ""}
-${myBirth ? `\n## 나의 생일 (궁합 참고)\n- ${myBirth.birthYear}년 ${myBirth.birthMonth}월 ${myBirth.birthDay}일생` : ""}
+${myBirth ? `\n## 나의 정보 (궁합 참고)\n- ${myBirth.birthYear}년 ${myBirth.birthMonth}월 ${myBirth.birthDay}일생 (${myBirth.calType === "lunar" ? "음력" : "양력"})\n- 출생시간: ${myBirth.birthHour !== null && myBirth.birthHour !== undefined ? `${myBirth.birthHour}시 ${myBirth.birthMinute ?? 0}분${myBirth.useJajasi ? " (야자시/조자시 적용)" : ""}` : "모름"}\n- 출생지: ${myBirth.birthPlace || "서울"}\n- 성별: ${myBirth.gender === "male" ? "남성" : "여성"}` : ""}
 
 반드시 아래 JSON 형식으로만 응답하세요:
 

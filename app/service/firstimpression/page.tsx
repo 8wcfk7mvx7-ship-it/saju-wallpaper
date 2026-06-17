@@ -91,11 +91,11 @@ const CG_IMPRESSION: Record<string, { symbol: string; keyword: string; desc: str
   },
 };
 
-const PILLAR_ROLE: { key: "month" | "day" | "year" | "hour"; label: string; sub: string; weight: string }[] = [
-  { key: "month", label: "월간(月干) — 첫인상의 핵심", sub: "사회생활에서 사람들이 가장 먼저 느끼는 분위기", weight: "★★★ 가장 비중이 큰 인상" },
-  { key: "day", label: "일간(日干) — 본질적인 나", sub: "조금 친해진 뒤에 드러나는 진짜 성향", weight: "★★ 가까워질수록 보이는 인상" },
-  { key: "year", label: "연간(年干) — 베이스 톤", sub: "가정·성장 환경에서 형성된 기본 분위기", weight: "★ 은연중에 깔려있는 배경 인상" },
-  { key: "hour", label: "시간(時干) — 디테일·마무리 인상", sub: "헤어질 때, 마무리할 때 남는 잔상", weight: "★ 끝인상에 영향" },
+const PILLAR_ROLE: { key: "month" | "day" | "year" | "hour"; label: string }[] = [
+  { key: "month", label: "사회생활에서 사람들이 가장 먼저 느끼는 분위기" },
+  { key: "day", label: "조금 친해진 뒤에 드러나는 진짜 모습" },
+  { key: "year", label: "가정·성장 환경에서 형성된 기본 분위기" },
+  { key: "hour", label: "헤어질 때, 마무리할 때 남는 잔상" },
 ];
 
 export default function FirstImpressionPage() {
@@ -251,26 +251,17 @@ export default function FirstImpressionPage() {
         <div className="text-center mb-8">
           <p className="text-amber-400 text-xs font-bold tracking-widest mb-2">FIRST IMPRESSION</p>
           <h1 className="text-2xl font-black leading-snug">
-            {pd.day.cg}{pd.day.jj}일주, 당신의 첫인상은
+            당신의 첫인상은
           </h1>
         </div>
 
-        {/* 월간 중심 메인 결과 */}
+        {/* 메인 결과 */}
         <div className="bg-gradient-to-br from-amber-950/40 to-orange-950/10 border border-amber-700/30 rounded-2xl p-5 mb-5">
-          <p className="text-[11px] font-bold tracking-widest text-amber-400 mb-2">월간(月干) {mainCg} · {main.symbol}</p>
-          <h2 className="text-xl font-black text-white mb-2">&quot;{main.keyword}&quot;</h2>
-          <p className="text-sm text-gray-300 leading-relaxed mb-4">
-            {main.desc}
-            {fiHasPyeongwan && " 여기에 편관(偏官)의 기운이 더해져서 말 한마디 안 해도 포스가 느껴지는 압도적인 첫인상이 있어. 함부로 대할 수 없는 분위기 때문에 처음 만난 사람도 자연스럽게 긴장하게 돼. 강렬하면서도 섹시한 인상을 남기는 타입이야."}
+          <h2 className="text-xl font-black text-white mb-3">&quot;{main.keyword}&quot;</h2>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            {main.desc} {main.merit} {main.risk}
+            {fiHasPyeongwan && " 여기에 강한 카리스마가 더해져서 말 한마디 안 해도 포스가 느껴지는 압도적인 첫인상을 줍니다. 함부로 대할 수 없는 분위기 때문에 처음 만난 사람도 자연스럽게 긴장하게 되고, 강렬하면서도 섹시한 인상을 남기는 타입입니다."}
           </p>
-          <div className="bg-white/5 rounded-xl px-4 py-3 mb-2">
-            <p className="text-xs font-bold text-emerald-300 mb-1">✓ 이렇게 보여요</p>
-            <p className="text-xs text-gray-300 leading-relaxed">{main.merit}</p>
-          </div>
-          <div className="bg-white/5 rounded-xl px-4 py-3">
-            <p className="text-xs font-bold text-rose-300 mb-1">⚠ 오해받기 쉬운 부분</p>
-            <p className="text-xs text-gray-300 leading-relaxed">{main.risk}</p>
-          </div>
         </div>
 
         {/* 개선법 */}
@@ -284,18 +275,14 @@ export default function FirstImpressionPage() {
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3 px-1">연·월·일·시, 단계별 인상</p>
         </div>
         <div className="space-y-3 mb-8">
-          {PILLAR_ROLE.map(({ key, label, sub, weight }) => {
+          {PILLAR_ROLE.map(({ key, label }) => {
             const cg = pillarCgMap[key];
             if (!cg) return null;
             const info = CG_IMPRESSION[cg];
             return (
               <div key={key} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-bold text-white">{label}</p>
-                  <span className="text-[10px] text-gray-500">{weight}</span>
-                </div>
-                <p className="text-[11px] text-gray-500 mb-2">{sub}</p>
-                <p className="text-xs font-bold mb-1" style={{ color: "#fbbf24" }}>{cg} · {info.symbol} — {info.keyword}</p>
+                <p className="text-[11px] text-gray-500 mb-2">{label}</p>
+                <p className="text-sm font-bold mb-1" style={{ color: "#fbbf24" }}>&quot;{info.keyword}&quot;</p>
                 <p className="text-xs text-gray-400 leading-relaxed">{info.desc}</p>
               </div>
             );
@@ -306,8 +293,8 @@ export default function FirstImpressionPage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
           <p className="text-sm font-bold text-sky-300 mb-2">📖 이렇게 활용해보세요</p>
           <ul className="text-xs text-gray-400 leading-relaxed space-y-1.5 list-disc list-inside">
-            <li>월간(月干) 결과는 회사·모임 등 사회생활에서 첫 만남에 가장 크게 작용합니다. 면접, 미팅, 소개팅 등 첫 만남 전에 참고해보세요.</li>
-            <li>일간(日干)은 친해진 뒤 드러나는 본모습이라, &apos;첫인상과 실제 성격이 다르다&apos;는 말을 듣는다면 이 차이에서 오는 경우가 많습니다.</li>
+            <li>맨 위 결과는 회사·모임 등 사회생활에서 첫 만남에 가장 크게 작용합니다. 면접, 미팅, 소개팅 등 첫 만남 전에 참고해보세요.</li>
+            <li>친해진 뒤 드러나는 본모습은 따로 정리되어 있으니, &apos;첫인상과 실제 성격이 다르다&apos;는 말을 듣는다면 이 차이에서 오는 경우가 많습니다.</li>
             <li>&apos;오해받기 쉬운 부분&apos;은 단점이 아니라, 같은 기운이 다르게 보이는 것뿐입니다. 개선법을 하루 한 가지씩만 의식적으로 적용해보세요.</li>
           </ul>
         </div>
