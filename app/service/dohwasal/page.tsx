@@ -221,21 +221,22 @@ function pickType(sinsalNames: string[], dayBranch?: string, allBranches?: strin
   return TYPES.find(t => t.id === "무도화형")!;
 }
 
-const PILLAR_LABEL: Record<string, string> = { "년": "연주", "연": "연주", "월": "월주", "일": "일주", "시": "시주" };
-
 // 홍염살이 자리한 기둥에 따른 디테일 설명 (일주에 있을 때 가장 강하게 작동)
 function getHongyeomDesc(pillars: string[]): string {
-  const labels = pillars.map(p => PILLAR_LABEL[p] ?? `${p}주`);
+  const parts: string[] = [];
   if (pillars.includes("일")) {
-    return `${labels.join("·")} 홍염살이라 가장 기운이 강하답니다. 일주는 '나 자신'을 그대로 드러내는 자리라서, 본인이 의식하지 않아도 표정·말투·분위기에서 묘한 색기가 늘 배어 나와요. 가장 영향력이 큰 자리에 홍염살이 앉아 있는, 보기 드문 케이스입니다.`;
+    parts.push("'나 자신'을 그대로 드러내는 본모습에 깃든 기운이라 가장 강하게 작동하는데, 본인이 의식하지 않아도 표정·말투·분위기에서 묘한 색기가 늘 배어 나옵니다.");
   }
-  if (pillars.includes("월")) {
-    return `${labels.join("·")} 홍염살이에요. 월주는 사회생활·대외적인 이미지를 보여주는 자리라서, 친구나 직장 동료처럼 가까운 사람들 사이에서 '묘하게 신경 쓰이는 사람'이라는 평가를 자주 듣게 됩니다.`;
+  if (pillars.includes("월") || pillars.includes("연")) {
+    parts.push("사회생활이나 대외적인 이미지에서, 친구나 직장 동료처럼 가까운 사람들 사이에서 묘하게 신경 쓰이는 존재가 될 확률이 높습니다.");
   }
   if (pillars.includes("시")) {
-    return `${labels.join("·")} 홍염살이에요. 시주는 인생 후반부·내가 만들어가는 환경과 관련된 자리라서, 나이가 들수록 또는 특정 상황(연애·사회생활)에 들어갔을 때 이 색기 있는 매력이 더 또렷하게 드러나는 경향이 있어요.`;
+    parts.push("나이가 들어도 사라지지 않는 매력이고, 심지어 노년에도 본인의 매력을 잃기는커녕 더욱 빛날 수 있는 사주입니다.");
   }
-  return `${labels.join("·")} 홍염살이에요. 연주는 가문·뿌리·초년운과 관련된 자리라서, 본인은 잘 못 느껴도 첫인상이나 분위기에서 은근한 색기가 묻어나는 경우가 많습니다.`;
+  if (parts.length === 0) {
+    parts.push("본인은 잘 못 느껴도 첫인상이나 분위기에서 은근한 색기가 묻어나는 경우가 많습니다.");
+  }
+  return parts.join(" ");
 }
 
 export default function DohwasalPage() {
