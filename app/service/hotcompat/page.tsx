@@ -698,60 +698,33 @@ function HotCompatContent() {
         <div className="relative mb-4">
           <div className={isPaid ? "" : "blur-sm select-none pointer-events-none"}>
 
-            {/* 배우자궁 생극 관계 */}
-            {saengGuk && (
+            {/* 배우자궁 생극 + 음양 + 섹스리스 — 줄글 */}
+            {(saengGuk || yangYinMatch || sexlessRisk) && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">배우자궁 오행 생극</p>
-                <p className="text-sm font-bold text-amber-300 mb-1">{saengGuk.dir}</p>
-                <p className="text-xs text-gray-400 leading-relaxed mb-1">{saengGuk.desc}</p>
-                <p className="text-xs text-gray-500 leading-relaxed">{saengGuk.satisfactionNote}</p>
+                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">두 사람의 잠자리 궁합</p>
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  {saengGuk && `${saengGuk.desc} ${saengGuk.satisfactionNote} `}
+                  {yangYinMatch && "양기가 강한 남성이 음기가 강한 여성에게 환장하는 조합이라, 서로의 에너지가 자연스럽게 보완되면서 강한 끌림이 생기는 구조예요. 음양의 밸런스가 맞아떨어지면 성적 케미가 배가됩니다. "}
+                  {sexlessRisk}
+                </p>
               </div>
             )}
 
-            {/* 양기×음기 환상 매치 */}
-            {yangYinMatch && (
-              <div className="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-5 mb-4">
-                <p className="text-xs text-rose-400 font-bold tracking-widest uppercase mb-2">양기 × 음기 환상 케미</p>
-                <p className="text-sm text-rose-200 leading-relaxed">양기가 강한 남성이 음기가 강한 여성에게 환장하는 조합이에요. 두 사람은 서로의 에너지가 자연스럽게 보완되어 강한 끌림이 생기는 구조입니다. 음양의 밸런스가 맞아떨어지면 성적 케미가 배가됩니다.</p>
-              </div>
-            )}
-
-            {/* 섹스리스 경고 */}
-            {sexlessRisk && (
-              <div className="bg-yellow-950/30 border border-yellow-600/30 rounded-2xl p-5 mb-4">
-                <p className="text-xs text-yellow-500 font-bold tracking-widest uppercase mb-2">섹스리스 주의</p>
-                <p className="text-xs text-yellow-200/80 leading-relaxed">{sexlessRisk}</p>
-              </div>
-            )}
-
-            {/* 개인 음양/수기운/성욕 분석 */}
+            {/* 개인 음양/수기운/성욕 분석 — 줄글 */}
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">개인별 성적 에너지 분석</p>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: label1, libido: libido1, r: r1 },
-                  { label: label2, libido: libido2, r: r2 },
-                ].map(({ label, libido, r: rr }) => (
-                  <div key={label} className="bg-white/[0.04] rounded-xl p-3">
-                    <p className="text-xs font-bold text-gray-300 mb-2">{label} · {rr.pillarsDetail.day.cg}{rr.pillarsDetail.day.jj}일주</p>
-                    <div className="flex gap-1.5 mb-2 flex-wrap">
-                      <span className="text-[10px] px-2 py-0.5 rounded-full border"
-                        style={{ color: libido.yinyang === "양기 강함" ? "#fbbf24" : libido.yinyang === "음기 강함" ? "#a78bfa" : "#6b7280",
-                                 borderColor: libido.yinyang === "양기 강함" ? "#fbbf2440" : libido.yinyang === "음기 강함" ? "#a78bfa40" : "#6b728040",
-                                 backgroundColor: libido.yinyang === "양기 강함" ? "#fbbf2412" : libido.yinyang === "음기 강함" ? "#a78bfa12" : "#6b728012" }}>
-                        {libido.yinyang}
-                      </span>
-                      {libido.waterStrong && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 text-sky-400">수기운 강함</span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-gray-400 leading-relaxed">{libido.libidomsg}</p>
-                    {libido.gwanSalWarning && (
-                      <p className="text-[10px] text-orange-400/80 mt-1.5 leading-relaxed">{libido.gwanSalWarning}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">서로가 서로에게 느끼는 점</p>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {label1}이 {label2}에게 느끼는 점은, {libido1.libidomsg} {libido1.gwanSalWarning ?? ""}
+                {libido1.yinyang === "양기 강함" && " 양기가 강해서 먼저 다가가고 리드하려는 욕구가 큰 편이에요."}
+                {libido1.yinyang === "음기 강함" && " 음기가 강해서 자극에 섬세하게 반응하고, 분위기와 감정 교감을 먼저 원하는 편이에요."}
+                {libido1.waterStrong && " 수(水) 기운이 받쳐줘서 끌리는 마음을 숨기지 못하고 자연스럽게 드러내는 타입이기도 해요."}
+              </p>
+              <p className="text-sm text-gray-300 leading-relaxed mt-3">
+                반대로 {label2}이 {label1}에게 느끼는 점은, {libido2.libidomsg} {libido2.gwanSalWarning ?? ""}
+                {libido2.yinyang === "양기 강함" && " 양기가 강해서 먼저 다가가고 리드하려는 욕구가 큰 편이에요."}
+                {libido2.yinyang === "음기 강함" && " 음기가 강해서 자극에 섬세하게 반응하고, 분위기와 감정 교감을 먼저 원하는 편이에요."}
+                {libido2.waterStrong && " 수(水) 기운이 받쳐줘서 끌리는 마음을 숨기지 못하고 자연스럽게 드러내는 타입이기도 해요."}
+              </p>
             </div>
 
             {/* 속궁합 보강법 */}
