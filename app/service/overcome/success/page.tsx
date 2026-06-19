@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import ShareImageButton from "@/components/ShareImageButton";
 
@@ -68,11 +68,6 @@ type Stage = "confirming" | "done" | "error";
 
 function SuccessContent() {
   const router = useRouter();
-  const params = useSearchParams();
-  const paymentKey = params.get("paymentKey") || "";
-  const orderId = params.get("orderId") || "";
-  const amount = Number(params.get("amount") || 990);
-  const isStarPayment = params.get("star") === "true";
 
   const [stage, setStage] = useState<Stage>("confirming");
   const [errorMsg, setErrorMsg] = useState("");
@@ -83,41 +78,30 @@ function SuccessContent() {
   const [dayJj, setDayJj] = useState("");
 
   useEffect(() => {
-    if (!isStarPayment && (!paymentKey || !orderId)) {
-      setErrorMsg("결제 정보가 올바르지 않습니다.");
-      setStage("error");
-      return;
-    }
-    async function run() {
-      try {
-        const raw = sessionStorage.getItem("overcomeData");
-        if (raw) {
-          const { form } = JSON.parse(raw);
-          const r = analyzeSaju({
-            birthYear: form.year, birthMonth: form.month, birthDay: form.day,
-            birthHour: null, birthMinute: null, name: "", gender: form.gender || "female",
-            birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
-          });
-          setSinsals(r.sinsalList.map((s: { name: string }) => s.name));
-          setDominant(r.dominant);
-          setLacking(r.lacking);
-          setDayCg(r.pillarsDetail.day.cg);
-          setDayJj(r.pillarsDetail.day.jj);
-        }
-        if (isStarPayment) { setStage("done"); return; }
-        const receiptEmail = sessionStorage.getItem("receiptEmail") || undefined;
-        await fetch("/api/payment/confirm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentKey, orderId, amount, customerEmail: receiptEmail, productName: "사주 극복법 맞춤 분석" }),
-        });
-        setStage("done");
-      } catch {
-        setStage("done"); // show results even if API call fails
+    try {
+      const raw = sessionStorage.getItem("overcomeData");
+      if (!raw) {
+        setErrorMsg("분석 정보가 올바르지 않습니다.");
+        setStage("error");
+        return;
       }
+      const { form } = JSON.parse(raw);
+      const r = analyzeSaju({
+        birthYear: form.year, birthMonth: form.month, birthDay: form.day,
+        birthHour: null, birthMinute: null, name: "", gender: form.gender || "female",
+        birthPlace: "서울", style: "auto", productType: "report", useJajasi: false,
+      });
+      setSinsals(r.sinsalList.map((s: { name: string }) => s.name));
+      setDominant(r.dominant);
+      setLacking(r.lacking);
+      setDayCg(r.pillarsDetail.day.cg);
+      setDayJj(r.pillarsDetail.day.jj);
+      setStage("done");
+    } catch {
+      setErrorMsg("분석 정보가 올바르지 않습니다.");
+      setStage("error");
     }
-    run();
-  }, [paymentKey, orderId, amount, isStarPayment]);
+  }, []);
 
   if (stage === "error") {
     return (
@@ -133,7 +117,7 @@ function SuccessContent() {
       <main className="min-h-screen bg-[#06060e] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400 text-sm">결제 확인 중...</p>
+          <p className="text-gray-400 text-sm">분석 중...</p>
         </div>
       </main>
     );
@@ -151,7 +135,7 @@ function SuccessContent() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-20" id="overcome-result">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
-          <span className="text-xs text-green-400/70 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">✓ 결제 완료</span>
+          <span className="text-xs text-green-400/70 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">✓ 분석 완료</span>
         </div>
 
         {/* 일주 */}
