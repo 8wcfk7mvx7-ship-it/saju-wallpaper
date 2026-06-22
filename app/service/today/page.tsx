@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
-  getJijiRelations, sortJijiRelationsByStrength, REL_TYPE_COLOR, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
+  getJijiRelations, sortJijiRelationsByStrength, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -75,7 +75,6 @@ const GROUP_TODAY: Record<string, { 총운: string; 재물: string; 애정: stri
 const COL_W = 52; // 각 컬럼 고정 너비(px)
 const COL_GAP = 6; // 컬럼 간격(px)
 const LINE_H = 28; // 각 커넥터 줄의 높이(px)
-const BADGE_R = 22; // 지지 뱃지 반지름(px) — circle diameter
 const HAP_COLOR = "#4ade80";
 const CHUNG_COLOR = "#f87171";
 const HYEONG_COLOR = "#fb923c";
@@ -94,35 +93,88 @@ function colCenterX(idx: number): number {
   return idx * (COL_W + COL_GAP) + COL_W / 2;
 }
 
-interface DiagramProps {
-  cols: { label: string; jj: string }[];
-  relations: JijiRelation[];
+interface LineRel {
+  aIdx: number;
+  bIdx: number;
+  label: string;
+  color: string;
 }
 
-function JijiDiagram({ cols, relations }: DiagramProps) {
+interface DiagramProps {
+  cols: { label: string; cg: string; jj: string }[];
+  jjLines: LineRel[]; // 지지 관계 — 명식표 아래쪽에 연결
+  cgLines: LineRel[]; // 천간 관계 — 명식표 위쪽에 연결
+}
+
+const CG_BADGE_D = 24;
+const JJ_BADGE_D = 30;
+const LABEL_H = 14;
+const ROW_GAP = 6;
+
+// 화살표 마커가 달린 커넥터 라인 — 시작/끝 양쪽에 삼각형 화살촉 + 중앙 레이블 배지
+function ConnectorLine({ xA, xB, y, color, label, width, height }: { xA: number; xB: number; y: number; color: string; label: string; width: number; height: number }) {
+  const lo = Math.min(xA, xB);
+  const hi = Math.max(xA, xB);
+  const midX = (lo + hi) / 2;
+  const tri = 6;
+  return (
+    <svg style={{ position: "absolute", left: 0, top: 0, width, height, overflow: "visible", pointerEvents: "none" }}>
+      <line x1={lo} y1={y} x2={hi} y2={y} stroke={color} strokeWidth={1.5} strokeOpacity={0.85} />
+      {/* 양쪽 화살촉 (서로 바깥쪽을 향함) */}
+      <polygon points={`${lo},${y} ${lo + tri},${y - tri / 1.6} ${lo + tri},${y + tri / 1.6}`} fill={color} opacity={0.9} />
+      <polygon points={`${hi},${y} ${hi - tri},${y - tri / 1.6} ${hi - tri},${y + tri / 1.6}`} fill={color} opacity={0.9} />
+      {/* 중앙 레이블 배지 */}
+      <rect x={midX - (label.length * 5 + 8)} y={y - 9} width={label.length * 10 + 16} height={18} rx={9} fill="#1a1a2e" stroke={color} strokeWidth={1} strokeOpacity={0.9} />
+      <text x={midX} y={y + 4} textAnchor="middle" fontSize={10} fontWeight={700} fill={color}>{label}</text>
+    </svg>
+  );
+}
+
+function RelationDiagram({ cols, jjLines, cgLines }: DiagramProps) {
   const totalW = cols.length * COL_W + (cols.length - 1) * COL_GAP;
-  const badgeAreaH = BADGE_R + 8; // top padding + badge
-  const linesH = relations.length * LINE_H + (relations.length > 0 ? 8 : 0);
-  const totalH = badgeAreaH + linesH;
+  const cgLinesH = cgLines.length * LINE_H + (cgLines.length > 0 ? ROW_GAP : 0);
+  const cgBadgeTop = LABEL_H + cgLinesH;
+  const jjBadgeTop = cgBadgeTop + CG_BADGE_D + ROW_GAP;
+  const jjLinesTop = jjBadgeTop + JJ_BADGE_D + ROW_GAP;
+  const jjLinesH = jjLines.length * LINE_H + (jjLines.length > 0 ? ROW_GAP : 0);
+  const totalH = jjLinesTop + jjLinesH + 4;
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <div style={{ position: "relative", width: totalW, minWidth: totalW, height: totalH + 4 }}>
-        {/* 컬럼 레이블 + 지지 뱃지 */}
+      <div style={{ position: "relative", width: totalW, minWidth: totalW, height: totalH }}>
+        {/* 천간 관계 라인 (위쪽) */}
+        {cgLines.map((rel, i) => (
+          <ConnectorLine
+            key={`cg-${i}`}
+            xA={colCenterX(rel.aIdx)} xB={colCenterX(rel.bIdx)}
+            y={LABEL_H + i * LINE_H + LINE_H / 2}
+            color={rel.color} label={rel.label} width={totalW} height={totalH}
+          />
+        ))}
+
+        {/* 컬럼 레이블 + 천간/지지 뱃지 */}
         {cols.map((col, i) => {
           const cx = colCenterX(i);
           return (
             <div key={i} style={{ position: "absolute", left: cx - COL_W / 2, top: 0, width: COL_W, textAlign: "center" }}>
-              <div style={{ fontSize: 9, color: "#6b7280", fontWeight: 700, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div style={{ position: "absolute", top: 0, width: COL_W, fontSize: 9, color: "#6b7280", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {col.label.replace(/\s*\(.*\)/, "")}
               </div>
               <div style={{
+                position: "absolute", top: cgBadgeTop, left: "50%", transform: "translateX(-50%)",
                 display: "inline-flex", alignItems: "center", justifyContent: "center",
-                width: BADGE_R, height: BADGE_R,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.07)",
-                border: "1.5px solid rgba(255,255,255,0.18)",
-                fontSize: 14, fontWeight: 900, color: "#e5e7eb",
+                width: CG_BADGE_D, height: CG_BADGE_D, borderRadius: "50%",
+                background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)",
+                fontSize: 12, fontWeight: 900, color: EL_STYLE[CHEONGAN_ELEMENT[col.cg] || "토"]?.text ?? "#e5e7eb",
+              }}>
+                {col.cg === "-" ? "·" : col.cg}
+              </div>
+              <div style={{
+                position: "absolute", top: jjBadgeTop, left: "50%", transform: "translateX(-50%)",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: JJ_BADGE_D, height: JJ_BADGE_D, borderRadius: "50%",
+                background: "rgba(255,255,255,0.07)", border: "1.5px solid rgba(255,255,255,0.18)",
+                fontSize: 14, fontWeight: 900, color: EL_STYLE[jijiElement(col.jj)]?.text ?? "#e5e7eb",
               }}>
                 {col.jj === "-" ? "·" : col.jj}
               </div>
@@ -130,30 +182,15 @@ function JijiDiagram({ cols, relations }: DiagramProps) {
           );
         })}
 
-        {/* 커넥터 라인들 — 강도순 정렬 */}
-        {relations.map((rel, lineIdx) => {
-          const xA = colCenterX(Math.min(rel.a, rel.b));
-          const xB = colCenterX(Math.max(rel.a, rel.b));
-          const y = badgeAreaH + lineIdx * LINE_H + LINE_H / 2;
-          const color = relColor(rel.type);
-          const midX = (xA + xB) / 2;
-
-          return (
-            <svg
-              key={lineIdx}
-              style={{ position: "absolute", left: 0, top: 0, width: totalW, height: totalH + 4, overflow: "visible", pointerEvents: "none" }}
-            >
-              {/* 수평 라인 */}
-              <line x1={xA} y1={y} x2={xB} y2={y} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
-              {/* 양쪽 수직 티끝 */}
-              <line x1={xA} y1={y - 5} x2={xA} y2={y + 5} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
-              <line x1={xB} y1={y - 5} x2={xB} y2={y + 5} stroke={color} strokeWidth={1.5} strokeOpacity={0.7} />
-              {/* 중앙 레이블 배경 */}
-              <rect x={midX - 14} y={y - 9} width={28} height={18} rx={9} fill="#1a1a2e" stroke={color} strokeWidth={1} strokeOpacity={0.8} />
-              <text x={midX} y={y + 4} textAnchor="middle" fontSize={10} fontWeight={700} fill={color}>{rel.type}</text>
-            </svg>
-          );
-        })}
+        {/* 지지 관계 라인 (아래쪽) */}
+        {jjLines.map((rel, i) => (
+          <ConnectorLine
+            key={`jj-${i}`}
+            xA={colCenterX(rel.aIdx)} xB={colCenterX(rel.bIdx)}
+            y={jjLinesTop + i * LINE_H + LINE_H / 2}
+            color={rel.color} label={rel.label} width={totalW} height={totalH}
+          />
+        ))}
       </div>
     </div>
   );
@@ -332,28 +369,32 @@ export default function TodayFortunePage() {
   const relations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
 
   // 천간합·충 — 오늘/세운/대운의 천간이 원국 천간(일간 포함)과 맺는 관계
+  // 원국 천간 4개는 명식표 컬럼 0(시주)~3(년주)에 위치
+  const wongukColIdx: Record<string, number> = { 시간: 0, 일간: 1, 월간: 2, 년간: 3 };
   const wonguk천간 = [
     { label: "년간", cg: r.pillarsDetail.year.cg },
     { label: "월간", cg: r.pillarsDetail.month.cg },
     { label: "일간", cg: r.pillarsDetail.day.cg },
     ...(r.pillarsDetail.hour ? [{ label: "시간", cg: r.pillarsDetail.hour.cg }] : []),
   ];
+  // 대운(4)·세운(5)·오늘(6) 컬럼
   const flowCg = [
-    { label: `대운(${currentDaewoon.age}세~)`, cg: currentDaewoon.cg },
-    { label: `세운(${thisYear})`, cg: yearPillar.cg },
-    { label: "오늘", cg: dayPillar.cg },
+    { label: `대운(${currentDaewoon.age}세~)`, cg: currentDaewoon.cg, colIdx: 4 },
+    { label: `세운(${thisYear})`, cg: yearPillar.cg, colIdx: 5 },
+    { label: "오늘", cg: dayPillar.cg, colIdx: 6 },
   ];
-  const cgRelations: { from: string; to: string; a: string; b: string; type: "합" | "충" }[] = [];
+  const cgRelations: { from: string; to: string; a: string; b: string; type: "합" | "충"; aIdx: number; bIdx: number }[] = [];
   for (const f of flowCg) {
     for (const w of wonguk천간) {
+      const wIdx = wongukColIdx[w.label];
       for (const [x, y] of CG_HAP) {
         if ((f.cg === x && w.cg === y) || (f.cg === y && w.cg === x)) {
-          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "합" });
+          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "합", aIdx: f.colIdx, bIdx: wIdx });
         }
       }
       for (const [x, y] of CG_CHUNG) {
         if ((f.cg === x && w.cg === y) || (f.cg === y && w.cg === x)) {
-          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "충" });
+          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "충", aIdx: f.colIdx, bIdx: wIdx });
         }
       }
     }
@@ -404,30 +445,18 @@ export default function TodayFortunePage() {
         </div>
         </FadeIn>
 
-        {/* 지지 합충 시각 다이어그램 */}
+        {/* 합충형파해 시각 다이어그램 — 명식표 컬럼 위치와 연결된 화살표 */}
         <FadeIn delay={80}>
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 mb-5 overflow-x-auto">
-          <p className="text-sm font-bold text-gray-300 mb-4">지지 합충형파해 다이어그램</p>
-          <JijiDiagram cols={cols} relations={relations} />
-          {/* 관계 설명 목록 */}
-          {(relations.length > 0 || cgRelations.length > 0) && (
-            <div className="mt-4 space-y-1.5 border-t border-white/10 pt-3">
-              {relations.map((rel, i) => (
-                <div key={`jj-${i}`} className="flex items-center gap-2 text-xs">
-                  <span className="font-bold shrink-0" style={{ color: REL_TYPE_COLOR[rel.type] }}>{rel.type}</span>
-                  <span className="text-gray-400">{allJjLabels[rel.a]}({rel.jjA}) ↔ {allJjLabels[rel.b]}({rel.jjB})</span>
-                </div>
-              ))}
-              {cgRelations.map((rel, i) => (
-                <div key={`cg-${i}`} className="flex items-center gap-2 text-xs">
-                  <span className="font-bold shrink-0" style={{ color: rel.type === "합" ? "#4ade80" : "#f87171" }}>천간{rel.type}</span>
-                  <span className="text-gray-400">{rel.from}({rel.a}) ↔ {rel.to}({rel.b})</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <p className="text-sm font-bold text-gray-300 mb-1">전체 합충형파해 분석</p>
+          <p className="text-[11px] text-gray-500 mb-4">위쪽 화살표: 천간 합·충 · 아래쪽 화살표: 지지 합충형파해 — 명식표 컬럼 위치 기준</p>
+          <RelationDiagram
+            cols={cols}
+            cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: rel.type === "합" ? HAP_COLOR : CHUNG_COLOR }))}
+            jjLines={relations.map(rel => ({ aIdx: rel.a, bIdx: rel.b, label: `${rel.jjA}${rel.jjB}${rel.type}`, color: relColor(rel.type) }))}
+          />
           {relations.length === 0 && cgRelations.length === 0 && (
-            <p className="text-xs text-gray-500 mt-2">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
+            <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
           )}
         </div>
         </FadeIn>
