@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ILJU_60, ILGAN_PERSONALITY, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER,
-  detectSamhapBanghap
+  detectSamhapBanghap, adjustCareerByExpression
 } from "@/lib/saju";
 
 // ── 스크롤 페이드인 컴포넌트 ────────────────────────────────────────────────
@@ -553,6 +553,10 @@ export default function ResultPage() {
           const ilju = ILJU_60[key];
           if (!ilju) return null;
           const ilganInfo = ILGAN_PERSONALITY[dayCg];
+          const pd = sajuResult.pillarsDetail;
+          const ssAll = [pd.year?.sipseongCg, pd.year?.sipseongJj, pd.month?.sipseongCg, pd.month?.sipseongJj, pd.day?.sipseongJj, pd.hour?.sipseongCg, pd.hour?.sipseongJj].filter(Boolean) as string[];
+          const sikSangCount = ssAll.filter(s => s === "식신" || s === "상관").length;
+          const iljuCareer = adjustCareerByExpression(ilju.career, sikSangCount);
           return (
             <FadeIn delay={60}>
             <div className="bg-gradient-to-br from-violet-950/60 to-indigo-950/50 border border-violet-500/25 rounded-2xl overflow-hidden">
@@ -587,7 +591,7 @@ export default function ResultPage() {
                   </div>
                   <div className="bg-black/20 border border-white/8 rounded-xl p-3">
                     <p className="text-[10px] text-amber-400 font-bold tracking-widest mb-1.5">💼 직업 적성</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">{ilju.career}</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">{iljuCareer}</p>
                   </div>
                 </div>
                 <div className="bg-orange-950/30 border border-orange-500/20 rounded-xl p-3">

@@ -8,7 +8,7 @@ import {
   detectSamhapBanghap, analyzeSipseongPatterns, detectByeongjon, analyzeDohwaTypes, detectChunganChung,
   JOHU_YONGSHIN, getSeasonByMonth,
   HAP_CHUNG_CHARACTER,
-  ILGAN_PERSONALITY, ILJU_60,
+  ILGAN_PERSONALITY, ILJU_60, adjustCareerByExpression,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, getJijiRelations,
@@ -491,6 +491,9 @@ function ResultView({
   const ilganInfo = ILGAN_PERSONALITY[ilgan];
   const iljuKey = ilgan + pd.day.jj;
   const iljuInfo = ILJU_60[iljuKey];
+  const ssAllManse = [pd.year.sipseongCg, pd.year.sipseongJj, pd.month.sipseongCg, pd.month.sipseongJj, pd.day.sipseongJj, pd.hour?.sipseongCg, pd.hour?.sipseongJj].filter(Boolean) as string[];
+  const sikSangCountManse = ssAllManse.filter(s => s === "식신" || s === "상관").length;
+  const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCountManse) : "";
   const weolji = WEOLJI_PSYCHOLOGY[monthJj];
   const singang = result.yongshin.strength;
   const singangTrait = SINGANG_TRAITS[singang];
@@ -1022,7 +1025,7 @@ function ResultView({
           <div className="grid grid-cols-1 gap-2.5">
             {[
               { label: "연애 스타일", text: iljuInfo.love, color: "#f472b6" },
-              { label: "적합 직업·커리어", text: iljuInfo.career, color: "#34d399" },
+              { label: "적합 직업·커리어", text: iljuCareerAdjusted, color: "#34d399" },
               { label: "주의할 점", text: iljuInfo.caution, color: "#f87171" },
               ...(ILGAN_SHADOW[ilgan] ? [{ label: `그림자 기질 — ${ILGAN_SHADOW[ilgan].title}`, text: ILGAN_SHADOW[ilgan].desc, color: "#9ca3af" }] : []),
             ].map(item => (

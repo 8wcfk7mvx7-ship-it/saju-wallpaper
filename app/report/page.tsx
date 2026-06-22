@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ILJU_60, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER } from "@/lib/saju";
+import { ILJU_60, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER, adjustCareerByExpression } from "@/lib/saju";
 
 // ── 상수 및 타입 ────────────────────────────────────────────────────────────
 const CG_ELEMENT: Record<string, string> = {
@@ -359,6 +359,8 @@ export default function ReportPage() {
   });
   const ssCounts: Record<string,number>={};
   allSS.filter(Boolean).forEach(s=>{ ssCounts[s]=(ssCounts[s]||0)+1; });
+  const sikSangCount = (ssCounts["식신"]||0) + (ssCounts["상관"]||0);
+  const iljuCareer = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCount) : "";
 
   const name = form.name || "";
   const birthPlace = form.birthPlace || "";
@@ -573,7 +575,7 @@ export default function ReportPage() {
               </div>
               <div style={{background:"rgba(245,158,11,0.08)",borderRadius:8,padding:"8px 10px"}}>
                 <div style={{color:"#f59e0b",fontWeight:600,marginBottom:3}}>💼 직업</div>
-                <div style={{color:"#fde68a",lineHeight:1.6}}>{iljuInfo.career}</div>
+                <div style={{color:"#fde68a",lineHeight:1.6}}>{iljuCareer}</div>
               </div>
             </div>
             <div style={{marginTop:8,background:"rgba(249,115,22,0.08)",borderRadius:8,padding:"8px 10px",fontSize:11}}>
