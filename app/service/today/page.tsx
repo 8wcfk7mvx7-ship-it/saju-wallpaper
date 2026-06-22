@@ -243,7 +243,7 @@ export default function TodayFortunePage() {
 
           <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-slate-600 to-zinc-600 hover:from-slate-500 hover:to-zinc-500 text-white shadow-lg shadow-black/50 transition-all active:scale-[0.98]">
+            className="w-full px-6 py-4 rounded-2xl font-black text-lg tracking-tight whitespace-nowrap bg-gradient-to-r from-slate-600 to-zinc-600 hover:from-slate-500 hover:to-zinc-500 text-white shadow-lg shadow-black/50 transition-all active:scale-[0.98]">
             오늘의 운세 확인하기
           </button>
           </FadeIn>
