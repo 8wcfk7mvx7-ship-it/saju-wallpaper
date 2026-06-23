@@ -478,6 +478,14 @@ export default function TodayFortunePage() {
   const allJjs = cols.map(c => c.jj);
   const relations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
 
+  // 천라지망(天羅地網): 원국·대운·세운·오늘 전체 지지 중 술+해(天羅) 또는 진+사(地網) 조합이 있는지 검사
+  const allJjSet = new Set(allJjs);
+  const hasCheonra = allJjSet.has("술") && allJjSet.has("해");
+  const hasJimang = allJjSet.has("진") && allJjSet.has("사");
+  const cheonraJimangLabels = hasCheonra || hasJimang
+    ? cols.filter(c => (hasCheonra && (c.jj === "술" || c.jj === "해")) || (hasJimang && (c.jj === "진" || c.jj === "사"))).map(c => c.label)
+    : [];
+
   // 천간합·충 — 오늘/세운/대운의 천간이 원국 천간(일간 포함)과 맺는 관계
   // 원국 천간 4개는 명식표 컬럼 0(시주)~3(년주)에 위치
   const wongukColIdx: Record<string, number> = { 시간: 0, 일간: 1, 월간: 2, 년간: 3 };
@@ -609,6 +617,16 @@ export default function TodayFortunePage() {
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
+          )}
+          {cheonraJimangLabels.length > 0 && (
+            <div className="mt-3 border-t border-white/10 pt-3">
+              <p className="text-xs font-bold text-amber-300">
+                ⚠ 천라지망(天羅地網) — {cheonraJimangLabels.join("·")}
+              </p>
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                {hasCheonra && hasJimang ? "술·해(天羅)와 진·사(地網)가 모두 갖춰져" : hasCheonra ? "술·해(天羅) 조합이 갖춰져" : "진·사(地網) 조합이 갖춰져"} 오늘은 뜻하지 않은 구속·제약이 느껴지기 쉬운 날입니다. 외부로 일을 벌이기보다 내면에 집중하면 오히려 단단해지는 흐름이에요.
+              </p>
+            </div>
           )}
         </div>
         </FadeIn>

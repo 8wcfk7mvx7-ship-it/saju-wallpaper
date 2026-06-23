@@ -128,14 +128,24 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
   const matches = (pairs: [string, string][], x: string, y: string) =>
     pairs.some(([p, q]) => (p === x && q === y) || (p === y && q === x));
 
+  // 자형살(自刑殺) — 같은 지지가 나란히 중복될 때 성립하는 4가지(진진·오오·유유·해해)만 형(刑)으로 인정.
+  // 그 외 같은 지지 중복(자자·축축·인인 등)은 병존(竝存)이며 합충형파해 관계가 아니므로 여기서 제외한다.
+  const JAHYEONG_JJS = ["진","오","유","해"];
+
   const relations: JijiRelation[] = [];
   for (let i = 0; i < jjs.length; i++) {
     for (let j = i + 1; j < jjs.length; j++) {
       const a = jjs[i], b = jjs[j];
       if (!a || !b) continue;
+
+      if (a === b) {
+        if (JAHYEONG_JJS.includes(a)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "형" });
+        continue;
+      }
+
       if (matches(YUKHAP, a, b)) relations.push({ a: i, b: j, jjA: a, jjB: b, type: "육합" });
 
-      // 삼합/반합 판정: a, b가 같은 삼합 그룹에 속한 두 글자인지 확인
+      // 삼합/반합 판정: a, b가 같은 삼합 그룹에 속한 서로 다른 두 글자인지 확인
       const group = SAMHAP_GROUPS.find(g => g.includes(a) && g.includes(b));
       if (group) {
         const allPresent = group.every(jj => jjs.includes(jj));
