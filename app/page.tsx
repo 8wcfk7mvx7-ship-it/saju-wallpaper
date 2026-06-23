@@ -1329,8 +1329,15 @@ export default function MainPage() {
           <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
             style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
             <div className="flex items-center gap-4 flex-1 min-w-0">
-              <Image src="/mascot-guide.png" alt="사주 마스코트" width={72} height={83}
-                className="shrink-0 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
+              <div className="relative shrink-0 w-[72px] h-[83px] flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full" style={{
+                  background: "radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 45%, rgba(255,255,255,0) 75%)",
+                  filter: "blur(6px)",
+                  transform: "scale(1.25)",
+                }} />
+                <Image src="/mascot-guide.png" alt="사주 마스코트" width={72} height={83}
+                  className="relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>📚 사주 명리학 가이드</p>
                 <p className="text-sm font-bold text-white mb-1">사주가 처음이신가요?</p>
