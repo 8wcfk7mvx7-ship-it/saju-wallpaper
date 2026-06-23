@@ -240,6 +240,59 @@ export function matchZimiTmi(palaces: ZiweiPalace[]): ZimiTmi[] {
   return ZIMI_TMI.filter(t => t.match(palaces));
 }
 
+// 부처궁(배우자운) 심층 분석 — 주성·보좌성·살성·잡성의 조합을 풀어서 하나의 흐르는 글로 엮어낸다.
+export function getBucheoNarrative(palaces: ZiweiPalace[]): string {
+  const bu = palaces.find(p => p.palaceName === "부처");
+  const myeong = palaces.find(p => p.palaceName === "명궁");
+  if (!bu) return "";
+
+  const parts: string[] = [];
+  const stars = bu.stars;
+  const hasTanRyeomPa = stars.some(s => ["탐랑", "염정", "파군"].includes(s));
+  const hasCheonryo = bu.minorStars.includes("천요");
+  const hasJigongJigeop = bu.maleficStars.includes("지공") && bu.maleficStars.includes("지겁");
+  const hasGwasukGojin = bu.minorStars.includes("과숙") || bu.minorStars.includes("고진");
+  const hasGyeongyangTara = bu.maleficStars.includes("경양") || bu.maleficStars.includes("타라");
+  const hasGilseong = bu.luckyStars.length > 0;
+  const myeongHasTaeeum = !!myeong?.stars.includes("태음");
+
+  if (hasTanRyeomPa) {
+    parts.push("초반에는 미쳐 날뛰듯 좋아하며 빠르게 빠져들지만, 그 강렬함이 오래가지 못하고 어느 순간 공허해지는 흐름이 자리해 있어요.");
+  }
+
+  if (hasCheonryo) {
+    let t = "연애결혼으로 성공할 확률이 꽤 높은 자리예요. 평소엔 천요가 매력·호감으로 작용해 인연을 끌어오지만, 주변에서 살성이 함께 들어오는 시기에는 이 기운이 바람·외도·배신, 혹은 치명적인 성격 차이로 돌변할 수 있어요.";
+    if (hasJigongJigeop) {
+      t += " 여기에 지공·지겁이 함께 자리해 재물 파탄이나 허탈감과 맞물리면 '정신적으로 같이 못 살겠다', '돈 문제나 신뢰가 바닥났다'는 생각이 들면서 다 내려놓고 무(無)의 상태로 돌아가고 싶은 심리가 강해질 수 있어요.";
+    }
+    parts.push(t);
+  } else if (hasJigongJigeop) {
+    parts.push("지공·지겁이 함께 자리해, 결혼 생활 속에서 갑작스러운 재물 파탄이나 허탈감을 겪을 때 모든 걸 내려놓고 무(無)로 돌아가고 싶은 심리가 크게 일어날 수 있어요.");
+  }
+
+  if (hasGwasukGojin) {
+    parts.push("그동안 꾸역꾸역 참아온 고독감이 쌓여있는 자리이기도 해요. 다만 이건 단순한 이혼수보다는 '고독'에 가까운 결과라서, 따로 각방을 쓰는 식으로 거리를 두면 결혼 생활 자체는 유지할 수 있는 경우가 많아요.");
+  }
+
+  if (hasGyeongyangTara && !hasCheonryo) {
+    parts.push("경양·타라 같은 살성이 함께 있어, 배우자와의 사이에서 잔잔한 마찰이나 신경전이 잦을 수 있는 자리예요.");
+  }
+
+  if (hasGilseong && !hasGwasukGojin) {
+    parts.push(`${bu.luckyStars.join("·")} 같은 길성이 함께해, 배우자 덕을 보거나 결혼 생활이 비교적 안정적으로 흘러갈 가능성을 높여주고 있어요.`);
+  }
+
+  if (myeongHasTaeeum) {
+    parts.push("다만 원국 명궁에 태음이 있어서, 평소엔 감정을 안으로 누르며 어떻게든 버텨내는 힘이 있는 사람이에요. 그래서 위와 같은 흐름이 와도 겉으로는 꾸역꾸역 잘 지내는 것처럼 보일 수 있어요.");
+  }
+
+  if (parts.length === 0) {
+    parts.push(`부처궁에 ${stars.length > 0 ? stars.join("·") + "이 자리해" : "특별한 살성·잡성 충돌 없이"} 비교적 무난하게 흘러가는 자리예요. 배우자와의 관계에서 극단적인 굴곡보다는 평이한 흐름이 이어질 가능성이 높아요.`);
+  }
+
+  return parts.join(" ");
+}
+
 // 명궁 지지의 오행에 대응하는 대표 주성 목록
 export const ELEMENT_TO_STARS: Record<"목" | "화" | "토" | "금" | "수", string[]> = {
   목: ["천기", "탐랑"],

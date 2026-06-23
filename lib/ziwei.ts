@@ -38,6 +38,7 @@ export interface ZiweiPalace {
   stars: string[];
   luckyStars: string[]; // 보좌성(좌보·우필·문창·문곡·천괴·천월·록존)
   maleficStars: string[]; // 살성(경양·타라·지공·지겁)
+  minorStars: string[]; // 잡성(천형·천요·고진·과숙·음살)
   isLifePalace: boolean;
   isBodyPalace: boolean;
   daeha: { from: number; to: number };
@@ -117,6 +118,33 @@ function calcAuxStars(yearStem: string, lunarMonth: number, hourBranchIndex: num
   return result;
 }
 
+// 고진(孤辰)/과숙(寡宿) 위치 — 연지 삼합 그룹 기준 (亥子丑→寅戌, 寅卯辰→巳丑, 巳午未→申辰, 申酉戌→亥未)
+const GOJIN_GWASUK_BRANCH: Record<number, [number, number]> = {
+  11: [2, 10], 0: [2, 10], 1: [2, 10],
+  2: [5, 1], 3: [5, 1], 4: [5, 1],
+  5: [8, 4], 6: [8, 4], 7: [8, 4],
+  8: [11, 7], 9: [11, 7], 10: [11, 7],
+};
+// 음살(陰殺) 위치 — 월 기준 寅子戌申午辰 6개월 반복
+const EUMSAL_BY_MONTH = [2, 0, 10, 8, 6, 4];
+
+// 천형/천요(월 기준)·고진/과숙(연지 기준)·음살(월 기준) 등 보조 살성/잡성 배치
+function calcMinorStars(yearBranchIndex: number, lunarMonth: number): Record<number, string[]> {
+  const result: Record<number, string[]> = {};
+  const add = (idx: number, name: string) => { result[idx] = result[idx] || []; result[idx].push(name); };
+
+  // 천형(天刑): 酉에서 정월 起 순행 / 천요(天姚): 丑에서 정월 起 순행
+  add(mod(9 + (lunarMonth - 1), 12), "천형");
+  add(mod(1 + (lunarMonth - 1), 12), "천요");
+
+  const gg = GOJIN_GWASUK_BRANCH[yearBranchIndex];
+  if (gg) { add(gg[0], "고진"); add(gg[1], "과숙"); }
+
+  add(EUMSAL_BY_MONTH[mod(lunarMonth - 1, 6)], "음살");
+
+  return result;
+}
+
 // 자미성 위치 산출 (오행국 B, 음력일 day 기준)
 function getZiweiIndex(bureau: number, day: number): number {
   const r0 = day % bureau;
@@ -185,8 +213,11 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
   const isYangYear = YANG_STEMS.has(yearStem);
   const forward = (isYangYear && gender === "male") || (!isYangYear && gender === "female");
 
-  // 6. 보좌성·살성 배치
+  // 6. 보좌성·살성·잡성 배치
   const auxMap = calcAuxStars(yearStem, lunarMonth, hourBranchIndex);
+  const yearBranchChar = input.yearGanjaText[1];
+  const yearBranchIndex = BRANCHES.indexOf(yearBranchChar);
+  const minorMap = calcMinorStars(yearBranchIndex < 0 ? 0 : yearBranchIndex, lunarMonth);
 
   const palaces: ZiweiPalace[] = BRANCHES.map((branch, branchIndex) => {
     // 궁명: 명궁에서 逆行(감소 방향)으로 명궁,형제,부처...순으로 배치
@@ -204,6 +235,7 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
       stars: starMap[branchIndex] || [],
       luckyStars: auxMap[branchIndex]?.lucky || [],
       maleficStars: auxMap[branchIndex]?.malefic || [],
+      minorStars: minorMap[branchIndex] || [],
       isLifePalace: branchIndex === lifeBranchIndex,
       isBodyPalace: branchIndex === bodyBranchIndex,
       daeha,

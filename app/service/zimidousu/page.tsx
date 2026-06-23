@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
-import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex, matchZimiTmi } from "@/lib/zimidousu";
+import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex, matchZimiTmi, getBucheoNarrative } from "@/lib/zimidousu";
 import { calcZiwei, getHourBranchIndex, BRANCHES, type ZiweiResult } from "@/lib/ziwei";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -21,7 +21,7 @@ const STAR_COLOR: Record<string, string> = {
 // ziwei.ts의 PALACE_NAMES와 동일한 순서 (명궁→...→부모). 노복궁/교우궁처럼 표기만 다른 동일 궁 매칭용
 const ZIWEI_PALACE_ORDER = ["명궁", "형제", "부처", "자녀", "재백", "질액", "천이", "교우", "관록", "전택", "복덕", "부모"];
 
-function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStars: string[] }, label: string): string {
+function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStars: string[]; minorStars: string[] }, label: string): string {
   let text: string;
   if (zp.stars.length === 0) {
     text = `${label}에는 자리한 주성이 없는 공궁(空宮)이에요. 맞은편 궁의 기운을 빌려와 해석하는 자리라, 환경과 인연에 따라 색깔이 크게 달라질 수 있어요.`;
@@ -31,6 +31,7 @@ function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStar
   }
   if (zp.luckyStars.length > 0) text += ` 보좌성 ${zp.luckyStars.join("·")}가 함께해 이 궁의 힘을 더 키워줘요.`;
   if (zp.maleficStars.length > 0) text += ` 다만 ${zp.maleficStars.join("·")} 같은 살성도 자리해 기복이나 돌발 변수에 대한 대비가 필요해요.`;
+  if (zp.minorStars.length > 0) text += ` ${zp.minorStars.join("·")} 같은 잡성도 함께 있어, 이 궁이 보여주는 이야기에 미묘한 결을 하나 더 더해줘요.`;
   return text;
 }
 
@@ -230,6 +231,7 @@ export default function ZimidousuPage() {
   const myeonggungPalace = PALACES[0];
   const palaceJiji = getPalaceJiji(result.myeonggungIdx);
   const tmiList = chart ? matchZimiTmi(chart.palaces) : [];
+  const bucheoNarrative = chart ? getBucheoNarrative(chart.palaces) : "";
 
   return (
     <main className="min-h-screen bg-[#0c0816] text-white">
@@ -287,7 +289,7 @@ export default function ZimidousuPage() {
                   }
                   const palace = chart.palaces[branchIdx];
                   return (
-                    <div key={branchIdx} className="rounded-xl p-2 min-h-[122px] flex flex-col"
+                    <div key={branchIdx} className="rounded-xl p-2 min-h-[134px] flex flex-col"
                       style={{
                         background: palace.isLifePalace ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.02)",
                         border: `1px solid ${palace.isLifePalace ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.06)"}`,
@@ -297,13 +299,16 @@ export default function ZimidousuPage() {
                           <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>{s}</span>
                         )) : <span className="text-[10px] text-gray-700">-</span>}
                       </div>
-                      {(palace.luckyStars.length > 0 || palace.maleficStars.length > 0) && (
+                      {(palace.luckyStars.length > 0 || palace.maleficStars.length > 0 || palace.minorStars.length > 0) && (
                         <div className="flex flex-wrap gap-x-1.5 mb-1">
                           {palace.luckyStars.map(s => (
                             <span key={s} className="text-[9px] font-bold text-emerald-400">{s}</span>
                           ))}
                           {palace.maleficStars.map(s => (
                             <span key={s} className="text-[9px] font-bold text-red-400">{s}</span>
+                          ))}
+                          {palace.minorStars.map(s => (
+                            <span key={s} className="text-[9px] font-bold text-amber-400">{s}</span>
                           ))}
                         </div>
                       )}
@@ -324,6 +329,14 @@ export default function ZimidousuPage() {
                 })
               )}
             </div>
+          </div>
+        )}
+
+        {/* 부처궁(배우자운) 심층 분석 — 주성·보좌성·살성·잡성 조합을 풀어서 하나의 글로 엮음 */}
+        {bucheoNarrative && (
+          <div className="bg-gradient-to-br from-rose-950/40 to-purple-950/30 border border-rose-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-rose-300 mb-2">배우자운 심층 분석 (부처궁)</p>
+            <p className="text-[12.5px] text-gray-300 leading-relaxed">{bucheoNarrative}</p>
           </div>
         )}
 
@@ -437,6 +450,7 @@ export default function ZimidousuPage() {
                       {zp.stars.map(s => <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>{s}</span>)}
                       {zp.luckyStars.map(s => <span key={s} className="text-[10px] font-bold text-emerald-400">{s}</span>)}
                       {zp.maleficStars.map(s => <span key={s} className="text-[10px] font-bold text-red-400">{s}</span>)}
+                      {zp.minorStars.map(s => <span key={s} className="text-[10px] font-bold text-amber-400">{s}</span>)}
                     </div>
                   )}
                   <p className="text-[11px] text-gray-500 leading-relaxed">{zp ? palaceAnalysis(zp, `${p.name}(${p.hanja})`) : p.desc}</p>
