@@ -82,15 +82,31 @@ export default function PrivacyPage() {
               개인정보 보유 및 이용 기간
             </h2>
             <div className="text-gray-400 pl-7 space-y-2">
+              <p>회사는 개인정보 수집 및 이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 다만 관련 법령의 규정에 의하여 보존할 필요가 있는 경우, 회사는 아래와 같이 관계 법령에서 정한 일정한 기간 동안 보관합니다.</p>
               <p>이용자가 입력한 사주 정보(이름, 생년월일, 출생지 등)는 <strong className="text-gray-300">브라우저의 로컬스토리지·세션스토리지에만 저장</strong>되며, 서버에 영구 보관되지 않습니다.</p>
-              <p>결제 관련 기록은 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년간 보관합니다.</p>
-              <p>서버 접속 로그는 3개월간 보관 후 자동 삭제됩니다.</p>
+              <ul className="list-disc list-inside space-y-1 text-gray-500">
+                <li>계약 또는 청약철회 등에 관한 기록: 5년 (전자상거래 등에서의 소비자보호에 관한 법률)</li>
+                <li>대금결제 및 재화·서비스 공급에 관한 기록: 5년 (전자상거래 등에서의 소비자보호에 관한 법률)</li>
+                <li>소비자의 불만 또는 분쟁처리에 관한 기록: 3년 (전자상거래 등에서의 소비자보호에 관한 법률)</li>
+                <li>접속 로그(IP 등)에 관한 기록: 3개월 (통신비밀보호법)</li>
+              </ul>
             </div>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">5</span>
+              개인정보 파기 절차 및 방법
+            </h2>
+            <div className="text-gray-400 pl-7 space-y-2">
+              <p>서비스는 원칙적으로 개인정보를 서버에 저장하지 않으며, 입력정보는 이용자의 브라우저(로컬스토리지·세션스토리지)에만 보관됩니다. 이용자가 브라우저 데이터를 삭제하거나 보유 목적이 달성되면 별도 조치 없이 즉시 파기된 것으로 봅니다.</p>
+              <p>전자적 파일 형태로 저장된 정보(결제 기록 등 법령에 따라 보관하는 정보)는 보유 기간이 만료되면 복구가 불가능한 방법으로 영구 삭제합니다.</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">6</span>
               개인정보 제3자 제공
             </h2>
             <div className="text-gray-400 pl-7 space-y-2">
@@ -117,34 +133,81 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">6</span>
-              쿠키 및 광고 추적
-            </h2>
-            <div className="text-gray-400 pl-7 space-y-2">
-              <p>서비스는 Google AdSense 등 광고 플랫폼의 쿠키를 사용할 수 있습니다. 광고 쿠키는 이용자의 관심사 기반 광고를 위해 사용되며, 브라우저 설정에서 거부할 수 있습니다.</p>
-              <p>쿠키 거부 방법: 브라우저 설정 → 개인정보/보안 → 쿠키 차단</p>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">7</span>
-              이용자의 권리
+              개인정보 처리위탁
             </h2>
             <div className="text-gray-400 pl-7 space-y-2">
-              <p>이용자는 언제든지 다음의 권리를 행사할 수 있습니다.</p>
-              <ul className="list-disc list-inside space-y-1 text-gray-500">
-                <li>개인정보 열람·정정·삭제 요구권</li>
-                <li>개인정보 처리 정지 요구권</li>
-                <li>브라우저 저장 데이터 직접 삭제: 브라우저 → 개발자도구 → Application → Local Storage 삭제</li>
-              </ul>
-              <p className="mt-2">개인정보 관련 문의는 아래 연락처로 접수하시기 바랍니다.</p>
+              <p>서비스는 원활한 업무 처리를 위해 위 6번 항목의 수탁 업체에 개인정보 처리 업무를 위탁하고 있습니다. 위탁 계약 시 「개인정보 보호법」에 따라 개인정보가 안전하게 관리될 수 있도록 필요한 사항을 규정하고, 수탁자가 개인정보를 안전하게 처리하는지를 감독합니다.</p>
+              <p>위탁 업체나 위탁 내용이 변경될 경우, 변경 사항을 본 방침을 통해 지체 없이 공지합니다.</p>
             </div>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">8</span>
+              쿠키 및 자동 수집 장치
+            </h2>
+            <div className="text-gray-400 pl-7 space-y-2">
+              <div>
+                <p className="text-gray-300 font-medium mb-1">가. 쿠키의 운영에 관한 사항</p>
+                <p>회사는 이용자의 정보를 수시로 저장하고 찾아내는 &lsquo;쿠키(cookie)&rsquo;를 운용합니다. 쿠키란 웹사이트를 운영하는 서버가 이용자의 브라우저에 보내는 아주 작은 텍스트 파일로서, 이용자의 컴퓨터·모바일 기기에 저장됩니다.</p>
+              </div>
+              <div>
+                <p className="text-gray-300 font-medium mb-1">나. 쿠키 사용 목적</p>
+                <p>접속 빈도·방문 시간 분석, 이용자의 관심분야 파악 및 서비스 이용 패턴 분석, Google AdSense 등 광고 플랫폼을 통한 관심사 기반 광고 제공을 위해 사용됩니다.</p>
+              </div>
+              <div>
+                <p className="text-gray-300 font-medium mb-1">다. 쿠키 설정 거부 방법</p>
+                <p>이용자는 웹 브라우저의 옵션을 설정하여 모든 쿠키를 허용하거나, 쿠키 저장 시마다 확인을 거치거나, 모든 쿠키의 저장을 거부할 수 있습니다. (설정 경로: 브라우저 설정 → 개인정보/보안 → 쿠키 차단) 단, 쿠키 저장을 거부할 경우 일부 서비스 이용에 어려움이 발생할 수 있습니다.</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">9</span>
+              개인정보의 기술적·관리적 보호 대책
+            </h2>
+            <div className="text-gray-400 pl-7 space-y-3">
+              <p>회사는 이용자의 개인정보를 취급함에 있어 분실, 도난, 누출, 변조 또는 훼손되지 않도록 안정성 확보를 위하여 다음과 같은 기술적·관리적 대책을 강구하고 있습니다.</p>
+              <div>
+                <p className="text-gray-300 font-medium mb-1">[기술적 대책]</p>
+                <ul className="list-disc list-inside space-y-1 text-gray-500">
+                  <li>이용자와 서버 간 통신 구간에 암호화(HTTPS/TLS)를 적용하여 데이터를 안전하게 전송합니다.</li>
+                  <li>결제 정보는 PG사(Toss Payments)가 직접 처리하며, 회사는 카드번호 등 민감한 결제 정보를 저장하지 않습니다.</li>
+                  <li>입력정보를 서버에 저장하지 않고 이용자의 브라우저에만 보관하는 원칙(로컬 저장)을 통해 외부 유출 위험을 최소화합니다.</li>
+                  <li>해킹 등 외부 침입에 대비하여 시스템적인 보안성을 확보하기 위해 가능한 기술적 장치를 갖추려 노력하고 있습니다.</li>
+                </ul>
+              </div>
+              <div>
+                <p className="text-gray-300 font-medium mb-1">[관리적 대책]</p>
+                <ul className="list-disc list-inside space-y-1 text-gray-500">
+                  <li>개인정보를 취급하는 담당자를 업무상 필요한 최소한의 인원으로 제한하고 있습니다.</li>
+                  <li>담당자에 대한 정기적인 교육을 통해 본 방침의 준수를 강조하고 있으며, 이행 여부를 수시로 점검하여 문제가 발견될 경우 즉시 시정 조치합니다.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">10</span>
+              이용자 및 법정대리인의 권리
+            </h2>
+            <div className="text-gray-400 pl-7 space-y-2">
+              <p>이용자(만 14세 미만인 경우 법정대리인)는 언제든지 다음의 권리를 행사할 수 있습니다.</p>
+              <ul className="list-disc list-inside space-y-1 text-gray-500">
+                <li>개인정보 열람·정정·삭제 요구권</li>
+                <li>개인정보 처리 정지 요구권 및 동의 철회권</li>
+                <li>브라우저 저장 데이터 직접 삭제: 브라우저 → 개발자도구 → Application → Local Storage 삭제</li>
+              </ul>
+              <p className="mt-2">권리 행사 요청을 받은 경우 회사는 지체 없이 필요한 조치를 취합니다. 개인정보 관련 문의는 아래 연락처로 접수하시기 바랍니다.</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">11</span>
               개인정보 보호책임자 및 문의
             </h2>
             <div className="text-gray-400 pl-7">
@@ -153,6 +216,18 @@ export default function PrivacyPage() {
                 <p><span className="text-gray-500">이메일:</span> <span className="text-gray-300">smple@outlook.kr</span></p>
                 <p><span className="text-gray-500">사이트:</span> <span className="text-gray-300">summerpalace.ai.kr</span></p>
               </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">12</span>
+              고지의 의무
+            </h2>
+            <div className="text-gray-400 pl-7 space-y-1">
+              <p>현 개인정보처리방침 내용 추가, 삭제 및 수정이 있을 경우에는 개정 최소 7일 전부터 서비스 내 공지사항을 통하여 고지할 것입니다. 다만, 이용자 권리의 중대한 변경이 있을 경우에는 최소 30일 전에 고지합니다.</p>
+              <p>- 공고일자: 2026년 5월 29일</p>
+              <p>- 시행일자: 2025년 1월 1일</p>
             </div>
           </section>
 
