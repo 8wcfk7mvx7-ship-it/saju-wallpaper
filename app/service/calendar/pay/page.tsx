@@ -2,6 +2,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
+import { getBalance, deductBalance } from "@/lib/blueberry";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -15,15 +17,25 @@ function CalendarPayContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>("card");
+  const [starBalance, setStarBalance] = useState(0);
 
   useEffect(() => {
+    setStarBalance(getBalance());
     if (params.get("error") === "true") setError("결제가 취소되었거나 실패하였습니다.");
   }, [params]);
 
-  async function handlePayment(payMethod: string) {
+  async function handlePayment() {
     if (!agreed) { setError("이용약관에 동의해주세요."); return; }
     if (!orderId) { setError("주문 정보가 없습니다."); return; }
     setLoading(true); setError("");
+
+    if (method === "starpiece") {
+      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      router.push(`/service/calendar/success?orderId=${orderId}&paymentKey=STARPIECE`);
+      return;
+    }
+
     try {
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
       const tossPayments = await loadTossPayments(clientKey);
@@ -37,7 +49,7 @@ function CalendarPayContent() {
         failUrl: `${base}/service/calendar/pay?orderId=${orderId}&error=true`,
         customerName: "고객",
       };
-      if (payMethod === "TOSSPAY") {
+      if (method === "easypay") {
         await payment.requestPayment({ method: "CARD", card: { flowMode: "DIRECT", easyPay: "TOSSPAY" }, ...commonParams });
       } else {
         await payment.requestPayment({ method: "CARD", ...commonParams });
@@ -101,25 +113,15 @@ function CalendarPayContent() {
           </p>
         )}
 
-        {/* 결제 버튼 */}
-        <div className="space-y-2.5">
-          <button
-            onClick={() => handlePayment("TOSSPAY")}
-            disabled={loading || !agreed}
-            className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98] disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 6px 24px rgba(5,150,105,0.4)" }}
-          >
-            {loading ? "처리 중..." : "토스페이로 ₩990 결제"}
-          </button>
-          <button
-            onClick={() => handlePayment("CARD")}
-            disabled={loading || !agreed}
-            className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-40"
-            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)" }}
-          >
-            {loading ? "처리 중..." : "신용·체크카드로 결제"}
-          </button>
-        </div>
+        <PaymentMethodSelector
+          amount={amount}
+          selected={method}
+          onSelect={setMethod}
+          starBalance={starBalance}
+          disabled={!agreed}
+          loading={loading}
+          onConfirm={handlePayment}
+        />
 
         <p className="text-center text-[11px] mt-4" style={{ color: "rgba(255,255,255,0.2)" }}>
           결제는 토스페이먼츠(주)를 통해 안전하게 처리됩니다

@@ -18,7 +18,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "결제 정보가 올바르지 않습니다." }, { status: 400 });
     }
 
-    const result = await confirmTossPayment(paymentKey, orderId, Number(amount));
+    // 별조각(포인트) 결제는 클라이언트에서 이미 잔액 차감을 완료한 뒤 들어오므로 토스 승인을 건너뛴다.
+    const isStarpiece = paymentKey === "STARPIECE";
+    const result = isStarpiece
+      ? { paymentKey, orderId, totalAmount: Number(amount), method: "별조각" }
+      : await confirmTossPayment(paymentKey, orderId, Number(amount));
 
     // DB에 결제 기록 저장
     const sb = getSupabase();

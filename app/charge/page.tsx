@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getBalance, addBalance } from "@/lib/blueberry";
+import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
 
 const TIERS = [
   { won: 1000,  base: 1000,  bonus: 100,  total: 1100 },
@@ -19,6 +20,7 @@ export default function ChargePage() {
   const [loading, setLoading] = useState(false);
   const [justCharged, setJustCharged] = useState<number | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [payMethod, setPayMethod] = useState<PaymentMethod>("card");
 
   useEffect(() => {
     setIsAdmin(localStorage.getItem("sp_admin") === "true");
@@ -163,44 +165,29 @@ export default function ChargePage() {
           ))}
         </div>
 
-        {/* 결제 방식 안내 */}
-        <div className="rounded-xl p-4 mb-6"
-          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <p className="text-xs font-bold mb-2 text-white">결제 방식</p>
-          <div className="space-y-1.5">
-            {["신용·체크카드", "카카오페이", "네이버페이", "토스페이"].map(m => (
-              <div key={m} className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full" style={{ background: "rgba(201,168,76,0.5)" }} />
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{m}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 충전 버튼 */}
-        <button
-          onClick={handleCharge}
-          disabled={selected === null || loading}
-          className="w-full py-4 rounded-2xl font-black text-base transition-all"
-          style={{
-            background: selected !== null
-              ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
-              : "rgba(255,255,255,0.07)",
-            color: selected !== null ? "#fff" : "rgba(255,255,255,0.25)",
-            boxShadow: selected !== null ? "0 8px 28px rgba(99,102,241,0.4)" : "none",
-            cursor: selected !== null ? "pointer" : "not-allowed",
-          }}
-        >
-          {loading
-            ? "처리 중..."
-            : selected !== null
-              ? `${TIERS[selected].won.toLocaleString()}원 결제하기`
-              : "금액을 선택하세요"}
-        </button>
+        {/* 결제 수단 선택 + 충전 버튼 */}
+        {selected !== null ? (
+          <PaymentMethodSelector
+            amount={TIERS[selected].won}
+            methods={["card", "easypay"]}
+            selected={payMethod}
+            onSelect={setPayMethod}
+            loading={loading}
+            onConfirm={handleCharge}
+          />
+        ) : (
+          <button
+            disabled
+            className="w-full py-4 rounded-2xl font-black text-base"
+            style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.25)", cursor: "not-allowed" }}
+          >
+            금액을 선택하세요
+          </button>
+        )}
 
         <p className="text-center text-xs mt-4" style={{ color: "rgba(255,255,255,0.25)" }}>
-          별조각는 Summer Palace 서비스 내에서만 사용 가능합니다.<br />
-          유효기간: 충전일로부터 1년 · 환불 불가
+          별조각은 Summer Palace 서비스 내에서만 사용 가능합니다.<br />
+          충전 후 5년간 유효하며, 미사용 잔액은 「환불규정」에 따라 환급 신청이 가능합니다.
         </p>
 
         {/* 별조각 사용처 */}

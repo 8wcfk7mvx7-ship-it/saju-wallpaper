@@ -2,6 +2,8 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
+import { getBalance, deductBalance } from "@/lib/blueberry";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -17,19 +19,29 @@ function DaewoonPayContent() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>("card");
+  const [starBalance, setStarBalance] = useState(0);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem("daewoonData");
       if (raw) setName(JSON.parse(raw).name || "");
     } catch {}
+    setStarBalance(getBalance());
     if (params.get("error") === "true") setError("결제가 취소되었거나 실패하였습니다.");
   }, [params]);
 
-  async function handlePayment(payMethod: string) {
+  async function handlePayment() {
     if (!agreed) { setError("이용약관에 동의해주세요."); return; }
     if (!orderId) { setError("주문 정보가 없습니다. 다시 시도해주세요."); return; }
     setLoading(true); setError("");
+
+    if (method === "starpiece") {
+      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      router.push(`/service/daewoon/success?orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
+      return;
+    }
+
     try {
       if (email) sessionStorage.setItem("receiptEmail", email);
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
@@ -44,7 +56,7 @@ function DaewoonPayContent() {
         failUrl: `${base}/service/daewoon/pay?orderId=${orderId}&amount=${amount}&error=true`,
         customerName: name || "고객",
       };
-      if (payMethod === "TOSSPAY") {
+      if (method === "easypay") {
         await payment.requestPayment({ method: "CARD", card: { flowMode: "DIRECT", easyPay: "TOSSPAY" }, ...commonParams });
       } else {
         await payment.requestPayment({ method: "CARD", ...commonParams });
@@ -123,22 +135,16 @@ function DaewoonPayContent() {
       </div>
 
       {/* 결제 버튼들 */}
-      <div className="w-full max-w-sm space-y-3">
-        <button
-          onClick={() => handlePayment("TOSSPAY")}
-          disabled={loading || !agreed}
-          className="w-full py-4 rounded-2xl font-black text-base transition-all disabled:opacity-40"
-          style={{ background: "linear-gradient(135deg, #3182f6, #1971f6)", color: "#fff" }}
-        >
-          {loading ? "처리 중..." : "토스페이로 결제"}
-        </button>
-        <button
-          onClick={() => handlePayment("CARD")}
-          disabled={loading || !agreed}
-          className="w-full py-4 rounded-2xl bg-white/10 hover:bg-white/15 font-bold text-sm transition-all disabled:opacity-40"
-        >
-          {loading ? "처리 중..." : "신용카드로 결제"}
-        </button>
+      <div className="w-full max-w-sm">
+        <PaymentMethodSelector
+          amount={amount}
+          selected={method}
+          onSelect={setMethod}
+          starBalance={starBalance}
+          disabled={!agreed}
+          loading={loading}
+          onConfirm={handlePayment}
+        />
       </div>
 
       <p className="text-xs text-gray-600 text-center mt-4 leading-relaxed max-w-sm">

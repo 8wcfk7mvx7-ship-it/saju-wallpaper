@@ -299,6 +299,20 @@ function TermsContent() {
                 </div>
               </section>
 
+              <div className="bg-violet-500/10 border border-violet-500/25 rounded-2xl p-5">
+                <p className="text-violet-300 font-black text-sm mb-2">별조각(포인트) 미사용 잔액 환급 정책</p>
+                <div className="text-violet-200/75 text-xs leading-relaxed space-y-1.5">
+                  <p>① 유료로 충전한 별조각은 <strong className="text-white">충전일로부터 5년간</strong> 유효하며, 이 중 <strong className="text-white">서비스에 사용되지 않은 잔액</strong>에 한해 환급을 신청할 수 있습니다.</p>
+                  <p>② 충전 시 지급되는 <strong className="text-white">보너스 별조각, 광고 시청·이벤트·출석 등으로 무상 지급된 별조각은 환급 대상에서 제외</strong>되며, 환급 금액은 유상 충전분 중 미사용 잔액을 기준으로 산정합니다.</p>
+                  <p>③ 유상·무상 별조각이 혼재되어 차감되는 경우, <strong className="text-white">무상 지급분이 먼저 차감</strong>된 것으로 간주하여 환급 가능 금액을 계산합니다.</p>
+                  <p>④ 환급 시 결제대행사(PG) 수수료 및 전자결제 수수료는 환급 금액에서 차감될 수 있습니다.</p>
+                  <p>⑤ 환급 신청은 본인 확인(이름·연락처·충전 시 결제 정보)을 거쳐야 하며, 본인 확인이 불가한 경우 환급이 제한될 수 있습니다.</p>
+                  <p>⑥ 유효기간(5년) 경과 시 미사용 잔액은 소멸되며, 회사는 만료 30일 전까지 등록된 연락처로 만료 예정 안내를 합니다.</p>
+                  <p>⑦ 비정상적인 방법(시스템 오류·버그 악용, 부정 결제, 약관 위반 등)으로 취득한 별조각은 환급 대상이 아니며, 사전 통지 없이 차감 또는 이용 제한될 수 있습니다.</p>
+                  <p>⑧ 환급 신청은 <a href="/terms?tab=refund#contact" className="underline">환불 신청 방법</a>에 안내된 채널로 접수하며, 접수 후 본인 확인 절차를 거쳐 영업일 기준 5~7일 이내 처리됩니다.</p>
+                </div>
+              </div>
+
               <section>
                 <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
                   <span className="text-gray-500 font-black">2.</span> 취소 가능 시점

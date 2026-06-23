@@ -2,6 +2,8 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
+import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
+import { getBalance, deductBalance } from "@/lib/blueberry";
 
 const PRODUCT_INFO: Record<string, { name: string; desc: string; icon: string; detail: string[] }> = {
   mobile: {
@@ -36,12 +38,13 @@ function PaymentContent() {
   const orderId = params.get("orderId") || "";
   const productType = params.get("productType") || "mobile";
   const amount = Number(params.get("amount") || 2900);
-  const method = params.get("method") || "";
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [payMethod, setPayMethod] = useState<PaymentMethod>("card");
+  const [starBalance, setStarBalance] = useState(0);
 
   const info = PRODUCT_INFO[productType] || PRODUCT_INFO.mobile;
 
@@ -53,15 +56,23 @@ function PaymentContent() {
         setName(f.name || "");
       }
     } catch {}
+    setStarBalance(getBalance());
   }, []);
 
-  async function handlePayment(payMethod: string) {
+  async function handlePayment() {
     if (!orderId) {
       setError("주문 정보가 없습니다. 뒤로 가서 다시 시도해주세요.");
       return;
     }
     setLoading(true);
     setError("");
+
+    if (payMethod === "starpiece") {
+      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      router.push(`/payment/success?productType=${productType}&orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
+      return;
+    }
+
     try {
       if (email) sessionStorage.setItem("receiptEmail", email);
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
@@ -79,7 +90,7 @@ function PaymentContent() {
         customerName: name || "고객",
       };
 
-      if (payMethod === "TOSSPAY") {
+      if (payMethod === "easypay") {
         // 토스페이 직접 호출: card.flowMode=DIRECT + card.easyPay
         await payment.requestPayment({
           method: "CARD",
@@ -156,31 +167,15 @@ function PaymentContent() {
       )}
 
       {/* 결제 버튼들 */}
-      <div className="w-full max-w-sm space-y-3">
-        {/* 토스페이 간편결제 */}
-        <button
-          disabled={loading}
-          onClick={() => handlePayment("TOSSPAY")}
-          className="w-full py-4 rounded-2xl font-bold text-base bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              결제 처리 중...
-            </>
-          ) : (
-            `💙 토스페이로 결제 ${PRICE_LABELS[productType]}`
-          )}
-        </button>
-
-        {/* 일반 카드 결제 (카카오페이 등 토스 결제창에서 선택 가능) */}
-        <button
-          disabled={loading}
-          onClick={() => handlePayment("CARD")}
-          className="w-full py-3 rounded-2xl font-medium text-sm bg-white/5 hover:bg-white/10 border border-white/10 transition-all disabled:opacity-50"
-        >
-          💳 카드 / 카카오페이 / 기타 결제
-        </button>
+      <div className="w-full max-w-sm">
+        <PaymentMethodSelector
+          amount={amount}
+          selected={payMethod}
+          onSelect={setPayMethod}
+          starBalance={starBalance}
+          loading={loading}
+          onConfirm={handlePayment}
+        />
       </div>
 
       {/* 안내 */}

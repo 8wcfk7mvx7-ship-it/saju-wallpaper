@@ -2,6 +2,8 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
+import { getBalance, deductBalance } from "@/lib/blueberry";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +52,8 @@ function OvercomePayContent() {
   const [codeSent, setCodeSent] = useState(false);
   const [code, setCode] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>("card");
+  const [starBalance, setStarBalance] = useState(0);
 
   useEffect(() => {
     if (!orderId) { router.replace("/service/overcome"); return; }
@@ -57,6 +61,7 @@ function OvercomePayContent() {
       const raw = sessionStorage.getItem("overcomeData");
       if (raw) setInfo(JSON.parse(raw).form ?? null);
     } catch {}
+    setStarBalance(getBalance());
   }, [orderId, router]);
 
   function sendCode() {
@@ -72,11 +77,18 @@ function OvercomePayContent() {
     setStep(3);
   }
 
-  async function handlePayment(payMethod: string) {
+  async function handlePayment() {
     if (!agreed) { setError("이용약관에 동의해주세요."); return; }
     if (!orderId) { setError("주문 정보가 없습니다. 다시 시도해주세요."); return; }
     setLoading(true);
     setError("");
+
+    if (method === "starpiece") {
+      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      router.push(`/service/overcome/success?orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
+      return;
+    }
+
     try {
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
       const tossPayments = await loadTossPayments(clientKey);
@@ -90,7 +102,7 @@ function OvercomePayContent() {
         failUrl: `${base}/service/overcome/pay?orderId=${orderId}&amount=${amount}&error=true`,
         customerName: info?.name || "고객",
       };
-      if (payMethod === "TOSSPAY") {
+      if (method === "easypay") {
         await payment.requestPayment({ method: "CARD", card: { flowMode: "DIRECT", easyPay: "TOSSPAY" }, ...commonParams });
       } else {
         await payment.requestPayment({ method: "CARD", ...commonParams });
@@ -235,17 +247,15 @@ function OvercomePayContent() {
           </div>
 
           <div className="w-full space-y-3">
-            <button disabled={loading} onClick={() => handlePayment("TOSSPAY")}
-              className="w-full py-4 rounded-2xl font-bold text-base active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl"
-              style={{ background: "linear-gradient(135deg, #dc2626 0%, #7c3aed 100%)", boxShadow: "0 8px 30px rgba(220,38,38,0.3)" }}>
-              {loading ? (
-                <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />결제 처리 중...</>
-              ) : `💙 토스페이로 결제 ₩${amount.toLocaleString()}`}
-            </button>
-            <button disabled={loading} onClick={() => handlePayment("CARD")}
-              className="w-full py-4 rounded-2xl font-bold text-base bg-white/5 border border-white/15 hover:bg-white/10 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-300">
-              💳 카드 / 카카오페이
-            </button>
+            <PaymentMethodSelector
+              amount={amount}
+              selected={method}
+              onSelect={setMethod}
+              starBalance={starBalance}
+              disabled={!agreed}
+              loading={loading}
+              onConfirm={handlePayment}
+            />
             <button onClick={() => setStep(2)} disabled={loading}
               className="w-full py-3 rounded-2xl font-bold text-xs text-gray-500 hover:text-gray-300 transition disabled:opacity-50">
               ← 이전 단계로
