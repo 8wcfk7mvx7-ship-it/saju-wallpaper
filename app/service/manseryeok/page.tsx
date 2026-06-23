@@ -487,6 +487,59 @@ function ResultView({
     return best;
   })();
 
+  // 여성 이성운 — 좋은 인연을 부르는 사주 구조 (관인상생·재관쌍미·용신유력·신왕관왕·부덕수기)
+  const femaleLovePatterns: { title: string; desc: string }[] = (() => {
+    if (form.gender !== "female") return [];
+    const has = (s: string) => ssAllManse.includes(s);
+    const countOf = (...names: string[]) => ssAllManse.filter(s => names.includes(s)).length;
+    const ys = result.yongshin;
+    const patterns: { title: string; desc: string }[] = [];
+
+    if (has("정관") && (has("정인") || has("편인"))) {
+      patterns.push({
+        title: "남편 인연이 나를 더 단단하게 채워주는 구조",
+        desc: "배우자를 의미하는 기운이 나를 키워주는 기운으로 자연스럽게 이어지는 구조예요. 관계를 맺을수록 오히려 내면이 더 안정되고 단단해지는 흐름이라, 한 사람을 깊이 만났을 때 그 인연이 인생 전체를 받쳐주는 든든한 버팀목이 되어주는 경우가 많아요.",
+      });
+    }
+    if (countOf("정재", "편재") >= 1 && countOf("정관", "편관") >= 1) {
+      patterns.push({
+        title: "재물과 인연이 함께 단단해지는 구조",
+        desc: "살림과 활동력을 의미하는 기운과 배우자를 의미하는 기운이 사주 안에서 함께 자리하고 있어요. 좋은 인연을 만나면 생활의 안정까지 같이 따라오는 흐름이라, 결혼이나 동거 이후 오히려 형편이 더 펴지는 경우가 많은 구조예요.",
+      });
+    }
+    if (ys.yongshin && (has("정관") || has("편관"))) {
+      const guanEl = (() => {
+        const cgEl: Record<string, string> = { 갑: "목", 을: "목", 병: "화", 정: "화", 무: "토", 기: "토", 경: "금", 신: "금", 임: "수", 계: "수" };
+        const ilganEl = cgEl[ilgan];
+        const controlledBy: Record<string, string> = { 목: "금", 화: "수", 토: "목", 금: "화", 수: "토" };
+        return controlledBy[ilganEl];
+      })();
+      if (guanEl === ys.yongshin || guanEl === ys.gishin) {
+        patterns.push({
+          title: "배우자 인연이 인생의 중심을 잡아주는 구조",
+          desc: "배우자를 의미하는 기운이 이 사주에서 가장 핵심적인 역할을 하고 있어요. 좋은 인연을 만났을 때 그 사람이 단순히 곁에 머무는 게 아니라, 흔들리던 부분을 붙잡아주고 삶의 방향을 잡아주는 존재가 되어주는 구조예요.",
+        });
+      }
+    }
+    if (countOf("비견", "겁재") >= 2 && countOf("정관", "편관") >= 2) {
+      patterns.push({
+        title: "강한 두 사람이 서로를 감당하는 구조",
+        desc: "스스로의 기운도 단단하고, 배우자를 의미하는 기운도 강하게 자리하고 있어요. 어느 한쪽이 끌려가는 관계가 아니라, 서로 비슷한 무게로 맞서면서도 함께 갈 수 있는 사람을 만났을 때 가장 좋은 합을 이루는 구조라 평범하고 약한 인연보다는 만만치 않은 상대를 만나야 오히려 관계가 오래갑니다.",
+      });
+    }
+    const dayJjEl = (() => {
+      const jjEl: Record<string, string> = { 자: "수", 축: "토", 인: "목", 묘: "목", 진: "토", 사: "화", 오: "화", 미: "토", 신: "금", 유: "금", 술: "토", 해: "수" };
+      return jjEl[pd.day.jj];
+    })();
+    if (dayJjEl && (dayJjEl === ys.yongshin || dayJjEl === ys.heeshin)) {
+      patterns.push({
+        title: "배우자 자리 자체가 나를 돕는 구조",
+        desc: "배우자 자리에 해당하는 기운이 이 사주가 가장 필요로 하는 기운과 일치해요. 결혼이나 동거를 시작한 이후 집안 분위기 자체가 차분해지고 서로를 보완해주는 흐름이 생기는 구조라, 이성운이 곧 안정운으로 이어지는 경우가 많아요.",
+      });
+    }
+    return patterns;
+  })();
+
   const monthJj = pd.month.jj;
   const ilganInfo = ILGAN_PERSONALITY[ilgan];
   const iljuKey = ilgan + pd.day.jj;
@@ -1202,6 +1255,20 @@ function ResultView({
           </Section>
         );
       })()}
+
+      {/* ④-3 여성 이성운 — 좋은 인연을 부르는 구조 */}
+      {femaleLovePatterns.length > 0 && (
+        <Section title="좋은 인연을 부르는 사주 속 신호" accent="#f59e0b">
+          <div className="space-y-4">
+            {femaleLovePatterns.map((p, i) => (
+              <div key={i} className={i > 0 ? "pt-4 border-t border-white/[0.06]" : ""}>
+                <p className="text-sm font-bold mb-1" style={{ color: "#fbbf24" }}>{p.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* ⑤ 월지 심리 */}
       {weolji && (
