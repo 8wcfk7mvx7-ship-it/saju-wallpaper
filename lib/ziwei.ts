@@ -36,6 +36,8 @@ export interface ZiweiPalace {
   branch: string;
   palaceName: string; // 명궁·형제·부처...
   stars: string[];
+  luckyStars: string[]; // 보좌성(좌보·우필·문창·문곡·천괴·천월·록존)
+  maleficStars: string[]; // 살성(경양·타라·지공·지겁)
   isLifePalace: boolean;
   isBodyPalace: boolean;
   daeha: { from: number; to: number };
@@ -61,6 +63,58 @@ const BUREAU_NAMES: Record<number, string> = { 2: "수이국(水二局)", 3: "�
 
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
+}
+
+// 십간 록존(祿存) 위치 — 甲祿在寅 乙祿在卯 丙祿在巳 丁祿在午 戊祿在巳 己祿在午 庚祿在申 辛祿在酉 壬祿在亥 癸祿在子
+const LUCUN_BRANCH: Record<string, number> = {
+  갑: 2, 을: 3, 병: 5, 정: 6, 무: 5, 기: 6, 경: 8, 신: 9, 임: 11, 계: 0,
+};
+
+// 십간 천괴(天魁)·천월(天鉞) 위치 — 甲戊庚丑未, 乙己子申, 丙丁亥酉, 壬癸卯巳, 辛午寅
+const GWAEWOL_BRANCH: Record<string, [number, number]> = {
+  갑: [1, 7], 무: [1, 7], 경: [1, 7],
+  을: [0, 8], 기: [0, 8],
+  병: [11, 9], 정: [11, 9],
+  임: [3, 5], 계: [3, 5],
+  신: [6, 2],
+};
+
+// 보좌성·살성(보조성) 배치 — 좌보/우필(월), 문창/문곡(시), 천괴/천월·록존/경양/타라(연간), 지공/지겁(시)
+function calcAuxStars(yearStem: string, lunarMonth: number, hourBranchIndex: number): Record<number, { lucky: string[]; malefic: string[] }> {
+  const result: Record<number, { lucky: string[]; malefic: string[] }> = {};
+  const add = (idx: number, kind: "lucky" | "malefic", name: string) => {
+    if (!result[idx]) result[idx] = { lucky: [], malefic: [] };
+    result[idx][kind].push(name);
+  };
+
+  // 좌보(左輔): 辰에서 정월 起 순행, 우필(右弼): 戌에서 정월 起 역행
+  add(mod(4 + (lunarMonth - 1), 12), "lucky", "좌보");
+  add(mod(10 - (lunarMonth - 1), 12), "lucky", "우필");
+
+  // 문곡(文曲): 辰에서 子時 起 순행, 문창(文昌): 戌에서 子時 起 역행
+  add(mod(4 + hourBranchIndex, 12), "lucky", "문곡");
+  add(mod(10 - hourBranchIndex, 12), "lucky", "문창");
+
+  // 천괴/천월
+  const gw = GWAEWOL_BRANCH[yearStem];
+  if (gw) {
+    add(gw[0], "lucky", "천괴");
+    add(gw[1], "lucky", "천월");
+  }
+
+  // 록존 + 경양(록존+1)/타라(록존-1)
+  const lucun = LUCUN_BRANCH[yearStem];
+  if (lucun !== undefined) {
+    add(lucun, "lucky", "록존");
+    add(mod(lucun + 1, 12), "malefic", "경양");
+    add(mod(lucun - 1, 12), "malefic", "타라");
+  }
+
+  // 지겁(地劫): 亥에서 子時 起 순행, 지공(地空): 亥에서 子時 起 역행
+  add(mod(11 + hourBranchIndex, 12), "malefic", "지겁");
+  add(mod(11 - hourBranchIndex, 12), "malefic", "지공");
+
+  return result;
 }
 
 // 자미성 위치 산출 (오행국 B, 음력일 day 기준)
@@ -131,6 +185,9 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
   const isYangYear = YANG_STEMS.has(yearStem);
   const forward = (isYangYear && gender === "male") || (!isYangYear && gender === "female");
 
+  // 6. 보좌성·살성 배치
+  const auxMap = calcAuxStars(yearStem, lunarMonth, hourBranchIndex);
+
   const palaces: ZiweiPalace[] = BRANCHES.map((branch, branchIndex) => {
     // 궁명: 명궁에서 逆行(감소 방향)으로 명궁,형제,부처...순으로 배치
     const palaceOffset = mod(lifeBranchIndex - branchIndex, 12);
@@ -145,6 +202,8 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
       branch,
       palaceName,
       stars: starMap[branchIndex] || [],
+      luckyStars: auxMap[branchIndex]?.lucky || [],
+      maleficStars: auxMap[branchIndex]?.malefic || [],
       isLifePalace: branchIndex === lifeBranchIndex,
       isBodyPalace: branchIndex === bodyBranchIndex,
       daeha,
