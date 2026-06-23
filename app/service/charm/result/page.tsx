@@ -293,7 +293,7 @@ function CharmResultContent() {
                   <span className="text-lg shrink-0">{s.icon}</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold text-pink-200">{s.cat}</span>
+                      <span className="text-sm font-bold text-pink-200">{s.cat.replace(/^\S+\s*/, "")}</span>
                       <span className="text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300">+{s.charmGrade}점</span>
                     </div>
                     <p className="text-xs text-gray-400 leading-relaxed">{s.oneliner}</p>

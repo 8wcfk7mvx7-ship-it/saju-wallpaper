@@ -347,7 +347,7 @@ function CharmSuccessContent() {
                 <div key={s.key} className="border-b border-white/5 pb-4 last:border-0 last:pb-0">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{s.icon}</span>
-                    <span className="font-bold text-pink-200">{s.cat}</span>
+                    <span className="font-bold text-pink-200">{s.cat.replace(/^\S+\s*/, "")}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300">+{s.charmGrade}점</span>
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed">{s.withSal}</p>
