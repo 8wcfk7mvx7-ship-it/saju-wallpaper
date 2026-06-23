@@ -75,18 +75,91 @@ const GROUP_TODAY: Record<string, { 총운: string; 재물: string; 애정: stri
 const MIN_COL_W = 44; // 컬럼 최소 너비(px) — 화면이 좁아지면 가로 스크롤로 전환
 const COL_GAP = 6; // 컬럼 간격(px)
 const LINE_H = 30; // 각 커넥터 줄의 높이(px)
-const HAP_COLOR = "#4ade80";
-const CHUNG_COLOR = "#f87171";
-const HYEONG_COLOR = "#fb923c";
-const PAHAE_COLOR = "#94a3b8";
-const WONJIN_COLOR = "#c084fc";
+// 오행별 결과 색상 — 합·충·형·파·해의 "최종적으로 남는/만들어지는 기운"을 오행 색으로 표현
+const ELEMENT_COLOR: Record<Element, string> = {
+  목: "#4ade80", // 초록
+  화: "#f87171", // 빨강
+  토: "#fbbf24", // 노랑
+  금: "#f3f4f6", // 흰색(밝은 회백)
+  수: "#52525b", // 흑색(어두운 배경에서 보이도록 짙은 회흑색)
+};
 
-function relColor(type: JijiRelation["type"]): string {
-  if (type === "육합" || type === "삼합" || type === "반합") return HAP_COLOR;
-  if (type === "충") return CHUNG_COLOR;
-  if (type === "형") return HYEONG_COLOR;
-  if (type === "파" || type === "해") return PAHAE_COLOR;
-  return WONJIN_COLOR;
+// 육합화기(六合化氣): 두 지지가 합쳐져 만들어내는 오행
+const YUKHAP_HWA: Record<string, Element> = {
+  "자축": "토", "인해": "목", "묘술": "화", "진유": "금", "사신": "수", "오미": "화",
+};
+// 삼합/반합 결과 오행 — 그룹 전체(또는 절반)가 향하는 오행
+const SAMHAP_HWA: { group: string[]; el: Element }[] = [
+  { group: ["인", "오", "술"], el: "화" },
+  { group: ["사", "유", "축"], el: "금" },
+  { group: ["신", "자", "진"], el: "수" },
+  { group: ["해", "묘", "미"], el: "목" },
+];
+// 천간합화기(天干合化氣)
+const CG_HWA: Record<string, Element> = {
+  "갑기": "토", "을경": "금", "병신": "수", "정임": "목", "무계": "화",
+};
+// 상극(相克) 순환 — key가 value를 극(克)한다 (key가 승자)
+const SANGGEUK: Record<Element, Element> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
+
+function pairKey(a: string, b: string): string {
+  // YUKHAP_HWA/CG_HWA는 고정된 한쪽 순서로 정의되어 있어 양방향 모두 시도
+  return `${a}${b}`;
+}
+
+function hapElement(a: string, b: string): Element | undefined {
+  return YUKHAP_HWA[pairKey(a, b)] ?? YUKHAP_HWA[pairKey(b, a)];
+}
+
+function samhapElement(a: string, b: string): Element | undefined {
+  return SAMHAP_HWA.find(g => g.group.includes(a) && g.group.includes(b))?.el;
+}
+
+function cgHapElement(a: string, b: string): Element | undefined {
+  return CG_HWA[pairKey(a, b)] ?? CG_HWA[pairKey(b, a)];
+}
+
+// 두 오행이 부딪힐 때 "남는(이기는)" 오행을 상극 순환으로 판정. 같은 오행이면 그대로, 상생 관계처럼
+// 명확한 승자가 없으면 undefined를 반환해 반반 색상으로 처리한다.
+function survivorElement(elA: Element, elB: Element): Element | undefined {
+  if (elA === elB) return elA;
+  if (SANGGEUK[elA] === elB) return elA;
+  if (SANGGEUK[elB] === elA) return elB;
+  return undefined;
+}
+
+// 지지 관계 한 쌍의 색상을 오행 기준으로 산출. 합(육합/삼합/반합)은 화기 오행 단색,
+// 충/형/파/해는 상극으로 남는 오행 단색(승자가 없으면 반반), 원진(귀문관살 포함)은 항상 반반 색상.
+function relColor(type: JijiRelation["type"], jjA: string, jjB: string): string | [string, string] {
+  const elA = jijiElement(jjA);
+  const elB = jijiElement(jjB);
+
+  if (type === "육합") {
+    const el = hapElement(jjA, jjB);
+    return el ? ELEMENT_COLOR[el] : ELEMENT_COLOR[elA];
+  }
+  if (type === "삼합" || type === "반합") {
+    const el = samhapElement(jjA, jjB);
+    return el ? ELEMENT_COLOR[el] : ELEMENT_COLOR[elA];
+  }
+  if (type === "원진") {
+    return [ELEMENT_COLOR[elA], ELEMENT_COLOR[elB]];
+  }
+  // 충/형/파/해 — 상극으로 남는 오행 판정
+  const survivor = survivorElement(elA, elB);
+  return survivor ? ELEMENT_COLOR[survivor] : [ELEMENT_COLOR[elA], ELEMENT_COLOR[elB]];
+}
+
+// 천간 관계 색상 — 합은 천간합화기 오행, 충은 상극으로 남는 오행(없으면 반반)
+function cgRelColor(type: "합" | "충", cgA: string, cgB: string): string | [string, string] {
+  const elA = CHEONGAN_ELEMENT[cgA] as Element;
+  const elB = CHEONGAN_ELEMENT[cgB] as Element;
+  if (type === "합") {
+    const el = cgHapElement(cgA, cgB);
+    return el ? ELEMENT_COLOR[el] : ELEMENT_COLOR[elA];
+  }
+  const survivor = survivorElement(elA, elB);
+  return survivor ? ELEMENT_COLOR[survivor] : [ELEMENT_COLOR[elA], ELEMENT_COLOR[elB]];
 }
 
 function jjRelDesc(type: JijiRelation["type"]): string {
@@ -111,7 +184,7 @@ interface LineRel {
   aIdx: number;
   bIdx: number;
   label: string;
-  color: string;
+  color: string | [string, string]; // 단색 또는 [좌측색, 우측색] 반반 색상
   desc: string; // 호버/탭 설명
 }
 
@@ -127,20 +200,27 @@ const LABEL_H = 14;
 const ROW_GAP = 6;
 
 // 화살표 마커가 달린 커넥터 라인 — 시작/끝 양쪽에 삼각형 화살촉 + 중앙 레이블 배지(호버/탭 시 설명 표시)
-function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: number; xB: number; y: number; color: string; label: string; desc: string; width: number; height: number }) {
+function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: number; xB: number; y: number; color: string | [string, string]; label: string; desc: string; width: number; height: number }) {
   const [open, setOpen] = useState(false);
   const lo = Math.min(xA, xB);
   const hi = Math.max(xA, xB);
   const midX = (lo + hi) / 2;
   const tri = 6;
   const badgeW = label.length * 10 + 16;
+  const isSplit = Array.isArray(color);
+  const cA = isSplit ? color[0] : color;
+  const cB = isSplit ? color[1] : color;
+  const badgeBg = isSplit ? `linear-gradient(90deg, ${cA} 50%, ${cB} 50%)` : "#1a1a2e";
+  const badgeBorder = isSplit ? "1px solid rgba(255,255,255,0.4)" : `1px solid ${cA}`;
+  const badgeText = isSplit ? "#0a0a0f" : cA;
   return (
     <>
       <svg style={{ position: "absolute", left: 0, top: 0, width, height, overflow: "visible", pointerEvents: "none" }}>
-        <line x1={lo} y1={y} x2={hi} y2={y} stroke={color} strokeWidth={1.5} strokeOpacity={0.85} />
+        <line x1={lo} y1={y} x2={midX} y2={y} stroke={cA} strokeWidth={1.5} strokeOpacity={0.85} />
+        <line x1={midX} y1={y} x2={hi} y2={y} stroke={cB} strokeWidth={1.5} strokeOpacity={0.85} />
         {/* 양쪽 화살촉 (서로 바깥쪽을 향함) */}
-        <polygon points={`${lo},${y} ${lo + tri},${y - tri / 1.6} ${lo + tri},${y + tri / 1.6}`} fill={color} opacity={0.9} />
-        <polygon points={`${hi},${y} ${hi - tri},${y - tri / 1.6} ${hi - tri},${y + tri / 1.6}`} fill={color} opacity={0.9} />
+        <polygon points={`${lo},${y} ${lo + tri},${y - tri / 1.6} ${lo + tri},${y + tri / 1.6}`} fill={cA} opacity={0.9} />
+        <polygon points={`${hi},${y} ${hi - tri},${y - tri / 1.6} ${hi - tri},${y + tri / 1.6}`} fill={cB} opacity={0.9} />
       </svg>
       {/* 중앙 레이블 배지 — title(PC 호버) + onClick(모바일 탭) 둘 다 지원 */}
       <div
@@ -148,9 +228,9 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: n
         onClick={() => setOpen(v => !v)}
         style={{
           position: "absolute", left: midX - badgeW / 2, top: y - 9, width: badgeW, height: 18,
-          borderRadius: 9, background: "#1a1a2e", border: `1px solid ${color}`,
+          borderRadius: 9, background: badgeBg, border: badgeBorder,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 10, fontWeight: 700, color, cursor: "pointer", userSelect: "none",
+          fontSize: 10, fontWeight: 700, color: badgeText, cursor: "pointer", userSelect: "none",
         }}
       >
         {label}
@@ -160,11 +240,11 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: n
           onClick={() => setOpen(false)}
           style={{
             position: "absolute", left: Math.max(0, Math.min(midX - 90, width - 180)), top: y + 12, width: 180, zIndex: 20,
-            background: "#13131f", border: `1px solid ${color}`, borderRadius: 10, padding: "8px 10px",
+            background: "#13131f", border: isSplit ? "1px solid rgba(255,255,255,0.4)" : `1px solid ${cA}`, borderRadius: 10, padding: "8px 10px",
             fontSize: 11, lineHeight: 1.5, color: "#d1d5db", boxShadow: "0 4px 16px rgba(0,0,0,0.4)", cursor: "pointer",
           }}
         >
-          <span style={{ color, fontWeight: 700 }}>{label}</span> {desc}
+          <span style={{ color: isSplit ? cB : cA, fontWeight: 700 }}>{label}</span> {desc}
         </div>
       )}
     </>
@@ -612,8 +692,8 @@ export default function TodayFortunePage() {
           <p className="text-[11px] text-gray-500 mb-4">위쪽 화살표: 천간 합·충 · 아래쪽 화살표: 지지 합충형파해 — 명식표 컬럼 위치 기준 (라벨을 누르면 설명이 보여요)</p>
           <RelationDiagram
             cols={cols}
-            cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: rel.type === "합" ? HAP_COLOR : CHUNG_COLOR, desc: cgRelDesc(rel.type) }))}
-            jjLines={relations.map(rel => { const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type); return { aIdx: rel.a, bIdx: rel.b, label: `${ja}${jb}${rel.type}`, color: relColor(rel.type), desc: jjRelDesc(rel.type) }; })}
+            cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
+            jjLines={relations.map(rel => { const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type); return { aIdx: rel.a, bIdx: rel.b, label: `${ja}${jb}${rel.type}`, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) }; })}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
@@ -621,7 +701,7 @@ export default function TodayFortunePage() {
           {cheonraJimangLabels.length > 0 && (
             <div className="mt-3 border-t border-white/10 pt-3">
               <p className="text-xs font-bold text-amber-300">
-                ⚠ 천라지망(天羅地網) — {cheonraJimangLabels.join("·")}
+                ⚠ {[hasCheonra && "술해천라", hasJimang && "진사지망"].filter(Boolean).join(" · ")} — {cheonraJimangLabels.join("·")}
               </p>
               <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                 {hasCheonra && hasJimang ? "술·해(天羅)와 진·사(地網)가 모두 갖춰져" : hasCheonra ? "술·해(天羅) 조합이 갖춰져" : "진·사(地網) 조합이 갖춰져"} 오늘은 뜻하지 않은 구속·제약이 느껴지기 쉬운 날입니다. 외부로 일을 벌이기보다 내면에 집중하면 오히려 단단해지는 흐름이에요.
