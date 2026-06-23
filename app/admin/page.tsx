@@ -54,6 +54,7 @@ interface Stats {
   kakaoTotalCount: number;
   blueberryPayments: { amount: number; product_name: string; created_at: string }[];
   blueberryRevenue: number;
+  topQuestions: { question: string; count: number }[];
 }
 
 const TABS = [
@@ -462,6 +463,28 @@ export default function AdminPage() {
                   })}
             </div>
 
+            {/* 월령도사 인기 질문 (익명화·정규화 집계) */}
+            <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <p className="text-xs font-bold text-gray-400 mb-1">월령도사 인기 질문 TOP 20</p>
+              <p className="text-[10px] text-gray-600 mb-4">숫자·구두점을 제거한 정규화 문구별 누적 횟수 (원문은 저장하지 않음)</p>
+              {(stats?.topQuestions ?? []).length === 0
+                ? <p className="text-xs text-gray-600 text-center py-4">데이터 없음</p>
+                : (stats?.topQuestions ?? []).map((q, i) => {
+                    const max = (stats?.topQuestions ?? [])[0]?.count || 1;
+                    return (
+                      <div key={i} className="mb-2.5">
+                        <div className="flex justify-between text-xs mb-1 gap-2">
+                          <span className="text-gray-300 truncate">{q.question}</span>
+                          <span className="text-violet-400 font-bold shrink-0">{q.count.toLocaleString()}회</span>
+                        </div>
+                        <div className="h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+                          <div className="h-1.5 rounded-full" style={{ width: `${(q.count / max) * 100}%`, background: "rgba(139,92,246,0.7)" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+            </div>
+
             {/* DB SQL 안내 */}
             <div className="rounded-xl p-4" style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.18)" }}>
               <p className="text-xs text-yellow-400 font-bold mb-2">Supabase 테이블 설정 (초기 1회)</p>
@@ -489,6 +512,11 @@ create table if not exists kakao_users (
   email text,
   last_login timestamptz default now(),
   created_at timestamptz default now()
+);
+create table if not exists chat_questions (
+  question_norm text primary key,
+  count integer not null default 1,
+  updated_at timestamptz default now()
 );`}</pre>
             </div>
           </>

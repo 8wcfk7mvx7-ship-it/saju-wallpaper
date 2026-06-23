@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
     pageViewsWeekRes, pageViewsTodayAllRes,
     kakaoUsersRes, kakaoUsersTodayRes,
     blueberryPaymentsRes,
+    chatQuestionsRes,
   ] = await Promise.all([
     sb.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
     sb.from("page_views").select("id", { count: "exact", head: true }),
@@ -47,6 +48,7 @@ export async function GET(req: NextRequest) {
     sb.from("kakao_users").select("id, nickname, profile_image, email, created_at, last_login").order("created_at", { ascending: false }).limit(50),
     sb.from("kakao_users").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
     sb.from("payments").select("amount, product_name, created_at").ilike("product_name", "%블루베리%").order("created_at", { ascending: false }).limit(50),
+    sb.from("chat_questions").select("question_norm, count").order("count", { ascending: false }).limit(20),
   ]);
 
   // ── 7일 일별 방문자 ──
@@ -111,6 +113,9 @@ export async function GET(req: NextRequest) {
     ? ((totalPaidCount / totalRes.count) * 100).toFixed(2)
     : "0.00";
 
+  // ── 월령도사 인기 질문 (익명화·정규화된 문구별 누적 카운트, DB에서 이미 집계됨) ──
+  const topQuestions = (chatQuestionsRes.data ?? []).map((v) => ({ question: v.question_norm, count: v.count }));
+
   return NextResponse.json({
     dbConnected: true,
     todayViews: todayRes.count ?? 0,
@@ -132,5 +137,6 @@ export async function GET(req: NextRequest) {
     kakaoTotalCount: (kakaoUsersRes.data ?? []).length,
     blueberryPayments: blueberryPaymentsRes.data ?? [],
     blueberryRevenue: (blueberryPaymentsRes.data ?? []).reduce((s, p) => s + p.amount, 0),
+    topQuestions,
   });
 }

@@ -1,7 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createClient } from "@supabase/supabase-js";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
+
+// 질문 통계용으로 익명화·정규화된 문구의 등장 횟수만 누적한다.
+// 원문, 사주 정보, 답변 내용은 저장하지 않는다 — 숫자(생년월일 등)와 구두점을 제거해 식별 가능한 정보를 남기지 않는다.
+function normalizeQuestionForStats(q: string): string {
+  return q
+    .trim()
+    .toLowerCase()
+    .replace(/\d+/g, "#")
+    .replace(/[?!.,~"'`]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 200);
+}
+
+function logQuestion(question: string) {
+  const sb = getSupabase();
+  const norm = normalizeQuestionForStats(question);
+  if (!sb || !norm) return;
+  sb.rpc("increment_chat_question", { q: norm }).then(() => {});
+}
 
 const SYSTEM_PROMPT = `당신은 '월령도사'입니다. 수십만 개의 사주 데이터를 학습한 사주 전문 AI로, 따뜻하고 정감 있는 말투로 상담합니다.
 
@@ -36,6 +64,9 @@ export async function POST(req: NextRequest) {
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: "메시지가 없습니다" }, { status: 400 });
     }
+
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+    if (lastUserMessage) logQuestion(lastUserMessage.content);
 
     const systemWithContext = sajuContext
       ? `${SYSTEM_PROMPT}\n\n## 사용자 사주 정보\n${sajuContext}`
