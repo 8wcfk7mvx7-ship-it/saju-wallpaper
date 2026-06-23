@@ -171,6 +171,37 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: n
   );
 }
 
+// 오행 펜타곤 버블 차트 — 목화토금수 점수를 5각형 배치로 시각화, 점수 비례 원 크기
+function OhaengPentagon({ scores }: { scores: Record<Element, number> }) {
+  const order: Element[] = ["목", "화", "토", "금", "수"];
+  const max = Math.max(1, ...order.map(el => scores[el]));
+  const size = 220;
+  const cx = size / 2, cy = size / 2 - 6;
+  const radius = 78;
+  return (
+    <div className="flex justify-center">
+      <svg width={size} height={size + 10} style={{ overflow: "visible" }}>
+        {order.map((el, i) => {
+          const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+          const x = cx + radius * Math.cos(angle);
+          const y = cy + radius * Math.sin(angle);
+          const score = scores[el] || 0;
+          const r = 14 + (score / max) * 26;
+          const color = EL_STYLE[el]?.text ?? "#e5e7eb";
+          return (
+            <g key={el}>
+              <line x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+              <circle cx={x} cy={y} r={r} fill={color} opacity={0.18} stroke={color} strokeWidth={1.5} />
+              <text x={x} y={y - 2} textAnchor="middle" fontSize={13} fontWeight={900} fill={color}>{el}</text>
+              <text x={x} y={y + 13} textAnchor="middle" fontSize={9} fontWeight={700} fill="rgba(255,255,255,0.5)">{score.toFixed(1)}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 function RelationDiagram({ cols, jjLines, cgLines }: DiagramProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [colW, setColW] = useState(56);
@@ -260,6 +291,15 @@ export default function TodayFortunePage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const [selDateStr, setSelDateStr] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
+  const [includeDaewoon, setIncludeDaewoon] = useState(true);
+  const [includeSewoon, setIncludeSewoon] = useState(true);
+  const [includeToday, setIncludeToday] = useState(true);
+  const [selDaewoonIdx, setSelDaewoonIdx] = useState<number | null>(null);
+  const [selSewoonYear, setSelSewoonYear] = useState<number | null>(null);
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -392,20 +432,31 @@ export default function TodayFortunePage() {
   const r = resultRef.current;
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
-  const today = new Date();
+  // "오늘" 날짜는 selDateStr로 임의 지정 가능 (기본값: 실제 오늘)
+  const [selY, selM, selD] = selDateStr.split("-").map(Number);
+  const today = new Date(selY, selM - 1, selD);
 
-  // 대운
+  // 대운 — 기본은 선택한 날짜 기준 나이에 해당하는 대운, 칩으로 다른 시기 선택 가능
   const yy = Number(form.birthYear), mm = Number(form.birthMonth), dd = Number(form.birthDay);
   const daewoon = calcDaewoon(yy, mm, dd, form.gender, ilgan, { cg: r.pillarsDetail.month.cg, jj: r.pillarsDetail.month.jj });
-  const currentDaewoon = daewoon.pillars[Math.max(0, daewoon.currentIdx)];
+  const approxAgeAtSelDate = selY - yy;
+  const autoIdx = (() => {
+    const idx = daewoon.pillars.findIndex((p, i) => {
+      const nextAge = i + 1 < daewoon.pillars.length ? daewoon.pillars[i + 1].age : 999;
+      return approxAgeAtSelDate >= p.age && approxAgeAtSelDate < nextAge;
+    });
+    return idx < 0 ? 0 : idx;
+  })();
+  const activeDaewoonIdx = selDaewoonIdx ?? autoIdx;
+  const currentDaewoon = daewoon.pillars[Math.max(0, Math.min(activeDaewoonIdx, daewoon.pillars.length - 1))];
 
-  // 세운 (올해)
-  const thisYear = today.getFullYear();
+  // 세운 — 기본은 선택한 날짜의 연도, 칩으로 다른 연도 선택 가능
+  const thisYear = selSewoonYear ?? selY;
   const yearPillar = getYearPillar(thisYear);
   const sewoonSipseongCg = getSipseong(ilgan, yearPillar.cg);
 
   // 오늘 일진
-  const dayPillar = getDayPillar(today.getFullYear(), today.getMonth() + 1, today.getDate());
+  const dayPillar = getDayPillar(selY, selM, selD);
   const todaySipseongCg = getSipseong(ilgan, dayPillar.cg);
   const todayGroup = SIPSEONG_GROUP[todaySipseongCg] ?? "비겁";
   const todayUunseong = getUunseong(ilgan, dayPillar.jj);
@@ -466,6 +517,39 @@ export default function TodayFortunePage() {
 
   const groupContent = GROUP_TODAY[todayGroup];
 
+  // 조후/궁성 보정 오행 차트 — 원국 + (토글된) 대운·세운·오늘을 합산해 재계산
+  const JOHU_BOOST_TODAY: Record<string, Partial<Record<Element, number>>> = {
+    인: { 목: 1.0 }, 묘: { 목: 1.5 }, 진: { 목: 0.7, 토: 0.4 },
+    사: { 화: 1.0 }, 오: { 화: 1.5 }, 미: { 화: 0.7, 토: 0.4 },
+    신: { 금: 1.0 }, 유: { 금: 1.5 }, 술: { 금: 0.7, 토: 0.4 },
+    해: { 수: 1.0 }, 자: { 수: 1.5 }, 축: { 수: 0.7, 토: 0.4 },
+  };
+  const ohaengScores: Record<Element, number> = { 목: 0, 화: 0, 토: 0, 금: 0, 수: 0 };
+  // 궁성(宮星) 가중치 — 월주·일주를 중심으로, 흐름(대운·세운·오늘)은 토글에 따라 가중 반영
+  const natalPillarsForChart = [
+    { cg: r.pillarsDetail.year.cg, jj: r.pillarsDetail.year.jj, weight: 0.8 },
+    { cg: r.pillarsDetail.month.cg, jj: r.pillarsDetail.month.jj, weight: 1.0 },
+    { cg: r.pillarsDetail.day.cg, jj: r.pillarsDetail.day.jj, weight: 1.0 },
+    ...(r.pillarsDetail.hour ? [{ cg: r.pillarsDetail.hour.cg, jj: r.pillarsDetail.hour.jj, weight: 0.9 }] : []),
+  ];
+  const flowPillarsForChart: { cg: string; jj: string; weight: number }[] = [
+    ...(includeDaewoon ? [{ cg: currentDaewoon.cg, jj: currentDaewoon.jj, weight: 1.1 }] : []),
+    ...(includeSewoon ? [{ cg: yearPillar.cg, jj: yearPillar.jj, weight: 0.9 }] : []),
+    ...(includeToday ? [{ cg: dayPillar.cg, jj: dayPillar.jj, weight: 0.6 }] : []),
+  ];
+  [...natalPillarsForChart, ...flowPillarsForChart].forEach(({ cg, jj, weight }) => {
+    const cgEl = CHEONGAN_ELEMENT[cg] as Element | undefined;
+    if (cgEl) ohaengScores[cgEl] += 1.5 * weight;
+    const jjEl = jijiElement(jj) as Element | undefined;
+    if (jjEl) ohaengScores[jjEl] += 1.2 * weight;
+  });
+  const johuTodayBoost = JOHU_BOOST_TODAY[r.pillarsDetail.month.jj];
+  if (johuTodayBoost) {
+    (Object.entries(johuTodayBoost) as [Element, number][]).forEach(([el, val]) => {
+      ohaengScores[el] += val;
+    });
+  }
+
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <BackButton />
@@ -480,6 +564,15 @@ export default function TodayFortunePage() {
             오늘은 {dayPillar.cg}{dayPillar.jj}일 ({todaySipseongCg})
           </h1>
           <p className="text-xs text-gray-500 mt-2">{today.getFullYear()}.{today.getMonth() + 1}.{today.getDate()} · 12운성: {todayUunseong}</p>
+          <div className="inline-flex items-center gap-2 mt-3 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5">
+            <span className="text-[11px] text-gray-500">날짜 변경</span>
+            <input
+              type="date"
+              value={selDateStr}
+              onChange={e => setSelDateStr(e.target.value)}
+              className="bg-transparent text-xs text-gray-200 outline-none"
+            />
+          </div>
         </div>
 
         {/* 명식표 */}
@@ -517,6 +610,64 @@ export default function TodayFortunePage() {
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
           )}
+        </div>
+        </FadeIn>
+
+        {/* 조후/궁성 보정 오행 차트 — 대운·세운 선택에 따라 실시간 변화 */}
+        <FadeIn delay={120}>
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 mb-5">
+          <p className="text-sm font-bold text-gray-300 mb-1">오행 구조 — 조후·궁성 보정</p>
+          <p className="text-[11px] text-gray-500 mb-3">아래에서 대운·세운을 바꾸거나 켜고 끌 때마다 보정된 오행 점수가 즉시 다시 계산돼요.</p>
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            <button
+              onClick={() => setIncludeDaewoon(v => !v)}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
+              style={{ background: includeDaewoon ? "rgba(156,163,175,0.2)" : "rgba(255,255,255,0.04)", color: includeDaewoon ? "#e5e7eb" : "rgba(255,255,255,0.35)", border: `1px solid ${includeDaewoon ? "rgba(156,163,175,0.4)" : "rgba(255,255,255,0.1)"}` }}
+            >
+              대운 {currentDaewoon.cg}{currentDaewoon.jj} ({currentDaewoon.age}세~)
+            </button>
+            <button
+              onClick={() => setIncludeSewoon(v => !v)}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
+              style={{ background: includeSewoon ? "rgba(156,163,175,0.2)" : "rgba(255,255,255,0.04)", color: includeSewoon ? "#e5e7eb" : "rgba(255,255,255,0.35)", border: `1px solid ${includeSewoon ? "rgba(156,163,175,0.4)" : "rgba(255,255,255,0.1)"}` }}
+            >
+              세운 {yearPillar.cg}{yearPillar.jj} ({thisYear})
+            </button>
+            <button
+              onClick={() => setIncludeToday(v => !v)}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
+              style={{ background: includeToday ? "rgba(156,163,175,0.2)" : "rgba(255,255,255,0.04)", color: includeToday ? "#e5e7eb" : "rgba(255,255,255,0.35)", border: `1px solid ${includeToday ? "rgba(156,163,175,0.4)" : "rgba(255,255,255,0.1)"}` }}
+            >
+              오늘 {dayPillar.cg}{dayPillar.jj}
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-3 mb-4 text-[11px]">
+            <label className="flex items-center gap-1.5 text-gray-500">
+              대운 선택
+              <select
+                value={activeDaewoonIdx}
+                onChange={e => setSelDaewoonIdx(Number(e.target.value))}
+                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-gray-200"
+              >
+                {daewoon.pillars.map((p, i) => (
+                  <option key={i} value={i}>{p.age}세~ {p.cg}{p.jj}</option>
+                ))}
+              </select>
+            </label>
+            <label className="flex items-center gap-1.5 text-gray-500">
+              세운 연도
+              <input
+                type="number"
+                value={thisYear}
+                onChange={e => setSelSewoonYear(Number(e.target.value))}
+                className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-gray-200"
+              />
+            </label>
+          </div>
+
+          <OhaengPentagon scores={ohaengScores} />
         </div>
         </FadeIn>
 
