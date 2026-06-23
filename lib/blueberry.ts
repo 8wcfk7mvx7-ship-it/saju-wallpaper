@@ -23,3 +23,10 @@ export function deductBalance(amount: number): boolean {
 export function setBalance(amount: number): void {
   localStorage.setItem(KEY, String(amount));
 }
+
+// 한국 시간(Asia/Seoul, UTC+9) 기준 "YYYY-MM-DD" 날짜 문자열
+export function getKstDateString(): string {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().slice(0, 10);
+}

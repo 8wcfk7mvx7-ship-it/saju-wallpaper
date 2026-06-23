@@ -194,6 +194,22 @@ export default function MyPage() {
           </div>
         )}
 
+        {/* 출석체크하고 별조각 받기 */}
+        {(
+          <button onClick={() => router.push("/attendance")}
+            className="w-full mb-3 p-4 rounded-2xl flex items-center justify-between"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">📅</span>
+              <div className="text-left">
+                <p className="text-sm font-bold text-white">출석체크하고 별조각 받기</p>
+                <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>한국시간 기준 하루 1회, ✦ 1개 적립</p>
+              </div>
+            </div>
+            <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>›</span>
+          </button>
+        )}
+
         {/* 광고 보고 별조각 받기 */}
         {(
           <button onClick={() => router.push("/ad-reward")}
