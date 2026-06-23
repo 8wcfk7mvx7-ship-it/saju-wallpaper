@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
-import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex } from "@/lib/zimidousu";
+import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex, matchZimiTmi } from "@/lib/zimidousu";
 import { calcZiwei, getHourBranchIndex, BRANCHES, type ZiweiResult } from "@/lib/ziwei";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -213,6 +213,7 @@ export default function ZimidousuPage() {
   const star = MAIN_STARS[starKey];
   const myeonggungPalace = PALACES[0];
   const palaceJiji = getPalaceJiji(result.myeonggungIdx);
+  const tmiList = chart ? matchZimiTmi(chart.palaces) : [];
 
   return (
     <main className="min-h-screen bg-[#0c0816] text-white">
@@ -296,6 +297,20 @@ export default function ZimidousuPage() {
                   );
                 })
               )}
+            </div>
+          </div>
+        )}
+
+        {/* 명식에 실제로 등장하는 주성·궁 조합에 맞는 TMI만 골라서 보여줌 */}
+        {tmiList.length > 0 && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-fuchsia-300 mb-3">내 명식에 해당하는 자미두수 TMI</p>
+            <div className="space-y-3">
+              {tmiList.map(t => (
+                <div key={t.id} className="rounded-xl px-4 py-3 bg-fuchsia-950/20 border border-fuchsia-700/20">
+                  <p className="text-[12.5px] text-gray-300 leading-relaxed">{t.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}

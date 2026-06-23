@@ -1,3 +1,5 @@
+import type { ZiweiPalace } from "./ziwei";
+
 // zimidousu.ts — 자미두수(紫微斗數) 라이트 버전 데이터베이스
 // 12궁(宮)과 14주성(主星)의 기본 데이터 + 명궁(命宮) 산출 로직
 // 정통 자미두수의 전체 별자리 배치는 오행국·기성결 등 복잡한 절차를 거치지만,
@@ -177,6 +179,65 @@ export function getSingungJiji(lunarMonth: number, hour: number | null): string 
 // 명궁을 기준으로 12궁이 순행 배치된다고 보고, 각 궁의 지지를 반환
 export function getPalaceJiji(myeonggungIndex: number): string[] {
   return Array.from({ length: 12 }, (_, i) => JIJI[(myeonggungIndex + i) % 12]);
+}
+
+export interface ZimiTmi {
+  id: string;
+  text: string;
+  match: (palaces: ZiweiPalace[]) => boolean;
+}
+
+function palaceOf(palaces: ZiweiPalace[], name: string): ZiweiPalace | undefined {
+  return palaces.find(p => p.palaceName === name);
+}
+
+// 자미두수에서 자주 화제가 되는 "한 줄 TMI" — 명식에 실제로 등장하는 주성·궁 조합만 매칭한다.
+// (좌보·우필·경양·타라·천형·천요 등 보좌성/살성과 묘왕지평함 등급은 라이트 버전 엔진 범위 밖이라 제외했어요.)
+export const ZIMI_TMI: ZimiTmi[] = [
+  {
+    id: "myeonggung-ziwei-only",
+    text: "명궁에 자미 하나만 단독으로 자리하고 있어요. 고집이 꽤 강하고 남의 말을 잘 듣지 않는 타입이에요. 사람을 가려서 사귀고 호불호가 분명한 편이에요.",
+    match: palaces => { const p = palaceOf(palaces, "명궁"); return !!p && p.stars.length === 1 && p.stars[0] === "자미"; },
+  },
+  {
+    id: "myeonggung-chilsal-only",
+    text: "명궁에 칠살 하나만 단독으로 자리하고 있어요. 사무직처럼 정해진 틀보다 예체능·의료·경찰·사업처럼 스스로 판을 짜는 일이 잘 맞아요. 본인이 본 사주 풀이가 마음에 들지 않으면 그 풀이 자체를 잘 믿지 않으려는 면도 있어요.",
+    match: palaces => { const p = palaceOf(palaces, "명궁"); return !!p && p.stars.length === 1 && p.stars[0] === "칠살"; },
+  },
+  {
+    id: "myeonggung-empty",
+    text: "명궁에 자리한 주성이 없는 '공궁(空宮)'이에요. 고집은 센데 그 고집을 뒷받침할 근거가 약해서, 사람을 너무 쉽게 믿었다가 곤란을 겪을 수 있어요. 중요한 결정 앞에서는 한 번 더 검증하는 습관을 들이면 좋아요.",
+    match: palaces => { const p = palaceOf(palaces, "명궁"); return !!p && p.stars.length === 0; },
+  },
+  {
+    id: "myeonggung-cheongi",
+    text: "명궁에 천기가 자리하고 있어요. 늘 누군가를 보좌하는 2인자 자리에서 능력이 빛나지만, 마음 한편에는 스스로 중심이 되고 싶은 욕구도 함께 있어요. 그 욕구를 인정하고 조절하는 게 관계를 오래 지키는 비결이에요.",
+    match: palaces => { const p = palaceOf(palaces, "명궁"); return !!p && p.stars.includes("천기"); },
+  },
+  {
+    id: "janyeo-yeomjeong-ziwei",
+    text: "자녀궁에 염정·자미의 기운이 자리하고 있어요. 자녀가 보통보다 성격이 강하고 주관이 뚜렷한 편이라, 어릴 때부터 본인의 의견을 존중해주는 양육이 잘 맞아요.",
+    match: palaces => { const p = palaceOf(palaces, "자녀"); return !!p && (p.stars.includes("염정") || p.stars.includes("자미")); },
+  },
+  {
+    id: "gwallok-geomun",
+    text: "관록궁에 거문이 자리하고 있어요. 말로 풀어내는 직업과 잘 맞아요 — 강의·법률·서비스·상담·콜센터처럼 언변이 무기가 되는 일에서 강점을 발휘해요.",
+    match: palaces => { const p = palaceOf(palaces, "관록"); return !!p && p.stars.includes("거문"); },
+  },
+  {
+    id: "bucheo-cheonryang",
+    text: "부처궁에 천량이 자리하고 있어요. 배우자가 나보다 나이가 많거나, 다정함이 깊어져 때로는 집착처럼 느껴질 수 있어요. 신뢰가 쌓이고 나면 누구보다 오래, 단단하게 곁을 지키는 사람이에요.",
+    match: palaces => { const p = palaceOf(palaces, "부처"); return !!p && p.stars.includes("천량"); },
+  },
+  {
+    id: "jilaek-ziwei",
+    text: "질액궁에 자미가 자리하고 있어요. 체질적으로 살이 잘 붙는 편이라 한 번 찐 살을 빼는 데 시간이 좀 걸려요. 꾸준한 루틴을 만들어두는 게 평소 컨디션 관리에 큰 도움이 돼요.",
+    match: palaces => { const p = palaceOf(palaces, "질액"); return !!p && p.stars.includes("자미"); },
+  },
+];
+
+export function matchZimiTmi(palaces: ZiweiPalace[]): ZimiTmi[] {
+  return ZIMI_TMI.filter(t => t.match(palaces));
 }
 
 // 명궁 지지의 오행에 대응하는 대표 주성 목록
