@@ -4012,11 +4012,21 @@ export function detectGagukPatterns(result: SajuResult): GagukPattern[] {
           : "두뇌 회전이 빠르고 말 한마디가 날카롭게 꽂히는 타입. 이성은 '대화하고 싶다'는 본능을 느낍니다." });
     }
   }
-  // 목화통명: 갑·을 일간 + 화 기운 강함
-  if (["갑","을"].includes(ilgan) && (dom.includes("화") || sc.화 >= 2)) {
-    patterns.push({ name:"목화통명", hanja:"木火通明", color:"#fbbf24",
-      desc:"목(木)이 화(火)를 품어 빛이 사방으로 통하는 사주. 지혜와 화려함이 동시에 발산됩니다.",
-      charmDesc:"눈빛이 빛나고 말할 때 에너지가 강하게 뿜어나옵니다. 처음 만난 이성이 '이 사람 특별하다'를 직감합니다." });
+  // 목화통명: 갑·을 일간이 ① 통근하여 뿌리가 있고(목이 완전히 무력하지 않음)
+  // ② 천간에 병·정화가 투출하여 식상(또는 상관)으로 빛을 발하며
+  // ③ 화기가 적절히 유기하되 과열(목분비회)되지 않고
+  // ④ 수의 극제로 화가 꺼지거나, 금의 과다한 극제로 목이 먼저 꺾이지 않은 경우에만 성립한다.
+  if (["갑","을"].includes(ilgan)) {
+    const mokHasRoot = sc.목 >= 1.5 || pillars.some(p => ["갑","을"].includes(p.cg) && p !== pd.day) || pillars.some(p => ["인","묘"].includes(p.jj));
+    const hwaTugan = pillars.some(p => p.cg === "병" || p.cg === "정");
+    const hwaJeokjeol = sc.화 >= 1.5 && sc.화 < 4;
+    const noSuGeukHwa = sc.수 < sc.화;
+    const noGeumGeukMok = sc.금 <= sc.목 + 1;
+    if (mokHasRoot && hwaTugan && hwaJeokjeol && noSuGeukHwa && noGeumGeukMok) {
+      patterns.push({ name:"목화통명", hanja:"木火通明", color:"#fbbf24",
+        desc:"목(木)이 화(火)를 품어 빛이 사방으로 통하는 사주. 뿌리가 단단한 목이 화를 적절히 길러내 지혜와 화려함이 동시에 발산됩니다.",
+        charmDesc:"눈빛이 빛나고 말할 때 에너지가 강하게 뿜어나옵니다. 처음 만난 이성이 '이 사람 특별하다'를 직감합니다." });
+    }
   }
   // 화토동궁: 병·정 일간 + 토 기운 강함
   if (["병","정"].includes(ilgan) && (dom.includes("토") || sc.토 >= 2)) {

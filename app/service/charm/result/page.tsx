@@ -363,11 +363,8 @@ function CharmResultContent() {
               <p className="text-sm text-gray-200 leading-relaxed">{idata.hiddenMagic}</p>
             </div>
             <div className="bg-red-500/[0.06] border border-red-500/20 rounded-2xl p-5 mb-4">
-              <p className="text-xs font-bold tracking-widest text-red-400 uppercase mb-3">⚠️ 찐친이 보게 되는 실체</p>
-              <p className="text-sm text-red-200/80 leading-relaxed">{idata.realSelf}</p>
-            </div>
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">연애할 때 드러나는 치명적 약점</p>
+              <p className="text-xs font-bold tracking-widest text-red-400 uppercase mb-3">⚠️ 연애할 때 드러나는 치명적 약점</p>
+              <p className="text-sm text-red-200/80 leading-relaxed mb-3">{idata.realSelf}</p>
               <p className="text-sm text-gray-300 leading-relaxed">{idata.fatalFlaw}</p>
             </div>
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">

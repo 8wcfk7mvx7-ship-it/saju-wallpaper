@@ -165,18 +165,12 @@ const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
   수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
 };
 
-interface FormState {
-  name: string;
-}
-
 // ─── 매인 컴포넌트 ────────────────────────────────────────────────────────────
 export default function CharmPage() {
   const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  const [counter] = useState(() => Math.floor(Math.random() * 600) + 3500);
-  const [form, setForm] = useState<FormState>({ name: "" });
   const [birthData, setBirthData] = useState<BirthFormData>(defaultBirthData("female"));
 
   useEffect(() => {
@@ -206,7 +200,7 @@ export default function CharmPage() {
     let y = birthData.birthYear === "" ? NaN : Number(birthData.birthYear);
     let mo = birthData.birthMonth === "" ? NaN : Number(birthData.birthMonth);
     let d = birthData.birthDay === "" ? NaN : Number(birthData.birthDay);
-    if (!form.name || isNaN(y) || isNaN(mo) || isNaN(d)) {
+    if (!birthData.name || isNaN(y) || isNaN(mo) || isNaN(d)) {
       alert("이름과 생년월일을 모두 입력해주세요.");
       return;
     }
@@ -226,16 +220,16 @@ export default function CharmPage() {
     }
     const h = birthData.birthHour;
     const min = birthData.birthMinute ?? 0;
-    saveSajuData({ name: form.name, gender: birthData.gender, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, birthHourUnknown: h === null, birthPlace: birthData.city || "서울", style: "auto", useJajasi: birthData.useJajasi });
-    const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, name: form.name, gender: birthData.gender, birthPlace: birthData.city || "서울", style: "auto", productType: "report", useJajasi: birthData.useJajasi });
-    const charmData = { form: { ...form, birthHour: h, birthMinute: h != null ? min : null }, result: r };
+    saveSajuData({ name: birthData.name, gender: birthData.gender, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, birthHourUnknown: h === null, birthPlace: birthData.city || "서울", style: "auto", useJajasi: birthData.useJajasi });
+    const r = analyzeSaju({ birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null, name: birthData.name, gender: birthData.gender, birthPlace: birthData.city || "서울", style: "auto", productType: "report", useJajasi: birthData.useJajasi });
+    const charmData = { form: { ...birthData, birthYear: y, birthMonth: mo, birthDay: d, birthHour: h, birthMinute: h != null ? min : null }, result: r };
     try { sessionStorage.setItem("charmData", JSON.stringify(charmData)); } catch {}
     setStep("loading");
   };
 
   // ── 로딩 ─────────────────────────────────────────────────────────────────
   if (step === "loading") return (
-    <AnalysisLoading subject={`${form.name}님의 매력`} onDone={() => router.push("/service/charm/result")} />
+    <AnalysisLoading subject={`${birthData.name}님의 매력`} onDone={() => router.push("/service/charm/result")} />
   );
 
   // ── 엔트리 ───────────────────────────────────────────────────────────────
@@ -254,12 +248,6 @@ export default function CharmPage() {
               <span className="text-xs font-bold text-pink-300 tracking-widest uppercase">Summer Palace · 매력 분석</span>
             </div>
             <div className="text-5xl drop-shadow-[0_0_40px_rgba(244,114,182,0.6)]">✨</div>
-            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-              <span className="text-indigo-200 text-sm font-semibold">
-                지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 매력 분석 중
-              </span>
-            </div>
           </div>
         </FadeIn>
         <div className="space-y-4 mb-14">
@@ -306,9 +294,9 @@ export default function CharmPage() {
           <p className="text-gray-400 text-sm">일간 매력 · 신살 · 오행 외모 · 찐친이 보는 실체</p>
         </div>
         <ProfilePicker onSelect={p => {
-          setForm(f => ({ ...f, name: p.name }));
           setBirthData(prev => ({
             ...prev,
+            name: p.name,
             gender: p.gender,
             birthYear: p.birthYear || "",
             birthMonth: p.birthMonth || "",
@@ -320,11 +308,6 @@ export default function CharmPage() {
         }} />
 
         <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 space-y-6 shadow-2xl shadow-black/40">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">이름</label>
-            <input type="text" placeholder="홍길동" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition" />
-          </div>
           <BirthInputForm value={birthData} onChange={setBirthData} accent="#a855f7" />
           <button onClick={handleAnalyze}
             className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-pink-900/40">
