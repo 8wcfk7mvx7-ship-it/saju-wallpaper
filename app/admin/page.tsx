@@ -325,7 +325,7 @@ export default function AdminPage() {
                 <p className="text-xs text-gray-500 mt-1">오늘 +{stats?.kakaoTodayCount ?? 0}명</p>
               </div>
               <div className="rounded-2xl p-4" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                <p className="text-xs text-violet-400 font-bold mb-1">블루베리 충전 매출</p>
+                <p className="text-xs text-violet-400 font-bold mb-1">별조각 충전 매출</p>
                 <p className="text-2xl font-black text-white">₩{statsLoading ? "—" : (stats?.blueberryRevenue ?? 0).toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">{(stats?.blueberryPayments ?? []).length}건</p>
               </div>
@@ -561,7 +561,7 @@ create table if not exists chat_questions (
             {/* 블루베리 충전 내역 */}
             <div className="rounded-2xl p-5" style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.15)" }}>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-bold text-violet-400">블루베리 충전 내역</p>
+                <p className="text-xs font-bold text-violet-400">별조각 충전 내역</p>
                 <span className="text-xs font-black text-violet-300">총 ₩{(stats?.blueberryRevenue ?? 0).toLocaleString()}</span>
               </div>
               {(stats?.blueberryPayments ?? []).length === 0
