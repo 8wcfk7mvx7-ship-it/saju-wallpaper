@@ -286,6 +286,8 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   암록:     {hanja:"暗祿",   category:"lucky",    desc:"숨겨진 복록. 뜻밖의 도움이나 재물이 생겨요"},
   // 중성
   진도화:   {hanja:"眞桃花", category:"neutral",  desc:"일지 기준 진짜 도화. 이성 매력과 인기가 매우 강해요"},
+  가도화:   {hanja:"假桃花", category:"neutral",  desc:"도화 기운이 한두 자리에만 약하게 자리해, 화려함보다는 잔잔하게 스며드는 매력이에요"},
+  편야도화: {hanja:"遍野桃花", category:"neutral", desc:"도화 기운이 사주 전체에 두루 퍼져 있어 어디서든 시선을 끄는 강한 매력이에요. 다만 관계가 산만해지거나 구설에 오르기 쉬우니 한 사람에게 집중하는 연습이 필요해요"},
   귀문관살: {hanja:"鬼門關殺",category:"neutral", desc:"영적 감수성이 예민하고 신경이 날카로워요. 예술·철학에 소질이 있어요"},
   // 흉신(凶神)
   홍염살:   {hanja:"紅艶殺", category:"unlucky",  desc:"이성 관계가 복잡해지기 쉽고 색정 구설이 있어요"},
@@ -1483,8 +1485,15 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   for (const ss of ['역마살','장성살','화개살','반안살','겁살','재살','망신살','지살','천살','월살','년살','육해살']) {
     addSinsal(ss, detailArr.filter(p => p.d.sinsal === ss).map(p => p.label));
   }
-  // 도화살 (연지 삼합그룹 기준 도화 지지)
-  addSinsal('도화살', detailArr.filter(p => p.d.jj === getDohwaJj(yeonji)).map(p => p.label));
+  // 도화살 (연지 삼합그룹 기준 도화 지지) — 기존 호환을 위해 플래그는 유지하되,
+  // 매력 점수 산정을 위해 자리한 위치 개수에 따라 가도화(1~2자리)/편야도화(3자리 이상)로 세분화한다.
+  const dohwaPillars = detailArr.filter(p => p.d.jj === getDohwaJj(yeonji)).map(p => p.label);
+  addSinsal('도화살', dohwaPillars);
+  if (dohwaPillars.length >= 3) {
+    addSinsal('편야도화', dohwaPillars);
+  } else if (dohwaPillars.length > 0) {
+    addSinsal('가도화', dohwaPillars);
+  }
   // 천을귀인
   const cheonulJjs = CHEONUL_JJ[ilgan] || [];
   addSinsal('천을귀인', detailArr.filter(p => cheonulJjs.includes(p.d.jj)).map(p => p.label));
