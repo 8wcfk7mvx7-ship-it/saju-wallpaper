@@ -936,10 +936,6 @@ export default function MainPage() {
   }, [showLangMenu]);
 
   useEffect(() => {
-    fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: "/" }) }).catch(() => {});
-  }, []);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       setActivityVisible(false);
       setTimeout(() => {

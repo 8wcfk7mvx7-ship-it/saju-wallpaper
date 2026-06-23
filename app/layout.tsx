@@ -5,6 +5,7 @@ import AutoLogout from "@/components/AutoLogout";
 import SiteHeader from "@/components/SiteHeader";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import NativeBridge from "@/components/NativeBridge";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const chosun = localFont({
   src: "./fonts/ChosunilboMyungjo.woff",
@@ -92,6 +93,7 @@ export default function RootLayout({
       <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
         <AutoLogout />
         <NativeBridge />
+        <PageViewTracker />
         <SiteHeader />
         <div style={{ paddingBottom: "calc(56px + env(safe-area-inset-bottom))" }} className="sm:pb-0">
           {children}
