@@ -169,7 +169,30 @@ export default function WealthPage() {
   const sikSangCount = totalCount("식신") + totalCount("상관");
   const inseongCount = totalCount("정인") + totalCount("편인");
   const bigeopCount = totalCount("비견") + totalCount("겁재");
+  const guanseongCount = totalCount("정관") + totalCount("편관");
+  const sikSinCount = totalCount("식신");
   const hasMuJae = jaeseongCount === 0;
+
+  // "부자들의 사주" 3가지 패턴 — 해당 조건을 만족할 때만 노출
+  const richPatterns: { title: string; desc: string }[] = [];
+  if (r.yongshin.strength === "신강" && jaeseongCount >= 2) {
+    richPatterns.push({
+      title: "스스로의 기운이 단단해 큰 재물을 감당하는 구조",
+      desc: "일간의 기운 자체가 튼튼하고, 재물을 의미하는 글자도 뿌리 깊게 자리하고 있습니다. 재물은 그릇이 큰 사람에게 모이는 법인데, 이 사주는 그 그릇 자체가 단단해서 큰돈이 들어와도 흔들리지 않고 감당할 수 있는 구조예요. 작은 수입에 머물기보다 사업 확장이나 투자처럼 그릇을 키우는 선택을 할 때 타고난 흐름을 제대로 쓸 수 있습니다.",
+    });
+  }
+  if (sikSinCount >= 1 && jaeseongCount >= 1) {
+    richPatterns.push({
+      title: "끊임없이 재물을 만들어내는 샘을 가진 구조",
+      desc: "내 안의 창의력과 활동력이 재물로 곧장 이어지는 흐름을 갖고 있습니다. 한 번 벌고 끝나는 게 아니라, 아이디어와 손길이 닿는 일마다 새로운 수익이 계속 생겨나는 마르지 않는 샘 같은 구조예요. 가만히 있기보다 끊임없이 무언가를 만들고 시도할 때 재물이 자연스럽게 따라옵니다.",
+    });
+  }
+  if (jaeseongCount >= 1 && guanseongCount >= 1) {
+    richPatterns.push({
+      title: "재물과 명예가 나란히 따라오는 구조",
+      desc: "돈을 의미하는 기운과 사회적 지위를 의미하는 기운이 사주 안에 함께 자리하고 있습니다. 부를 얻으면 그에 걸맞은 직책이나 평판이 따라오고, 그 지위가 다시 재물을 지켜주는 식으로 서로를 밀어주는 구조예요. 돈만 좇기보다 신뢰와 책임을 함께 쌓아갈 때 두 가지가 동시에 커지는 흐름을 타게 됩니다.",
+    });
+  }
 
   // "사주에서 가장 강한 기운"은 만세력 기준대로 천간뿐 아니라 지지(본기)의 십성까지 모두 합산해 판단한다.
   const topCounts: Record<string, number> = {};
@@ -266,13 +289,27 @@ export default function WealthPage() {
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-amber-300 mb-1">
-            사주 구조 진단 — {r.yongshin.strength} · 용신 &apos;{yongshinEl}&apos; ({yongshinSipseong})
+            사주 구조 진단 — 용신 &apos;{yongshinEl}&apos; ({yongshinSipseong})
           </p>
           <p className="text-xs text-gray-500 mb-2">{r.yongshin.desc}</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            월주·연주를 포함한 사주 전체의 조후(調候)와 신강·신약을 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.
+            사주 전체의 기운이 균형을 이루려면 무엇이 더 필요한지를 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.
           </p>
         </div>
+
+        {richPatterns.length > 0 && (
+          <div className="bg-gradient-to-br from-yellow-950/50 to-amber-950/30 border border-yellow-700/30 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-yellow-300 mb-3">✨ 큰 재물을 모으는 사람들과 닮은 구조</p>
+            <div className="space-y-4">
+              {richPatterns.map((p, i) => (
+                <div key={i} className={i > 0 ? "pt-4 border-t border-yellow-700/20" : ""}>
+                  <p className="text-sm font-bold text-yellow-200 mb-1">{p.title}</p>
+                  <p className="text-sm text-gray-300 leading-relaxed">{p.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {moneyCombo && (
           <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
