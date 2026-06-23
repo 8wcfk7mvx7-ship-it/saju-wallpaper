@@ -53,7 +53,7 @@ function TermsContent() {
             <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
           </div>
           <h1 className="text-2xl font-black text-white mb-2">이용약관 · 환불규정</h1>
-          <p className="text-sm text-gray-600">최종 수정일: 2026년 5월 31일 &middot; 시행일: 2025년 1월 1일</p>
+          <p className="text-sm text-gray-600">최종 수정일: 2026년 6월 23일 &middot; 시행일: 2026년 6월 23일</p>
         </div>
 
         {/* 탭 */}

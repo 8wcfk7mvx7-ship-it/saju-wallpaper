@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
           </div>
           <h1 className="text-2xl font-black text-white mb-2">개인정보처리방침</h1>
-          <p className="text-sm text-gray-600">최종 수정일: 2026년 5월 29일 · 시행일: 2025년 1월 1일</p>
+          <p className="text-sm text-gray-600">최종 수정일: 2026년 6월 23일 · 시행일: 2026년 6월 23일</p>
         </div>
 
         <div className="space-y-8 text-sm leading-relaxed">
@@ -202,6 +202,13 @@ export default function PrivacyPage() {
                 <li>브라우저 저장 데이터 직접 삭제: 브라우저 → 개발자도구 → Application → Local Storage 삭제</li>
               </ul>
               <p className="mt-2">권리 행사 요청을 받은 경우 회사는 지체 없이 필요한 조치를 취합니다. 개인정보 관련 문의는 아래 연락처로 접수하시기 바랍니다.</p>
+              <p className="mt-2">정보주체는 개인정보 침해로 인한 구제를 받기 위하여 개인정보분쟁조정위원회, 개인정보침해신고센터 등에 분쟁해결이나 상담을 신청할 수 있습니다. 그 밖의 개인정보 침해 신고·상담은 아래 기관에 문의하시기 바랍니다.</p>
+              <ul className="list-disc list-inside space-y-1 text-gray-500">
+                <li>개인정보분쟁조정위원회: 1833-6972 (www.kopico.go.kr)</li>
+                <li>개인정보침해신고센터: 국번없이 118 (privacy.kisa.or.kr)</li>
+                <li>대검찰청: 국번없이 1301 (www.spo.go.kr)</li>
+                <li>경찰청 사이버범죄 신고시스템: 국번없이 182 (ecrm.police.go.kr)</li>
+              </ul>
             </div>
           </section>
 
@@ -226,8 +233,8 @@ export default function PrivacyPage() {
             </h2>
             <div className="text-gray-400 pl-7 space-y-1">
               <p>현 개인정보처리방침 내용 추가, 삭제 및 수정이 있을 경우에는 개정 최소 7일 전부터 서비스 내 공지사항을 통하여 고지할 것입니다. 다만, 이용자 권리의 중대한 변경이 있을 경우에는 최소 30일 전에 고지합니다.</p>
-              <p>- 공고일자: 2026년 5월 29일</p>
-              <p>- 시행일자: 2025년 1월 1일</p>
+              <p>- 공고일자: 2026년 6월 23일</p>
+              <p>- 시행일자: 2026년 6월 23일</p>
             </div>
           </section>
 
