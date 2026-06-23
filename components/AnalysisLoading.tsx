@@ -19,6 +19,14 @@ const ROTATING_MSGS = [
   "결과를 정리하는 중...",
 ];
 
+// 받침 유무에 따라 "을"/"를" 조사를 고른다.
+function objectParticle(word: string): string {
+  const ch = word.trim().slice(-1);
+  const code = ch.charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return "를";
+  return code % 28 === 0 ? "를" : "을";
+}
+
 interface Props {
   /** "홍길동님의 매력" 또는 "두 사람의 궁합" 형태로 전달 */
   subject: string;
@@ -92,7 +100,7 @@ export default function AnalysisLoading({ subject, duration = 2800, onDone, mess
           </div>
 
           <p className="text-base font-bold mb-1" style={{ color: "rgba(255,255,255,0.9)" }}>
-            {subject}을 열심히 분석 중입니다...
+            {subject}{objectParticle(subject)} 열심히 분석 중입니다...
           </p>
           <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
             {rotatingMsgs[msgIdx]}

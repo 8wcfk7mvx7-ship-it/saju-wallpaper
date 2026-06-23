@@ -90,8 +90,21 @@ export const REL_STRENGTH_ORDER: Record<JijiRelation["type"], number> = {
   원진: 6,
 };
 
+// 같은 관계 유형 내에서도 왕지(자오묘유) > 생지(인신사해) > 고지(진술축미) 순으로 강하다.
+const JIJI_TIER: Record<string, number> = {
+  자: 0, 오: 0, 묘: 0, 유: 0,
+  인: 1, 신: 1, 사: 1, 해: 1,
+  진: 2, 술: 2, 축: 2, 미: 2,
+};
+
 export function sortJijiRelationsByStrength(relations: JijiRelation[]): JijiRelation[] {
-  return [...relations].sort((a, b) => REL_STRENGTH_ORDER[a.type] - REL_STRENGTH_ORDER[b.type]);
+  return [...relations].sort((a, b) => {
+    const typeDiff = REL_STRENGTH_ORDER[a.type] - REL_STRENGTH_ORDER[b.type];
+    if (typeDiff !== 0) return typeDiff;
+    const tierA = Math.min(JIJI_TIER[a.jjA] ?? 1, JIJI_TIER[a.jjB] ?? 1);
+    const tierB = Math.min(JIJI_TIER[b.jjA] ?? 1, JIJI_TIER[b.jjB] ?? 1);
+    return tierA - tierB;
+  });
 }
 
 // 4기둥(년/월/일/시)의 지지 배열을 받아 둘씩 짝지어 육합·삼합/반합·충·형·파·해·원진 관계를 찾아낸다.
