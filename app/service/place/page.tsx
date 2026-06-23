@@ -167,7 +167,7 @@ export default function PlacePage() {
   function handleBlueberryUnlock() {
     const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
     if ((isNaN(bb) ? 0 : bb) < BLUEBERRY_PRICE) {
-      alert(`블루베리가 부족합니다. 현재 ${isNaN(bb) ? 0 : bb}개 / 필요 ${BLUEBERRY_PRICE}개`);
+      alert(`별조각이 부족합니다. 현재 ${isNaN(bb) ? 0 : bb}개 / 필요 ${BLUEBERRY_PRICE}개`);
       return;
     }
     localStorage.setItem("sp_blueberries", String(bb - BLUEBERRY_PRICE));
@@ -625,7 +625,7 @@ export default function PlacePage() {
               <button
                 onClick={handleBlueberryUnlock}
                 className="w-full py-3 font-bold text-white/70 text-sm hover:opacity-90 transition-opacity bg-white/5 border-t border-white/10">
-                🫐 블루베리 {BLUEBERRY_PRICE}개로 보기
+                ✨ 별조각 {BLUEBERRY_PRICE}개로 보기
               </button>
             )}
             <p className="text-center text-xs text-white/25 mt-3">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
