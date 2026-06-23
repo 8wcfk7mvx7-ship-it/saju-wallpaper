@@ -19,7 +19,7 @@ import {
   detectGagukPatterns,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -1072,6 +1072,12 @@ function ResultView({
               <div className="rounded-xl px-4 py-3 mb-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <p className="text-[10px] font-bold mb-1" style={{ color: "#fbbf24" }}>{iljuKey}일주 · 고집 강도 {gz.stubbornness}/5</p>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{gz.specific}</p>
+              </div>
+            )}
+            {GANYEO_ERA_SHIFT_NOTE[iljuKey] && (
+              <div className="rounded-xl px-4 py-3 mb-3" style={{ background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.15)" }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: "#60a5fa" }}>시대가 바뀌면 강함의 모양도 바뀌어요</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{GANYEO_ERA_SHIFT_NOTE[iljuKey]}</p>
               </div>
             )}
             <p className="text-[10px] font-bold mb-2" style={{ color: "#fbbf24" }}>&quot;간여지동은 팔자가 드세다&quot;? — 이 기운이 무기가 되는 이유</p>
