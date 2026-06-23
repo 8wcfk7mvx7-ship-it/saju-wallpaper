@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, getSipseongStrength, getJijiRelations, canonicalJijiPairOrder, CHEONGAN_ELEMENT, type SajuResult } from "@/lib/saju";
 import { SIPSEONG_DESC, ILGAN_MALE_IDEAL, isGwaegang, GWAEGANG_MALE_WARNING, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -400,13 +400,13 @@ export default function IdealTypePage() {
             <p className="text-sm text-gray-300 leading-relaxed">
               {hapRels.length > 0 && (
                 <>
-                  사주 안에서 <span className="text-emerald-300 font-semibold">{hapRels.map(h => `${JJ_KR[h.jjA] ?? h.jjA}·${JJ_KR[h.jjB] ?? h.jjB} ${h.type}`).join(", ")}</span>이 형성돼요.
+                  사주 안에서 <span className="text-emerald-300 font-semibold">{hapRels.map(h => { const [ja, jb] = canonicalJijiPairOrder(h.jjA, h.jjB, h.type); return `${JJ_KR[ja] ?? ja}·${JJ_KR[jb] ?? jb} ${h.type}`; }).join(", ")}</span>이 형성돼요.
                   합이 되는 지지를 가진 상대와는 처음부터 편안한 기운이 흘러요.{" "}
                 </>
               )}
               {chungRels.length > 0 && (
                 <>
-                  반면 <span className="text-rose-300 font-semibold">{chungRels.map(h => `${JJ_KR[h.jjA] ?? h.jjA}·${JJ_KR[h.jjB] ?? h.jjB} 충`).join(", ")}</span>이 있어,
+                  반면 <span className="text-rose-300 font-semibold">{chungRels.map(h => { const [ja, jb] = canonicalJijiPairOrder(h.jjA, h.jjB, h.type); return `${JJ_KR[ja] ?? ja}·${JJ_KR[jb] ?? jb} 충`; }).join(", ")}</span>이 있어,
                   해당 지지를 일지로 가진 상대와는 서로 자극은 되지만 충돌이 생기기 쉬운 구조예요. 끌리되 오래가기는 에너지가 많이 들어요.
                 </>
               )}

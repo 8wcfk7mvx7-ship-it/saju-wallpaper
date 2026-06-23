@@ -1,4 +1,12 @@
 // lib/saju.ts
+// 받침 유무에 따라 "을"/"를" 조사를 고른다.
+export function objectParticle(word: string): string {
+  const ch = word.trim().slice(-1);
+  const code = ch.charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return "를";
+  return code % 28 === 0 ? "를" : "을";
+}
+
 export type Element = "목" | "화" | "토" | "금" | "수";
 export type WallpaperStyle = "watercolor" | "pixel" | "illustration" | "game" | "cartoon" | "auto";
 
@@ -142,6 +150,31 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
     }
   }
   return relations;
+}
+
+// 두 지지를 관습적으로 통용되는 표기 순서(예: 진유합, 자오충)로 정렬해 "진유합"처럼 합쳐 보여줄 때 쓴다.
+// 위치(기둥) 기반의 jjA/jjB 순서와는 별개로, 이름을 부를 때만 canonical 순서를 따른다.
+const YUKHAP_CANON: [string, string][] = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
+const CHUNG_CANON: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
+const PA_CANON: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
+const HAE_CANON: [string, string][] = [["자","미"],["축","오"],["인","사"],["묘","진"],["신","해"],["유","술"]];
+const HYEONG_CANON: [string, string][] = [["자","묘"],["인","사"],["사","신"],["신","인"],["축","술"],["술","미"],["미","축"]];
+const SAMHAP_GROUPS_CANON: string[][] = [["인","오","술"],["사","유","축"],["신","자","진"],["해","묘","미"]];
+
+export function canonicalJijiPairOrder(jjA: string, jjB: string, type: JijiRelation["type"]): [string, string] {
+  const pairsByType: Record<string, [string, string][]> = {
+    육합: YUKHAP_CANON, 충: CHUNG_CANON, 파: PA_CANON, 해: HAE_CANON, 형: HYEONG_CANON,
+  };
+  const pairs = pairsByType[type];
+  if (pairs) {
+    const found = pairs.find(([p, q]) => (p === jjA && q === jjB) || (p === jjB && q === jjA));
+    if (found) return found;
+  }
+  if (type === "삼합" || type === "반합") {
+    const group = SAMHAP_GROUPS_CANON.find(g => g.includes(jjA) && g.includes(jjB));
+    if (group) return group.indexOf(jjA) < group.indexOf(jjB) ? [jjA, jjB] : [jjB, jjA];
+  }
+  return [jjA, jjB];
 }
 
 
@@ -2644,7 +2677,7 @@ export function monthJidongGeuksIlju(monthCg: string, monthJj: string, dayCg: st
   if (!dayTrait || !(monthGanyeoKey in GANYEO_JIDONG_ILJU)) return false;
   const monthOhaeng = CG_OHAENG[monthCg] ?? JJ_OHAENG[monthJj];
   const dayOhaeng = CG_OHAENG[dayCg];
-  return OHAENG_GEUKHAE[monthOhaeng] === dayOhaeng;
+  return OHAENG_GEUKHAE[dayOhaeng] === monthOhaeng;
 }
 
 // ── 사주 해석 원칙: 격국보다 글자 속성 중심 ──────────────────────────────
@@ -3371,10 +3404,11 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
       const cgEl = CG_OHAENG[hit.cg];
       const jjEl = JJ_OHAENG[hit.jj] ?? CG_OHAENG[JIJI_BONGI[hit.jj]?.[0] ?? ""];
       const sameJiji = cgEl === jjEl; // 같은 오행 = 통근
-      // 같은 기둥 지지가 천간을 극하는 경우 (예: 신금 위에 사화)
-      const jjGeuksCg = OHAENG_GEUKHAE[jjEl as string] === cgEl;
-      // 같은 기둥 지지가 천간을 생하는 경우
-      const jjSaengsCg = OHAENG_SAENG[jjEl as string] === cgEl;
+      // 같은 기둥 지지가 천간을 극하는 경우 (예: 신금 정관이 사화 위에 앉아 화극금으로 녹는 경우)
+      // OHAENG_GEUKHAE[X]는 "X를 극하는 오행"이므로, cgEl을 극하는 오행이 jjEl과 같으면 지지가 천간을 극한다.
+      const jjGeuksCg = OHAENG_GEUKHAE[cgEl as string] === jjEl;
+      // 같은 기둥 지지가 천간을 생하는 경우 (OHAENG_SAENG[X]는 "X를 생하는 오행")
+      const jjSaengsCg = OHAENG_SAENG[cgEl as string] === jjEl;
 
       if (isChunged) {
         score -= 0.6;
@@ -3390,7 +3424,7 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
         reasons.push(`바로 아래 지지(${hit.jj})가 ${hit.cg}의 기운을 눌러 약화시켜요`);
       } else if (jjSaengsCg) {
         score += 0.3;
-        reasons.push(`바로 아래 지지(${hit.jj})가 ${hit.cg}을 생(生)해 힘을 더해줘요`);
+        reasons.push(`바로 아래 지지(${hit.jj})가 ${hit.cg}${objectParticle(hit.cg)} 생(生)해 힘을 더해줘요`);
       }
     }
 

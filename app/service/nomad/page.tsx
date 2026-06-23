@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
+import { analyzeSaju, analyzeSipseongPatterns, getSipseongStrength, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -211,6 +211,8 @@ export default function NomadPage() {
   const strength = r.yongshin.strength;
   const matched = TYPES.find(t => t.cond(groupCounts, strength)) || DEFAULT_TYPE;
   const patterns = analyzeSipseongPatterns(r.pillarsDetail);
+  const strengthInfo = getSipseongStrength(r);
+  const strengthMap = Object.fromEntries(strengthInfo.map(s => [s.group, s])) as Record<"비겁" | "식상" | "재성" | "관성" | "인성", typeof strengthInfo[number]>;
 
   return (
     <main className="min-h-screen bg-[#0a0a14] text-white">
@@ -229,40 +231,18 @@ export default function NomadPage() {
         <div className="bg-gradient-to-br from-cyan-950/60 to-blue-950/40 border border-cyan-700/30 rounded-3xl p-6 mb-5 text-center">
           <div className="text-4xl mb-2">{matched.emoji}</div>
           <p className="text-cyan-300 text-xs font-bold tracking-widest uppercase mb-2">{matched.id}</p>
-          <p className="text-xl font-black leading-snug mb-3">{matched.title}</p>
-          <p className="text-sm text-gray-300 leading-relaxed text-left">{matched.desc}</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-3">🧭 {matched.envTitle}</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{matched.env}</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-amber-300 mb-3">💼 어울리는 일·직업 분야</p>
-          <div className="grid grid-cols-1 gap-2">
-            {matched.jobs.map((j, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm text-gray-300 leading-relaxed">
-                <span className="text-amber-400 mt-0.5">·</span>
-                <span>{j}</span>
-              </div>
-            ))}
+          <p className="text-xl font-black leading-snug mb-4">{matched.title}</p>
+          <div className="text-sm text-gray-300 leading-relaxed text-left space-y-3">
+            <p>{matched.desc} {matched.env}</p>
+            <p>구체적으로는 {matched.jobs.join(", ")} 같은 분야에서 이 기운이 잘 풀려요.</p>
+            <p>{matched.warn}</p>
+            <p className="text-cyan-200">{matched.action}</p>
           </div>
         </div>
 
-        <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-rose-300 mb-1">⚠ 이 유형이 흔히 무너지는 지점</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{matched.warn}</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-cyan-700/20 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-cyan-300 mb-1">✅ 오늘부터 해볼 수 있는 실천</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{matched.action}</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
           <p className="text-sm font-bold text-sky-300 mb-3">십성 구성으로 보는 나의 균형</p>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             {Object.entries(groupCounts).map(([g, n]) => (
               <div key={g} className="flex items-center gap-2">
                 <span className="text-xs text-gray-400 w-10">{g}</span>
@@ -273,23 +253,20 @@ export default function NomadPage() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-3 leading-relaxed">
-            식상은 새로운 것을 만드는 힘, 재성은 그것을 돈으로 바꾸는 힘, 관성은 체계와 규칙, 인성은 학습과 전문성, 비겁은 추진력과 경쟁심을 의미합니다. 이 다섯 기운의 균형이 곧 일하는 방식의 취향을 결정합니다.
-          </p>
-        </div>
-
-        {patterns.length > 0 && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-            <p className="text-sm font-bold text-violet-300 mb-3">사주 구조(격국)로 보는 추가 변수</p>
-            {patterns.slice(0, 2).map((p, i) => (
-              <div key={i} className={i > 0 ? "mt-3 pt-3 border-t border-white/5" : ""}>
-                <p className="text-sm font-bold text-gray-200 mb-1">{p.name} ({p.hanja})</p>
-                <p className="text-xs text-gray-500 mb-1 leading-relaxed">{p.desc}</p>
-                <p className="text-xs text-emerald-300 leading-relaxed">▶ {p.advice}</p>
-              </div>
+          <div className="text-sm text-gray-300 leading-relaxed space-y-2">
+            <p>
+              식상은 새로운 것을 만드는 힘, 재성은 그것을 돈으로 바꾸는 힘, 관성은 체계와 규칙, 인성은 학습과 전문성, 비겁은 추진력과 경쟁심을 의미해요. 이 다섯 기운의 균형이 곧 일하는 방식의 취향을 결정하는데, 단순히 글자 개수만이 아니라 그 글자가 어느 자리에 있고 주변 기운과 어떤 관계를 맺는지(통근·생극·충)까지 함께 봐야 진짜 세력이 보여요.
+            </p>
+            {(["비겁", "식상", "재성", "관성", "인성"] as const).map(g => (
+              <p key={g}><span className="font-bold text-gray-200">{g}</span>은 {strengthMap[g].status} — {strengthMap[g].reason}</p>
             ))}
+            {patterns.length > 0 && (
+              <p>
+                {patterns.slice(0, 2).map(p => `${p.desc} ${p.advice}`).join(" ")}
+              </p>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => router.push("/service/sidejob")}

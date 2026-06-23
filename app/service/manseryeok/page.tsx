@@ -8,7 +8,7 @@ import {
   detectSamhapBanghap, analyzeSipseongPatterns, detectByeongjon, analyzeDohwaTypes, detectChunganChung,
   JOHU_YONGSHIN, getSeasonByMonth,
   HAP_CHUNG_CHARACTER,
-  ILGAN_PERSONALITY, ILJU_60, adjustCareerByExpression,
+  ILGAN_PERSONALITY, ILJU_60, adjustCareerByExpression, canonicalJijiPairOrder,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, getJijiRelations,
@@ -655,9 +655,10 @@ function ResultView({
             <div className="mt-3 flex flex-wrap justify-center gap-1.5">
               {relations.map((r, i) => {
                 const st = REL_STYLE[r.type];
+                const [ja, jb] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
                 return (
                   <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
-                    {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {r.jjA}{r.jjB} {r.type}
+                    {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {ja}{jb} {r.type}
                   </span>
                 );
               })}

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
-  getJijiRelations, sortJijiRelationsByStrength, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
+  getJijiRelations, sortJijiRelationsByStrength, canonicalJijiPairOrder, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -512,7 +512,7 @@ export default function TodayFortunePage() {
           <RelationDiagram
             cols={cols}
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: rel.type === "합" ? HAP_COLOR : CHUNG_COLOR, desc: cgRelDesc(rel.type) }))}
-            jjLines={relations.map(rel => ({ aIdx: rel.a, bIdx: rel.b, label: `${rel.jjA}${rel.jjB}${rel.type}`, color: relColor(rel.type), desc: jjRelDesc(rel.type) }))}
+            jjLines={relations.map(rel => { const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type); return { aIdx: rel.a, bIdx: rel.b, label: `${ja}${jb}${rel.type}`, color: relColor(rel.type), desc: jjRelDesc(rel.type) }; })}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
