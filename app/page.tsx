@@ -1331,9 +1331,9 @@ export default function MainPage() {
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className="relative shrink-0 w-[72px] h-[83px] flex items-center justify-center">
                 <div className="absolute inset-0 rounded-full" style={{
-                  background: "radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 45%, rgba(255,255,255,0) 75%)",
+                  background: "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 30%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0) 78%)",
                   filter: "blur(6px)",
-                  transform: "scale(1.25)",
+                  transform: "scale(1.3)",
                 }} />
                 <Image src="/mascot-guide.png" alt="사주 마스코트" width={72} height={83}
                   className="relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
