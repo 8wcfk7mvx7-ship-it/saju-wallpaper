@@ -246,6 +246,9 @@ export default function ResultPage() {
   const [birthMonth, setBirthMonth] = useState(1);
   const [aiWallpapers, setAiWallpapers] = useState<Array<{url:string;theme:string;themeKo:string}>>([]);
   const [paymentDone, setPaymentDone] = useState(false);
+  const [blueberries, setBlueberries] = useState(0);
+  const [bbError, setBbError] = useState("");
+  const [bbLoading, setBbLoading] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("sajuResult");
@@ -258,6 +261,8 @@ export default function ResultPage() {
       if (wpRaw) setAiWallpapers(JSON.parse(wpRaw));
     } catch {}
     setPaymentDone(sessionStorage.getItem("paymentDone") === "true");
+    const bb = parseInt(localStorage.getItem("sp_blueberries") ?? "0", 10);
+    setBlueberries(isNaN(bb) ? 0 : bb);
     const form = formRaw ? JSON.parse(formRaw) : {};
     setData(parsed);
     setLang(form.lang || "ko");
@@ -314,6 +319,21 @@ export default function ResultPage() {
 
   const PRICES: Record<string, string> = { mobile: "₩2,000", report: "₩8,900", bundle: "₩9,900" };
   const PRICE_AMOUNTS: Record<string, number> = { mobile: 2000, report: 8900, bundle: 9900 };
+  const bbPrice = PRICE_AMOUNTS[productType];
+  const canAffordBb = blueberries >= bbPrice;
+
+  function handleBlueberryPayment() {
+    setBbError("");
+    if (!canAffordBb) {
+      setBbError(`별조각이 부족합니다. 현재 ${blueberries.toLocaleString()}개 / 필요 ${bbPrice.toLocaleString()}개`);
+      return;
+    }
+    setBbLoading(true);
+    localStorage.setItem("sp_blueberries", String(blueberries - bbPrice));
+    sessionStorage.setItem("paymentDone", "true");
+    sessionStorage.setItem("paymentProductType", productType);
+    router.push(`/generating?productType=${productType}`);
+  }
 
   // 쟁재(爭財) 감지: 비겁이 재성보다 훨씬 많은 경우
   const det2 = sajuResult.pillarsDetail;
@@ -1578,8 +1598,46 @@ export default function ResultPage() {
             </div>
           </button>
 
+          {/* 별조각 보유 현황 */}
+          <div className="rounded-xl p-3 flex items-center justify-between" style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">✨</span>
+              <div>
+                <p className="text-[11px]" style={{ color: "#a78bfa" }}>{displayLang === "ko" ? "내 별조각" : "My Star Pieces"}</p>
+                <p className="text-sm font-black text-white">{blueberries.toLocaleString()}개</p>
+              </div>
+            </div>
+            <p className="text-xs font-bold" style={{ color: canAffordBb ? "#a78bfa" : "#f87171" }}>
+              {displayLang === "ko" ? "필요" : "Need"} {bbPrice.toLocaleString()}개
+            </p>
+          </div>
+
+          {bbError && (
+            <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{bbError}</p>
+          )}
+
           {/* 결제 버튼들 */}
           <div className="space-y-2 pt-1">
+            <button
+              onClick={handleBlueberryPayment}
+              disabled={bbLoading || !canAffordBb}
+              className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-[0.98] disabled:opacity-40"
+              style={{
+                background: canAffordBb ? "linear-gradient(135deg, #6366f1, #818cf8)" : "rgba(99,102,241,0.3)",
+                color: "#fff",
+                boxShadow: canAffordBb ? "0 6px 24px rgba(99,102,241,0.4)" : "none",
+              }}>
+              ✨ {displayLang === "ko" ? `별조각 ${bbPrice.toLocaleString()}개로 결제` : `Pay with ${bbPrice.toLocaleString()} Star Pieces`}
+              {!canAffordBb && <span className="text-xs ml-1 opacity-70">{displayLang === "ko" ? "(부족)" : "(insufficient)"}</span>}
+            </button>
+            {!canAffordBb && (
+              <button
+                onClick={() => router.push("/charge")}
+                className="w-full py-3 rounded-xl font-bold text-sm transition-all"
+                style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", color: "#a78bfa" }}>
+                ✨ {displayLang === "ko" ? "별조각 충전하기" : "Charge Star Pieces"}
+              </button>
+            )}
             <button
               onClick={() => router.push(`/payment?orderId=${data.orderId}&productType=${productType}&amount=${PRICE_AMOUNTS[productType]}`)}
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-[0.98] text-white font-bold py-4 rounded-xl transition-all text-base shadow-lg shadow-indigo-900/40">
