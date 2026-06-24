@@ -34,7 +34,21 @@ import {
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+  getJijiRelations, REL_TYPE_COLOR, sortJijiRelationsByStrength, canonicalJijiPairOrder, type JijiRelation,
 } from "@/lib/saju";
+
+// 합충 관계 유형별 짝사랑 코칭 한 줄
+const HAPCHUNG_NOTE: Record<JijiRelation["type"], string> = {
+  육합: "강한 정서적 유대와 친밀감이 형성되는 조합이에요. 처음부터 편안하게 느껴질 가능성이 높습니다.",
+  삼합: "서로의 부족한 기운을 채워주는 궁합이에요. 함께 있을 때 안정감과 시너지가 동시에 생깁니다.",
+  반합: "부분적인 합의 기운이 있어요. 완전한 삼합보다는 약하지만 긍정적인 끌림이 작용합니다.",
+  충: "강한 자극과 긴장이 동시에 존재해요. 처음엔 확 끌리지만 갈등도 잦을 수 있는 '애증' 구조입니다.",
+  형: "서로를 깎아내거나 신경전이 생기기 쉬운 조합이에요. 배려와 거리 조절이 특히 중요합니다.",
+  파: "관계가 미묘하게 어긋나거나 흐트러지는 기운이에요. 작은 오해가 쌓이지 않도록 소통이 필요합니다.",
+  해: "은근한 방해나 서운함이 쌓일 수 있는 조합이에요. 서로의 영역을 침범하지 않는 게 중요합니다.",
+  원진: "이유 없이 미묘하게 거리감이 느껴질 수 있는 궁합이에요. 시간을 들여 신뢰를 쌓아야 합니다.",
+};
+const HAPCHUNG_LABEL: Record<string, string> = { year: "연주", month: "월주", day: "일주", hour: "시주" };
 
 // 일간별 짝사랑 성공 비결
 const CRUSH_SUCCESS: Record<string, {
@@ -179,6 +193,7 @@ export default function CrushPage() {
   const [formError, setFormError] = useState("");
   const [result, setResult] = useState<CrushResult | null>(null);
   const [targetSaju, setTargetSaju] = useState<SajuResult | null>(null);
+  const [mySaju, setMySaju] = useState<SajuResult | null>(null);
 
   useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2000); return () => clearTimeout(t); }, []);
 
@@ -246,6 +261,15 @@ export default function CrushPage() {
           gender: myForm.gender, birthPlace: myForm.city || "서울",
           calType: myForm.calendarType, useJajasi: myForm.useJajasi,
         };
+        const mySajuR = analyzeSaju({
+          birthYear: my, birthMonth: mm, birthDay: md,
+          birthHour: myForm.birthHour, birthMinute: myForm.birthMinute ?? 0,
+          name: "나", gender: myForm.gender, birthPlace: myForm.city || "서울",
+          style: "auto", productType: "report", useJajasi: myForm.useJajasi,
+        });
+        setMySaju(mySajuR);
+      } else {
+        setMySaju(null);
       }
 
       const res = await analyzeCrush(
@@ -646,6 +670,81 @@ export default function CrushPage() {
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>💬 심장 흔드는 한 마디</p>
                   <p className="text-sm font-bold italic" style={{ color: "#fff" }}>{tip.phrase}</p>
                 </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* 나와의 합충(合沖) 분석 */}
+        {targetSaju && mySaju && (() => {
+          const pick = (s: SajuResult) => {
+            const p = s.pillarsDetail;
+            const arr: { label: string; jj: string }[] = [
+              { label: "연주", jj: p.year.jj },
+              { label: "월주", jj: p.month.jj },
+              { label: "일주", jj: p.day.jj },
+            ];
+            if (p.hour) arr.push({ label: "시주", jj: p.hour.jj });
+            return arr;
+          };
+          const myPillars = pick(mySaju);
+          const targetPillars = pick(targetSaju);
+          const allJj = [...myPillars.map(p => p.jj), ...targetPillars.map(p => p.jj)];
+          const myCount = myPillars.length;
+          const crossRelations = sortJijiRelationsByStrength(
+            getJijiRelations(allJj).filter(r => (r.a < myCount) !== (r.b < myCount))
+          );
+          const hapCount = crossRelations.filter(r => r.type === "육합" || r.type === "삼합" || r.type === "반합").length;
+          const chungCount = crossRelations.filter(r => r.type === "충").length;
+          const tensionCount = crossRelations.filter(r => r.type === "형" || r.type === "파" || r.type === "해" || r.type === "원진").length;
+
+          return (
+            <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.05)" }}>
+              <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: "rgba(167,139,250,0.18)" }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🔗</span>
+                  <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>나와 이 사람의 합충(合沖) 분석</h3>
+                </div>
+                <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>두 사람의 사주를 미리 대보고 잘 맞을지 살펴봐요</p>
+              </div>
+              <div className="p-5 space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                    <p className="text-lg font-black" style={{ color: "#34d399" }}>{hapCount}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>합 (끌림)</p>
+                  </div>
+                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
+                    <p className="text-lg font-black" style={{ color: "#f87171" }}>{chungCount}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>충 (자극·긴장)</p>
+                  </div>
+                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(192,132,252,0.08)", border: "1px solid rgba(192,132,252,0.2)" }}>
+                    <p className="text-lg font-black" style={{ color: "#c084fc" }}>{tensionCount}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>형·파·해·원진</p>
+                  </div>
+                </div>
+
+                {crossRelations.length === 0 && (
+                  <p className="text-sm leading-relaxed text-center py-2" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    두 사람의 사주 사이에 강하게 부딫히는 합충 관계는 없어요. 무난하게 서로를 알아갈 수 있는 궁합이에요.
+                  </p>
+                )}
+
+                {crossRelations.map((r, i) => {
+                  const [c1, c2] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
+                  const myLabel = myPillars[r.a].label;
+                  const targetLabel = targetPillars[r.b - myCount].label;
+                  return (
+                    <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: REL_TYPE_COLOR[r.type], color: "#06060e" }}>{r.type}</span>
+                        <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
+                          나({myLabel}) {c1} ↔ 그 사람({targetLabel}) {c2}
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{HAPCHUNG_NOTE[r.type]}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
