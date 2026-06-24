@@ -5,7 +5,7 @@ import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
   getJijiRelations, sortJijiRelationsByStrength, canonicalJijiPairOrder, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
-  UUNSEONG_DETAIL, ILGAN_PERSONALITY,
+  UUNSEONG_DETAIL, ILGAN_PERSONALITY, getSipseongStrength,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -604,11 +604,26 @@ export default function TodayFortunePage() {
   }
 
   // 오늘 지지가 원국/세운/대운 지지와 맺는 충·합 여부 (영역별 해설 보정용)
+  // 합과 충이 동시에 존재할 수 있으므로, 더 많이 겹치는(=기운이 더 큰) 쪽 하나만 골라서 보여준다.
   const todayRelations = relations.filter(rel => allJjLabels[rel.a] === "오늘" || allJjLabels[rel.b] === "오늘");
-  const hasTodayChung = todayRelations.some(rel => rel.type === "충") || cgRelations.some(c => c.from === "오늘" && c.type === "충");
-  const hasTodayHap = todayRelations.some(rel => rel.type === "육합" || rel.type === "삼합" || rel.type === "반합") || cgRelations.some(c => c.from === "오늘" && c.type === "합");
+  const todayHapCount = todayRelations.filter(rel => rel.type === "육합" || rel.type === "삼합" || rel.type === "반합").length
+    + cgRelations.filter(c => c.from === "오늘" && c.type === "합").length;
+  const todayChungCount = todayRelations.filter(rel => rel.type === "충").length
+    + cgRelations.filter(c => c.from === "오늘" && c.type === "충").length;
+  const todayDominantFlow: "합" | "충" | null =
+    todayHapCount === 0 && todayChungCount === 0 ? null : todayHapCount >= todayChungCount ? "합" : "충";
+  const hasTodayHap = todayDominantFlow === "합";
+  const hasTodayChung = todayDominantFlow === "충";
 
   const groupContent = GROUP_TODAY[todayGroup];
+  // 평소 사주에서 오늘 들어온 성향(그룹)이 이미 강한지/약한지 — 전문 용어 없이 풀어 설명하는 데 사용
+  const natalGroupStrength = getSipseongStrength(r).find(s => s.group === todayGroup);
+  const todayGroupFlavorText =
+    natalGroupStrength?.status === "강함"
+      ? "이 기운은 평소 나에게도 이미 두드러진 성향과 같은 결이에요. 그래서 오늘은 그 모습이 한층 더 진하게 드러나는 날이 될 수 있어요. 강점이 부각되는 만큼, 너무 한쪽으로 치우치지 않도록 균형을 챙기면 더 좋습니다."
+      : natalGroupStrength?.status === "무" || natalGroupStrength?.status === "약함"
+      ? "이 기운은 평소 나에게는 잘 드러나지 않던 결이에요. 그래서 오늘은 평소와는 조금 다른 낯선 느낌을 받을 수 있는데, 부족했던 부분을 잠시 채워주는 흐름이니 새로운 시도를 해보기에 오히려 좋은 날입니다."
+      : "이 기운은 평소 나에게 이미 적절히 자리한 결이에요. 무리하지 않고 평소의 균형을 유지하면서 하루를 보내기 좋은 흐름입니다.";
 
   // 조후/궁성 보정 오행 차트 — 원국 + (토글된) 대운·세운·오늘을 합산해 재계산
   const JOHU_BOOST_TODAY: Record<string, Partial<Record<Element, number>>> = {
@@ -779,11 +794,12 @@ export default function TodayFortunePage() {
         <div className="bg-gradient-to-br from-slate-800/40 to-zinc-900/40 border border-white/10 rounded-3xl p-6 mb-5">
           <p className="text-gray-400 text-xs font-bold tracking-widest uppercase mb-2">오늘의 총운 — 일진 {todaySipseongCg} ({todayGroup})</p>
           <p className="text-sm text-gray-200 leading-relaxed">{groupContent.총운}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mt-3">{todayGroupFlavorText}</p>
           {hasTodayHap && (
-            <p className="text-sm text-emerald-300 leading-relaxed mt-3">✦ 오늘 원국·세운과 합(合)을 이루는 기운이 있어, 전반적으로 일이 무난하게 풀리고 사람과의 관계도 부드럽게 이어질 가능성이 높은 날입니다.</p>
+            <p className="text-sm text-emerald-300 leading-relaxed mt-3">✦ 오늘은 주변 기운과 자연스럽게 맞아떨어지는 흐름이 흘러서, 전반적으로 일이 무난하게 풀리고 사람과의 관계도 부드럽게 이어질 가능성이 높은 날입니다.</p>
           )}
           {hasTodayChung && (
-            <p className="text-sm text-rose-300 leading-relaxed mt-3">⚠ 오늘 원국·세운과 충(沖)을 이루는 기운이 있어, 예상치 못한 변수나 마음이 흔들리는 일이 생기기 쉬운 날이에요. 중요한 결정은 하루 정도 미뤄보는 것도 방법입니다.</p>
+            <p className="text-sm text-rose-300 leading-relaxed mt-3">⚠ 오늘은 평소 흐름과 다소 부딪히는 기운이 들어와서, 예상치 못한 변수나 마음이 흔들리는 일이 생기기 쉬운 날이에요. 중요한 결정은 하루 정도 미뤄보는 것도 방법입니다.</p>
           )}
         </div>
         </FadeIn>
@@ -796,10 +812,10 @@ export default function TodayFortunePage() {
             오늘 일진의 천간 {dayPillar.cg}은 평소 {ilgan}일간인 {form.name || "나"}님에게 {ILGAN_PERSONALITY[dayPillar.cg]?.detail || ""}
           </p>
           {hasTodayHap && (
-            <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 내 일간과 합을 이루는 기운이 들어와 있어, {ILGAN_PERSONALITY[dayPillar.cg]?.keyword || "오늘의 기운"}이 평소보다 부드럽게 나에게 녹아드는 날이에요.</p>
+            <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 이 기운이 나와 자연스럽게 맞아떨어져, {ILGAN_PERSONALITY[dayPillar.cg]?.keyword || "오늘의 기운"}이 평소보다 부드럽게 나에게 녹아드는 날이에요.</p>
           )}
           {hasTodayChung && (
-            <p className="text-sm text-rose-300 leading-relaxed mt-2">오늘은 내 일간과 충을 이루는 기운이 들어와 있어, 평소의 나와는 다른 낯선 자극이 들어오는 느낌을 받기 쉬워요. 좋고 나쁨보다는 '환기'의 의미로 받아들이면 도움이 됩니다.</p>
+            <p className="text-sm text-rose-300 leading-relaxed mt-2">오늘은 이 기운이 평소의 나와 다소 부딪히면서, 평소와는 다른 낯선 자극이 들어오는 느낌을 받기 쉬워요. 좋고 나쁨보다는 '환기'의 의미로 받아들이면 도움이 됩니다.</p>
           )}
         </div>
         </FadeIn>
