@@ -1338,7 +1338,11 @@ export default function MainPage() {
         {/* ── 정보성 가이드 배너 ── */}
         <section id="guide-section" className="mb-10" style={{ scrollMarginTop: "72px" }}>
           <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
-            style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
+            style={{
+              background: "linear-gradient(135deg, rgba(201,168,76,0.16) 0%, rgba(201,168,76,0.05) 100%)",
+              border: "1px solid rgba(201,168,76,0.45)",
+              boxShadow: "0 0 24px rgba(201,168,76,0.15)",
+            }}>
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className="relative shrink-0 w-[72px] h-[83px] flex items-center justify-center">
                 <div className="absolute inset-0 rounded-full" style={{
@@ -1350,7 +1354,7 @@ export default function MainPage() {
                   className="relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold mb-1" style={{ color: "#c9a84c" }}>📚 사주 명리학 가이드</p>
+                <p className="text-xs font-black mb-1" style={{ color: "#e0c168" }}>📚 사주 명리학 가이드</p>
                 <p className="text-sm font-bold text-white mb-1">사주가 처음이신가요?</p>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
                   오행·천간지지·신살·대운 등 기초를 광고 없이 설명합니다.
@@ -1359,8 +1363,8 @@ export default function MainPage() {
             </div>
             <button
               onClick={() => router.push("/guide")}
-              className="shrink-0 text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
-              style={{ background: "rgba(201,168,76,0.15)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.3)" }}
+              className="shrink-0 text-sm font-black px-5 py-2.5 rounded-xl transition-all"
+              style={{ background: "#c9a84c", color: "#1a1305", border: "1px solid #c9a84c" }}
             >
               가이드 보기 →
             </button>
