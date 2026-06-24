@@ -343,6 +343,9 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   // 지지해(地支害/穿) — 방해·배신의 기운
   지지해:   {hanja:"地支害",   category:"unlucky",  desc:"육해(六害). 방해·장애가 따르며 가까운 사람의 배신을 조심하세요. 각 쌍별 작용: 자미·축오·인유·묘신·진해·사술 — 해당 기운의 충돌로 인한 음성적 갈등이에요"},
   현침살:   {hanja:"懸針殺",   category:"neutral",  desc:"말과 글로 상대의 핵심을 꿰뚫는 기운이에요. 독설도 위로도 평범하지 않고 속살을 건드려요. 잘 쓰면 탁월한 치유자, 잘못 쓰면 상처를 남겨요. 갑(甲)·신(辛)·묘(卯)·오(午)·미(未)·신(申)이 해당해요"},
+  // 의처살·의부살 — 일주(일간+일지) 기준, 일지 정재/정관 암합
+  의처살:   {hanja:"疑妻殺",   category:"unlucky",  desc:"배우자에게 집착하는 경향이 있고, 내심 배우자의 이성 관계를 의심하게 되는 기운이에요. 일지 정재암합의 작용으로 애착과 의심이 동시에 강해져요"},
+  의부살:   {hanja:"疑夫殺",   category:"unlucky",  desc:"배우자에게 집착하는 경향이 있고, 내심 배우자의 이성 관계를 의심하게 되는 기운이에요. 일지 정관암합의 작용으로 애착과 의심이 동시에 강해져요"},
 };
 
 // 양인살: 일간 기준 양인 지지
@@ -383,6 +386,113 @@ const AMROK_JJ: Record<string,string> = {
   기:'미', 경:'사', 신:'진', 임:'인', 계:'축'};
 // 백호살: 해당 일주(천간+지지)
 const BAEHO_ILJU = new Set(['갑진','을미','병술','정축','무진','기미','경술','신축','임진','계미']);
+
+// 의처살(남자)·의부살(여자): 일지 정재/정관 암합 일주
+interface UicheoUibuEntry {
+  gender: "male" | "female";
+  amhap: string; // 일지 지장간 ─ 정재/정관 암합 설명
+  base: string[]; // 기본 성향 서술
+  baekho?: boolean; // 백호살 동반 여부
+  yearGroup?: { type: "도화" | "망신"; note: string }; // 연지 삼합 그룹 조건부 서술
+  intensify?: { jj: string; note: string }; // 동주에 있으면 심각해지는 지지
+  windRisk?: { jjs: string[]; note: string }; // 바람날 가능성 지지(운에서 와도 해당)
+}
+
+const UICHEO_UIBU_DATA: Record<string, UicheoUibuEntry> = {
+  갑오: {
+    gender: "male",
+    amhap: "甲과 午중 己土 정재가 암합을 이뤄요.",
+    base: ["午火가 상관이라 애정표현에 능숙한 애처가형 의처증세를 보여요."],
+    yearGroup: { type: "도화", note: "사유축생이면 午火가 도화살이 되어 배우자의 미모와 바람기를 의심하는 인자가 더해져요." },
+    intensify: { jj: "해", note: "옆에 해(亥, 장생편인)가 함께 있으면 의심과 집착이 한층 심각해져요. (亥중 甲木과 암합)" },
+  },
+  병술: {
+    gender: "male",
+    amhap: "丙과 戌중 辛金 정재가 암합을 이뤄요.",
+    base: ["戌이 식신이자 입묘지라 '마누라 없으면 못 사는' 애처가형 의처증이에요."],
+    baekho: true,
+    intensify: { jj: "인", note: "옆에 인(寅, 편인장생)이 함께 있으면 한층 심각해져요. (寅중 丙火와 암합)" },
+  },
+  무진: {
+    gender: "male",
+    amhap: "戊와 辰중 癸水 정재가 암합을 이뤄요.",
+    base: ["辰이 비견이라, 내 배우자가 비견인 내 친구를 더 좋아한다는 의처증이에요."],
+    baekho: true,
+    windRisk: { jjs: ["인", "신", "사", "해"], note: "주변에 사생지(寅申巳亥)가 있으면 암합 인자가 되며, 이 중 巳火 편인이 있으면 특히 심해요." },
+  },
+  경진: {
+    gender: "male",
+    amhap: "庚과 辰중 乙木 정재가 암합을 이뤄요.",
+    base: [
+      "辰이 편인이라 의심이 가중되고, 辰 배우자가 용을 닮아 변화무쌍하고 바쁘게 움직여요.",
+      "辰은 인묘진(재성)·신유술(비겁)·해자축(식상)에서 모습이 다변해요.",
+    ],
+    intensify: { jj: "신", note: "옆에 신(申)이 있거나 운에서 申이 오면(申중 庚金과 암합) 한층 심각해져요." },
+  },
+  임술: {
+    gender: "male",
+    amhap: "壬과 戌중 丁火 정재가 암합을 이뤄요.",
+    base: ["戌이 관살이라 스트레스를 심하게 주는 배우자이며, 戌은 동물로는 개예요."],
+    baekho: true,
+    intensify: { jj: "신", note: "옆에 申(편인장생)이 있으면 심해지고, 亥子 운에 바람날 가능성이 있어요." },
+  },
+  을사: {
+    gender: "female",
+    amhap: "乙과 巳중 庚金 정관이 암합을 이뤄요.",
+    base: ["巳火가 욕지상관이라 잔소리·욕설·무시·변덕을 부리는 의부증세를 보여요."],
+    yearGroup: { type: "망신", note: "인오술생이면 巳火가 망신살이 되어, 남편이 철없는 바람기와 망신살의 인연이에요." },
+    intensify: { jj: "자", note: "옆에 子(편인), 巳戌귀문관살, 巳申합(극단적 히스테리)이 있으면 심해져요." },
+    windRisk: { jjs: ["묘", "진", "미"], note: "옆에 卯辰未(乙庚암합)가 있거나 운에서 오면 바람날 가능성으로 봐요." },
+  },
+  정해: {
+    gender: "female",
+    amhap: "丁과 亥중 壬水 정관이 암합을 이뤄요.",
+    base: ["亥水는 태지귀인정관이라, 겁이 많고 조바심이 있으며 유교적인 보수성을 지녀요."],
+    yearGroup: { type: "망신", note: "신자진생이면 亥水가 귀인망신이 되어, 남편이 귀공자형으로 잘생겨서 오히려 불안해져요." },
+    intensify: { jj: "묘", note: "옆에 卯(편인), 辰亥귀문관살이 있으면 丁火는 집요해서 병적인 집착을 보여요." },
+    windRisk: { jjs: ["오", "미", "술"], note: "옆에 午未戌(정임암합)이 있거나 운에서 오면 바람날 가능성으로 봐요." },
+  },
+  기해: {
+    gender: "female",
+    amhap: "己와 亥중 甲木 정관이 암합을 이뤄요.",
+    base: ["亥水는 태지라 겁이 많고 조바심이 있으며, 정재적인 애착심으로 인한 의부증이에요."],
+    yearGroup: { type: "망신", note: "신자진생이면 亥水가 망신이 되어, 남편이 내 친구나 형제와의 스캔들로 망신당할 인연이에요." },
+    intensify: { jj: "오", note: "옆에 午(편인, 甲己암합)·辰亥귀문관살이 있으면 심해져요." },
+    windRisk: { jjs: ["축", "오", "미"], note: "옆에 丑午未(甲己암합)가 있거나 운에서 오면 바람날 가능성으로 봐요." },
+  },
+  신사: {
+    gender: "female",
+    amhap: "辛과 巳중 丙火 정관이 암합을 이뤄요.",
+    base: [
+      "巳는 절지정관이라, 남편이 밖에서는 호인이지만 안에서는 무정하고 보수적이에요.",
+      "巳火는 巳酉丑 금국(金局)의 삼합운동으로 늘 변하기를 원해요. 巳戌·巳申은 전형적인 변태 기질이라 잘 쓰면 천재성, 잘못 쓰면 신병으로 이어져요.",
+    ],
+    yearGroup: { type: "망신", note: "인오술생이면 巳火가 망신살이 되어, 남편이 겉은 신사 기질이나 속은 변태(巳)성을 지녀요." },
+    intensify: { jj: "축", note: "옆에 丑(편인, 丙辛암합), 巳戌귀문관살, 巳申합이 있으면 심해져요." },
+  },
+  계해: {
+    gender: "female",
+    amhap: "癸와 亥중 戊土 정관이 암합을 이뤄요.",
+    base: ["亥중 戊土가 부부궁에 절지를 깔았으니, 밖으로만 도는 남편이 늘 의심스러워요."],
+    yearGroup: { type: "망신", note: "신자진생이면 亥水가 망신이 되어, 남편이 내 친구나 형제와의 스캔들로 망신당할 인연이에요." },
+    intensify: { jj: "유", note: "옆에 酉(편인병지)가 있으면 청정수가 되어, 아주 예민한 결벽성 의부증을 보여요." },
+    windRisk: { jjs: ["자", "축"], note: "옆에 子丑(戊癸암합)이 있거나 운에서 오면 바람날 가능성으로 봐요." },
+  },
+};
+
+function getUicheoUibuNarrative(dayCg: string, dayJj: string, gender: "male" | "female", yeonji: string, jjSet: Set<string>): string {
+  const entry = UICHEO_UIBU_DATA[dayCg + dayJj];
+  if (!entry || entry.gender !== gender) return "";
+  const lines = [entry.amhap, ...entry.base];
+  if (entry.baekho) lines.push("백호살을 동반해 배우자와의 이별·사별 가능성의 인자도 함께 자리해요.");
+  if (entry.yearGroup) {
+    const hit = entry.yearGroup.type === "도화" ? getDohwaJj(yeonji) === dayJj : getSinsal(yeonji, dayJj) === "망신살";
+    if (hit) lines.push(entry.yearGroup.note);
+  }
+  if (entry.intensify && jjSet.has(entry.intensify.jj)) lines.push(entry.intensify.note);
+  if (entry.windRisk && entry.windRisk.jjs.some(jj => jjSet.has(jj))) lines.push(entry.windRisk.note);
+  return lines.join(" ");
+}
 // 귀문관살: 지지 쌍 (어느 방향이든)
 const GWIMUN_PAIRS = [['자','유'],['축','오'],['인','미'],['묘','신'],['진','해'],['사','술']];
 // 원진살: 지지 쌍
@@ -1587,6 +1697,19 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   // 백호살: 일주(일간+일지) 조합
   if (BAEHO_ILJU.has(dayPillar.cg + dayPillar.jj)) {
     addSinsal('백호살', ['일']);
+  }
+  // 의처살(남)·의부살(여): 일주(일간+일지) + 성별 조합 (일지 정재/정관 암합)
+  {
+    const uuEntry = UICHEO_UIBU_DATA[dayPillar.cg + dayPillar.jj];
+    if (uuEntry && uuEntry.gender === input.gender) {
+      const name = input.gender === 'male' ? '의처살' : '의부살';
+      const info = SINSAL_INFO[name];
+      sinsalList.push({
+        name, hanja: info.hanja, pillars: ['일'],
+        desc: getUicheoUibuNarrative(dayPillar.cg, dayPillar.jj, input.gender, yeonji, jjSet),
+        category: info.category,
+      });
+    }
   }
   // 귀문관살: 사주 내 지지 쌍 조합
   for (const pair of GWIMUN_PAIRS) {
