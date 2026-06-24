@@ -21,7 +21,14 @@ const STAR_COLOR: Record<string, string> = {
 // ziwei.ts의 PALACE_NAMES와 동일한 순서 (명궁→...→부모). 노복궁/교우궁처럼 표기만 다른 동일 궁 매칭용
 const ZIWEI_PALACE_ORDER = ["명궁", "형제", "부처", "자녀", "재백", "질액", "천이", "교우", "관록", "전택", "복덕", "부모"];
 
-function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStars: string[]; minorStars: string[] }, label: string): string {
+const SIHWA_DESC: Record<string, string> = {
+  록: "재물과 기회가 들어오는 쪽으로 힘이 더해지는",
+  권: "주도권과 추진력이 강해지는",
+  과: "명예·평판이 좋아지는",
+  기: "막힘이나 변동이 생기기 쉬운",
+};
+
+function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStars: string[]; minorStars: string[]; sihwa: Record<string, "록" | "권" | "과" | "기"> }, label: string): string {
   let text: string;
   if (zp.stars.length === 0) {
     text = `${label}에는 자리한 주성이 없는 공궁(空宮)이에요. 맞은편 궁의 기운을 빌려와 해석하는 자리라, 환경과 인연에 따라 색깔이 크게 달라질 수 있어요.`;
@@ -32,6 +39,10 @@ function palaceAnalysis(zp: { stars: string[]; luckyStars: string[]; maleficStar
   if (zp.luckyStars.length > 0) text += ` 보좌성 ${zp.luckyStars.join("·")}가 함께해 이 궁의 힘을 더 키워줘요.`;
   if (zp.maleficStars.length > 0) text += ` 다만 ${zp.maleficStars.join("·")} 같은 살성도 자리해 기복이나 돌발 변수에 대한 대비가 필요해요.`;
   if (zp.minorStars.length > 0) text += ` ${zp.minorStars.join("·")} 같은 잡성도 함께 있어, 이 궁이 보여주는 이야기에 미묘한 결을 하나 더 더해줘요.`;
+  const sihwaEntries = Object.entries(zp.sihwa);
+  if (sihwaEntries.length > 0) {
+    text += " " + sihwaEntries.map(([star, sh]) => `${star}이 화${sh}(化${sh})를 맞아 ${SIHWA_DESC[sh]} 흐름이에요.`).join(" ");
+  }
   return text;
 }
 
@@ -296,13 +307,18 @@ export default function ZimidousuPage() {
                       }}>
                       <div className="flex flex-wrap gap-x-1 mb-1">
                         {palace.stars.length > 0 ? palace.stars.map(s => (
-                          <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>{s}</span>
+                          <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>
+                            {s}
+                            {palace.sihwa[s] && <span className="ml-0.5 text-[9px] px-1 rounded bg-fuchsia-600/80 text-white">{palace.sihwa[s]}</span>}
+                          </span>
                         )) : <span className="text-[10px] text-gray-700">-</span>}
                       </div>
                       {(palace.luckyStars.length > 0 || palace.maleficStars.length > 0 || palace.minorStars.length > 0) && (
                         <div className="flex flex-wrap gap-x-1.5 mb-1">
                           {palace.luckyStars.map(s => (
-                            <span key={s} className="text-[9px] font-bold text-emerald-400">{s}</span>
+                            <span key={s} className="text-[9px] font-bold text-emerald-400">
+                              {s}{palace.sihwa[s] && <span className="ml-0.5 px-0.5 rounded bg-fuchsia-600/80 text-white">{palace.sihwa[s]}</span>}
+                            </span>
                           ))}
                           {palace.maleficStars.map(s => (
                             <span key={s} className="text-[9px] font-bold text-red-400">{s}</span>
@@ -447,8 +463,16 @@ export default function ZimidousuPage() {
                   </div>
                   {zp && (
                     <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1.5">
-                      {zp.stars.map(s => <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>{s}</span>)}
-                      {zp.luckyStars.map(s => <span key={s} className="text-[10px] font-bold text-emerald-400">{s}</span>)}
+                      {zp.stars.map(s => (
+                        <span key={s} className="text-[11px] font-black" style={{ color: STAR_COLOR[s] || "#e5e7eb" }}>
+                          {s}{zp.sihwa[s] && <span className="ml-0.5 text-[9px] px-1 rounded bg-fuchsia-600/80 text-white">{zp.sihwa[s]}</span>}
+                        </span>
+                      ))}
+                      {zp.luckyStars.map(s => (
+                        <span key={s} className="text-[10px] font-bold text-emerald-400">
+                          {s}{zp.sihwa[s] && <span className="ml-0.5 px-0.5 rounded bg-fuchsia-600/80 text-white">{zp.sihwa[s]}</span>}
+                        </span>
+                      ))}
                       {zp.maleficStars.map(s => <span key={s} className="text-[10px] font-bold text-red-400">{s}</span>)}
                       {zp.minorStars.map(s => <span key={s} className="text-[10px] font-bold text-amber-400">{s}</span>)}
                     </div>

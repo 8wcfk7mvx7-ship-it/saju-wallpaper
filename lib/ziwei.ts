@@ -39,10 +39,26 @@ export interface ZiweiPalace {
   luckyStars: string[]; // 보좌성(좌보·우필·문창·문곡·천괴·천월·록존)
   maleficStars: string[]; // 살성(경양·타라·지공·지겁)
   minorStars: string[]; // 잡성(천형·천요·고진·과숙·음살)
+  sihwa: Record<string, "록" | "권" | "과" | "기">; // 사화(四化) — 이 궁에 있는 별 이름 → 화록/화권/화과/화기
   isLifePalace: boolean;
   isBodyPalace: boolean;
   daeha: { from: number; to: number };
 }
+
+// 십간 사화(十干四化) — 연간 기준, [화록, 화권, 화과, 화기] 순서로 별 이름 지정
+const SIHWA_TABLE: Record<string, [string, string, string, string]> = {
+  갑: ["염정", "파군", "무곡", "태양"],
+  을: ["천기", "천량", "자미", "태음"],
+  병: ["천동", "천기", "문창", "염정"],
+  정: ["태음", "천동", "천기", "거문"],
+  무: ["탐랑", "태음", "우필", "천기"],
+  기: ["무곡", "탐랑", "천량", "문곡"],
+  경: ["태양", "무곡", "태음", "천동"],
+  신: ["거문", "태양", "문곡", "문창"],
+  임: ["천량", "자미", "좌보", "무곡"],
+  계: ["파군", "거문", "태음", "탐랑"],
+};
+const SIHWA_LABELS: ("록" | "권" | "과" | "기")[] = ["록", "권", "과", "기"];
 
 export interface ZiweiResult {
   bureau: number; // 오행국 (2~6)
@@ -219,6 +235,23 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
   const yearBranchIndex = BRANCHES.indexOf(yearBranchChar);
   const minorMap = calcMinorStars(yearBranchIndex < 0 ? 0 : yearBranchIndex, lunarMonth);
 
+  // 사화(四化): 연간으로 결정된 4개 별이 실제로 배치된 궁을 찾아 화록/화권/화과/화기를 매핑
+  const sihwaStars = SIHWA_TABLE[yearStem];
+  const sihwaMapByBranch: Record<number, Record<string, "록" | "권" | "과" | "기">> = {};
+  if (sihwaStars) {
+    sihwaStars.forEach((starName, i) => {
+      const label = SIHWA_LABELS[i];
+      for (let bi = 0; bi < 12; bi++) {
+        const inMain = (starMap[bi] || []).includes(starName);
+        const inAux = (auxMap[bi]?.lucky || []).includes(starName);
+        if (inMain || inAux) {
+          sihwaMapByBranch[bi] = sihwaMapByBranch[bi] || {};
+          sihwaMapByBranch[bi][starName] = label;
+        }
+      }
+    });
+  }
+
   const palaces: ZiweiPalace[] = BRANCHES.map((branch, branchIndex) => {
     // 궁명: 명궁에서 逆行(감소 방향)으로 명궁,형제,부처...순으로 배치
     const palaceOffset = mod(lifeBranchIndex - branchIndex, 12);
@@ -236,6 +269,7 @@ export function calcZiwei(input: ZiweiInput): ZiweiResult {
       luckyStars: auxMap[branchIndex]?.lucky || [],
       maleficStars: auxMap[branchIndex]?.malefic || [],
       minorStars: minorMap[branchIndex] || [],
+      sihwa: sihwaMapByBranch[branchIndex] || {},
       isLifePalace: branchIndex === lifeBranchIndex,
       isBodyPalace: branchIndex === bodyBranchIndex,
       daeha,
