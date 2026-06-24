@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL, SIPSEONG_GROUP_EXCESS, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO } from "@/lib/saju2";
-import { getSipseongGroupByElement } from "@/lib/saju";
+import { getSipseongGroupByElement, ILGAN_PERSONALITY, UUNSEONG_DETAIL } from "@/lib/saju";
 
 type Step = "gate" | "input" | "chat";
 
@@ -160,9 +160,20 @@ export default function SajuChatPage() {
       .map(k => `${SIPSEONG_MONEY_COMBO[k].name}(${SIPSEONG_MONEY_COMBO[k].hanja}): ${SIPSEONG_MONEY_COMBO[k].desc}`)
       .join("; ");
 
+    const ilganInfo = ILGAN_PERSONALITY[dayCg];
+    const ilganNote = ilganInfo ? `일간 특성(${ilganInfo.short}, ${ilganInfo.keyword}): ${ilganInfo.detail}` : "";
+
+    const dayUunseong = result.pillarsDetail.day.uunseong as string | undefined;
+    const uunseongDetail = dayUunseong ? UUNSEONG_DETAIL[dayUunseong] : undefined;
+    const uunseongNote = uunseongDetail
+      ? `일주 12운성(${dayUunseong}, ${uunseongDetail.hanja}/${uunseongDetail.stage}): ${uunseongDetail.desc}`
+      : "";
+
     const context = [
       `사주팔자: ${result.fourPillars}`,
       `일간: ${result.pillarsDetail.day.cg}`,
+      ilganNote,
+      uunseongNote,
       `오행 점수 — 목:${result.scores.목} 화:${result.scores.화} 토:${result.scores.토} 금:${result.scores.금} 수:${result.scores.수}`,
       `강한 오행: ${dominantStr}`,
       `신살: ${sinsalNames}`,

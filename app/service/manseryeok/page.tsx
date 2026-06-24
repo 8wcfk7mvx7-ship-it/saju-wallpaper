@@ -9,6 +9,7 @@ import {
   JOHU_YONGSHIN, getSeasonByMonth,
   HAP_CHUNG_CHARACTER,
   ILGAN_PERSONALITY, ILJU_60, adjustCareerByExpression, canonicalJijiPairOrder,
+  UUNSEONG_DETAIL,
   OHAENG_HEALTH, OHAENG_CAREER,
   WEOLJI_PSYCHOLOGY, SINGANG_TRAITS,
   JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, getJijiRelations,
@@ -546,6 +547,7 @@ function ResultView({
   const ilganInfo = ILGAN_PERSONALITY[ilgan];
   const iljuKey = ilgan + pd.day.jj;
   const iljuInfo = ILJU_60[iljuKey];
+  const uunseongDetailInfo = UUNSEONG_DETAIL[pd.day.uunseong];
   const sikSangCountManse = ssAllManse.filter(s => s === "식신" || s === "상관").length;
   const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCountManse) : "";
   const weolji = WEOLJI_PSYCHOLOGY[monthJj];
@@ -1080,6 +1082,7 @@ function ResultView({
           </div>
           <div className="grid grid-cols-1 gap-2.5">
             {[
+              ...(uunseongDetailInfo ? [{ label: `일주 12운성 — ${pd.day.uunseong}(${UUNSEONG_HANJA[pd.day.uunseong] || ""}) · ${uunseongDetailInfo.stage}`, text: uunseongDetailInfo.desc, color: "#60a5fa" }] : []),
               { label: "연애 스타일", text: iljuInfo.love, color: "#f472b6" },
               { label: "적합 직업·커리어", text: iljuCareerAdjusted, color: "#34d399" },
               { label: "주의할 점", text: iljuInfo.caution, color: "#f87171" },
