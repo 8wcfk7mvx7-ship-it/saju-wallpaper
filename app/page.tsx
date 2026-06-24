@@ -1188,18 +1188,26 @@ export default function MainPage() {
           </div>
 
           {/* 신뢰 메시지 */}
-          <p className="text-[13px] sm:text-sm leading-relaxed sm:leading-loose mt-5 max-w-sm sm:max-w-xl mx-auto px-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.85)" }}>
-            그냥 만든 AI 사주 사이트가 아니에요.<br />
-            취미로 시작했다가 명리학 자격증까지 따고,<br />
-            무료로 이 사람 저 사람 사주를 봐주다 보니<br />
-            만족도가 높아져 어느새 유료 상담까지 하게 된{" "}
-            <span style={{ color: "#fff", fontWeight: 700 }}>현직 사주 전문가의 임상 데이터</span>가 그대로 담겨 있어요.<br />
-            단순 AI 풀이가 아닌, <span style={{ color: "#fff", fontWeight: 700 }}>실제 임상 사주 분석법</span>을 섞어서{" "}
-            최고의 결과를 보여드릴게요.<br />
-            챗GPT에 만세력 캡쳐본 한 장 올려서 보는 풀이와는 출발이 달라요.<br />
-            방대한 <span style={{ color: "#fff", fontWeight: 700 }}>사주 데이터베이스</span>와 <span style={{ color: "#fff", fontWeight: 700 }}>실제 명리상담 사례</span>를 기반으로 학습된 분석이라{" "}
-            깊이와 디테일에서 차이가 느껴지실 거예요.
-          </p>
+          <div className="mt-6 max-w-sm sm:max-w-xl mx-auto px-4">
+            <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
+                캡처 한 장 올려서 보는 챗봇 풀이와는 출발이 다릅니다.
+              </p>
+              <ul className="space-y-2.5">
+                {[
+                  { icon: "🎓", text: <>명리학 자격을 갖춘 <strong style={{ color: "#fff" }}>현직 사주 전문가의 임상 데이터</strong>를 기반으로 분석합니다</> },
+                  { icon: "📚", text: <>방대한 <strong style={{ color: "#fff" }}>사주 데이터베이스</strong>를 학습해 풀이의 깊이가 다릅니다</> },
+                  { icon: "💬", text: <>실제 <strong style={{ color: "#fff" }}>명리상담 사례</strong>를 반영해 디테일을 더했습니다</> },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+                    <span className="shrink-0">{item.icon}</span>
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
         </section>
 
