@@ -588,12 +588,16 @@ export default function TodayFortunePage() {
       const wIdx = wongukColIdx[w.label];
       for (const [x, y] of CG_HAP) {
         if ((f.cg === x && w.cg === y) || (f.cg === y && w.cg === x)) {
-          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "합", aIdx: f.colIdx, bIdx: wIdx });
+          const aIdx = f.cg === x ? f.colIdx : wIdx;
+          const bIdx = f.cg === x ? wIdx : f.colIdx;
+          cgRelations.push({ from: f.label, to: w.label, a: x, b: y, type: "합", aIdx, bIdx });
         }
       }
       for (const [x, y] of CG_CHUNG) {
         if ((f.cg === x && w.cg === y) || (f.cg === y && w.cg === x)) {
-          cgRelations.push({ from: f.label, to: w.label, a: f.cg, b: w.cg, type: "충", aIdx: f.colIdx, bIdx: wIdx });
+          const aIdx = f.cg === x ? f.colIdx : wIdx;
+          const bIdx = f.cg === x ? wIdx : f.colIdx;
+          cgRelations.push({ from: f.label, to: w.label, a: x, b: y, type: "충", aIdx, bIdx });
         }
       }
     }
