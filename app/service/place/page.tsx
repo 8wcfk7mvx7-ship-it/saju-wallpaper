@@ -501,12 +501,12 @@ export default function PlacePage() {
                 <p className="text-sm font-bold text-violet-300 mb-3">합·충으로 보는 이동 타이밍</p>
                 {hapList.map((rel, i) => (
                   <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
-                    <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해 현재 환경에 안정적으로 정착하려는 흐름이 있어. 이사·이민을 고려 중이라면 크게 서두르지 않아도 돼.
+                    <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해 현재 환경에 안정적으로 정착하려는 흐름이 있어요. 이사·이민을 고려 중이라면 크게 서두르지 않아도 돼요.
                   </p>
                 ))}
                 {chungList.map((rel, i) => (
                   <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                    <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) 충</span> — 충 에너지가 이동·변화를 촉진하는 구조야. 지금 있는 곳보다 새로운 환경으로 옮겼을 때 오히려 기운이 살아나는 타입이야. 추천 도시로의 이사가 실제로 전환점이 될 수 있어.
+                    <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) 충</span> — 충 에너지가 이동·변화를 촉진하는 구조예요. 지금 있는 곳보다 새로운 환경으로 옮겼을 때 오히려 기운이 살아나는 타입이에요. 추천 도시로의 이사가 실제로 전환점이 될 수 있어요.
                   </p>
                 ))}
               </div>

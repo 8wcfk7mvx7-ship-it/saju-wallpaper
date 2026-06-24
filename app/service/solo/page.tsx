@@ -420,10 +420,10 @@ export default function SoloPage() {
               </div>
               <p className="text-xs text-gray-500 leading-relaxed pt-2 border-t border-white/5">
                 {gwan?.status === "무" || gwan?.status === "약함"
-                  ? `관성(배우자·사회적 책임 기운)이 ${gwan.status}한 구조야. 누군가에게 통제받거나 의존하는 관계보다 스스로 결정하고 움직이는 삶이 더 에너지가 나는 타입이야. 비혼이 심리적으로 훨씬 자연스럽게 느껴질 수 있어.`
+                  ? `관성(배우자·사회적 책임 기운)이 ${gwan.status}한 구조예요. 누군가에게 통제받거나 의존하는 관계보다 스스로 결정하고 움직이는 삶이 더 에너지가 나는 타입이에요. 비혼이 심리적으로 훨씬 자연스럽게 느껴질 수 있어요.`
                   : gwan?.status === "강함"
-                  ? `관성이 강해 관계·책임·사회적 연결에 대한 욕구가 크게 자리하고 있어. 완전한 비혼보다 가까운 파트너십 관계를 유지하면서 자유도를 확보하는 방식이 현실적으로 잘 맞을 수 있어.`
-                  : `관성이 보통 수준이라, 결혼·비혼 어느 쪽이든 본인의 라이프스타일 선호와 상대방의 궁합이 훨씬 더 큰 변수야.`}
+                  ? `관성이 강해 관계·책임·사회적 연결에 대한 욕구가 크게 자리하고 있어요. 완전한 비혼보다 가까운 파트너십 관계를 유지하면서 자유도를 확보하는 방식이 현실적으로 잘 맞을 수 있어요.`
+                  : `관성이 보통 수준이라, 결혼·비혼 어느 쪽이든 본인의 라이프스타일 선호와 상대방의 궁합이 훨씬 더 큰 변수예요.`}
               </p>
             </div>
           );
@@ -442,12 +442,12 @@ export default function SoloPage() {
               <p className="text-sm font-bold text-rose-300 mb-3">합·충으로 보는 관계 흐름</p>
               {hapList.map((rel, i) => (
                 <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
-                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 합을 이뤄 서로 끌어당기는 에너지가 있어. 인연이 만들어지는 환경이 자연스럽게 조성되는 구조라, 비혼을 선택해도 의미 있는 관계가 끊이지 않을 가능성이 높아.
+                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 합을 이뤄 서로 끌어당기는 에너지가 있어요. 인연이 만들어지는 환경이 자연스럽게 조성되는 구조라, 비혼을 선택해도 의미 있는 관계가 끊이지 않을 가능성이 높아요.
                 </p>
               ))}
               {chungList.map((rel, i) => (
                 <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 충돌하는 기운이 있어. 관계를 안정적으로 유지하기보다 변화와 이별의 흐름이 반복되기 쉬운 구조야. 결혼이든 비혼이든, 관계에 지나치게 집착하기보다 '오고 가는 것'에 유연한 태도가 정서적으로 훨씬 편해.
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기둥이 충돌하는 기운이 있어요. 관계를 안정적으로 유지하기보다 변화와 이별의 흐름이 반복되기 쉬운 구조예요. 결혼이든 비혼이든, 관계에 지나치게 집착하기보다 '오고 가는 것'에 유연한 태도가 정서적으로 훨씬 편해요.
                 </p>
               ))}
             </div>

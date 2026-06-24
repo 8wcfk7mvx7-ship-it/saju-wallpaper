@@ -614,17 +614,17 @@ function SpyContent() {
               <div className="pt-2 border-t border-white/5 space-y-1.5">
                 {sik?.status === "강함" && (
                   <p className="text-xs text-rose-300/80 leading-relaxed">
-                    ⚠ 식상이 강해 — 표현 욕구가 크고 자기 감정을 밖으로 드러내야 직성이 풀리는 타입이야. 관계 안에서 억눌리면 밖에서 위로를 찾는 패턴이 생기기 쉬워.
+                    ⚠ 식상이 강해 — 표현 욕구가 크고 자기 감정을 밖으로 드러내야 직성이 풀리는 타입이에요. 관계 안에서 억눌리면 밖에서 위로를 찾는 패턴이 생기기 쉬워요.
                   </p>
                 )}
                 {gwan?.status === "강함" && (
                   <p className="text-xs text-sky-300/80 leading-relaxed">
-                    관성이 강해 — 원칙·책임·사회적 시선을 중요하게 생각하는 타입이야. 충동적인 바람보다는 장기적 관계를 유지하는 경향이 있어.
+                    관성이 강해 — 원칙·책임·사회적 시선을 중요하게 생각하는 타입이에요. 충동적인 바람보다는 장기적 관계를 유지하는 경향이 있어요.
                   </p>
                 )}
                 {jae?.status === "강함" && (
                   <p className="text-xs text-amber-300/80 leading-relaxed">
-                    재성이 강해 — 이성에게 매력적으로 다가가는 능력과 다양한 인간관계를 동시에 유지하는 성향이 있어. 한 사람에게만 집중하기보다 넓게 교류하는 패턴이 나타날 수 있어.
+                    재성이 강해 — 이성에게 매력적으로 다가가는 능력과 다양한 인간관계를 동시에 유지하는 성향이 있어요. 한 사람에게만 집중하기보다 넓게 교류하는 패턴이 나타날 수 있어요.
                   </p>
                 )}
               </div>
@@ -645,12 +645,12 @@ function SpyContent() {
               <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">합·충 — 관계 안정성 흐름</p>
               {hapList.map((rel, i) => (
                 <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
-                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해져 관계 자체에 끌림의 에너지가 강한 구조야. 한 사람에게 깊게 빠지는 경향이 있고, 그만큼 이별 후 빠져나오는 것도 오래 걸려.
+                  <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합해져 관계 자체에 끌림의 에너지가 강한 구조예요. 한 사람에게 깊게 빠지는 경향이 있고, 그만큼 이별 후 빠져나오는 것도 오래 걸려요.
                 </p>
               ))}
               {chungList.map((rel, i) => (
                 <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 기둥 간 충돌이 있어 감정 기복이 크고, 안정된 관계보다 자극·갈등·화해의 사이클이 반복되기 쉬운 구조야. 관계 자체가 불안정할 때 외부에서 위안을 찾으려는 충동이 커져.
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 기둥 간 충돌이 있어 감정 기복이 크고, 안정된 관계보다 자극·갈등·화해의 사이클이 반복되기 쉬운 구조예요. 관계 자체가 불안정할 때 외부에서 위안을 찾으려는 충동이 커져요.
                 </p>
               ))}
             </div>

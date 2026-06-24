@@ -586,7 +586,7 @@ export default function DohwasalPage() {
                 </div>
                 <div className="border-t border-white/10 pt-3 mt-1">
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    💡 도화살이 강하면 말 한마디, 행동 하나, 만든 것 하나하나가 <span className="text-rose-300 font-semibold">파급력</span>을 띠게 돼. 위에 있는 연예인들처럼 본인이 의도하지 않아도 화제가 되고, 트렌드를 만들고, 사람들의 기억에 오래 남는 게 이 기운의 특징이야. 내 도화 기운을 제대로 알고 활용하면, 콘텐츠든 관계든 사업이든 훨씬 넓은 범위로 영향을 미칠 수 있어.
+                    💡 도화살이 강하면 말 한마디, 행동 하나, 만든 것 하나하나가 <span className="text-rose-300 font-semibold">파급력</span>을 띠게 돼요. 위에 있는 연예인들처럼 본인이 의도하지 않아도 화제가 되고, 트렌드를 만들고, 사람들의 기억에 오래 남는 게 이 기운의 특징이에요. 내 도화 기운을 제대로 알고 활용하면, 콘텐츠든 관계든 사업이든 훨씬 넓은 범위로 영향을 미칠 수 있어요.
                   </p>
                 </div>
               </div>
