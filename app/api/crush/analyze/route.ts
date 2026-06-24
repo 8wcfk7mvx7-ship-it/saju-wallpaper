@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO } from "@/lib/saju2";
+import { ILGAN_INNER_OUTER, ILGAN_PERSONALITY } from "@/lib/saju";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -45,6 +46,11 @@ export async function POST(req: NextRequest) {
           .some(v => v.sipseongCg?.includes("인") || v.sipseongJj?.includes("인"))
       : false;
 
+    // 일간 성격 + 겉모습/속마음(십신 기반) 데이터 — 공략 포인트·심리 패턴 서술에 녹여 넣을 재료
+    const ilgan = dayPillar ? dayPillar[0] : "";
+    const ilganInfo = ILGAN_PERSONALITY[ilgan];
+    const innerOuter = ILGAN_INNER_OUTER[ilgan];
+
     const prompt = `당신은 명리학 전문가입니다. 아래 사주 데이터를 분석하여 이 사람의 연애 스타일과 이상형, 공략법을 분석하세요.
 
 ## 분석 대상 사주
@@ -63,16 +69,20 @@ export async function POST(req: NextRequest) {
 - 인성 유무: ${hasInseong ? "있음" : "없음"}
 ${sipseongDescs ? `\n## 십신 심화 데이터\n${sipseongDescs}` : ""}
 ${moneyComboText ? `\n## 재물 구조\n${moneyComboText}` : ""}
+${ilganInfo ? `\n## 일간(${ilgan}) 기본 성격\n- 키워드: ${ilganInfo.keyword}\n- 상세: ${ilganInfo.detail}` : ""}
+${innerOuter ? `\n## 겉모습(${innerOuter.outer}) vs 속마음(${innerOuter.inner})\n- ${innerOuter.synthesis}\n→ 이 겉/속 차이를 "심리 패턴"과 "공략 포인트" 서술 안에 반드시 자연스럽게 녹여서, "겉으로는 ~처럼 보여도 속으로는 ~를 원한다" 같은 통찰을 공략 전략과 연결해 설명하세요. 별도 항목으로 따로 떼어 쓰지 마세요.` : ""}
 ${myBirth ? `\n## 나의 정보 (궁합 참고)\n- ${myBirth.birthYear}년 ${myBirth.birthMonth}월 ${myBirth.birthDay}일생 (${myBirth.calType === "lunar" ? "음력" : "양력"})\n- 출생시간: ${myBirth.birthHour !== null && myBirth.birthHour !== undefined ? `${myBirth.birthHour}시 ${myBirth.birthMinute ?? 0}분${myBirth.useJajasi ? " (야자시/조자시 적용)" : ""}` : "모름"}\n- 출생지: ${myBirth.birthPlace || "서울"}\n- 성별: ${myBirth.gender === "male" ? "남성" : "여성"}` : ""}
 
-반드시 아래 JSON 형식으로만 응답하세요:
+위 사주 데이터(오행, 십성 분포, 십신 심화 데이터, 재물 구조, 일간 성격, 겉모습/속마음, 신살)를 최대한 전부 근거로 활용해서, 명리학적으로 구체적이고 풍부한 분량의 글을 작성하세요. 뻔하고 일반적인 표현은 피하고, 위에 주어진 데이터의 세부 항목(구체적 십신 이름, 신살 이름, 오행)을 직접 언급하며 설명하세요. 모든 응답은 반드시 한국어로 작성하세요.
+
+반드시 아래 JSON 형식으로만 응답하세요 (글자 수 기준은 한글 기준, 공백 포함):
 
 {
-  "idealType": "이 사람이 매력을 느끼는 이상형 유형 — 어떤 사람에게 끌리는지, 외모보다 내면적 기준은 무엇인지 구체적으로 (150-200자)",
-  "approach": "이 사람의 마음을 얻기 위한 구체적 공략법 — 첫 만남부터 고백까지, 어떤 방식으로 접근하면 심장을 흔들 수 있는지 전략적으로 (150-200자)",
-  "psychology": "이 사람의 연애 심리 패턴 — 연애할 때 어떻게 행동하는지, 무엇을 중요하게 여기는지, 어떤 관계에서 안정감을 느끼는지 (150-200자)",
-  "moneyStyle": "재물·돈 스타일 및 쟁재남 진단 — 재성 분포를 기반으로 재물을 대하는 방식, 쟁재남/재다남 여부, 연애에서 경제관계 특징 (100-150자)",
-  "warning": "이 사람과 연애할 때 주의할 점 — 절대로 하면 안 되는 행동, 관계를 망치는 패턴, 피해야 할 상황 (100-150자)",
+  "idealType": "이 사람이 매력을 느끼는 이상형 유형 — 어떤 사람에게 끌리는지, 외모보다 내면적 기준은 무엇인지, 왜 그런지 사주 근거를 들어 깊이 있게 (600-800자, 2-3문단)",
+  "approach": "이 사람의 마음을 얻기 위한 구체적 공략법 — 첫 만남부터 고백까지 단계별로, 겉모습과 속마음의 차이까지 활용한 전략적 접근법을 구체적인 행동 지침과 함께 (600-800자, 2-3문단)",
+  "psychology": "이 사람의 연애 심리 패턴 — 연애할 때 어떻게 행동하는지, 무엇을 중요하게 여기는지, 어떤 관계에서 안정감을 느끼는지, 겉으로 보이는 모습과 내면의 진짜 욕구가 어떻게 다른지를 포함해서 (600-800자, 2-3문단)",
+  "moneyStyle": "재물·돈 스타일 및 쟁재남 진단 — 재성 분포와 십신 구조를 기반으로 재물을 대하는 방식, 쟁재남/재다남 여부, 연애에서 경제관계 특징을 구체적으로 (400-500자)",
+  "warning": "이 사람과 연애할 때 주의할 점 — 절대로 하면 안 되는 행동, 관계를 망치는 패턴, 신살이나 십신 구조상 특히 조심해야 할 상황을 구체적으로 (400-500자)",
   "compatibility": "${myBirth ? "두 사람의 사주 궁합 한 줄 평가 (50자 이내)" : "내 생일을 입력하면 궁합 점수를 확인할 수 있습니다"}",
   "score": ${myBirth ? "두 사람의 궁합 점수 (0-100, 숫자만)" : "0"},
   "grade": "${myBirth ? "S/A/B/C/D 중 하나" : "N"}"
@@ -80,7 +90,7 @@ ${myBirth ? `\n## 나의 정보 (궁합 참고)\n- ${myBirth.birthYear}년 ${myB
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 2000,
+      max_tokens: 8000,
       messages: [{ role: "user", content: prompt }],
     });
 

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult,
+  analyzeSaju, ILGAN_PERSONALITY, type SajuResult,
   getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
@@ -573,31 +573,6 @@ export default function CrushPage() {
           );
         })()}
 
-        {/* 겉모습 vs 속마음 */}
-        {targetSaju && (() => {
-          const ilgan = targetSaju.pillarsDetail.day.cg;
-          const io = ILGAN_INNER_OUTER[ilgan];
-          if (!io) return null;
-          return (
-            <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🪞</span>
-                <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>겉모습 vs 속마음</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div className="rounded-xl p-3" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>밖으로 보이는 모습</p>
-                  <p className="text-sm font-bold text-white">{io.outer}</p>
-                </div>
-                <div className="rounded-xl p-3" style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fb7185" }}>내면의 진짜 욕구</p>
-                  <p className="text-sm font-bold text-white">{io.inner}</p>
-                </div>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{io.synthesis}</p>
-            </div>
-          );
-        })()}
 
         {/* 신살 목록 */}
         {targetSaju && targetSaju.sinsalList.length > 0 && (

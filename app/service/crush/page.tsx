@@ -29,26 +29,13 @@ import { useRouter } from "next/navigation";
 import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import {
-  analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult,
+  analyzeSaju, ILGAN_PERSONALITY, type SajuResult,
   getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
-  getJijiRelations, REL_TYPE_COLOR, sortJijiRelationsByStrength, canonicalJijiPairOrder, type JijiRelation,
 } from "@/lib/saju";
-
-// 합충 관계 유형별 짝사랑 코칭 한 줄
-const HAPCHUNG_NOTE: Record<JijiRelation["type"], string> = {
-  육합: "강한 정서적 유대와 친밀감이 형성되는 조합이에요. 처음부터 편안하게 느껴질 가능성이 높습니다.",
-  삼합: "서로의 부족한 기운을 채워주는 궁합이에요. 함께 있을 때 안정감과 시너지가 동시에 생깁니다.",
-  반합: "부분적인 합의 기운이 있어요. 완전한 삼합보다는 약하지만 긍정적인 끌림이 작용합니다.",
-  충: "강한 자극과 긴장이 동시에 존재해요. 처음엔 확 끌리지만 갈등도 잦을 수 있는 '애증' 구조입니다.",
-  형: "서로를 깎아내거나 신경전이 생기기 쉬운 조합이에요. 배려와 거리 조절이 특히 중요합니다.",
-  파: "관계가 미묘하게 어긋나거나 흐트러지는 기운이에요. 작은 오해가 쌓이지 않도록 소통이 필요합니다.",
-  해: "은근한 방해나 서운함이 쌓일 수 있는 조합이에요. 서로의 영역을 침범하지 않는 게 중요합니다.",
-  원진: "이유 없이 미묘하게 거리감이 느껴질 수 있는 궁합이에요. 시간을 들여 신뢰를 쌓아야 합니다.",
-};
-const HAPCHUNG_LABEL: Record<string, string> = { year: "연주", month: "월주", day: "일주", hour: "시주" };
+import HapchungDiagram from "@/components/HapchungDiagram";
 
 // 일간별 짝사랑 성공 비결
 const CRUSH_SUCCESS: Record<string, {
@@ -580,32 +567,6 @@ export default function CrushPage() {
           );
         })()}
 
-        {/* 겉모습 vs 속마음 */}
-        {targetSaju && (() => {
-          const ilgan = targetSaju.pillarsDetail.day.cg;
-          const io = ILGAN_INNER_OUTER[ilgan];
-          if (!io) return null;
-          return (
-            <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🪞</span>
-                <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>겉모습 vs 속마음</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div className="rounded-xl p-3" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>밖으로 보이는 모습</p>
-                  <p className="text-sm font-bold text-white">{io.outer}</p>
-                </div>
-                <div className="rounded-xl p-3" style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.2)" }}>
-                  <p className="text-[10px] font-bold mb-1" style={{ color: "#fb7185" }}>내면의 진짜 욕구</p>
-                  <p className="text-sm font-bold text-white">{io.inner}</p>
-                </div>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{io.synthesis}</p>
-            </div>
-          );
-        })()}
-
         {/* 신살 목록 */}
         {targetSaju && targetSaju.sinsalList.length > 0 && (
           <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -676,127 +637,9 @@ export default function CrushPage() {
         })()}
 
         {/* 나와의 합충(合沖) 분석 — 원국 다이어그램 */}
-        {targetSaju && mySaju && (() => {
-          const SLOT_LABEL = ["연주", "월주", "일주", "시주"];
-          const pickSlots = (s: SajuResult) => {
-            const p = s.pillarsDetail;
-            const raw = [p.year, p.month, p.day, p.hour];
-            return raw
-              .map((d, slot) => (d ? { slot, label: SLOT_LABEL[slot], jj: d.jj, cg: d.cg } : null))
-              .filter((d): d is { slot: number; label: string; jj: string; cg: string } => !!d);
-          };
-          const myPillars = pickSlots(mySaju);
-          const targetPillars = pickSlots(targetSaju);
-          const allJj = [...myPillars.map(p => p.jj), ...targetPillars.map(p => p.jj)];
-          const myCount = myPillars.length;
-          const crossRelations = sortJijiRelationsByStrength(
-            getJijiRelations(allJj).filter(r => (r.a < myCount) !== (r.b < myCount))
-          );
-          const hapCount = crossRelations.filter(r => r.type === "육합" || r.type === "삼합" || r.type === "반합").length;
-          const chungCount = crossRelations.filter(r => r.type === "충").length;
-          const tensionCount = crossRelations.filter(r => r.type === "형" || r.type === "파" || r.type === "해" || r.type === "원진").length;
-          const xOf = (slot: number) => 12.5 + slot * 25;
-
-          return (
-            <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.05)" }}>
-              <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: "rgba(167,139,250,0.18)" }}>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🔗</span>
-                  <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>나와 이 사람의 합충(合沖) 분석</h3>
-                </div>
-                <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>두 원국을 나란히 놓고 합·충·형·파·해·원진(귀문)을 화살표로 짚어봐요</p>
-              </div>
-
-              <div className="p-5">
-                {/* 원국 다이어그램 */}
-                <div className="relative mb-4" style={{ height: 190 }}>
-                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
-                    {crossRelations.map((r, i) => {
-                      const mine = myPillars[r.a];
-                      const theirs = targetPillars[r.b - myCount];
-                      const x1 = xOf(mine.slot), x2 = xOf(theirs.slot);
-                      const isStrong = r.type === "육합" || r.type === "삼합" || r.type === "충";
-                      return (
-                        <line key={i} x1={x1} y1={22} x2={x2} y2={78}
-                          stroke={REL_TYPE_COLOR[r.type]} strokeWidth={isStrong ? 1.4 : 0.9}
-                          strokeOpacity={0.85} strokeDasharray={r.type === "충" ? undefined : (r.type === "원진" || r.type === "해" ? "2,2" : undefined)}
-                          markerEnd={`url(#arrow-${r.type})`} />
-                      );
-                    })}
-                    <defs>
-                      {Object.entries(REL_TYPE_COLOR).map(([type, color]) => (
-                        <marker key={type} id={`arrow-${type}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse">
-                          <path d="M0,0 L10,5 L0,10 Z" fill={color} />
-                        </marker>
-                      ))}
-                    </defs>
-                  </svg>
-
-                  {myPillars.map(p => (
-                    <div key={`my-${p.slot}`} className="absolute flex flex-col items-center" style={{ left: `${xOf(p.slot)}%`, top: "22%", transform: "translate(-50%, -50%)" }}>
-                      <div className="rounded-lg px-2.5 py-1.5 text-center" style={{ background: "rgba(251,113,133,0.12)", border: "1px solid rgba(251,113,133,0.35)" }}>
-                        <p className="text-sm font-black text-white leading-tight">{p.cg}{p.jj}</p>
-                      </div>
-                      <p className="text-[9px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>{p.label}</p>
-                    </div>
-                  ))}
-                  {targetPillars.map(p => (
-                    <div key={`target-${p.slot}`} className="absolute flex flex-col items-center" style={{ left: `${xOf(p.slot)}%`, top: "78%", transform: "translate(-50%, -50%)" }}>
-                      <p className="text-[9px] mb-1" style={{ color: "rgba(255,255,255,0.3)" }}>{p.label}</p>
-                      <div className="rounded-lg px-2.5 py-1.5 text-center" style={{ background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.35)" }}>
-                        <p className="text-sm font-black text-white leading-tight">{p.cg}{p.jj}</p>
-                      </div>
-                    </div>
-                  ))}
-
-                  <span className="absolute top-0 left-0 text-[10px] font-bold" style={{ color: "#fb7185" }}>나</span>
-                  <span className="absolute bottom-0 left-0 text-[10px] font-bold" style={{ color: "#a78bfa" }}>그 사람</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
-                    <p className="text-lg font-black" style={{ color: "#34d399" }}>{hapCount}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>합 (끌림)</p>
-                  </div>
-                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
-                    <p className="text-lg font-black" style={{ color: "#f87171" }}>{chungCount}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>충 (자극·긴장)</p>
-                  </div>
-                  <div className="rounded-xl p-3 text-center" style={{ background: "rgba(192,132,252,0.08)", border: "1px solid rgba(192,132,252,0.2)" }}>
-                    <p className="text-lg font-black" style={{ color: "#c084fc" }}>{tensionCount}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>형·파·해·원진(귀문)</p>
-                  </div>
-                </div>
-
-                {crossRelations.length === 0 && (
-                  <p className="text-sm leading-relaxed text-center py-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-                    두 사람의 사주 사이에 강하게 부딫히는 합충 관계는 없어요. 무난하게 서로를 알아갈 수 있는 궁합이에요.
-                  </p>
-                )}
-
-                <div className="space-y-2">
-                  {crossRelations.map((r, i) => {
-                    const [c1, c2] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
-                    const myLabel = myPillars[r.a].label;
-                    const targetLabel = targetPillars[r.b - myCount].label;
-                    const typeText = r.type === "원진" ? "원진(귀문)" : r.type;
-                    return (
-                      <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: REL_TYPE_COLOR[r.type], color: "#06060e" }}>{typeText}</span>
-                          <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
-                            나({myLabel}) {c1} ↔ 그 사람({targetLabel}) {c2}
-                          </span>
-                        </div>
-                        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{HAPCHUNG_NOTE[r.type]}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+        {targetSaju && mySaju && (
+          <HapchungDiagram mySaju={mySaju} targetSaju={targetSaju} />
+        )}
 
         {/* 공유 + CTA */}
         <div className="mt-6 rounded-2xl p-5 text-center"
