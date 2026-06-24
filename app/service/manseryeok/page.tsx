@@ -699,6 +699,7 @@ function ResultView({
           const REL_STYLE: Record<string, { color: string; bg: string }> = {
             육합: { color: "#34d399", bg: "rgba(52,211,153,0.1)" },
             삼합: { color: "#34d399", bg: "rgba(52,211,153,0.1)" },
+            반합: { color: "#34d399", bg: "rgba(52,211,153,0.1)" },
             충:   { color: "#f87171", bg: "rgba(248,113,113,0.1)" },
             형:   { color: "#f87171", bg: "rgba(248,113,113,0.1)" },
             파:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
