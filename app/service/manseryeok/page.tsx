@@ -488,6 +488,8 @@ function ResultView({
   })();
 
   // 여성 이성운 — 좋은 인연을 부르는 사주 구조 (관인상생·재관쌍미·용신유력·신왕관왕·부덕수기)
+  const ssAllManse = [pd.year.sipseongCg, pd.year.sipseongJj, pd.month.sipseongCg, pd.month.sipseongJj, pd.day.sipseongJj, pd.hour?.sipseongCg, pd.hour?.sipseongJj].filter(Boolean) as string[];
+
   const femaleLovePatterns: { title: string; desc: string }[] = (() => {
     if (form.gender !== "female") return [];
     const has = (s: string) => ssAllManse.includes(s);
@@ -544,7 +546,6 @@ function ResultView({
   const ilganInfo = ILGAN_PERSONALITY[ilgan];
   const iljuKey = ilgan + pd.day.jj;
   const iljuInfo = ILJU_60[iljuKey];
-  const ssAllManse = [pd.year.sipseongCg, pd.year.sipseongJj, pd.month.sipseongCg, pd.month.sipseongJj, pd.day.sipseongJj, pd.hour?.sipseongCg, pd.hour?.sipseongJj].filter(Boolean) as string[];
   const sikSangCountManse = ssAllManse.filter(s => s === "식신" || s === "상관").length;
   const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCountManse) : "";
   const weolji = WEOLJI_PSYCHOLOGY[monthJj];
