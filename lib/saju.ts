@@ -200,6 +200,17 @@ export interface SajuResult {
   yongshin: YongsinResult;
 }
 
+// 신살 목록을 화면에 나열할 때 쓰는 필터 — 도화살은 가도화/편야도화/진도화/나체도화/곤랑도화/녹방도화의
+// 상위 기본 카테고리일 뿐이라 항상 숨기고, 더 구체적인 도화 세부 유형이 함께 있으면
+// 약한 신호인 가도화도 중복으로 보이지 않게 같이 숨긴다. (점수 계산 등 내부 로직에는 영향 없음)
+const SPECIFIC_DOHWA_NAMES = new Set(["진도화", "나체도화", "곤랑도화", "녹방도화", "편야도화"]);
+export function getDisplaySinsalList(sinsalList: SinsalItem[]): SinsalItem[] {
+  const hasSpecificDohwa = sinsalList.some(s => SPECIFIC_DOHWA_NAMES.has(s.name));
+  return sinsalList.filter(s =>
+    s.name !== "도화살" && !(s.name === "가도화" && hasSpecificDohwa)
+  );
+}
+
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"];
 const JIJI = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
