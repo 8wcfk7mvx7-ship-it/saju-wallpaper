@@ -431,7 +431,7 @@ function ContactSection() {
                   className="transition-colors underline underline-offset-2"
                   style={{ color: "#fde68a" }}
                 >
-                  카카오 채널로 빠르게 문의
+                  카카오 채널로 빠르게 문의 (전화·이메일보다 빨라요)
                 </a>
               </span>
             </div>
@@ -1475,6 +1475,14 @@ export default function MainPage() {
             <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors">환불규정</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors">고객센터(카카오 채널)</a>
+          </div>
+
+          <div className="text-center mb-5">
+            <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-colors"
+              style={{ background: "rgba(253,224,71,0.1)", border: "1px solid rgba(253,224,71,0.25)", color: "#fde68a" }}>
+              💬 전화·이메일보다 카카오톡 문의가 가장 빠릅니다
+            </a>
           </div>
 
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
