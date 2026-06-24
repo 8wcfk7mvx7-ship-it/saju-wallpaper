@@ -361,7 +361,7 @@ export default function StockPage() {
   // ── 엔트리 ────────────────────────────────────────────────────────────────
   if (step === "entry") {
     return (
-      <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden page-fade-in">
         <div className="fixed top-5 left-5 z-20">
           <button onClick={() => router.push("/")} className="text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
         </div>

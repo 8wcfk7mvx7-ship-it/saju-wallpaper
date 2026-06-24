@@ -23,7 +23,7 @@ export default function AdultGatePage() {
 
   if (!confirmed) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "#06060e" }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-4 page-fade-in" style={{ background: "#06060e" }}>
         <div className="max-w-2xl w-full text-center">
           <div className="text-5xl mb-6">🔞</div>
           <h1 className="text-2xl font-black text-white mb-3">성인 전용 서비스</h1>

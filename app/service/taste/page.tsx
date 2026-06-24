@@ -238,7 +238,7 @@ export default function TastePage() {
 
   // ── 스플래시 ──────────────────────────────────────────────────────────────
   if (step === "splash") return (
-    <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden page-fade-in">
       <BackButton />
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>
       <div className="fixed inset-0 pointer-events-none">

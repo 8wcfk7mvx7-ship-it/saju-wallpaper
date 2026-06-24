@@ -493,7 +493,7 @@ function HotCompatContent() {
 
   if (step === "entry") {
     return (
-      <main className="min-h-screen bg-[#08010f] text-white flex flex-col">
+      <main className="min-h-screen bg-[#08010f] text-white flex flex-col page-fade-in">
         <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/40 blur-[160px]" />

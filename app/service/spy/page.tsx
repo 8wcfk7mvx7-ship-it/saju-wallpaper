@@ -204,7 +204,7 @@ function SpyContent() {
   // ── 진입 ──────────────────────────────────────────────────────────────────
   if (step === "entry") {
     return (
-      <main className="min-h-screen bg-[#0a0101] text-white flex flex-col">
+      <main className="min-h-screen bg-[#0a0101] text-white flex flex-col page-fade-in">
         <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-red-950/40 blur-[160px]" />

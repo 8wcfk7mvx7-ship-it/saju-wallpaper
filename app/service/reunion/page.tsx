@@ -122,7 +122,7 @@ export default function ReunionPage() {
   // ── SPLASH ─────────────────────────────────────────────────────────────────
   if (step === "splash") {
     return (
-      <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10">
+      <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10 page-fade-in">
         <BackButton />
         <div className="w-full max-w-2xl space-y-6 text-center">
           <div className="text-5xl">🔥</div>

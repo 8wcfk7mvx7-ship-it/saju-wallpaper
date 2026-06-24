@@ -91,7 +91,7 @@ export default function NomadPage() {
 
   if (step === "entry") {
     return (
-      <main className="min-h-screen bg-[#0a0a14] text-white flex flex-col">
+      <main className="min-h-screen bg-[#0a0a14] text-white flex flex-col page-fade-in">
         <BackButton />
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-cyan-950/40 blur-[160px]" />

@@ -55,7 +55,7 @@ export default function OvercomePage() {
 
   if (step === "splash") {
     return (
-      <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden"
+      <main className="min-h-screen bg-[#06060e] text-white flex flex-col relative overflow-hidden page-fade-in"
         style={{ animation: "fadeIn 0.45s ease-out" }}>
         <BackButton />
         <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}`}</style>

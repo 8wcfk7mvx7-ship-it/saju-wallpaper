@@ -247,7 +247,7 @@ export default function PlacePage() {
 
       {/* ══ SPLASH ══ */}
       {step === "splash" && (
-        <div className="min-h-screen relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden page-fade-in">
           <div className="fixed inset-0 pointer-events-none">
             <div className="absolute top-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-amber-900/20 blur-[150px]" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[450px] h-[450px] rounded-full bg-violet-900/20 blur-[130px]" />

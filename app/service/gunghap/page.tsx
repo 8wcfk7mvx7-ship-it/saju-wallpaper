@@ -467,7 +467,7 @@ export default function GunghapPage(){
 
       {/* ══ ENTRY ══ */}
       {step==='entry'&&(
-        <div style={{minHeight:'100vh',position:'relative',overflowX:'hidden'}}>
+        <div className="page-fade-in" style={{minHeight:'100vh',position:'relative',overflowX:'hidden'}}>
           {/* 배경 글로우 */}
           <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}}>
             <div style={{position:'absolute',top:'-15%',left:'-10%',width:520,height:520,

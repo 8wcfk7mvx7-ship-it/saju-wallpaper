@@ -224,7 +224,7 @@ export default function SajuChatPage() {
   // ── Gate ──────────────────────────────────────────────────────────────────────
   if (step === "gate") {
     return (
-      <div style={{
+      <div className="page-fade-in" style={{
         minHeight: "100vh", background: "#06060e", color: "#e8e0ff",
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", padding: "24px", position: "relative", overflow: "hidden",
