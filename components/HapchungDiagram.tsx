@@ -57,13 +57,20 @@ export default function HapchungDiagram({
   const targetPillars = pickSlots(targetSaju);
   const allJj = [...myPillars.map(p => p.jj), ...targetPillars.map(p => p.jj)];
   const myCount = myPillars.length;
+  // 같은 자리(연주-연주, 월주-월주, 일주-일주, 시주-시주)끼리만 비교 — 자리를 건너뛰는 크로스 비교는 제외
   const crossRelations = sortJijiRelationsByStrength(
-    getJijiRelations(allJj).filter(r => (r.a < myCount) !== (r.b < myCount))
+    getJijiRelations(allJj).filter(r => {
+      if ((r.a < myCount) === (r.b < myCount)) return false;
+      const mine = r.a < myCount ? myPillars[r.a] : myPillars[r.b];
+      const theirs = r.a < myCount ? targetPillars[r.b - myCount] : targetPillars[r.a - myCount];
+      return mine.slot === theirs.slot;
+    })
   );
   const hapCount = crossRelations.filter(r => r.type === "육합" || r.type === "삼합" || r.type === "반합").length;
   const chungCount = crossRelations.filter(r => r.type === "충").length;
   const tensionCount = crossRelations.filter(r => r.type === "형" || r.type === "파" || r.type === "해" || r.type === "원진").length;
-  const xOf = (slot: number) => 12.5 + slot * 25;
+  // 화면상 왼쪽부터 시주·일주·월주·연주 순으로 보이도록 자리 순서를 뒤집어 배치
+  const xOf = (slot: number) => 12.5 + (3 - slot) * 25;
   const myChipBorder = myChipColor.replace(/0\.\d+\)$/, "0.35)");
   const targetChipBorder = targetChipColor.replace(/0\.\d+\)$/, "0.35)");
 

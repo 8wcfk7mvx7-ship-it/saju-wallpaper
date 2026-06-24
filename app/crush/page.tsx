@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  analyzeSaju, ILGAN_PERSONALITY, getDisplaySinsalList, type SajuResult,
+  analyzeSaju, ILGAN_PERSONALITY, type SajuResult,
   getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
@@ -302,7 +302,7 @@ export default function CrushPage() {
           {[
             "💡 이 사람의 이상형 유형",
             "💡 어떻게 접근해야 마음이 열릴까",
-            "💡 쟁재남인지, 인성다자인지 진단",
+            "💡 연애에 얼마나 진지하게 임하는 사람인지",
             "💡 연애할 때 조심해야 할 포인트",
             "💡 나와의 궁합 점수 (내 생일 입력 시)",
           ].map((t, i) => (
@@ -508,7 +508,7 @@ export default function CrushPage() {
           { icon: "💭", title: "이 사람의 이상형", content: result.idealType, accent: "#f43f5e" },
           { icon: "🎯", title: "공략 포인트 · 이렇게 접근하세요", content: result.approach, accent: "#fb7185" },
           { icon: "🧠", title: "심리 패턴 · 연애할 때 이런 사람", content: result.psychology, accent: "#a78bfa" },
-          { icon: "💰", title: "돈·재물 스타일 (쟁재남 진단)", content: result.moneyStyle, accent: "#fbbf24" },
+          { icon: "💰", title: "돈·재물 스타일", content: result.moneyStyle, accent: "#fbbf24" },
           { icon: "⚠️", title: "주의할 점 · 이건 피하세요", content: result.warning, accent: "#f97316" },
         ].map((card, i) => (
           <div key={i} className="mb-4 rounded-2xl p-5"
@@ -574,23 +574,6 @@ export default function CrushPage() {
         })()}
 
 
-        {/* 신살 목록 */}
-        {targetSaju && getDisplaySinsalList(targetSaju.sinsalList).length > 0 && (
-          <div className="mb-4 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">✦</span>
-              <h3 className="text-sm font-black" style={{ color: "#fbbf24" }}>그 사람의 신살 (神殺)</h3>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {getDisplaySinsalList(targetSaju.sinsalList).map((s, i) => (
-                <div key={i} className="rounded-xl px-3 py-2" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
-                  <p className="text-xs font-bold" style={{ color: "#fbbf24" }}>{s.name}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{s.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* 짝사랑 성공 비결 */}
         {targetSaju && (() => {

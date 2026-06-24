@@ -10,6 +10,7 @@ import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import HapchungDiagram from "@/components/HapchungDiagram";
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -894,6 +895,12 @@ export default function GunghapPage(){
                 </div>
               ))}
             </div>
+
+            {/* ④-2 합충 다이어그램 — 같은 자리(연주-연주·월주-월주·일주-일주·시주-시주)끼리만 비교 */}
+            <HapchungDiagram
+              mySaju={result.r1} targetSaju={result.r2}
+              myName={p1.name || "나"} targetName={p2.name || "그 사람"}
+            />
 
             {/* ⑤ 용신/오행 */}
             <div style={{background:'rgba(255,255,255,0.03)',borderRadius:13,padding:'14px',marginBottom:14,border:'1px solid rgba(255,255,255,0.06)'}}>
