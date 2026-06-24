@@ -241,7 +241,7 @@ export function matchZimiTmi(palaces: ZiweiPalace[]): ZimiTmi[] {
 }
 
 // 부처궁(배우자운) 심층 분석 — 주성·보좌성·살성·잡성의 조합을 풀어서 하나의 흐르는 글로 엮어낸다.
-export function getBucheoNarrative(palaces: ZiweiPalace[]): string {
+export function getBucheoNarrative(palaces: ZiweiPalace[], gender?: "male" | "female"): string {
   const bu = palaces.find(p => p.palaceName === "부처");
   const myeong = palaces.find(p => p.palaceName === "명궁");
   if (!bu) return "";
@@ -251,7 +251,10 @@ export function getBucheoNarrative(palaces: ZiweiPalace[]): string {
   const hasTanRyeomPa = stars.some(s => ["탐랑", "염정", "파군"].includes(s));
   const hasCheonryo = bu.minorStars.includes("천요");
   const hasJigongJigeop = bu.maleficStars.includes("지공") && bu.maleficStars.includes("지겁");
-  const hasGwasukGojin = bu.minorStars.includes("과숙") || bu.minorStars.includes("고진");
+  const hasGwasuk = bu.minorStars.includes("과숙");
+  const hasGojinBu = bu.minorStars.includes("고진");
+  const hasGojinMyeong = !!myeong?.minorStars.includes("고진");
+  const hasGwasukGojin = hasGwasuk || hasGojinBu;
   const hasGyeongyangTara = bu.maleficStars.includes("경양") || bu.maleficStars.includes("타라");
   const hasGilseong = bu.luckyStars.length > 0;
   const myeongHasTaeeum = !!myeong?.stars.includes("태음");
@@ -272,6 +275,10 @@ export function getBucheoNarrative(palaces: ZiweiPalace[]): string {
 
   if (hasGwasukGojin) {
     parts.push("그동안 꾸역꾸역 참아온 고독감이 쌓여있는 자리이기도 해요. 다만 이건 단순한 이혼수보다는 '고독'에 가까운 결과라서, 따로 각방을 쓰는 식으로 거리를 두면 결혼 생활 자체는 유지할 수 있는 경우가 많아요.");
+  }
+
+  if (gender === "male" && (hasGojinMyeong || hasGojinBu)) {
+    parts.push("특히 명궁이나 부처궁 쪽에 외로움의 별 기운이 자리해, 다른 자리보다 이혼이나 별거로 이어질 위험이 조금 더 높은 편이에요. 혼자 있는 시간을 인정하면서도, 배우자와의 거리를 너무 벌리지 않으려는 의식적인 노력이 필요해요.");
   }
 
   if (hasGyeongyangTara && !hasCheonryo) {

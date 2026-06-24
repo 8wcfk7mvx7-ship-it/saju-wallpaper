@@ -26,7 +26,13 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
 }
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseongStrength, getJijiRelations, type SajuResult } from "@/lib/saju";
+import {
+  analyzeSaju, getSipseongStrength, getJijiRelations, type SajuResult,
+  getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
+  getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
+  getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
+  getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+} from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -358,6 +364,25 @@ function SpyContent() {
   const ilgan   = result.pillarsDetail.day.cg;
   const spyData = ILGAN_SPY[ilgan] ?? ILGAN_SPY["무"];
 
+  const theirGender = theirForm.gender;
+  const jipchaknamNarrative = getJipchaknamNarrative(result, theirGender);
+  const extraTraitNarrative = [
+    jipchaknamNarrative,
+    getYangpaltongNarrative(result, theirGender),
+    getHwasuMultiHongyeomNarrative(result),
+    getBigeopMultiNarrative(result, theirGender),
+    getPporonamNarrative(result, theirGender),
+    getJaengjaenamNarrative(result, theirGender),
+    getJaeseongHonjapNarrative(result, theirGender),
+    getGwandanyeoNarrative(result, theirGender),
+    getSanggwanGyeongwanNarrative(result, theirGender),
+    getGwanseongGoripNarrative(result, theirGender),
+    getGwanbiAmhapNarrative(result, theirGender),
+    getDohwaPositionNarrative(result),
+    getMuinseongNarrative(result),
+    !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
+  ].filter((s): s is string => !!s).join(" ");
+
   const dangerSinsals: { name: string; desc: string }[] = [];
   if (has진도화) dangerSinsals.push({ name: "진도화(眞桃花)", desc: "일지 기준 진짜 도화. 이성 매력과 인기가 매우 강합니다. 유혹에 노출될 가능성이 높습니다." });
   if (has홍염)  dangerSinsals.push({ name: "홍염살(紅艶殺)", desc: "색정 구설 기운. 이성과의 스캔들 가능성이 사주에 내재되어 있습니다." });
@@ -463,7 +488,7 @@ function SpyContent() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">연애 패턴 — {ilgan}일간</p>
           <p className="text-base font-bold mb-3" style={{ color: spyData.riskColor }}>{spyData.style}</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-4">{spyData.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-4">{spyData.desc}{extraTraitNarrative ? ` ${extraTraitNarrative}` : ""}</p>
           <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 mb-4">
             <span className="text-xs text-gray-500 font-semibold">바람기 위험</span>
             <span className="text-xs font-bold" style={{ color: spyData.riskColor }}>{spyData.risk}</span>

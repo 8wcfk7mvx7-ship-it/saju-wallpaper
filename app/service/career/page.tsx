@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSangcheong } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -299,7 +299,7 @@ export default function CareerPage() {
         <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 mb-5 text-center">
           <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">사주 구조 진단</p>
           <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 용신 {yongshinEl} ({yongshinGroup})</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} {getJikjangSiseonNarrative(r)}</p>
         </div>
 
         {/* 조후(調候) 분석 */}

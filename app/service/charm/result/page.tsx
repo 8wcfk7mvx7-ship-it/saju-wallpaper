@@ -2,7 +2,14 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import type { SajuResult } from "@/lib/saju";
-import { detectGagukPatterns } from "@/lib/saju";
+import {
+  detectGagukPatterns,
+  getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
+  getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
+  getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
+  getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+  getOhaengPlaceNarrative, getGongmangNarrative,
+} from "@/lib/saju";
 import {
   ILGAN_CHARM_DB,
   SAL_CHARM_DB,
@@ -142,6 +149,26 @@ function CharmResultContent() {
 
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
 
+  const jipchaknamNarrative = getJipchaknamNarrative(result, gender);
+  const charmExtraNarrative = [
+    jipchaknamNarrative,
+    getYangpaltongNarrative(result, gender),
+    getMuinseongNarrative(result),
+    getHwasuMultiHongyeomNarrative(result),
+    getBigeopMultiNarrative(result, gender),
+    getPporonamNarrative(result, gender),
+    getJaengjaenamNarrative(result, gender),
+    getJaeseongHonjapNarrative(result, gender),
+    getGwandanyeoNarrative(result, gender),
+    getSanggwanGyeongwanNarrative(result, gender),
+    getGwanseongGoripNarrative(result, gender),
+    getGwanbiAmhapNarrative(result, gender),
+    getDohwaPositionNarrative(result),
+    getGongmangNarrative(result),
+    getOhaengPlaceNarrative(result),
+    !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
+  ].filter((s): s is string => !!s).join(" ");
+
   const handlePayment = () => {
     const orderId = generateOrderId();
     sessionStorage.setItem("charmOrderId", orderId);
@@ -251,7 +278,7 @@ function CharmResultContent() {
         {/* ═══ 오행 외모 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""}</p>
           <p className="text-xs text-gray-600">📺 비슷한 스타일: {olook?.celebs}</p>
         </div>
 

@@ -231,7 +231,7 @@ export default function ZimidousuPage() {
   const myeonggungPalace = PALACES[0];
   const palaceJiji = getPalaceJiji(result.myeonggungIdx);
   const tmiList = chart ? matchZimiTmi(chart.palaces) : [];
-  const bucheoNarrative = chart ? getBucheoNarrative(chart.palaces) : "";
+  const bucheoNarrative = chart ? getBucheoNarrative(chart.palaces, form.gender) : "";
 
   return (
     <main className="min-h-screen bg-[#0c0816] text-white">

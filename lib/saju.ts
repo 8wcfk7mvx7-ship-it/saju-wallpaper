@@ -971,7 +971,7 @@ function getSinsal(yeonji: string, jj: string): string {
 }
 
 // 공망 계산 (일주 기준)
-function getGongmang(dayCg: string, dayJj: string): string[] {
+export function getGongmang(dayCg: string, dayJj: string): string[] {
   const ci = CHEONGAN.indexOf(dayCg);
   const ji = JIJI.indexOf(dayJj);
   const sunsuJi = (ji - ci + 12) % 12;
@@ -3591,6 +3591,259 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
   }
 
   return results;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 추가 성향 내러티브 헬퍼 — 기존 십성/오행/신살 데이터를 조합해
+// 자연스러운 문장 단편(string | null)으로 변환한다. (UI 카드 신설 금지, 기존 문단에 덧붙이는 용도)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const JJ_YANG_SET = new Set(["자","인","진","오","신","술"]);
+const CG_HAP_PARTNER: Record<string, string> = {
+  갑:"기", 기:"갑", 을:"경", 경:"을", 병:"신", 신:"병", 정:"임", 임:"정", 무:"계", 계:"무",
+};
+
+function allPillarsOf(r: SajuResult) {
+  const pd = r.pillarsDetail;
+  return [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+}
+
+function allSipseongOf(r: SajuResult): string[] {
+  return allPillarsOf(r).flatMap(p => [p.sipseongCg, p.sipseongJj]).filter((s): s is string => !!s);
+}
+
+function sipseongCount(r: SajuResult, names: string[]): number {
+  return allSipseongOf(r).filter(s => names.includes(s)).length;
+}
+
+function sipseongHas(r: SajuResult, names: string[]): boolean {
+  return allSipseongOf(r).some(s => names.includes(s));
+}
+
+function groupStrength(r: SajuResult, group: "비겁" | "식상" | "재성" | "관성" | "인성"): SipseongStrengthInfo["status"] {
+  const info = getSipseongStrength(r).find(s => s.group === group);
+  return info ? info.status : "무";
+}
+
+// 1) 집착남 사주 (남자만): 월지 수왕절 + 음일간(계/신/기/무) + 화 부족 + 관성 존재 + 금 존재
+export function getJipchaknamNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  const pd = r.pillarsDetail;
+  const monthIsSu = JJ_OHAENG[pd.month.jj] === "수";
+  const dayCg = pd.day.cg;
+  const isEumIlgan = ["계", "신", "기", "무"].includes(dayCg);
+  if (!monthIsSu || !isEumIlgan) return null;
+
+  const elements: Element[] = ["목", "화", "토", "금", "수"];
+  const minEl = elements.reduce((a, b) => (r.scores[a] <= r.scores[b] ? a : b));
+  const hwaLow = r.lacking.includes("화") || minEl === "화";
+  if (!hwaLow) return null;
+
+  const hasGwanseong = sipseongHas(r, ["정관", "편관"]);
+  if (!hasGwanseong) return null;
+
+  const allCg = allPillarsOf(r).map(p => p.cg);
+  const allJj = allPillarsOf(r).map(p => p.jj);
+  const hasGeum = allCg.includes("경") || allCg.includes("신") || allJj.includes("신") || allJj.includes("유") || r.scores.금 > 0;
+  if (!hasGeum) return null;
+
+  const hasMok = allCg.includes("갑") || allCg.includes("을") || allJj.includes("인") || allJj.includes("묘") || r.scores.목 > 0;
+
+  const sentences: string[] = [
+    "한 사람에게 마음이 깊이 들어가면 좀처럼 빠져나오지 못하고, 상대에게 강하게 집착하는 경향이 있는 구조예요.",
+  ];
+  if (hasMok) {
+    sentences.push("거기에 자신이 정한 기준이나 원칙을 끝까지 밀어붙이는 면이 더해져, 한 번 꽂힌 사람·관계를 잘 놓지 못하는 성향이 한층 강해질 수 있어요.");
+  }
+  sentences.push(getHwabuJokNarrative(r) ?? "");
+  return sentences.filter(Boolean).join(" ");
+}
+
+// 2) 화기운 보충법 + 화부족 성향 (모든 성별)
+export function getHwabuJokNarrative(r: SajuResult): string | null {
+  const elements: Element[] = ["목", "화", "토", "금", "수"];
+  const minEl = elements.reduce((a, b) => (r.scores[a] <= r.scores[b] ? a : b));
+  const hwaLow = r.lacking.includes("화") || minEl === "화";
+  if (!hwaLow) return null;
+
+  return "화(火) 기운이 약해서 사치스러운 면이나 노출에 대한 욕구, 짝사랑에 잘 빠지는 면이 있을 수 있고, 잘 웃거나 잘 놀라고 가슴이 자주 두근거리며 더운 걸 유독 싫어하는 편이에요. 드럼이나 피아노 같은 건반악기, 관악기 등 악기를 연주하거나 라틴댄스·필라테스 같은 운동을 즐기면 부족한 화 기운을 자연스럽게 채울 수 있어요.";
+}
+
+// 3) 무인성: 인성(정인/편인)이 전혀 없음
+export function getMuinseongNarrative(r: SajuResult): string | null {
+  if (sipseongHas(r, ["정인", "편인"])) return null;
+  return "인성이 없어서 뇌가 해맑은 편이에요. 무언가를 잘 잊어버리는 경향이 있고, 예전에 본 내용도 다시 접하면 매번 새롭게 느껴지곤 해요.";
+}
+
+// 4) 양팔통: 4기둥의 천간+지지 8글자가 모두 양
+export function getYangpaltongNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  const pillars = allPillarsOf(r);
+  if (pillars.length < 4) return null;
+  const allYang = pillars.every(p => CG_YANG_SET.has(p.cg) && JJ_YANG_SET.has(p.jj));
+  if (!allYang) return null;
+
+  let s = "사주 8글자가 모두 양(陽)으로만 이루어진 양팔통이에요. 외향적이고 진취적인 기운이 강하고, 추진력과 결단력이 빨라서 한번 마음먹으면 망설임 없이 밀고 나가는 타입이에요. 다만 성격이 급한 편이라 속도 조절이 필요해요.";
+  if (gender === "male") {
+    s += " 본인 성질을 스스로 제어하기 힘들어하는 순간이 있을 수 있어, 의식적으로 속도를 늦추는 연습이 도움이 돼요.";
+  } else if (gender === "female") {
+    s += " 여성치고는 남성적인 기질이 강하게 드러나는 편이라, 씩씩하고 주도적인 모습으로 비춰질 때가 많아요.";
+  }
+  return s;
+}
+
+// 5) 화수다자 + 홍염살: 성욕/스킨십/외모 취향 관련 (모든 성별)
+export function getHwasuMultiHongyeomNarrative(r: SajuResult): string | null {
+  const hasHwa = r.dominant.includes("화");
+  const hasSu = r.dominant.includes("수");
+  if (!hasHwa || !hasSu) return null;
+  const hasHongyeom = r.sinsalList.some(s => s.name === "홍염살");
+  if (!hasHongyeom) return null;
+  return "화(火)와 수(水) 기운이 동시에 강하고 홍염살까지 자리해, 스킨십이나 애정 표현에 적극적인 편이고 이성에게 매력적으로 비치는 끼가 있어요. 외모나 분위기를 중요하게 여기는 취향도 함께 있는 구조예요.";
+}
+
+// 6) 비겁다자: 비견+겁재 2개 이상 (모든 성별, 여성+기신 추가 문장)
+export function getBigeopMultiNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  const bigeupCount = sipseongCount(r, ["비견", "겁재"]);
+  if (bigeupCount < 2) return null;
+
+  let s = "비견·겁재 기운이 여러 자리에 있어서 경쟁심과 승부욕이 강한 편이에요. 남에게 지는 걸 싫어하고, 질투심도 또래보다 강하게 느끼는 성향이 있어요.";
+  const dayEl = CHEONGAN_ELEMENT[r.pillarsDetail.day.cg];
+  if (gender === "female" && bigeupCount >= 3 && r.yongshin.gishin === dayEl) {
+    s += " 다만 그 강한 기운이 본인에게는 부담으로 작용하는 구조라, 여성 관계에서 본의 아니게 다른 여성들의 견제나 미움을 사기 쉬운 흐름도 있으니 인간관계를 둥글게 다루는 노력이 도움이 돼요.";
+  }
+  return s;
+}
+
+// 7) 오행별 기운이 강한 장소 추천 (dominant 오행 기준)
+const OHAENG_PLACES: Record<Element, string[]> = {
+  목: ["등산", "산장", "전통찻집", "책방", "만화방", "식물원", "가구가게", "수목원", "시골", "산림욕"],
+  화: ["사람 많은 곳", "시장", "백화점", "노래방", "스포츠 관람", "콘서트", "경마장", "하이킹", "꽃 많은 곳"],
+  토: ["올림픽공원", "농원", "대학로", "조각공원", "동물원", "운동장", "들판", "잔디공원", "흙길 둘레길"],
+  금: ["오락실", "피시방", "비디오방", "미술관", "암반계곡"],
+  수: ["수영장", "호프집", "섬", "재즈카페", "온천욕", "낚시", "강", "바다", "호수공원"],
+};
+
+export function getOhaengPlaceNarrative(r: SajuResult): string | null {
+  if (r.dominant.length === 0) return null;
+  const el = r.dominant[0];
+  const places = OHAENG_PLACES[el];
+  if (!places || places.length === 0) return null;
+  // 결과가 매번 같은 두 곳만 나오지 않도록 사주 점수 합으로 시작 인덱스를 살짝 흔든다.
+  const seed = Math.round((r.scores[el] ?? 0) * 10);
+  const a = places[seed % places.length];
+  const b = places[(seed + 3) % places.length];
+  return `${el}(${el}) 기운이 강한 사주라, 기운을 채우고 싶을 땐 ${a}이나 ${b} 같은 곳에 가보는 것도 좋아요.`;
+}
+
+// 8) 공망 다자: 4기둥 중 2개 이상의 지지가 공망에 해당
+export function getGongmangNarrative(r: SajuResult): string | null {
+  const pd = r.pillarsDetail;
+  const gongmangJjs = getGongmang(pd.day.cg, pd.day.jj);
+  const pillars = allPillarsOf(r);
+  const hitCount = pillars.filter(p => gongmangJjs.includes(p.jj)).length;
+  if (hitCount < 2) return null;
+  return "공망에 해당하는 기둥이 여러 자리라, 평생 돈 생각이 머리에서 잘 떠나지 않는 흐름이 있을 수 있어요. 채워도 채워지지 않는 듯한 허전함이 돈에 대한 집착으로 이어지기 쉬우니, 돈 자체보다 돈을 버는 과정과 의미에 마음을 두는 게 마음 편한 길이에요.";
+}
+
+// 9) 일지도화 vs 월지도화
+export function getDohwaPositionNarrative(r: SajuResult): string | null {
+  const pd = r.pillarsDetail;
+  const dohwaJj = getDohwaJj(pd.year.jj);
+  const ilji = pd.day.jj === dohwaJj;
+  const wolji = pd.month.jj === dohwaJj;
+  if (!ilji && !wolji) return null;
+  if (ilji && wolji) {
+    return "일지와 월지에 모두 도화 기운이 자리해, 이성에게 인기가 많으면서 동시에 업무나 성과 면에서도 크게 주목받고 인정받는 타입이에요.";
+  }
+  if (ilji) return "도화 기운이 일지에 자리해, 이성에게 인기 있는 타입이에요.";
+  return "도화 기운이 월지에 자리해, 업무나 성과 면에서 더 크게 주목받고 인정받는 타입이에요.";
+}
+
+// 10) 직장을 대하는 시각 — 각 십성 그룹 강함 상태별 한 문장
+const JIKJANG_SISEON: Record<"비겁" | "식상" | "재성" | "관성" | "인성", string> = {
+  비겁: "직장을 동료·경쟁자와 함께 부대끼는 곳으로 여기다 보니, 동료나 상사와 친하게 지내고 회식 같은 자리도 즐기는 편이에요.",
+  식상: "직장에서도 말이나 표현을 통해 에너지를 쏟는 편이라, 회의나 대화 자리에서 말이 많아지고 아이디어를 적극적으로 풀어내는 타입이에요.",
+  재성: "직장을 무엇보다 생계를 책임지는 수단으로 보는 경향이 강해서, 보상이나 실질적인 이득에 민감하게 반응하는 편이에요.",
+  관성: "조직의 질서나 위계를 존중하는 편이라 상사의 말을 잘 따르고, 정해진 규칙 안에서 인정받으려는 태도가 강해요.",
+  인성: "스스로 다 해내기보다 '어떻게든 되겠지, 도와주겠지' 하는 마음으로 주변의 도움이나 배움에 의존하는 경향이 있어요.",
+};
+
+export function getJikjangSiseonNarrative(r: SajuResult): string | null {
+  const strong = getSipseongStrength(r).filter(s => s.status === "강함").map(s => s.group);
+  if (strong.length === 0) return null;
+  return strong.map(g => JIKJANG_SISEON[g]).join(" ");
+}
+
+// 11) 기신대운 진입 시 주의
+export function getGishinDaewoonCaution(r: SajuResult, daewoonElement: Element): string | null {
+  if (daewoonElement !== r.yongshin.gishin) return null;
+  return "지금 흘러가는 대운의 기운이 기신에 해당해서, 무리한 시도나 급격한 변화는 피하고 몸과 마음을 돌보는 시기로 삼는 게 좋아요.";
+}
+
+// 14) 비겁다 무관 "뽀로로남" (남자만)
+export function getPporonamNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  if (groupStrength(r, "비겁") !== "강함") return null;
+  if (sipseongHas(r, ["정관", "편관"])) return null;
+  return "비겁 기운은 강한데 관성이 전혀 없어서, 가정이나 책임에 대한 개념이 약하고 노는 것을 우선시하는 성향이 있을 수 있어요. 제대로 된 남편 역할을 기대하기에는 다소 아쉬울 수 있는 구조라, 책임감을 의식적으로 키우려는 노력이 필요해요.";
+}
+
+// 15) 쟁재남 (남자만)
+export function getJaengjaenamNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  const jaeCount = sipseongCount(r, ["정재", "편재"]);
+  const bigeupCount = sipseongCount(r, ["비견", "겁재"]);
+  if (!(jaeCount >= 1 && bigeupCount >= 2)) return null;
+  return "평소엔 무난하게 잘 지내다가도, 헤어지자는 이야기가 나오면 갑자기 집착이나 연락, 소유욕이 강해지는 경향이 있어요. 관계를 쉽게 끝내기 어려운 상대일 수 있어요.";
+}
+
+// 16) 재성혼잡 재다남 (남자만)
+export function getJaeseongHonjapNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  const hasJeongjae = sipseongHas(r, ["정재"]);
+  const hasPyeonjae = sipseongHas(r, ["편재"]);
+  if (!hasJeongjae || !hasPyeonjae) return null;
+  const jaeCount = sipseongCount(r, ["정재", "편재"]);
+  const isMulti = jaeCount >= 3 || groupStrength(r, "재성") === "강함";
+  if (!isMulti) return null;
+  return "처음엔 상대를 잘 챙겨주고 다정한 모습을 보이지만, 상대의 상황이 어려워지면 마음이 쉽게 떠날 수 있는 구조예요. 외도나 바람기로 흐를 가능성에도 주의가 필요해요.";
+}
+
+// 17) 관다녀 (여자만)
+export function getGwandanyeoNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "female") return null;
+  const count = sipseongCount(r, ["정관", "편관"]);
+  const isMulti = count >= 3 || groupStrength(r, "관성") === "강함";
+  if (!isMulti) return null;
+  return "주변에 호감을 보이는 남자가 많아서 인연이 복잡해지기 쉬운 구조예요. 스스로 중심을 잡고 선을 분명히 하는 게 중요해요.";
+}
+
+// 18) 상관견관녀 (여자만)
+export function getSanggwanGyeongwanNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "female") return null;
+  if (!sipseongHas(r, ["상관"]) || !sipseongHas(r, ["정관"])) return null;
+  return "욱하는 성격이나 잡도리하려는 태도가 배우자를 궁지로 밀어넣는 경향이 있을 수 있어요.";
+}
+
+// 19) 관성고립녀 (여자만, 단순화: 관성 1개 + 재성 0개)
+export function getGwanseongGoripNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "female") return null;
+  const gwanCount = sipseongCount(r, ["정관", "편관"]);
+  const jaeCount = sipseongCount(r, ["정재", "편재"]);
+  if (gwanCount !== 1 || jaeCount !== 0) return null;
+  return "결혼 생활에서 외로움이나 소통 부족을 느끼기 쉬운 구조예요. 배우자와의 정서적 교류를 의식적으로 늘리려는 노력이 필요해요.";
+}
+
+// 20) 관비암합녀 (여자만, 단순화: 일간 천간합 짝이 다른 자리에 정관/편관으로 존재)
+export function getGwanbiAmhapNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "female") return null;
+  const dayCg = r.pillarsDetail.day.cg;
+  const partner = CG_HAP_PARTNER[dayCg];
+  if (!partner) return null;
+  const others = allPillarsOf(r).filter(p => p !== r.pillarsDetail.day);
+  const hit = others.some(p => p.cg === partner && ["정관", "편관"].includes(p.sipseongCg));
+  if (!hit) return null;
+  return "모르는 사이에 다른 사람에게 끌리거나 남편 외의 인연과 묘하게 얽히는 기류가 생기기 쉬운 구조라, 인간관계의 선을 분명히 하는 게 좋아요.";
 }
 
 const CG_BYEONGJON_DESC: Record<string, string> = {

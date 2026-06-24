@@ -1,7 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult } from "@/lib/saju";
+import {
+  analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, type SajuResult,
+  getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
+  getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
+  getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
+  getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+} from "@/lib/saju";
 
 // 일간별 짝사랑 성공 비결
 const CRUSH_SUCCESS: Record<string, {
@@ -218,7 +224,32 @@ export default function CrushPage() {
         { birthYear: fy, birthMonth: fm, birthDay: fd, birthTime: targetTime, calType: targetCalType, isLeapMonth: targetIsLeap, gender: targetGender, birthPlace: targetBirthPlace },
         myYear && myMonth && myDay ? { birthYear: myYear, birthMonth: myMonth, birthDay: myDay } : undefined,
       );
-      setResult(res);
+
+      const jipchaknamNarrative = getJipchaknamNarrative(sajuR, targetGender);
+      const psychologyExtra = [
+        jipchaknamNarrative,
+        getYangpaltongNarrative(sajuR, targetGender),
+        getMuinseongNarrative(sajuR),
+        getDohwaPositionNarrative(sajuR),
+        getSanggwanGyeongwanNarrative(sajuR, targetGender),
+        getGwanseongGoripNarrative(sajuR, targetGender),
+        getGwanbiAmhapNarrative(sajuR, targetGender),
+        getHwasuMultiHongyeomNarrative(sajuR),
+        !jipchaknamNarrative ? getHwabuJokNarrative(sajuR) : null,
+      ].filter((s): s is string => !!s).join(" ");
+      const moneyStyleExtra = [
+        getJaengjaenamNarrative(sajuR, targetGender),
+        getJaeseongHonjapNarrative(sajuR, targetGender),
+        getGwandanyeoNarrative(sajuR, targetGender),
+        getBigeopMultiNarrative(sajuR, targetGender),
+        getPporonamNarrative(sajuR, targetGender),
+      ].filter((s): s is string => !!s).join(" ");
+
+      setResult({
+        ...res,
+        psychology: psychologyExtra ? `${res.psychology} ${psychologyExtra}` : res.psychology,
+        moneyStyle: moneyStyleExtra ? `${res.moneyStyle} ${moneyStyleExtra}` : res.moneyStyle,
+      });
       setStep("result");
     } catch {
       setFormError("분석 중 오류가 발생했습니다. 다시 시도해주세요.");

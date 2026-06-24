@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -258,7 +258,7 @@ export default function SidejobPage() {
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-sky-300 mb-1">용신 기준 — &apos;{yongshinEl}&apos; ({yongshinSipseong})</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} 부업을 고를 때도 이 기운과 맞는 분야를 우선 고려하면, 본업과 부업 사이의 에너지 소모가 줄어듭니다.</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} 부업을 고를 때도 이 기운과 맞는 분야를 우선 고려하면, 본업과 부업 사이의 에너지 소모가 줄어듭니다. {getJikjangSiseonNarrative(r)}</p>
         </div>
 
         {/* 재성·식상 세력 심화 분석 */}
