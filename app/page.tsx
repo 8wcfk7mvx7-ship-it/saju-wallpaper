@@ -704,7 +704,7 @@ const SERVICES: {
   {
     id: "daewoon", emoji: "⏳",
     title: "대운·세운 80년 분석",
-    viral: "내 인생이 몇 살에 터지는지 AI가 직접 알려줍니다",
+    viral: "내 인생이 몇 살에 터지는지 사주가 직접 알려줍니다",
     desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
     tags: ["대운", "세운", "교운기 전략"],
     href: "/service/daewoon", badge: "",
