@@ -128,7 +128,7 @@ export default function LoadingPage() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-purple-900/20 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-md w-full text-center space-y-10">
+      <div className="relative z-10 max-w-2xl w-full text-center space-y-10">
 
         {/* 메인 아이콘 */}
         <div className="relative inline-block">

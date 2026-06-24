@@ -83,7 +83,7 @@ export default function AttendancePage() {
         </button>
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto w-full px-5 pt-10 pb-24">
+      <div className="relative z-10 max-w-2xl mx-auto w-full px-5 pt-10 pb-24">
         <div className="text-center mb-10">
           <div className="text-5xl mb-4">📅</div>
           <h1 className="text-2xl font-black mb-1">출석체크</h1>

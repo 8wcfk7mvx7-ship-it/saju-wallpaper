@@ -70,7 +70,7 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-5">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <h1 className="text-2xl font-black mb-1 text-center">회원가입</h1>
         <p className="text-sm text-gray-500 mb-8 text-center">Summer Palace 계정을 만들면 별조각이 안전하게 보관돼요.</p>
 

@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-5">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <h1 className="text-2xl font-black mb-1 text-center">로그인</h1>
         <p className="text-sm text-gray-500 mb-8 text-center">Summer Palace 계정으로 별조각을 안전하게 관리하세요.</p>
 

@@ -74,7 +74,7 @@ function CharmPayContent() {
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center px-4 py-10">
       <BackButton />
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">✨</div>
           <h1 className="text-2xl font-black text-white mb-1">매력 프리미엄 보고서</h1>

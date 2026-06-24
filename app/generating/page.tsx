@@ -228,7 +228,7 @@ function GeneratingContent() {
       </div>
 
       {/* 프로그레스 바 */}
-      <div className="w-full max-w-sm mb-6">
+      <div className="w-full max-w-2xl mb-6">
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>진행률</span>
           <span>{totalProgress}%</span>
@@ -242,7 +242,7 @@ function GeneratingContent() {
       </div>
 
       {/* 스텝 리스트 */}
-      <div className="w-full max-w-sm space-y-2 mb-6">
+      <div className="w-full max-w-2xl space-y-2 mb-6">
         {steps.map((step) => (
           <div
             key={step.id}
@@ -303,7 +303,7 @@ function GeneratingContent() {
 
       {/* 에러 */}
       {error && (
-        <div className="w-full max-w-sm mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
+        <div className="w-full max-w-2xl mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
           <p className="text-red-400 text-sm mb-3">{error}</p>
           <button
             onClick={() => router.push("/result")}
@@ -316,7 +316,7 @@ function GeneratingContent() {
 
       {/* ── AdSense 광고 ── */}
       {!done && !error && (
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-2xl">
           <p className="text-xs text-gray-600 text-center mb-2">AI 생성에는 약 1-2분이 소요됩니다 ☕</p>
           {/* 광고 1: 배너 */}
           <AdBanner />

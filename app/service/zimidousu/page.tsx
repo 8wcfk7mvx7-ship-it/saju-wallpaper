@@ -379,7 +379,7 @@ export default function ZimidousuPage() {
 
         {/* 5대 궁 × 인기 질문 연결 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-gray-200 mb-1">사람들이 가장 궁금한 건 이 5개 궁에 다 있어</p>
+          <p className="text-sm font-bold text-gray-200 mb-1">사람들이 가장 궁금한 건 이 5개 궁에 다 있어요</p>
           <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
             돈 → 배우자 → 성공 → 건강 → 성격 순서로 묻는 게 자미두수 상담의 공식.
           </p>
@@ -389,7 +389,7 @@ export default function ZimidousuPage() {
                 name: "재백궁", hanja: "財帛宮", color: "text-yellow-300",
                 border: "border-yellow-700/30", bg: "bg-yellow-900/10",
                 q: "부자 될 팔자인가?",
-                desc: "돈이 어떤 방식으로 들어오는지, 재물운의 안정성, 재테크 스타일까지 여기서 봐.",
+                desc: "돈이 어떤 방식으로 들어오는지, 재물운의 안정성, 재테크 스타일까지 여기서 볼 수 있어요.",
               },
               {
                 name: "부처궁", hanja: "夫妻宮", color: "text-rose-300",
@@ -401,19 +401,19 @@ export default function ZimidousuPage() {
                 name: "관록궁", hanja: "官祿宮", color: "text-sky-300",
                 border: "border-sky-700/30", bg: "bg-sky-900/10",
                 q: "사업가 체질인가 직장인 체질인가? 유명해질 팔자인가?",
-                desc: "직업 적성, 성취 방식, 사회적 지위의 최고점을 여기서 읽어.",
+                desc: "직업 적성, 성취 방식, 사회적 지위의 최고점을 여기서 읽을 수 있어요.",
               },
               {
                 name: "천이궁", hanja: "遷移宮", color: "text-emerald-300",
                 border: "border-emerald-700/30", bg: "bg-emerald-900/10",
                 q: "귀인복 / 인생 전성기는 언제?",
-                desc: "밖에서 만나는 사람들의 수준, 귀인이 얼마나 들어오는지, 해외 운도 여기 달려 있어.",
+                desc: "밖에서 만나는 사람들의 수준, 귀인이 얼마나 들어오는지, 해외 운도 여기 달려 있어요.",
               },
               {
                 name: "복덕궁", hanja: "福德宮", color: "text-fuchsia-300",
                 border: "border-fuchsia-700/30", bg: "bg-fuchsia-900/10",
                 q: "외모·매력 / 타고난 복의 그릇",
-                desc: "타고난 분위기와 매력, 삶을 즐기는 방식, 정신적 행복감의 기준점이 여기 있어.",
+                desc: "타고난 분위기와 매력, 삶을 즐기는 방식, 정신적 행복감의 기준점이 여기 있어요.",
               },
             ].map((p) => (
               <div key={p.name} className={`rounded-xl px-4 py-3 border ${p.border} ${p.bg}`}>

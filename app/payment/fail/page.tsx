@@ -24,11 +24,11 @@ function FailContent() {
     <div className="min-h-screen bg-[#0d0d1a] text-white flex flex-col items-center justify-center px-6 gap-5">
       <div className="text-6xl">😔</div>
       <h1 className="text-xl font-bold text-red-400">결제에 실패했어요</h1>
-      <div className="bg-white/5 border border-white/10 rounded-xl p-4 max-w-sm w-full text-center">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4 max-w-2xl w-full text-center">
         <p className="text-sm text-gray-300">{displayMessage}</p>
         {code && <p className="text-xs text-gray-500 mt-2">오류 코드: {code}</p>}
       </div>
-      <div className="flex flex-col gap-3 w-full max-w-sm">
+      <div className="flex flex-col gap-3 w-full max-w-2xl">
         <button
           onClick={() => router.back()}
           className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-medium transition-colors"

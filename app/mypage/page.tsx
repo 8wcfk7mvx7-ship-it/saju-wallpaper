@@ -133,7 +133,7 @@ export default function MyPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
-      <div className="max-w-lg mx-auto px-4 pt-6">
+      <div className="max-w-2xl mx-auto px-4 pt-6">
         {/* 유저 카드 */}
         {user ? (
           <div className="flex items-center gap-3 mb-6 p-4 rounded-2xl"

@@ -205,7 +205,7 @@ export default function DaewoonPage() {
           <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
         </div>
 
-        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-2xl mx-auto w-full pb-12">
 
           <div className="flex items-center gap-2 mb-8">
             <div className="w-2 h-2 rounded-full bg-yellow-400 pulse" />
@@ -272,7 +272,7 @@ export default function DaewoonPage() {
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#06060e] text-white">
-        <div className="max-w-lg mx-auto px-5 py-10 pb-24">
+        <div className="max-w-2xl mx-auto px-5 py-10 pb-24">
           <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
           <div className="mb-8">
@@ -400,7 +400,7 @@ export default function DaewoonPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
-      <div className="max-w-lg mx-auto px-5 py-8 pb-32">
+      <div className="max-w-2xl mx-auto px-5 py-8 pb-32">
         <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
         <div className="mb-6">
@@ -542,7 +542,7 @@ export default function DaewoonPage() {
 
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-2xl mx-auto">
               {blueberries >= PRICE ? (
                 <button
                   onClick={() => {

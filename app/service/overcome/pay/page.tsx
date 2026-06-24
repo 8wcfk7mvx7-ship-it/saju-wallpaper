@@ -18,7 +18,7 @@ type OvercomeForm = { name: string; year: number; month: number; day: number; ho
 
 function StepBar({ step }: { step: number }) {
   return (
-    <div className="w-full max-w-sm flex items-center justify-between mb-6">
+    <div className="w-full max-w-2xl flex items-center justify-between mb-6">
       {STEPS.map((s, i) => (
         <div key={s.n} className="flex items-center flex-1">
           <div className="flex flex-col items-center flex-1">
@@ -129,7 +129,7 @@ function OvercomePayContent() {
 
       {/* Step 1: 정보 확인 */}
       {step === 1 && (
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-2xl">
           <div className="rounded-3xl p-6 mb-6"
             style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.1) 0%, rgba(124,58,237,0.1) 100%)", border: "1px solid rgba(220,38,38,0.25)" }}>
             <div className="text-5xl mb-3 text-center">⚡</div>
@@ -172,7 +172,7 @@ function OvercomePayContent() {
 
       {/* Step 2: 이메일 인증 */}
       {step === 2 && (
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-2xl">
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
             <h2 className="text-lg font-black mb-1">이메일 인증</h2>
             <p className="text-xs text-gray-500 mb-5">결제 확인서와 분석 결과 다시보기에 사용할 이메일입니다.</p>
@@ -219,7 +219,7 @@ function OvercomePayContent() {
 
       {/* Step 3: 안전결제 */}
       {step === 3 && (
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-2xl">
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-gray-400 text-sm">결제 금액</span>

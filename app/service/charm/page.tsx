@@ -240,7 +240,7 @@ export default function CharmPage() {
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-pink-900/25 blur-[160px]" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/20 blur-[130px]" />
       </div>
-      <div className="relative z-10 max-w-xl w-full text-center">
+      <div className="relative z-10 max-w-2xl w-full text-center">
         <FadeIn delay={0}>
           <div className="flex flex-col items-center gap-4 mb-8">
             <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/30 rounded-full px-4 py-1.5">

@@ -247,7 +247,7 @@ export default function ReunionPage() {
   if (step === "splash") {
     return (
       <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10">
-        <div className="w-full max-w-sm space-y-6 text-center">
+        <div className="w-full max-w-2xl space-y-6 text-center">
           <div className="text-5xl">🔥</div>
           <h1 className="text-3xl font-black text-white leading-tight">
             지금 이 순간,<br />
@@ -311,7 +311,7 @@ export default function ReunionPage() {
     const err = validate(myData);
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
-        <div className="w-full max-w-sm mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-6">
           <button onClick={() => setStep("splash")} className="text-gray-400 text-sm hover:text-white">← 뒤로</button>
 
           <div>
@@ -345,7 +345,7 @@ export default function ReunionPage() {
     const err = validate(theirData);
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
-        <div className="w-full max-w-sm mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-6">
           <button onClick={() => setStep("my")} className="text-gray-400 text-sm hover:text-white">← 뒤로</button>
 
           <div>
@@ -408,7 +408,7 @@ export default function ReunionPage() {
 
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
-        <div className="w-full max-w-sm mx-auto space-y-5">
+        <div className="w-full max-w-2xl mx-auto space-y-5">
           <button onClick={() => setStep("their")} className="text-gray-400 text-sm hover:text-white">← 다시 입력</button>
 
           {/* 스코어 카드 */}

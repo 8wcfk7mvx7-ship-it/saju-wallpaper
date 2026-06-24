@@ -396,7 +396,7 @@ export default function FormPage() {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pb-16">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pb-16">
         {/* 헤더 */}
         <div className="text-center mb-10 pt-2">
           <div className="relative inline-block mb-4">

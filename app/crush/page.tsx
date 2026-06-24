@@ -267,7 +267,7 @@ export default function CrushPage() {
 
       <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-      <div className="relative z-10 max-w-md w-full text-center">
+      <div className="relative z-10 max-w-2xl w-full text-center">
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: "rgba(244,63,94,0.1)", border: "1px solid rgba(244,63,94,0.3)" }}>
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
@@ -325,7 +325,7 @@ export default function CrushPage() {
   // ── INPUT ─────────────────────────────────────────────────────────────────────
   if (step === "input") return (
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
-      <div className="max-w-lg mx-auto px-5 pt-8">
+      <div className="max-w-2xl mx-auto px-5 pt-8">
         <button onClick={() => setStep("splash")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 뒤로</button>
 
         <div className="mb-8">
@@ -472,7 +472,7 @@ export default function CrushPage() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
-      <div className="max-w-lg mx-auto px-4 pt-8">
+      <div className="max-w-2xl mx-auto px-4 pt-8">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep("input")} className="text-gray-600 hover:text-gray-400 transition text-sm">← 다시 분석</button>
           <button onClick={() => router.push("/")} className="ml-auto text-xs text-gray-700 hover:text-gray-500 transition">홈 →</button>

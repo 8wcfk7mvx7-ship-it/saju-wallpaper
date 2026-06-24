@@ -65,11 +65,11 @@ function HotCompatPayContent() {
 
   return (
     <main className="min-h-screen bg-[#08010f] text-white flex flex-col items-center px-4 py-10">
-      <div className="w-full max-w-sm mb-6">
+      <div className="w-full max-w-2xl mb-6">
         <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition text-sm">← 뒤로</button>
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🔥</div>
           <h1 className="text-2xl font-black text-white mb-1">19금 사주 궁합</h1>

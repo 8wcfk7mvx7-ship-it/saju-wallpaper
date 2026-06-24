@@ -74,7 +74,7 @@ function DaewoonPayContent() {
       <BackButton />
 
       {/* 상품 카드 */}
-      <div className="w-full max-w-sm bg-gradient-to-br from-amber-950/60 to-yellow-950/60 border border-yellow-700/30 rounded-3xl p-6 mb-6">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-amber-950/60 to-yellow-950/60 border border-yellow-700/30 rounded-3xl p-6 mb-6">
         <div className="text-5xl mb-3 text-center">⏳</div>
         <h1 className="text-xl font-black text-center text-white mb-1">대운·세운 프리미엄 보고서</h1>
         <p className="text-sm text-gray-400 text-center mb-5">
@@ -101,7 +101,7 @@ function DaewoonPayContent() {
       </div>
 
       {/* 이메일 (선택) */}
-      <div className="w-full max-w-sm mb-4">
+      <div className="w-full max-w-2xl mb-4">
         <label className="block text-xs text-gray-500 mb-1.5">영수증 받을 이메일 (선택)</label>
         <input
           type="email"
@@ -113,11 +113,11 @@ function DaewoonPayContent() {
       </div>
 
       {error && (
-        <div className="w-full max-w-sm mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm text-center">{error}</div>
+        <div className="w-full max-w-2xl mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm text-center">{error}</div>
       )}
 
       {/* 약관 */}
-      <div className="w-full max-w-sm mb-5">
+      <div className="w-full max-w-2xl mb-5">
         <label className="flex items-start gap-3 cursor-pointer">
           <div
             onClick={() => setAgreed(!agreed)}
@@ -135,7 +135,7 @@ function DaewoonPayContent() {
       </div>
 
       {/* 결제 버튼들 */}
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <PaymentMethodSelector
           amount={amount}
           selected={method}

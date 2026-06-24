@@ -115,7 +115,7 @@ function PaymentContent() {
   return (
     <div className="min-h-screen bg-[#0d0d1a] text-white flex flex-col items-center justify-center px-4 py-12">
       {/* 헤더 */}
-      <div className="w-full max-w-sm mb-6 flex items-center gap-3">
+      <div className="w-full max-w-2xl mb-6 flex items-center gap-3">
         <button
           onClick={() => router.back()}
           className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1"
@@ -125,7 +125,7 @@ function PaymentContent() {
       </div>
 
       {/* 상품 카드 */}
-      <div className="w-full max-w-sm bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
+      <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
         <div className="text-4xl mb-3 text-center">{info.icon}</div>
         <h1 className="text-xl font-bold text-center text-white mb-1">{info.name}</h1>
         <p className="text-sm text-gray-400 text-center mb-5">{info.desc}</p>
@@ -148,7 +148,7 @@ function PaymentContent() {
       </div>
 
       {/* 이메일 (선택) */}
-      <div className="w-full max-w-sm mb-4">
+      <div className="w-full max-w-2xl mb-4">
         <label className="block text-xs text-gray-500 mb-1.5">영수증 받을 이메일 (선택)</label>
         <input
           type="email"
@@ -161,13 +161,13 @@ function PaymentContent() {
 
       {/* 에러 */}
       {error && (
-        <div className="w-full max-w-sm mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm text-center">
+        <div className="w-full max-w-2xl mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm text-center">
           {error}
         </div>
       )}
 
       {/* 결제 버튼들 */}
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-2xl">
         <PaymentMethodSelector
           amount={amount}
           selected={payMethod}

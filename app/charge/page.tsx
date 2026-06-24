@@ -67,7 +67,7 @@ export default function ChargePage() {
         </button>
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto w-full px-5 pt-10 pb-24">
+      <div className="relative z-10 max-w-2xl mx-auto w-full px-5 pt-10 pb-24">
 
         {/* 헤더 */}
         <div className="text-center mb-10">
