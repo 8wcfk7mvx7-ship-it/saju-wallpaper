@@ -62,7 +62,7 @@ export default function IljinCalendar() {
           <h2 className="text-lg font-black tracking-tight" style={{ color: "rgba(255,255,255,0.9)" }}>
             일진달력
           </h2>
-          <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
+          <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
           <p className="text-[13px] mt-1 font-medium tracking-wide" style={{ color: "rgba(255,215,100,0.75)" }}>
             오늘 · {todayPillarLine}
           </p>
@@ -70,7 +70,7 @@ export default function IljinCalendar() {
         <div className="flex items-center gap-3">
           <button onClick={prevMonth} disabled={year === 1975 && month === 1}
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>‹</button>
+            style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.72)" }}>‹</button>
           <div className="flex items-center gap-1">
             <select value={year} onChange={e => setYear(Number(e.target.value))}
               className="text-lg font-black text-center rounded-lg px-1 py-0.5"
@@ -85,7 +85,7 @@ export default function IljinCalendar() {
           </div>
           <button onClick={nextMonth} disabled={year === 2030 && month === 12}
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition disabled:opacity-20 hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}>›</button>
+            style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.72)" }}>›</button>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export default function IljinCalendar() {
           {year}년 {month}월 1일 기준 월주: <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{firstDayMonthPillar.cg}{firstDayMonthPillar.jj}월</span>
         </p>
         {monthChange && (
-          <p className="text-[14px] mt-1" style={{ color: "rgba(255,255,255,0.65)" }}>
+          <p className="text-[14px] mt-1" style={{ color: "rgba(255,255,255,0.78)" }}>
             → {monthChange.day}일부터 <span className="font-bold" style={{ color: "rgba(255,215,100,0.85)" }}>{monthChange.cg}{monthChange.jj}월</span>로 바뀝니다 (절입)
           </p>
         )}
@@ -105,7 +105,7 @@ export default function IljinCalendar() {
       <div className="grid grid-cols-7 mb-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         {["일","월","화","수","목","금","토"].map((d, i) => (
           <div key={d} className="text-center text-sm font-bold pb-2"
-            style={{ color: i === 0 ? "#f87171" : i === 6 ? "#93c5fd" : "rgba(255,255,255,0.45)" }}>
+            style={{ color: i === 0 ? "#f87171" : i === 6 ? "#93c5fd" : "rgba(255,255,255,0.72)" }}>
             {d}
           </div>
         ))}
@@ -141,11 +141,11 @@ export default function IljinCalendar() {
                 {day}
               </span>
               {/* 한자 일진 */}
-              <span className="text-[13px] font-bold leading-none" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <span className="text-[13px] font-bold leading-none" style={{ color: "rgba(255,255,255,0.72)" }}>
                 {cgH}{jjH}
               </span>
               {/* 한글 */}
-              <span className="text-[11px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <span className="text-[11px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>
                 {cg}{jj}
               </span>
               {/* 오늘 표시 */}
