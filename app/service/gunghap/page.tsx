@@ -341,8 +341,6 @@ export default function GunghapPage(){
     gradeTitle:string; gradeDesc:string;
     r1:ReturnType<typeof analyzeSaju>; r2:ReturnType<typeof analyzeSaju>;
   }>(null);
-  const [counter]=useState(()=>Math.floor(Math.random()*200)+120);
-  const [totalCount]=useState(()=>Math.floor(Math.random()*12000)+32000);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
   const [step,setStep]=useState<'entry'|'form'|'loading'|'result'>('entry');
   const [relationType,setRelationType]=useState('');
@@ -463,7 +461,7 @@ export default function GunghapPage(){
 
   return (
     <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0d0d1a 0%,#1a1a2e 45%,#16213e 100%)',
-      fontFamily:"'Apple SD Gothic Neo','Malgun Gothic',sans-serif",color:'#fff'}}>
+      color:'#fff'}}>
 
       {/* ══ ENTRY ══ */}
       {step==='entry'&&(
@@ -489,24 +487,6 @@ export default function GunghapPage(){
 
           <div style={{position:'relative',zIndex:1,maxWidth:420,margin:'0 auto',
             padding:'72px 24px 80px',textAlign:'center'}}>
-
-            {/* 카운터 뱃지 */}
-            <FadeSlide delay={100}>
-              <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8,marginBottom:28}}>
-                <div style={{display:'inline-flex',alignItems:'center',gap:8,
-                  background:'rgba(255,107,107,0.12)',border:'1px solid rgba(255,107,107,0.28)',
-                  borderRadius:100,padding:'7px 18px'}}>
-                  <span style={{width:7,height:7,borderRadius:'50%',background:'#ff6b6b',
-                    display:'inline-block',animation:'pulse 1.5s infinite'}}/>
-                  <span style={{color:'#ffb3b3',fontSize:13,fontWeight:600}}>
-                    지금 이 순간 <strong style={{color:'#fff'}}>{counter.toLocaleString()}명</strong>이 확인 중
-                  </span>
-                </div>
-                <span style={{fontSize:11,color:'rgba(255,255,255,0.25)'}}>
-                  누적 <strong style={{color:'rgba(255,255,255,0.45)'}}>{totalCount.toLocaleString()}명</strong> 분석 완료
-                </span>
-              </div>
-            </FadeSlide>
 
             {/* 헤드라인 */}
             <FadeSlide delay={250}>
@@ -587,16 +567,6 @@ export default function GunghapPage(){
               style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:13,cursor:'pointer',padding:0,fontFamily:'inherit'}}>
               ← {step==='result'?'다시 입력':'처음으로'}
             </button>
-          </div>
-          <div style={{textAlign:'center',padding:'14px 18px 0'}}>
-            <div style={{display:'inline-flex',alignItems:'center',gap:8,
-              background:'rgba(255,107,107,0.08)',border:'1px solid rgba(255,107,107,0.22)',
-              borderRadius:100,padding:'6px 16px'}}>
-              <span style={{width:6,height:6,borderRadius:'50%',background:'#ff6b6b',display:'inline-block',animation:'pulse 1.5s infinite'}}/>
-              <span style={{color:'#ff9f9f',fontSize:13,fontWeight:600}}>
-                오늘 <strong style={{color:'#fff'}}>{counter.toLocaleString()}명</strong>이 확인했습니다
-              </span>
-            </div>
           </div>
 
           <div style={{maxWidth:520,margin:'0 auto',padding:'18px 16px 80px'}} id={step==='result'?'gunghap-result':undefined}>
