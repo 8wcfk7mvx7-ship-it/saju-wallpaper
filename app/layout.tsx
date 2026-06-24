@@ -91,6 +91,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
+        <div className="bg-waterfall" aria-hidden="true" />
         <AutoLogout />
         <NativeBridge />
         <PageViewTracker />

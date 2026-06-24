@@ -145,7 +145,7 @@ export default function IljinCalendar() {
                 {cgH}{jjH}
               </span>
               {/* 한글 */}
-              <span className="text-[11px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>
+              <span className="text-[11px] leading-none mt-0.5" style={{ color: "rgba(255,255,255,0.92)" }}>
                 {cg}{jj}
               </span>
               {/* 오늘 표시 */}

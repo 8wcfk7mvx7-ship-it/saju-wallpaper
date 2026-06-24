@@ -21,6 +21,30 @@ body {
   color: var(--foreground);
 }
 
+/* ── 배경 폭포 문양: 있는둥 없는둥, 아주 옅게 흐르는 세로 결 ── */
+.bg-waterfall {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: repeating-linear-gradient(
+    95deg,
+    rgba(255,255,255,0.7) 0px,
+    rgba(255,255,255,0.7) 1px,
+    transparent 1px,
+    transparent 42px
+  );
+  background-size: 100% 220px;
+  animation: waterfallDrift 16s linear infinite;
+}
+
+@keyframes waterfallDrift {
+  from { background-position: 0 0; }
+  to { background-position: 0 -220px; }
+}
+
 /* ── Capacitor 네이티브 앱 보정 (상태바 영역만큼 헤더 밀어내기) ── */
 html.native-app header.sticky.top-0 {
   padding-top: env(safe-area-inset-top);

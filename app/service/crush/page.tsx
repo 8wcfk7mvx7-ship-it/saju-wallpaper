@@ -675,20 +675,18 @@ export default function CrushPage() {
           );
         })()}
 
-        {/* 나와의 합충(合沖) 분석 */}
+        {/* 나와의 합충(合沖) 분석 — 원국 다이어그램 */}
         {targetSaju && mySaju && (() => {
-          const pick = (s: SajuResult) => {
+          const SLOT_LABEL = ["연주", "월주", "일주", "시주"];
+          const pickSlots = (s: SajuResult) => {
             const p = s.pillarsDetail;
-            const arr: { label: string; jj: string }[] = [
-              { label: "연주", jj: p.year.jj },
-              { label: "월주", jj: p.month.jj },
-              { label: "일주", jj: p.day.jj },
-            ];
-            if (p.hour) arr.push({ label: "시주", jj: p.hour.jj });
-            return arr;
+            const raw = [p.year, p.month, p.day, p.hour];
+            return raw
+              .map((d, slot) => (d ? { slot, label: SLOT_LABEL[slot], jj: d.jj, cg: d.cg } : null))
+              .filter((d): d is { slot: number; label: string; jj: string; cg: string } => !!d);
           };
-          const myPillars = pick(mySaju);
-          const targetPillars = pick(targetSaju);
+          const myPillars = pickSlots(mySaju);
+          const targetPillars = pickSlots(targetSaju);
           const allJj = [...myPillars.map(p => p.jj), ...targetPillars.map(p => p.jj)];
           const myCount = myPillars.length;
           const crossRelations = sortJijiRelationsByStrength(
@@ -697,6 +695,7 @@ export default function CrushPage() {
           const hapCount = crossRelations.filter(r => r.type === "육합" || r.type === "삼합" || r.type === "반합").length;
           const chungCount = crossRelations.filter(r => r.type === "충").length;
           const tensionCount = crossRelations.filter(r => r.type === "형" || r.type === "파" || r.type === "해" || r.type === "원진").length;
+          const xOf = (slot: number) => 12.5 + slot * 25;
 
           return (
             <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.05)" }}>
@@ -705,10 +704,56 @@ export default function CrushPage() {
                   <span className="text-xl">🔗</span>
                   <h3 className="text-sm font-black" style={{ color: "#a78bfa" }}>나와 이 사람의 합충(合沖) 분석</h3>
                 </div>
-                <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>두 사람의 사주를 미리 대보고 잘 맞을지 살펴봐요</p>
+                <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>두 원국을 나란히 놓고 합·충·형·파·해·원진(귀문)을 화살표로 짚어봐요</p>
               </div>
-              <div className="p-5 space-y-3">
-                <div className="grid grid-cols-3 gap-2">
+
+              <div className="p-5">
+                {/* 원국 다이어그램 */}
+                <div className="relative mb-4" style={{ height: 190 }}>
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
+                    {crossRelations.map((r, i) => {
+                      const mine = myPillars[r.a];
+                      const theirs = targetPillars[r.b - myCount];
+                      const x1 = xOf(mine.slot), x2 = xOf(theirs.slot);
+                      const isStrong = r.type === "육합" || r.type === "삼합" || r.type === "충";
+                      return (
+                        <line key={i} x1={x1} y1={22} x2={x2} y2={78}
+                          stroke={REL_TYPE_COLOR[r.type]} strokeWidth={isStrong ? 1.4 : 0.9}
+                          strokeOpacity={0.85} strokeDasharray={r.type === "충" ? undefined : (r.type === "원진" || r.type === "해" ? "2,2" : undefined)}
+                          markerEnd={`url(#arrow-${r.type})`} />
+                      );
+                    })}
+                    <defs>
+                      {Object.entries(REL_TYPE_COLOR).map(([type, color]) => (
+                        <marker key={type} id={`arrow-${type}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse">
+                          <path d="M0,0 L10,5 L0,10 Z" fill={color} />
+                        </marker>
+                      ))}
+                    </defs>
+                  </svg>
+
+                  {myPillars.map(p => (
+                    <div key={`my-${p.slot}`} className="absolute flex flex-col items-center" style={{ left: `${xOf(p.slot)}%`, top: "22%", transform: "translate(-50%, -50%)" }}>
+                      <div className="rounded-lg px-2.5 py-1.5 text-center" style={{ background: "rgba(251,113,133,0.12)", border: "1px solid rgba(251,113,133,0.35)" }}>
+                        <p className="text-sm font-black text-white leading-tight">{p.cg}{p.jj}</p>
+                      </div>
+                      <p className="text-[9px] mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>{p.label}</p>
+                    </div>
+                  ))}
+                  {targetPillars.map(p => (
+                    <div key={`target-${p.slot}`} className="absolute flex flex-col items-center" style={{ left: `${xOf(p.slot)}%`, top: "78%", transform: "translate(-50%, -50%)" }}>
+                      <p className="text-[9px] mb-1" style={{ color: "rgba(255,255,255,0.3)" }}>{p.label}</p>
+                      <div className="rounded-lg px-2.5 py-1.5 text-center" style={{ background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.35)" }}>
+                        <p className="text-sm font-black text-white leading-tight">{p.cg}{p.jj}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <span className="absolute top-0 left-0 text-[10px] font-bold" style={{ color: "#fb7185" }}>나</span>
+                  <span className="absolute bottom-0 left-0 text-[10px] font-bold" style={{ color: "#a78bfa" }}>그 사람</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   <div className="rounded-xl p-3 text-center" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
                     <p className="text-lg font-black" style={{ color: "#34d399" }}>{hapCount}</p>
                     <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>합 (끌림)</p>
@@ -719,7 +764,7 @@ export default function CrushPage() {
                   </div>
                   <div className="rounded-xl p-3 text-center" style={{ background: "rgba(192,132,252,0.08)", border: "1px solid rgba(192,132,252,0.2)" }}>
                     <p className="text-lg font-black" style={{ color: "#c084fc" }}>{tensionCount}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>형·파·해·원진</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>형·파·해·원진(귀문)</p>
                   </div>
                 </div>
 
@@ -729,22 +774,25 @@ export default function CrushPage() {
                   </p>
                 )}
 
-                {crossRelations.map((r, i) => {
-                  const [c1, c2] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
-                  const myLabel = myPillars[r.a].label;
-                  const targetLabel = targetPillars[r.b - myCount].label;
-                  return (
-                    <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: REL_TYPE_COLOR[r.type], color: "#06060e" }}>{r.type}</span>
-                        <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
-                          나({myLabel}) {c1} ↔ 그 사람({targetLabel}) {c2}
-                        </span>
+                <div className="space-y-2">
+                  {crossRelations.map((r, i) => {
+                    const [c1, c2] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
+                    const myLabel = myPillars[r.a].label;
+                    const targetLabel = targetPillars[r.b - myCount].label;
+                    const typeText = r.type === "원진" ? "원진(귀문)" : r.type;
+                    return (
+                      <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: REL_TYPE_COLOR[r.type], color: "#06060e" }}>{typeText}</span>
+                          <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
+                            나({myLabel}) {c1} ↔ 그 사람({targetLabel}) {c2}
+                          </span>
+                        </div>
+                        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{HAPCHUNG_NOTE[r.type]}</p>
                       </div>
-                      <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{HAPCHUNG_NOTE[r.type]}</p>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           );
