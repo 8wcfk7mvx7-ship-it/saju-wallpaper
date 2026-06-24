@@ -285,12 +285,12 @@ export default function SidejobPage() {
               </div>
               <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-white/5 leading-relaxed">
                 {sik?.status === "강함" && jae?.status === "강함"
-                  ? `식상과 재성이 모두 강해 — 아이디어를 수익으로 연결하는 흐름이 사주 안에 이미 갖춰진 구조야. 투잡 가능성이 높은 만큼 어떤 부업에 집중할지 선택이 중요해.`
+                  ? `식상과 재성이 모두 강해 — 아이디어를 수익으로 연결하는 흐름이 사주 안에 이미 갖춰진 구조예요. 투잡 가능성이 높은 만큼 어떤 부업에 집중할지 선택이 중요해요.`
                   : sik?.status === "강함"
-                  ? `식상 기운이 강해 창작·실행력은 있지만, 재성 세력이 약한 편이라 만든 것을 돈으로 연결하는 과정에서 마무리가 느슨해질 수 있어. 수익화 루트를 미리 정해두는 게 핵심이야.`
+                  ? `식상 기운이 강해 창작·실행력은 있지만, 재성 세력이 약한 편이라 만든 것을 돈으로 연결하는 과정에서 마무리가 느슨해질 수 있어요. 수익화 루트를 미리 정해두는 게 핵심이에요.`
                   : jae?.status === "강함"
-                  ? `재성 기운이 강해 돈에 대한 감각은 예리하지만, 식상 세력이 약하면 새로운 수입원 자체를 만드는 실행력이 부족할 수 있어. 기존 전문성을 레버리지하는 부업이 잘 맞아.`
-                  : `식상·재성 모두 큰 힘이 없어, 무리해서 새로운 수입원을 개척하기보다 안정적으로 본업을 키우는 쪽이 더 잘 맞는 구조일 수 있어.`}
+                  ? `재성 기운이 강해 돈에 대한 감각은 예리하지만, 식상 세력이 약하면 새로운 수입원 자체를 만드는 실행력이 부족할 수 있어요. 기존 전문성을 레버리지하는 부업이 잘 맞아요.`
+                  : `식상·재성 모두 큰 힘이 없어, 무리해서 새로운 수입원을 개척하기보다 안정적으로 본업을 키우는 쪽이 더 잘 맞는 구조일 수 있어요.`}
               </p>
             </div>
           );
@@ -309,12 +309,12 @@ export default function SidejobPage() {
               <p className="text-sm font-bold text-teal-300 mb-3">합·충으로 보는 투잡 에너지 흐름</p>
               {hapList.map((rel, i) => (
                 <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1.5">
-                  <span className="text-teal-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합을 이뤄 안정적으로 흐르는 구조야. 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이야.
+                  <span className="text-teal-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 합을 이뤄 안정적으로 흐르는 구조예요. 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이에요.
                 </p>
               ))}
               {chungList.map((rel, i) => (
                 <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 충돌해 에너지가 분산될 수 있어. 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니 집중력이 중요해.
+                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 기운이 충돌해 에너지가 분산될 수 있어요. 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니 집중력이 중요해요.
                 </p>
               ))}
             </div>
@@ -333,16 +333,16 @@ export default function SidejobPage() {
               <p className="text-sm font-bold text-rose-300 mb-1">오행 극(克) — 에너지 소모 패턴</p>
               {dominantControlsLacking ? (
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  사주에서 가장 강한 <b>{dominantEl}</b> 기운이 가장 부족한 <b>{lackingEl}</b> 기운을 계속 누르고 있어. 강한 쪽은 더 강해지고 약한 쪽은 더 고갈되는 구조라, 투잡을 할 때도 강한 기운 쪽 일(아이디어 실행·영업 등)에 몰두하다 보면 체력이나 꾸준함을 담당하는 약한 기운이 빠르게 소진돼. 쉬는 날을 강제로 만들어두는 게 핵심이야.
+                  사주에서 가장 강한 <b>{dominantEl}</b> 기운이 가장 부족한 <b>{lackingEl}</b> 기운을 계속 누르고 있어요. 강한 쪽은 더 강해지고 약한 쪽은 더 고갈되는 구조라, 투잡을 할 때도 강한 기운 쪽 일(아이디어 실행·영업 등)에 몰두하다 보면 체력이나 꾸준함을 담당하는 약한 기운이 빠르게 소진돼요. 쉬는 날을 강제로 만들어두는 게 핵심이에요.
                 </p>
               ) : (
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  오행들이 비교적 순환하는 구조야. 한쪽으로만 에너지가 집중되지 않아서 투잡을 해도 체력·감정·재물 사이에서 균형을 어느 정도 유지할 수 있는 편이야.
+                  오행들이 비교적 순환하는 구조예요. 한쪽으로만 에너지가 집중되지 않아서 투잡을 해도 체력·감정·재물 사이에서 균형을 어느 정도 유지할 수 있는 편이에요.
                 </p>
               )}
               {gishinEl && (
                 <p className="text-xs text-gray-500 leading-relaxed mt-2 pt-2 border-t border-white/5">
-                  기신(忌神) <b>{gishinEl}</b> 기운이 강해지는 환경(예: 경쟁이 심한 분야, 과도한 관리 업무)에서 부업을 하면 용신이 눌려 오히려 본업까지 흔들릴 수 있어. 기신 기운이 적은 분야를 선택하는 것이 장기적으로 유리해.
+                  기신(忌神) <b>{gishinEl}</b> 기운이 강해지는 환경(예: 경쟁이 심한 분야, 과도한 관리 업무)에서 부업을 하면 용신이 눌려 오히려 본업까지 흔들릴 수 있어요. 기신 기운이 적은 분야를 선택하는 것이 장기적으로 유리해요.
                 </p>
               )}
             </div>
