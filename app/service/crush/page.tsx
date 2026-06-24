@@ -583,17 +583,17 @@ export default function CrushPage() {
               <div className="p-5 space-y-4">
                 {/* 핵심 훅 */}
                 <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>🎯 마음을 여는 핵심</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>🎯 마음을 여는 핵심</p>
                   <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{tip.hook}</p>
                 </div>
                 {/* 타이밍 */}
                 <div className="rounded-xl p-4" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fbbf24" }}>⏰ 타이밍 전략</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#fbbf24" }}>⏰ 타이밍 전략</p>
                   <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{tip.timing}</p>
                 </div>
                 {/* 반드시 할 것 */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#34d399" }}>✅ 반드시 해야 할 것</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#34d399" }}>✅ 반드시 해야 할 것</p>
                   <div className="space-y-2">
                     {tip.doThis.map((d, i) => (
                       <div key={i} className="flex items-start gap-2 rounded-xl px-3 py-2.5" style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.15)" }}>
@@ -605,12 +605,12 @@ export default function CrushPage() {
                 </div>
                 {/* 절대 금물 */}
                 <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#f87171" }}>🚫 절대 금물</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#f87171" }}>🚫 절대 금물</p>
                   <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{tip.neverDo}</p>
                 </div>
                 {/* 심장 흔드는 한 마디 */}
                 <div className="rounded-xl p-4 text-center" style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.25)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>💬 심장 흔드는 한 마디</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#fb7185" }}>💬 심장 흔드는 한 마디</p>
                   <p className="text-sm font-bold italic" style={{ color: "#fff" }}>{tip.phrase}</p>
                 </div>
               </div>
