@@ -259,7 +259,7 @@ export default function PlacePage() {
               <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 여름궁전</button>
             </div>
 
-            <div className="max-w-xl mx-auto px-6 pt-12 pb-28 text-center">
+            <div className="max-w-2xl mx-auto px-6 pt-12 pb-28 text-center">
               <div className="flex flex-col items-center gap-2 mb-8">
                 <div className="inline-flex items-center gap-2 bg-amber-500/12 border border-amber-500/28 rounded-full px-4 py-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block" />

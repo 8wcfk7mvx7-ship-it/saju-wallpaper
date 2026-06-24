@@ -246,7 +246,7 @@ export default function TastePage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-orange-900/10 blur-[130px]" />
       </div>
 
-      <div className="relative z-10 max-w-xl w-full text-center space-y-0">
+      <div className="relative z-10 max-w-2xl w-full text-center space-y-0">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5">

@@ -92,7 +92,7 @@ export default function LandingPage() {
         <div className="absolute top-[40%] left-[55%] w-[250px] h-[250px] rounded-full bg-violet-700/10 blur-[80px]" />
       </div>
 
-      <div className="relative z-10 max-w-xl w-full text-center space-y-0">
+      <div className="relative z-10 max-w-2xl w-full text-center space-y-0">
 
         {/* 배지 + 아이콘 */}
         <FadeInLine delay={0} className="mb-6">

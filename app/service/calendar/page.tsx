@@ -322,7 +322,7 @@ export default function CalendarPage() {
 
       <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-base text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-      <div className="relative z-10 max-w-xl w-full text-center">
+      <div className="relative z-10 max-w-2xl w-full text-center">
         <FadeIn delay={0} className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">

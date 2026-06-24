@@ -55,7 +55,7 @@ export default function AdultGatePage() {
 
   return (
     <main className="min-h-screen px-4 py-12" style={{ background: "#06060e" }}>
-      <div className="max-w-xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <button onClick={() => router.push("/")} className="flex items-center gap-1.5 mb-8 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
           ← 홈으로
         </button>

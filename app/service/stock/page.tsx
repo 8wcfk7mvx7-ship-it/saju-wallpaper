@@ -369,7 +369,7 @@ export default function StockPage() {
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-900/25 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-900/20 blur-[130px]" />
         </div>
-        <div className="relative z-10 max-w-xl w-full text-center">
+        <div className="relative z-10 max-w-2xl w-full text-center">
           <FadeIn delay={0}><div className="text-5xl mb-10 drop-shadow-[0_0_40px_rgba(16,185,129,0.5)]">📈</div></FadeIn>
           <FadeIn delay={100}>
             <div className="flex flex-col items-center gap-2 mb-10">
