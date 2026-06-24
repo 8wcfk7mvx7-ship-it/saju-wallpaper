@@ -5,6 +5,7 @@ import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getDayPillar, getSipseong, getUunseong,
   getJijiRelations, sortJijiRelationsByStrength, canonicalJijiPairOrder, CHEONGAN_ELEMENT, EL_STYLE, jijiElement, type SajuResult, type Element, type JijiRelation,
+  UUNSEONG_DETAIL, ILGAN_PERSONALITY,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -779,6 +780,35 @@ export default function TodayFortunePage() {
           )}
           {hasTodayChung && (
             <p className="text-sm text-rose-300 leading-relaxed mt-3">⚠ 오늘 원국·세운과 충(沖)을 이루는 기운이 있어, 예상치 못한 변수나 마음이 흔들리는 일이 생기기 쉬운 날이에요. 중요한 결정은 하루 정도 미뤄보는 것도 방법입니다.</p>
+          )}
+        </div>
+        </FadeIn>
+
+        {/* 오늘의 천간 — 일간과의 관계 */}
+        <FadeIn delay={190}>
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-violet-300 mb-1">🌗 오늘 만나는 기운 — {dayPillar.cg}{ILGAN_PERSONALITY[dayPillar.cg] ? `(${ILGAN_PERSONALITY[dayPillar.cg].keyword})` : ""}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            오늘 일진의 천간 {dayPillar.cg}은 평소 {ilgan}일간인 {form.name || "나"}님에게 {ILGAN_PERSONALITY[dayPillar.cg]?.detail || ""}
+          </p>
+          {hasTodayHap && (
+            <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 내 일간과 합을 이루는 기운이 들어와 있어, {ILGAN_PERSONALITY[dayPillar.cg]?.keyword || "오늘의 기운"}이 평소보다 부드럽게 나에게 녹아드는 날이에요.</p>
+          )}
+          {hasTodayChung && (
+            <p className="text-sm text-rose-300 leading-relaxed mt-2">오늘은 내 일간과 충을 이루는 기운이 들어와 있어, 평소의 나와는 다른 낯선 자극이 들어오는 느낌을 받기 쉬워요. 좋고 나쁨보다는 '환기'의 의미로 받아들이면 도움이 됩니다.</p>
+          )}
+        </div>
+        </FadeIn>
+
+        {/* 오늘의 12운성 상세 */}
+        <FadeIn delay={220}>
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-cyan-300 mb-1">🌀 오늘의 12운성 — {todayUunseong}{UUNSEONG_DETAIL[todayUunseong] ? `(${UUNSEONG_DETAIL[todayUunseong].hanja})` : ""}</p>
+          {UUNSEONG_DETAIL[todayUunseong] && (
+            <>
+              <p className="text-xs text-gray-500 mb-2">생애 주기로 보면 '{UUNSEONG_DETAIL[todayUunseong].stage}' 단계 — {UUNSEONG_DETAIL[todayUunseong].keyword}</p>
+              <p className="text-sm text-gray-300 leading-relaxed">오늘 내 일간의 기운이 {todayUunseong}({UUNSEONG_DETAIL[todayUunseong].hanja}) 자리에 놓여요. {UUNSEONG_DETAIL[todayUunseong].desc}</p>
+            </>
           )}
         </div>
         </FadeIn>
