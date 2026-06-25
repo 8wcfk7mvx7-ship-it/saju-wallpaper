@@ -247,7 +247,7 @@ export const ILGAN_AFFECTION_STYLE: Record<string, string> = {
 };
 
 // ─── 사주 과다·편중 패턴 ───────────────────────────────────────────────────
-import type { SajuResult } from './saju';
+import { type SajuResult, getUunseong } from './saju';
 
 export interface ExcessPattern {
   id: string;
@@ -737,3 +737,141 @@ export const BIGEOB_EXCESS_DESC: Record<string, string> = {
   금: "금 기운이 과다하면 날카로운 경쟁 심리가 앞서요. 의리보다 자존심이 먼저가 되어 주변 관계에 상처를 남기기 쉬워요.",
   수: "수 기운이 너무 많으면 흐름을 잃고 우유부단해져요. 생각은 많은데 결정이 늦어지고 방향 없이 떠다니는 느낌이 들 수 있어요.",
 };
+
+// ─── 성적 에너지(性 에너지) 분석 ─────────────────────────────────────────────
+// 식상 발달·오행의 수(水) 비중·일지의 기운·신강신약을 토대로 성욕·생식력 쪽
+// 에너지를 진단한다. 전문 용어는 절대 노출하지 않고 풀어서 설명한다.
+export interface SexEnergyAnalysis {
+  grade: "약함" | "보통" | "강함";
+  gradeRatio: number; // 0~100, 게이지 표시용
+  summary: string;
+  points: string[];
+}
+
+export function getSexEnergyAnalysis(r: SajuResult): SexEnergyAnalysis {
+  const pd = r.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+  const ilgan = pd.day.cg;
+
+  const countSipseong = (names: string[]) =>
+    pillars.reduce((acc, p) => acc + (names.includes(p.sipseongCg) ? 1 : 0) + (names.includes(p.sipseongJj) ? 1 : 0), 0);
+  const siksangCount = countSipseong(["식신", "상관"]);
+  const isShinyak = r.yongshin.strength === "신약";
+  const isShingang = r.yongshin.strength === "신강";
+  const suStrong = r.dominant.includes("수");
+  const dayJijiStage = getUunseong(ilgan, pd.day.jj);
+
+  const points: string[] = [];
+  let score = 50;
+
+  if (siksangCount >= 2) {
+    points.push("표현하고 베푸려는 기운이 발달해서, 성에 대한 관심과 욕구가 또래보다 강한 편이에요. 그만큼 상대를 즐겁게 해주는 테크닉도 자연스럽게 따라와요. 다만 너무 앞서가지 않게 스스로 조절하는 게 필요해요.");
+    score += 18;
+  } else if (siksangCount === 0) {
+    points.push("욕구를 적극적으로 드러내는 기운이 적은 편이라, 먼저 다가가기보다 상대가 이끌어줄 때 편하게 따라가는 스타일이에요.");
+    score -= 8;
+  }
+
+  if (suStrong) {
+    points.push("기운이 촉촉하고 유연한 쪽으로 쏠려 있어서, 체력과 생식 관련 능력이 대체로 좋은 편이고 쾌감에 대한 반응도 잘 느끼는 타입이에요.");
+    score += 12;
+  } else if (r.lacking.includes("수")) {
+    points.push("촉촉하고 유연한 기운이 부족한 편이라, 컨디션이나 분위기에 따라 반응이 크게 달라질 수 있어요. 평소 체력 관리가 도움이 돼요.");
+    score -= 6;
+  }
+
+  if (dayJijiStage === "목욕") {
+    points.push("겉으로는 단정하고 차분해 보여도, 속으로는 꾸밈없이 본능적이고 자유로운 분위기를 즐기는 타입이에요. 상대에게 색다른 즐거움을 주는 매력이 있어요.");
+    score += 10;
+  } else if (["제왕", "건록"].includes(dayJijiStage)) {
+    points.push("에너지가 가장 강한 시기의 기운을 타고나서, 체력과 지속력 면에서 자신감이 있는 편이에요.");
+    score += 8;
+  } else if (["사", "묘", "절"].includes(dayJijiStage)) {
+    points.push("겉으로 드러내는 에너지보다 안으로 갈무리하는 기운이 강해서, 분위기를 천천히 끌어올리는 쪽이 더 잘 맞는 타입이에요.");
+    score -= 6;
+  }
+
+  if (isShinyak && siksangCount >= 2) {
+    points.push("타고난 기운에 비해 체력이 욕구를 다 받쳐주지 못하는 편이라, 분위기나 유혹에 약하게 작용할 수 있어요. 무리하지 않는 페이스 조절이 중요해요.");
+    score -= 10;
+  } else if (isShingang) {
+    points.push("기본 체력이 탄탄한 편이라 활달하고 에너지 넘치는 상대와 잘 맞고, 관계에서도 페이스를 오래 유지하는 힘이 있어요.");
+    score += 8;
+  }
+
+  score = Math.max(5, Math.min(95, score));
+  const grade: SexEnergyAnalysis["grade"] = score >= 65 ? "강함" : score <= 35 ? "약함" : "보통";
+  const summary =
+    grade === "강함"
+      ? "타고난 성적 에너지가 또래보다 풍부한 편이에요. 정상적인 욕구와 생식 관련 능력이 좋은 쪽으로, 너무 과하지 않게 조절하는 지혜가 필요해요."
+      : grade === "약함"
+      ? "성적 에너지가 잔잔하게 흐르는 편이에요. 부족하다기보다 천천히 달아오르는 스타일이라, 충분한 분위기와 시간이 만족도를 크게 끌어올려요."
+      : "성적 에너지가 무난하게 균형 잡힌 편이에요. 특별히 부족하거나 과한 부분 없이 안정적으로 관계를 즐기는 타입이에요.";
+
+  if (points.length === 0) {
+    points.push("특별히 한쪽으로 쏠린 기운이 없어서 무난하고 결함 없는 편이에요.");
+  }
+
+  return { grade, gradeRatio: score, summary, points };
+}
+
+// ─── 외모·인상 분석 ──────────────────────────────────────────────────────────
+// 오행의 조화, 식상·인성 발달, 태어난 시기의 역마 기운, 금여성 여부를 토대로
+// 외모·인상에 관한 경향을 짚어준다. 전문 용어 없이 풀어서 설명하고,
+// 근거가 약하거나 옮기기 애매한 항목은 과감히 생략한다.
+export interface AppearanceAnalysis {
+  summary: string;
+  points: string[];
+}
+
+const YEOKMA_JIJI = ["인", "신", "사", "해"];
+
+export function getAppearanceAnalysis(r: SajuResult): AppearanceAnalysis {
+  const pd = r.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+
+  const countSipseong = (names: string[]) =>
+    pillars.reduce((acc, p) => acc + (names.includes(p.sipseongCg) ? 1 : 0) + (names.includes(p.sipseongJj) ? 1 : 0), 0);
+  const siksinCount = countSipseong(["식신", "상관"]);
+  const inseongCount = countSipseong(["편인", "정인"]);
+
+  const points: string[] = [];
+
+  if (r.lacking.length === 0) {
+    points.push("오행이 골고루 섞여 있어서 전체적인 인상이 조화롭고, 어디 하나 튀거나 부담스럽지 않은 편안한 느낌을 줘요.");
+  } else if (r.lacking.length >= 2) {
+    points.push("오행이 한쪽으로 쏠려 있어서 평범한 느낌보다는, 인상에 확실한 포인트나 분위기가 도드라지는 쪽이에요.");
+  }
+
+  if (siksinCount >= 2) {
+    points.push("표현력과 관련된 기운이 풍부해서 또래보다 화사하고 수려한 인상이라는 평을 자주 들어요. 보는 사람을 편하게 만드는 매력적인 분위기가 함께 묻어나는 타입이에요.");
+  }
+
+  if (inseongCount >= 2) {
+    points.push("받아들이고 품는 기운이 안정적으로 자리해서 표정이나 분위기가 부드럽고 단정해요. 부모님 쪽, 특히 어머니 쪽 분위기를 많이 닮았다는 얘기를 들을 수 있어요.");
+  }
+
+  const hourYeokma = pd.hour && YEOKMA_JIJI.includes(pd.hour.jj);
+  const monthYeokma = YEOKMA_JIJI.includes(pd.month.jj);
+
+  if (hourYeokma) {
+    points.push("태어난 시간대 기운이 움직임이 많은 라인이라, 가마가 정중앙이 아니라 살짝 한쪽으로 치우쳐 있을 가능성이 있고, 잠버릇도 한쪽으로 쏠려서 자는 경우가 많아요.");
+  }
+  if (monthYeokma) {
+    points.push("태어난 달의 기운도 움직임이 많은 라인이라, 가마가 한 개가 아니라 두 개거나 고리 모양으로 겹쳐 있는 경우가 흔해요.");
+  }
+
+  if (r.sinsalList.some(s => s.name === "금여성")) {
+    points.push("타고난 복이 안정적으로 깔려 있는 기운이라, 성격이 온화하고 유순하면서 용모도 좋다는 평을 듣는 편이에요. 좋은 인연을 만날 운도 함께 따라와요.");
+  }
+
+  const summary = points.length > 0
+    ? "사주 곳곳의 기운이 외모·인상에도 자연스럽게 드러나는 편이에요."
+    : "외모·인상에 특별히 도드라지는 기운은 없지만, 그만큼 무난하고 결함 없는 인상이에요.";
+
+  if (points.length === 0) {
+    points.push("오행과 기운이 무난하게 섞여 있어서 평범하지만 결함 없는 인상이에요.");
+  }
+
+  return { summary, points };
+}

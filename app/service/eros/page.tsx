@@ -27,6 +27,7 @@ function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace
   );
 }
 import { analyzeSaju, getSexlifeInsights, type SajuResult } from "@/lib/saju";
+import { getSexEnergyAnalysis, getAppearanceAnalysis } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
@@ -558,6 +559,7 @@ function ErosContent() {
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 외모</p>
           <p className="text-sm text-gray-200 leading-relaxed">
             {app.face} {app.body} {app.vibe} 비슷한 분위기로는 <span className="font-semibold" style={{ color: grade.color }}>{app.celeb}</span> 같은 이미지가 있습니다.
+            {" "}{getAppearanceAnalysis(result).points.join(" ")}
           </p>
         </div>
 
@@ -566,11 +568,12 @@ function ErosContent() {
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 성적 에너지</p>
           <p className="text-sm text-gray-200 leading-relaxed">
             {sexData.power} {sexData.energy} {sexData.style} {ILGAN_DAYNIGHT[ilgan]?.[form.gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입입니다."}
-            {hasMokYok && ` 게다가 감각과 관능이 가장 강한 위치를 타고나, ${form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌리고," : "양기가 강하고 이성을 끌어당기는 에너지가 있으며,"} 패션 감각도 타고나 약간의 노출도 고급스럽게 소화하고 어딜 가나 스타일로 시선을 끄는 것이 자연스럽게 성적 매력으로 연결됩니다.`}
-            {hasPyeongwan && " 강한 카리스마가 있어 섹시하면서도 강렬한 인상을 남기는데, 말 한마디 없이도 포스가 느껴지고 압도적인 분위기 자체가 이성을 끌어당기며 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적입니다."}
+            {hasMokYok && ` 게다가 감각과 관능이 가장 강한 위치를 타고나, ${form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌리고," : "양기가 강하고 이성을 끌어당기는 에너지가 있으며,"} 패션 감각도 타고나 약간의 노출도 고급스럽게 소화하고 어딜 가나 스타일로 시선을 끄는 것이 자연스럽게 성관계 매력으로 연결됩니다.`}
+            {hasPyeongwan && " 강한 카리스마가 있어 매력적이면서도 강렬한 인상을 남기는데, 말 한마디 없이도 포스가 느껴지고 압도적인 분위기 자체가 이성을 끌어당기며 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적입니다."}
             {form.gender === "female" && has수기운강 && " 수(水) 기운도 강해 흡인·수용·생식의 에너지가 풍부한데, 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있어 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다."}
             {form.gender === "female" && is음간 && has수기운강 && " 받아들이고 흡수하는 기운까지 겹쳐, 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다."}
             {" "}{getSexlifeInsights(result).map(ins => ins.desc).join(" ")}
+            {" "}{getSexEnergyAnalysis(result).points.join(" ")}
           </p>
         </div>
 

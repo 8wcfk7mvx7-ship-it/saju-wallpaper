@@ -18,7 +18,7 @@ import {
   calcCharmGrade,
   type CharmGradeResult,
 } from "@/lib/charmEngine";
-import { CHARM_TRAITS } from "@/lib/saju2";
+import { CHARM_TRAITS, getAppearanceAnalysis } from "@/lib/saju2";
 import { generateOrderId } from "@/lib/toss";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import StarShower from "@/components/StarShower";
@@ -278,7 +278,7 @@ function CharmResultContent() {
         {/* ═══ 오행 외모 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""} {getAppearanceAnalysis(result).points.join(" ")}</p>
           <p className="text-xs text-gray-600">📺 비슷한 스타일: {olook?.celebs}</p>
         </div>
 
