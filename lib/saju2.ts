@@ -247,7 +247,7 @@ export const ILGAN_AFFECTION_STYLE: Record<string, string> = {
 };
 
 // ─── 사주 과다·편중 패턴 ───────────────────────────────────────────────────
-import { type SajuResult, getUunseong } from './saju';
+import { type SajuResult, getUunseong, CHEONGAN_ELEMENT } from './saju';
 
 export interface ExcessPattern {
   id: string;
@@ -874,4 +874,177 @@ export function getAppearanceAnalysis(r: SajuResult): AppearanceAnalysis {
   }
 
   return { summary, points };
+}
+
+// ─── 배우자복 분석 ────────────────────────────────────────────────────────────
+// 배우자를 나타내는 기운(여성은 관성, 남성은 재성)의 분포·자리·희기신 여부를 토대로
+// 배우자 인연의 흐름을 짚어준다. 전문 용어 없이 풀어서 설명한다.
+const ELEM_CONTROLS: Record<string, string> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
+
+export interface SpouseFortuneAnalysis {
+  points: string[];
+}
+
+export function getSpouseFortuneAnalysis(r: SajuResult, gender: "male" | "female"): SpouseFortuneAnalysis {
+  const pd = r.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+  const ilgan = pd.day.cg;
+  const ilganEl = CHEONGAN_ELEMENT[ilgan];
+
+  const properStar = gender === "female" ? "정관" : "정재";
+  const looseStar = gender === "female" ? "편관" : "편재";
+  // 여성: 일간을 극하는 오행(관성) 역산, 남성: 일간이 극하는 오행(재성)
+  const spouseEl = gender === "female"
+    ? Object.keys(ELEM_CONTROLS).find(k => ELEM_CONTROLS[k] === ilganEl)
+    : ELEM_CONTROLS[ilganEl];
+
+  const countStar = (names: string[]) =>
+    pillars.reduce((acc, p) => acc + (names.includes(p.sipseongCg) ? 1 : 0) + (names.includes(p.sipseongJj) ? 1 : 0), 0);
+  const starCount = countStar([properStar, looseStar]);
+  const looseCount = countStar([looseStar]);
+
+  const points: string[] = [];
+
+  if (starCount === 0) {
+    points.push("배우자 인연을 나타내는 기운이 사주에 약하게 자리해서, 인연이 다소 늦게 들어오거나 옅게 느껴질 수 있어요. 천천히, 신중하게 인연을 찾는 쪽이 오히려 잘 맞는 흐름이에요.");
+  } else if (starCount >= 3 || looseCount >= 2) {
+    points.push("배우자 인연을 나타내는 기운이 여러 자리에 강하게 몰려 있어서, 그만큼 관계에서 부딪히거나 마음고생할 일이 따라오기 쉬워요. 인연을 성급하게 정하지 않고 충분히 지켜보는 게 도움이 돼요.");
+  } else {
+    points.push("배우자 인연을 나타내는 기운이 적당히 자리해서, 무난하게 좋은 인연을 만날 흐름이에요.");
+  }
+
+  if ([pd.day.sipseongJj].includes(properStar) || [pd.day.sipseongJj].includes(looseStar)) {
+    points.push("배우자 기운이 나와 가장 가까운 자리에 바로 놓여 있어서, 일상에서 가까이 부대끼며 직접적인 영향을 주고받는 인연이에요.");
+  }
+
+  if (spouseEl && spouseEl === r.yongshin.heeshin) {
+    points.push("배우자 기운이 나에게 도움이 되는 좋은 기운과 맞물려 있어서, 인연을 만나면 그 사람으로 인해 안정감과 덕을 보는 흐름이에요.");
+  } else if (spouseEl && spouseEl === r.yongshin.gishin) {
+    points.push("배우자 기운이 나에게는 다소 부담스러운 기운과 맞물려 있어서, 관계에서 마음고생을 조심해야 해요. 서로 숨 쉴 공간을 주는 관계가 오래갑니다.");
+  }
+
+  return { points };
+}
+
+// ─── 개운법 빅데이터: 오행 우선순위 + 색·방향·음식·운동·숫자 ──────────────────
+// 일간 기준 용신·희신·기신·구신을 토대로 5개 오행에 좋고/나쁨 순위를 매기고,
+// 각 오행에 맞는 색깔·방향·음식·운동·숫자까지 구체적으로 제안한다.
+export interface GaewunRankItem {
+  element: string;
+  rank: number; // 1~5, 낮을수록 좋음
+  isGood: boolean;
+  color: string;
+  colorHex: string;
+  direction: string;
+  food: string;
+  taste: string;
+  exercise: string;
+  items: string;
+  numbers: string;
+}
+
+const GAEWUN_BIGDATA: Record<string, Omit<GaewunRankItem, "rank" | "isGood">> = {
+  수: { element: "수", color: "검정·남색", colorHex: "#1a1a2e", direction: "북쪽", food: "흑미·검은콩·검은깨·해산물", taste: "짠맛", exercise: "수영·수상스포츠", items: "분수대·수족관·검은색 소품", numbers: "1, 6" },
+  목: { element: "목", color: "청색·녹색", colorHex: "#1d4ed8", direction: "동쪽·동남쪽", food: "녹색채소·밀가루음식·새싹채소", taste: "신맛", exercise: "산책·등산·요가", items: "꽃·화분·목조각·식물", numbers: "3, 8" },
+  화: { element: "화", color: "빨강·주황", colorHex: "#dc2626", direction: "남쪽", food: "대추·수박·붉은과일·매운음식", taste: "쓴맛", exercise: "조깅·유산소·격한 운동", items: "조명·캔들·붉은색 용품", numbers: "2, 7" },
+  토: { element: "토", color: "황색·갈색", colorHex: "#b45309", direction: "북동·북서·남서", food: "굴·참외·오렌지·노란과일", taste: "단맛", exercise: "등산·트레킹", items: "도자기·토기·황토 소품", numbers: "5, 10" },
+  금: { element: "금", color: "백색·은색", colorHex: "#cbd5e1", direction: "서쪽", food: "무·대파·바나나·흰색 음식", taste: "매운맛", exercise: "헬스·웨이트", items: "보석·금속 액세서리", numbers: "4, 9" },
+};
+
+export function getGaewunRanking(r: SajuResult): GaewunRankItem[] {
+  const { yongshin, heeshin, gishin } = r.yongshin;
+  const elements = ["목", "화", "토", "금", "수"];
+  const scored = elements.map(el => {
+    let score = 0;
+    if (el === yongshin) score = 35;
+    else if (el === heeshin) score = 27;
+    else if (el === gishin) score = -10;
+    else score = (r.dominant as string[]).includes(el) ? 8 : 15;
+    return { el, score };
+  }).sort((a, b) => b.score - a.score);
+
+  return scored.map((s, i) => ({
+    ...GAEWUN_BIGDATA[s.el],
+    rank: i + 1,
+    isGood: i < 3,
+  }));
+}
+
+// ─── '엉덩이가 무거워야 사는 사주' — 화개·간여지동 안정형 ───────────────────
+// 진술축미 화개살이 자리하거나, 천간·지지가 같은 오행으로 겹친 간여지동 구조는
+// 잦은 이동·이직보다 한 자리에서 진득하게 버티는 쪽이 유리하다는 데이터.
+export interface StayPutPattern {
+  id: string;
+  title: string;
+  desc: string;
+  advice: string;
+}
+
+const HWAGAE_JIJI = ["진", "술", "축", "미"];
+const GANYEOJIDONG_PAIRS: Record<string, string> = {
+  갑인: "목", 을묘: "목", 병오: "화", 정사: "화", 무진: "토", 무술: "토",
+  기축: "토", 기미: "토", 경신: "금", 신유: "금", 임자: "수", 계해: "수",
+};
+
+export function detectStayPutPattern(r: SajuResult): StayPutPattern[] {
+  const pd = r.pillarsDetail;
+  const pillars = [pd.year, pd.month, pd.day, ...(pd.hour ? [pd.hour] : [])];
+  const patterns: StayPutPattern[] = [];
+
+  const hwagaeCount = pillars.filter(p => HWAGAE_JIJI.includes(p.jj)).length;
+  if (hwagaeCount >= 2) {
+    patterns.push({
+      id: "hwagae_stayput",
+      title: "엉덩이가 무거워야 사는 사주",
+      desc: "사주 곳곳에 묵직하게 쌓아두는 기운이 깔려 있어요. 이 글자들은 거대한 대지이자 창고 같은 느낌이라, 여기저기 섣부르게 움직이면 재물이 사방으로 흩어지고 실속이 없어져요.",
+      advice: "한 직장, 한 분야에서 진득하게 버티면 결국 그 판의 전문가가 되어 결과를 독식하게 돼요. 자주 옮기고 싶은 마음이 들 때일수록 한 번 더 참아보는 게 이득이에요.",
+    });
+  }
+
+  const ganji = pillars.map(p => `${p.cg}${p.jj}`);
+  if (ganji.some(g => GANYEOJIDONG_PAIRS[g])) {
+    patterns.push({
+      id: "ganyeojidong_stayput",
+      title: "고집과 주체성이 강한 뚝심형",
+      desc: "위아래 기운이 흙과 돌처럼 단단하게 뭉쳐 있어서 고집과 주체성이 굉장히 강한 구조예요. 환경 변화에 휩쓸려 잦은 이직이나 변경을 하면 에너지만 낭비되기 쉬워요.",
+      advice: "뚝심 있게 한곳을 지키며 자기 브랜딩을 쌓아가면, 돈과 기회가 알아서 따라오는 타입이에요. 흔들리지 않고 버티는 것 자체가 이 사람의 가장 큰 경쟁력이에요.",
+    });
+  }
+
+  return patterns;
+}
+
+// ─── 배우자가 바람 못 피우는 사주 — 배우자궁(일지) 도화·홍염 ────────────────
+// 배우자의 자리인 일지에 도화살이나 홍염살이 직접 놓이면, 매력의 본진이
+// 이미 집(배우자) 안에 있는 구조라 상대가 밖에서 눈 돌릴 이유가 구조적으로 적다는 데이터.
+const JIJI_ORDER_FS = ["자", "축", "인", "묘", "진", "사", "오", "미", "신", "유", "술", "해"];
+function getDohwaJjFromYear(yeonji: string): string {
+  const yi = JIJI_ORDER_FS.indexOf(yeonji);
+  if ([2, 6, 10].includes(yi)) return "묘";
+  if ([11, 3, 7].includes(yi)) return "자";
+  if ([8, 0, 4].includes(yi)) return "유";
+  return "오";
+}
+const HONGYEOM_JJ_BY_DAYCG: Record<string, string> = {
+  갑: "오", 을: "신", 병: "인", 정: "미", 무: "오", 기: "미", 경: "술", 신: "유", 임: "자", 계: "신",
+};
+
+export interface FaithfulSpouseAnalysis {
+  hasDohwa: boolean;
+  hasHongyeom: boolean;
+  desc: string;
+}
+
+export function getFaithfulSpouseAnalysis(r: SajuResult): FaithfulSpouseAnalysis | null {
+  const pd = r.pillarsDetail;
+  const hasDohwa = pd.day.jj === getDohwaJjFromYear(pd.year.jj);
+  const hasHongyeom = pd.day.jj === (HONGYEOM_JJ_BY_DAYCG[pd.day.cg] || "");
+
+  if (!hasDohwa && !hasHongyeom) return null;
+
+  return {
+    hasDohwa,
+    hasHongyeom,
+    desc: "배우자 자리(일지)에 매력을 뜻하는 기운이 바로 놓여 있어요. 매력의 본진이 이미 집 안에 있는 구조라, 배우자 입장에서는 세상에서 제일 매력적인 사람이 집에 있는 셈이에요. 밖에서 눈 돌릴 이유가 구조적으로 적은 사주예요. 연애할 때부터 상대가 먼저 적극적으로 다가왔거나, 결혼 후에도 어딜 가든 배우자 얘기를 많이 하는 흐름으로 나타나는 경우가 많아요.",
+  };
 }

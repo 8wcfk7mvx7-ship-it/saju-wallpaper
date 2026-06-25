@@ -11,6 +11,7 @@ import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
+import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -855,6 +856,18 @@ export default function GunghapPage(){
                 ))}
               </div>
               <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.5,margin:0}}>{result.baram.desc}</p>
+              {(()=>{
+                const fs1=getFaithfulSpouseAnalysis(result.r1);
+                const fs2=getFaithfulSpouseAnalysis(result.r2);
+                if(!fs1&&!fs2) return null;
+                return (
+                  <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.5,margin:'8px 0 0',paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+                    {fs1&&`${p1.name} ▸ ${fs1.desc}`}
+                    {fs1&&fs2&&<br/>}
+                    {fs2&&`${p2.name} ▸ ${fs2.desc}`}
+                  </p>
+                );
+              })()}
             </div>
 
             {/* ④ 주별 분석 */}
@@ -906,7 +919,20 @@ export default function GunghapPage(){
             <div style={{background:'rgba(255,255,255,0.03)',borderRadius:13,padding:'14px',marginBottom:14,border:'1px solid rgba(255,255,255,0.06)'}}>
               <p style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.35)',marginBottom:8,letterSpacing:'0.1em'}}>용신·오행 조화</p>
               <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',marginBottom:5,lineHeight:1.5}}>{result.yongsinDesc}</p>
-              <p style={{fontSize:12,color:'rgba(255,255,255,0.45)',lineHeight:1.5}}>{result.ohaengDesc}</p>
+              <p style={{fontSize:12,color:'rgba(255,255,255,0.45)',lineHeight:1.5,marginBottom:8}}>{result.ohaengDesc}</p>
+              {(()=>{
+                const sf1=getSpouseFortuneAnalysis(result.r1,p1.birthData.gender);
+                const sf2=getSpouseFortuneAnalysis(result.r2,p2.birthData.gender);
+                const text1=sf1.points.join(" ");
+                const text2=sf2.points.join(" ");
+                if(!text1&&!text2) return null;
+                return (
+                  <div style={{paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+                    {text1&&<p style={{fontSize:12,color:'rgba(255,255,255,0.5)',lineHeight:1.6,marginBottom:text2?6:0}}>{p1.name} ▸ {text1}</p>}
+                    {text2&&<p style={{fontSize:12,color:'rgba(255,255,255,0.5)',lineHeight:1.6,margin:0}}>{p2.name} ▸ {text2}</p>}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* 끌리는 이유 */}
