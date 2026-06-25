@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN, detectExcessPatterns } from "@/lib/saju2";
+import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN, SPEND_TO_EARN_ILGAN, detectExcessPatterns } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -293,7 +293,7 @@ export default function WealthPage() {
           </p>
           <p className="text-xs text-gray-500 mb-2">{r.yongshin.desc}</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            사주 전체의 기운이 균형을 이루려면 무엇이 더 필요한지를 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.
+            사주 전체의 기운이 균형을 이루려면 무엇이 더 필요한지를 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.{ilgan === "경" && " 경금은 누군가 도와주는 기운을 크게 받기보다, 비슷한 기운이 곁에서 함께 받쳐줄 때 더 단단해지는 구조예요. 도와주는 기운이 너무 많으면 오히려 장점이 죽고, 적당히 적게 있는 정도가 가장 잘 맞습니다. 책임감을 다스리는 기운을 유독 잘 다루는 일간이라, 재물이 책임감 기운으로 흘러가는 루트를 가장 능숙하게 쓸 줄 알고, 재물을 다루는 솜씨도 좋은 편인데 단순한 사업가형보다는 판을 짜고 이끄는 통치자형에 가깝습니다."}{SPEND_TO_EARN_ILGAN[ilgan] && ` ${SPEND_TO_EARN_ILGAN[ilgan].desc} 쓰면 좋은 곳은 ${SPEND_TO_EARN_ILGAN[ilgan].where}`}
           </p>
         </div>
 

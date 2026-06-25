@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
+import { GANYEOJIDONG_PAIRS } from "@/lib/saju2";
 import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ const SINSAL_OVERCOME: Record<string, {
     caution:"억지로 정착을 강요하면 더 큰 이탈이 옵니다." },
   화개살: { icon:"🌙",color:"#818cf8",name:"화개살(華蓋殺)",
     problem:"고독합니다. 주류에 섞이기가 어렵습니다. 혼자 있어야 충전이 됩니다.",
-    overcome:["고독을 적으로 삼지 마세요. 창의적 힘으로 전환하세요.","명상·수련·종교 활동이 에너지를 안정시킵니다.","혼자만의 공간과 시간을 충분히 확보하세요.","소수의 진짜 관계를 추구하세요."],
+    overcome:["고독을 적으로 삼지 마세요. 창의적 힘으로 전환하세요.","명상·수련·종교 활동이 에너지를 안정시킵니다.","혼자만의 공간과 시간을 충분히 확보하세요.","소수의 진짜 관계를 추구하세요.","여기저기 옮겨 다니면 재물이 흩어지기 쉬운 기운이라, 한 직장·한 분야에서 진득하게 버틸수록 결국 그 판의 전문가가 되어 실속을 챙기게 됩니다."],
     caution:"술·도박·게임 등 현실 도피에 빠지기 쉽습니다." },
   겁살: { icon:"💥",color:"#f97316",name:"겁살(劫殺)",
     problem:"갑작스러운 사고·충돌·빼앗김이 옵니다. 충동이 강합니다.",
@@ -143,7 +144,10 @@ function SuccessContent() {
           <div className="text-center mb-8 p-6 rounded-3xl" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)" }}>
             <p className="text-xs text-gray-600 font-bold tracking-widest uppercase mb-2">일주</p>
             <p className="text-5xl font-black text-white mb-1">{dayCg}{dayJj}</p>
-            <p className="text-sm text-gray-500">사주 극복법 맞춤 분석</p>
+            <p className="text-sm text-gray-500">
+              사주 극복법 맞춤 분석
+              {GANYEOJIDONG_PAIRS[`${dayCg}${dayJj}`] && " — 위아래가 같은 기운으로 단단히 뭉친 일주라 고집과 주체성이 굉장히 강합니다. 환경 변화에 휩쓸려 잦은 이직이나 이동을 하면 에너지만 낭비되기 쉬우니, 뚝심 있게 한곳을 지키며 자기 브랜딩을 쌓아갈수록 돈과 기회가 따라옵니다."}
+            </p>
           </div>
         )}
 
