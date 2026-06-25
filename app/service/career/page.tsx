@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, ILJU_60, adjustCareerByExpression, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSangcheong } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -263,6 +263,9 @@ export default function CareerPage() {
   const gwanseongCount = totalCount("정관") + totalCount("편관");
   const hasSikSangSaengGwan = sikSangCount >= 1 && gwanseongCount >= 1;
 
+  const iljuInfo = ILJU_60[`${ilgan}${r.pillarsDetail.day.jj}`];
+  const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCount) : "";
+
   // 비겁 과다 판단: 비견+겁재 합산 3개 이상이면 과다로 본다
   const bigeobCount = totalCount("비견") + totalCount("겁재");
   const ilganEl2 = (CHEONGAN_ELEMENT[ilgan] || "목") as string;
@@ -353,7 +356,7 @@ export default function CareerPage() {
               </span>
             ))}
           </div>
-          <p className="text-sm text-gray-300 leading-relaxed">{careerInfo?.desc} {getJikjangSiseonNarrative(r)} {johu.desc}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{careerInfo?.desc} {getJikjangSiseonNarrative(r)} {johu.desc}{iljuCareerAdjusted && ` 태어난 날의 기둥(일주) 자체로 보면, ${iljuCareerAdjusted}`}</p>
         </div>
 
         {/* 섹션 2 — 나와 안 맞는 직업/환경 */}

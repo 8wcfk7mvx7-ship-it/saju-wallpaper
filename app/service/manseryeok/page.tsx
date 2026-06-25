@@ -1437,8 +1437,8 @@ function ResultView({
 
       {/* ⑧ 직업 적성 */}
       <Section title="직업 적성 · 커리어 분석" accent="#34d399">
-        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>지배 오행({domEl}) 기준 적성 분석</p>
-        <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>{domCareer.strengths}</p>
+        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>지배 오행({domEl}) · 일주 기준 적성 분석</p>
+        <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.65)" }}>{domCareer.strengths}{iljuCareerAdjusted && ` 타고난 일주(태어난 날의 기둥) 기준으로 보면, ${iljuCareerAdjusted}`}</p>
         <div className="flex flex-wrap gap-1.5 mb-3">
           {domCareer.suited.map(s => (
             <span key={s} className="text-xs px-3 py-1 rounded-full font-semibold" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }}>{s}</span>
