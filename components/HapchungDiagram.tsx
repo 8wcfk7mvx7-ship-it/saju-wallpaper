@@ -157,6 +157,9 @@ export default function HapchungDiagram({
             const myLabel = myPillars[r.a].label;
             const targetLabel = targetPillars[r.b - myCount].label;
             const typeText = r.type === "원진" ? "원진(귀문)" : r.type;
+            // 같은 두 지지 사이에 육합과 파가 동시에 성립하는 쌍(인해, 사신) — 합과 파가 같이 작용한다는 점을 짚어준다
+            const isHapPaOverlap = (r.type === "육합" || r.type === "파") &&
+              crossRelations.some(o => o !== r && o.a === r.a && o.b === r.b && (o.type === "육합" || o.type === "파"));
             return (
               <div key={i} className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div className="flex items-center gap-2 mb-1.5">
@@ -165,7 +168,10 @@ export default function HapchungDiagram({
                     {myName}({myLabel}) {c1} ↔ {targetName}({targetLabel}) {c2}
                   </span>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{HAPCHUNG_NOTE[r.type]}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+                  {HAPCHUNG_NOTE[r.type]}
+                  {isHapPaOverlap && " 같은 지지 쌍이 합과 파를 동시에 이루는 조합이라, 서로를 끌어당기는 힘은 분명하지만 그 합이 끝까지 매끄럽게 유지되긴 어려워요. 시작은 좋아도 시간이 지나며 이해관계나 감정 대립으로 균열이 생기기 쉬운 구조예요."}
+                </p>
               </div>
             );
           })}
