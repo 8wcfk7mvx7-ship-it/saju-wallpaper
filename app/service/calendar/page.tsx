@@ -375,7 +375,7 @@ export default function CalendarPage() {
             style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
             길일·흉일 확인하기 →
           </button>
-          <p className="text-base text-gray-600 mt-4">이번 달 무료 · 다음 2개월은 ₩990</p>
+          <p className="text-base text-gray-600 mt-4">앞으로 3개월치 길일·흉일을 모두 무료로 확인하세요</p>
         </div>
       </div>
     </main>
@@ -481,26 +481,26 @@ export default function CalendarPage() {
 
                       {/* 천간 */}
                       <div className="w-full flex flex-col items-center">
-                        <span className="text-[11px] font-bold mb-0.5" style={{ color: EL_COLOR[cgEl] }}>{sipCg || "─"}</span>
-                        <div className="w-full aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0"
+                        <span className="text-[10px] font-bold mb-0.5" style={{ color: EL_COLOR[cgEl] }}>{sipCg || "─"}</span>
+                        <div className="w-full rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0 py-2"
                           style={{ background: EL_BG[cgEl], border: `1px solid ${EL_COLOR[cgEl]}40` }}>
-                          <span className="font-black leading-none" style={{ fontSize: "clamp(1.4rem,5vw,2rem)", color: EL_COLOR[cgEl] }}>
+                          <span className="font-black leading-none text-2xl" style={{ color: EL_COLOR[cgEl] }}>
                             {CG_HANJA[pd.cg] ?? pd.cg}
                           </span>
-                          <span className="text-[11px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.cg}</span>
+                          <span className="text-[10px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.cg}</span>
                         </div>
                       </div>
 
                       {/* 지지 */}
                       <div className="w-full flex flex-col items-center">
-                        <div className="w-full aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0"
+                        <div className="w-full rounded-xl flex flex-col items-center justify-center gap-0.5 min-w-0 py-2"
                           style={{ background: EL_BG[jjEl], border: `1px solid ${EL_COLOR[jjEl]}40` }}>
-                          <span className="font-black leading-none" style={{ fontSize: "clamp(1.4rem,5vw,2rem)", color: EL_COLOR[jjEl] }}>
+                          <span className="font-black leading-none text-2xl" style={{ color: EL_COLOR[jjEl] }}>
                             {JJ_HANJA[pd.jj] ?? pd.jj}
                           </span>
-                          <span className="text-[11px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.jj}</span>
+                          <span className="text-[10px] leading-none" style={{ color: "rgba(255,255,255,0.5)" }}>{pd.jj}</span>
                         </div>
-                        <span className="text-[11px] font-bold mt-0.5" style={{ color: EL_COLOR[jjEl] }}>{sipJj || "─"}</span>
+                        <span className="text-[10px] font-bold mt-0.5" style={{ color: EL_COLOR[jjEl] }}>{sipJj || "─"}</span>
                       </div>
 
                       {/* 지장간 */}
@@ -538,8 +538,7 @@ export default function CalendarPage() {
           style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
           <span style={{ color: "#e8c97a" }}>📌</span>
           <span style={{ color: "rgba(255,255,255,0.55)" }}>
-            오늘 기준 <strong className="text-white">3개월</strong> ({months[0].month}월 · {months[1].month}월 · {months[2].month}월) 데이터만 분석됩니다.
-            {" "}{months[0].month}월은 무료 공개, {months[1].month}~{months[2].month}월은 ₩990 결제 후 확인 가능합니다.
+            오늘 기준 <strong className="text-white">3개월</strong> ({months[0].month}월 · {months[1].month}월 · {months[2].month}월) 데이터를 모두 분석해 드려요.
           </span>
         </div>
 
@@ -559,12 +558,12 @@ export default function CalendarPage() {
         </div>
 
         {/* 3개월 캘린더 */}
-        {months.map(({ year, month }, monthIdx) => {
+        {months.map(({ year, month }) => {
           const dim = daysInMonth(year, month);
           const fdow = firstDow(year, month);
           const cells: (number | null)[] = [...Array(fdow).fill(null), ...Array.from({ length: dim }, (_, i) => i + 1)];
           while (cells.length % 7 !== 0) cells.push(null);
-          const isLocked = monthIdx > 0 && !isPaid;
+          const isLocked = false;
 
           return (
             <div key={`${year}-${month}`} className="mb-8 relative">
@@ -631,40 +630,6 @@ export default function CalendarPage() {
                   );
                 })}
               </div>
-
-              {/* 잠금 오버레이 */}
-              {isLocked && (
-                <div className="absolute inset-0 rounded-lg flex flex-col items-center justify-center z-10"
-                  style={{ backdropFilter: "blur(6px)", background: "rgba(6,6,14,0.75)", border: "1px solid rgba(201,168,76,0.2)" }}>
-                  <div className="text-center px-6">
-                    <div className="text-4xl mb-2">🔒</div>
-                    <p className="text-base font-black text-white mb-1">{month}월 길일·흉일</p>
-                    <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>결제 후 즉시 확인 가능</p>
-                    {blueberries >= 990 ? (
-                      <button
-                        onClick={() => {
-                          setShowering(true);
-                          const next = blueberries - 990;
-                          localStorage.setItem("sp_blueberries", String(next));
-                          localStorage.setItem("sp_calendar_paid", "true");
-                          setBlueberries(next);
-                          setTimeout(() => { setIsPaid(true); setShowering(false); }, 700);
-                        }}
-                        className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
-                        style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
-                        ✦ 별조각 뿌리고 보기 (990개)
-                      </button>
-                    ) : (
-                      <button onClick={handleUnlock}
-                        className="px-6 py-3 rounded-xl font-black text-base transition-all active:scale-95"
-                        style={{ background: "linear-gradient(135deg, #059669, #0d9488)", color: "#fff", boxShadow: "0 4px 20px rgba(5,150,105,0.4)" }}>
-                        ₩990 결제하기
-                      </button>
-                    )}
-                    <p className="text-[12px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>한 번 결제로 {months[1].month}~{months[2].month}월 전체 잠금 해제</p>
-                  </div>
-                </div>
-              )}
 
               {/* 선택된 날 상세 */}
               {!isLocked && selectedDay && viewYear === year && viewMonth === month && (
