@@ -1349,10 +1349,10 @@ export default function MainPage() {
                   className="relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-black mb-1" style={{ color: "#e0c168" }}>📚 사주 명리학 가이드</p>
-                <p className="text-sm font-bold text-white mb-1">사주가 처음이신가요?</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  오행·천간지지·신살·대운 등 기초를 광고 없이 설명합니다.
+                <p className="text-xs font-black mb-1.5 uppercase tracking-widest" style={{ color: "#e0c168" }}>사주 명리학 가이드</p>
+                <p className="text-lg font-black text-white mb-1.5">사주가 처음이신가요?</p>
+                <p className="text-sm font-bold leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+                  오행·천간지지·신살·대운 등 기초를 단계별로 설명합니다.
                 </p>
               </div>
             </div>

@@ -102,7 +102,7 @@ export default function GuidePage() {
       <div className="mt-10 rounded-2xl p-5" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}>
         <p className="text-sm font-semibold mb-1" style={{ color: "#c9a84c" }}>블로그도 확인해보세요</p>
         <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>연도별 운세 흐름, 일간별 특성 등 심화 콘텐츠를 다룹니다.</p>
-        <Link href="/blog" className="text-xs font-bold" style={{ color: "#c9a84c" }}>블로그 바로가기 →</Link>
+        <a href="https://cykablyat.tistory.com" target="_blank" rel="noopener noreferrer" className="text-xs font-bold" style={{ color: "#c9a84c" }}>블로그 바로가기 →</a>
       </div>
     </div>
   );
