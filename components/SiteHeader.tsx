@@ -31,18 +31,23 @@ export default function SiteHeader() {
   }
 
   useEffect(() => {
-    const u = parseUser();
-    setUser(u);
-    if (u) {
-      let s = parseInt(localStorage.getItem("sp_blueberries") ?? "", 10);
-      if (isNaN(s)) {
-        s = 864000;
-        localStorage.setItem("sp_blueberries", String(s));
+    function refresh() {
+      const u = parseUser();
+      setUser(u);
+      if (u) {
+        let s = parseInt(localStorage.getItem("sp_blueberries") ?? "", 10);
+        if (isNaN(s)) {
+          s = 864000;
+          localStorage.setItem("sp_blueberries", String(s));
+        }
+        setStars(s);
+      } else {
+        setStars(0);
       }
-      setStars(s);
-    } else {
-      setStars(0);
     }
+    refresh();
+    window.addEventListener("sp-auth-changed", refresh);
+    return () => window.removeEventListener("sp-auth-changed", refresh);
   }, [pathname]);
 
   if (SUPPRESS_PATHS.includes(pathname)) return null;
@@ -122,12 +127,12 @@ export default function SiteHeader() {
       {/* 데스크톱 로그인 선택 팝업 */}
       {showLoginModal && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center"
+          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto py-8"
           style={{ background: "rgba(0,0,0,0.6)" }}
           onClick={() => setShowLoginModal(false)}
         >
           <div
-            className="w-full max-w-sm mx-4 rounded-2xl p-6"
+            className="w-full max-w-sm mx-4 rounded-2xl p-6 max-h-full overflow-y-auto"
             style={{ background: "#0c0c18", border: "1px solid rgba(255,255,255,0.1)" }}
             onClick={e => e.stopPropagation()}
           >

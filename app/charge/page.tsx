@@ -190,25 +190,6 @@ export default function ChargePage() {
           충전 후 5년간 유효하며, 미사용 잔액은 「환불규정」에 따라 환급 신청이 가능합니다.
         </p>
 
-        {/* 별조각 사용처 */}
-        <div className="mt-10">
-          <p className="text-xs font-bold mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>별조각로 이용 가능한 서비스</p>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { emoji: "🔮", name: "오행 배경화면", price: "AI 유료" },
-              { emoji: "✨", name: "매력 분석", price: "₩1,900" },
-              { emoji: "⏳", name: "대운·세운", price: "₩15,000" },
-              { emoji: "🌍", name: "도시·나라 추천", price: "₩990" },
-            ].map(svc => (
-              <div key={svc.name} className="rounded-xl p-3"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="text-xl mb-1">{svc.emoji}</div>
-                <p className="text-xs font-bold text-white leading-tight">{svc.name}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "#a78bfa" }}>{svc.price}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </main>
   );

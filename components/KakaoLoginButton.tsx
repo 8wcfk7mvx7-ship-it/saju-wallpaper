@@ -34,6 +34,9 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
   useEffect(() => {
     setMounted(true);
     setUser(parseUser());
+    const onAuthChanged = () => setUser(parseUser());
+    window.addEventListener("sp-auth-changed", onAuthChanged);
+    return () => window.removeEventListener("sp-auth-changed", onAuthChanged);
   }, []);
 
   if (!mounted) return null;
@@ -41,6 +44,7 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
   function logout() {
     document.cookie = "sp_user=; max-age=0; path=/";
     setUser(null);
+    window.dispatchEvent(new Event("sp-auth-changed"));
   }
 
   // ── 플로팅 모바일 CTA ────────────────────────────────────────────────────

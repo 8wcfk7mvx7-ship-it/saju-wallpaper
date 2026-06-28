@@ -25,6 +25,10 @@ const UI: Record<Lang, {
   catLabel: Record<Category, string>;
   start: string;
   charging: string;
+  navBadge: string;
+  nav: [string, string, string, string];
+  mypage: string;
+  badgeTags: [string, string, string, string, string, string];
 }> = {
   ko: {
     h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
@@ -36,6 +40,10 @@ const UI: Record<Lang, {
     catLabel: { "전체": "전체", "무료": "무료", "연애·궁합": "연애·궁합", "금전·투자": "직업·금전", "운명·대운": "운세·대운", "라이프": "라이프", "Special": "프리미엄", "매력": "매력" },
     start: "시작",
     charging: "별조각 충전",
+    navBadge: "AI 사주",
+    nav: ["사주", "가이드", "일진달력", "문의하기"],
+    mypage: "마이페이지",
+    badgeTags: ["격국·용신 분석", "60갑자 일주론", "신살 발견", "대운·세운표", "경도 보정", "무료"],
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -47,6 +55,10 @@ const UI: Record<Lang, {
     catLabel: { "전체": "All", "무료": "Free", "연애·궁합": "Love", "금전·투자": "Money", "운명·대운": "Destiny", "라이프": "Lifestyle", "Special": "Premium", "매력": "Charm" },
     start: "Start",
     charging: "Top Up",
+    navBadge: "AI Saju",
+    nav: ["Saju", "Guide", "Daily Calendar", "Contact"],
+    mypage: "My Page",
+    badgeTags: ["Chart & Element Analysis", "60 Pillar Theory", "Sign Discovery", "Decade·Annual Chart", "Longitude Correction", "Free"],
   },
   id: {
     h1: ["Wallpaper Anda saat ini", "mungkin memblokir", "energi Anda"],
@@ -58,6 +70,10 @@ const UI: Record<Lang, {
     catLabel: { "전체": "Semua", "무료": "Gratis", "연애·궁합": "Cinta", "금전·투자": "Uang", "운명·대운": "Takdir", "라이프": "Gaya Hidup", "Special": "Premium", "매력": "Daya Tarik" },
     start: "Mulai",
     charging: "Isi Ulang",
+    navBadge: "AI Saju",
+    nav: ["Saju", "Panduan", "Kalender Harian", "Kontak"],
+    mypage: "Halaman Saya",
+    badgeTags: ["Analisis Bagan & Elemen", "Teori 60 Pilar", "Penemuan Tanda", "Tabel Dekade·Tahunan", "Koreksi Bujur", "Gratis"],
   },
   ta: {
     h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
@@ -69,7 +85,21 @@ const UI: Record<Lang, {
     catLabel: { "전체": "அனைத்தும்", "무료": "இலவசம்", "연애·궁합": "காதல்", "금전·투자": "பணம்", "운명·대운": "விதி", "라이프": "வாழ்க்கை", "Special": "சிறப்பு", "매력": "ஈர்ப்பு" },
     start: "தொடங்கு",
     charging: "நிரப்பு",
+    navBadge: "AI சாஜு",
+    nav: ["சாஜு", "வழிகாட்டி", "தினசரி நாட்காட்டி", "தொடர்பு"],
+    mypage: "என் பக்கம்",
+    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "60 நிலை கோட்பாடு", "அடையாள கண்டுபிடிப்பு", "தசா·வருட அட்டவணை", "தீர்க்கரேகை திருத்தம்", "இலவசம்"],
   },
+};
+
+// ── 60갑자 로마자 표기 (한글 미적용 언어용) ──────────────────────────────────
+const STEM_ROMAN = ["Gap", "Eul", "Byeong", "Jeong", "Mu", "Gi", "Gyeong", "Sin", "Im", "Gye"];
+const BRANCH_ROMAN = ["Ja", "Chuk", "In", "Myo", "Jin", "Sa", "O", "Mi", "Sin", "Yu", "Sul", "Hae"];
+const SURNAME_ROMAN: Record<string, string> = {
+  "김": "Kim", "이": "Lee", "박": "Park", "최": "Choi", "정": "Jeong", "강": "Kang", "조": "Cho", "윤": "Yoon", "장": "Jang", "임": "Lim",
+  "한": "Han", "오": "Oh", "서": "Seo", "신": "Shin", "권": "Kwon", "황": "Hwang", "안": "Ahn", "송": "Song", "전": "Jeon", "홍": "Hong",
+  "유": "Yu", "고": "Ko", "문": "Moon", "양": "Yang", "손": "Son", "배": "Bae", "백": "Baek", "허": "Heo", "남": "Nam", "심": "Shim",
+  "노": "Noh", "하": "Ha", "곽": "Kwak", "성": "Seong", "차": "Cha", "주": "Joo", "우": "Woo", "구": "Koo", "민": "Min", "류": "Ryu",
 };
 
 const CATEGORIES: { key: Category; icon: string; desc: string }[] = [
@@ -254,6 +284,50 @@ const ACTIONS = [
   "도화살 유형을 확인했습니다",
 ];
 
+// ko 외 언어용 ACTIONS 번역 (ACTIONS와 동일한 순서/개수)
+const ACTIONS_TR: Record<Lang, string[]> = {
+  ko: ACTIONS,
+  en: [
+    "created a Five Elements wallpaper", "analyzed their saju compatibility", "completed an MBTI combination analysis",
+    "finished a charm analysis", "checked their investment style", "opened a 14-year annual fortune flow",
+    "received a sexual charm analysis", "purchased a decade-fortune report", "checked compatibility risk",
+    "analyzed reunion chances", "checked the daily fortune calendar", "started a saju chat",
+    "read a feng shui guide", "completed a one-sided love analysis", "received an improvement plan",
+    "discovered a hidden hazard sign", "checked a romance-attraction sign", "looked up their full chart",
+    "completed an elemental balance analysis", "checked their decade-fortune flow", "received a one-sided love strategy",
+    "received a compatibility score", "unlocked a reunion strategy", "checked the annual fortune flow",
+    "discovered a romance-attraction sign", "checked a hidden sign", "checked a travel-fortune sign",
+    "checked their list of fortune signs", "checked a Five Elements balancing method", "checked a Zi Wei Dou Shu chart",
+    "checked regional fortune", "checked their romance-attraction type",
+  ],
+  id: [
+    "membuat wallpaper Lima Elemen", "menganalisis kecocokan saju", "menyelesaikan analisis kombinasi MBTI",
+    "menyelesaikan analisis daya tarik", "memeriksa gaya investasi", "membuka alur keberuntungan tahunan 14 tahun",
+    "menerima analisis daya tarik seksual", "membeli laporan keberuntungan dekade", "memeriksa tingkat risiko kecocokan",
+    "menganalisis peluang rujuk kembali", "memeriksa kalender keberuntungan harian", "memulai obrolan saju",
+    "membaca panduan feng shui", "menyelesaikan analisis cinta bertepuk sebelah tangan", "menerima rencana perbaikan diri",
+    "menemukan tanda bahaya tersembunyi", "memeriksa tanda daya tarik asmara", "memeriksa chart lengkap (manseryeok)",
+    "menyelesaikan analisis keseimbangan elemen", "memeriksa alur keberuntungan dekade", "menerima strategi cinta bertepuk sebelah tangan",
+    "menerima skor kecocokan", "membuka strategi rujuk kembali", "memeriksa alur keberuntungan tahunan",
+    "menemukan tanda daya tarik asmara", "memeriksa tanda tersembunyi", "memeriksa tanda keberuntungan perjalanan",
+    "memeriksa daftar tanda keberuntungan", "memeriksa metode penyeimbang Lima Elemen", "memeriksa chart Zi Wei Dou Shu",
+    "memeriksa keberuntungan regional", "memeriksa tipe daya tarik asmara",
+  ],
+  ta: [
+    "ஐந்து தத்துவ வால்பேப்பரை உருவாக்கினார்", "சாஜு பொருத்தத்தை பகுப்பாய்வு செய்தார்", "MBTI இணைவு பகுப்பாய்வை முடித்தார்",
+    "கவர்ச்சி பகுப்பாய்வை முடித்தார்", "முதலீட்டு பாங்கை சரிபார்த்தார்", "14 ஆண்டு வருடாந்திர அதிர்வை திறந்தார்",
+    "பாலியல் கவர்ச்சி பகுப்பாய்வைப் பெற்றார்", "தசா அறிக்கையை வாங்கினார்", "பொருத்தம் ஆபத்து அளவைச் சரிபார்த்தார்",
+    "மீண்டும் இணையும் வாய்ப்பை பகுப்பாய்வு செய்தார்", "தினசரி அதிர்வு நாட்காட்டியை சரிபார்த்தார்", "சாஜு அரட்டையைத் தொடங்கினார்",
+    "ஃபெங் சுயி வழிகாட்டியைப் படித்தார்", "ஒருதலை காதல் பகுப்பாய்வை முடித்தார்", "முன்னேற்றத் திட்டத்தைப் பெற்றார்",
+    "மறைந்த ஆபத்து அடையாளத்தைக் கண்டறிந்தார்", "காதல் கவர்ச்சி அடையாளத்தைச் சரிபார்த்தார்", "முழு ஜாதகத்தைப் பார்வையிட்டார்",
+    "தத்துவ சமநிலை பகுப்பாய்வை முடித்தார்", "தசா அதிர்வைச் சரிபார்த்தார்", "ஒருதலை காதல் உபாயத்தைப் பெற்றார்",
+    "பொருத்த மதிப்பெண்ணைப் பெற்றார்", "மீண்டும் இணையும் உபாயத்தைத் திறந்தார்", "வருடாந்திர அதிர்வைச் சரிபார்த்தார்",
+    "காதல் கவர்ச்சி அடையாளத்தைக் கண்டறிந்தார்", "மறைந்த அடையாளத்தைச் சரிபார்த்தார்", "பயண அதிர்வு அடையாளத்தைச் சரிபார்த்தார்",
+    "அதிர்வு அடையாளங்களின் பட்டியலைச் சரிபார்த்தார்", "ஐந்து தத்துவ சமநிலை முறையைச் சரிபார்த்தார்", "ஜி வெய் தௌ சு விளக்கப்படத்தைச் சரிபார்த்தார்",
+    "பிராந்திய அதிர்வைச் சரிபார்த்தார்", "காதல் கவர்ச்சி வகையைச் சரிபார்த்தார்",
+  ],
+};
+
 // 시드 기반 의사난수 (서버/클라이언트 렌더링 결과를 동일하게 맞추기 위함)
 function mulberry32(seed: number) {
   return function () {
@@ -265,25 +339,41 @@ function mulberry32(seed: number) {
 }
 
 // 갑오일주 / 갑자일주는 고정 노출, 나머지는 60일주 × 성씨 × 행동의 무작위 조합 약 200개
-const ACTIVITIES = (() => {
-  const fixed = [
-    "갑오일주 김○○님이 사주 궁합을 분석했습니다",
-    "갑자일주 정○○님이 MBTI 조합 분석을 완료했습니다",
+type ActivityEntry = { stemIdx: number; branchIdx: number; surname: string; actionIdx: number };
+const ACTIVITY_ENTRIES: ActivityEntry[] = (() => {
+  const fixed: ActivityEntry[] = [
+    { stemIdx: 0, branchIdx: 6, surname: "김", actionIdx: 1 },
+    { stemIdx: 0, branchIdx: 0, surname: "정", actionIdx: 2 },
   ];
   const rand = mulberry32(20260613);
-  const generated: string[] = [];
+  const generated: ActivityEntry[] = [];
   const seen = new Set<string>();
   while (generated.length < 200) {
-    const ilju = ILJU_60[Math.floor(rand() * ILJU_60.length)];
+    const iljuIdx = Math.floor(rand() * ILJU_60.length);
+    const stemIdx = iljuIdx % 10;
+    const branchIdx = iljuIdx % 12;
     const surname = SURNAMES[Math.floor(rand() * SURNAMES.length)];
-    const action = ACTIONS[Math.floor(rand() * ACTIONS.length)];
-    const key = `${ilju}-${surname}-${action}`;
+    const actionIdx = Math.floor(rand() * ACTIONS.length);
+    const key = `${iljuIdx}-${surname}-${actionIdx}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    generated.push(`${ilju} ${surname}○○님이 ${action}`);
+    generated.push({ stemIdx, branchIdx, surname, actionIdx });
   }
   return [...fixed, ...generated];
 })();
+
+function renderActivity(entry: ActivityEntry, lang: Lang): string {
+  const action = ACTIONS_TR[lang][entry.actionIdx];
+  if (lang === "ko") {
+    const ilju = `${STEMS_KO[entry.stemIdx]}${BRANCHES_KO[entry.branchIdx]}일주`;
+    return `${ilju} ${entry.surname}○○님이 ${action}`;
+  }
+  const romanIlju = `${STEM_ROMAN[entry.stemIdx].toLowerCase()}${BRANCH_ROMAN[entry.branchIdx].toLowerCase()}-ilju`;
+  const surname = SURNAME_ROMAN[entry.surname] || entry.surname;
+  if (lang === "id") return `${romanIlju} ${surname} baru saja ${action}`;
+  if (lang === "ta") return `${romanIlju} ${surname} ${action}`;
+  return `${romanIlju} ${surname} just ${action}`;
+}
 
 
 function ContactSection() {
@@ -939,7 +1029,7 @@ export default function MainPage() {
     const interval = setInterval(() => {
       setActivityVisible(false);
       setTimeout(() => {
-        setActivityIndex(i => (i + 1) % ACTIVITIES.length);
+        setActivityIndex(i => (i + 1) % ACTIVITY_ENTRIES.length);
         setActivityVisible(true);
       }, 400);
     }, 3500);
@@ -989,17 +1079,17 @@ export default function MainPage() {
             <span className="font-black text-base tracking-tight text-white">Summer Palace</span>
             <span className="hidden sm:block text-[10px] px-2 py-0.5 rounded-full font-black"
               style={{ background: "rgba(59,130,246,0.15)", color: "#3b82f6", border: "1px solid rgba(59,130,246,0.25)" }}>
-              AI 사주
+              {t.navBadge}
             </span>
           </button>
 
           {/* 상단 네비 링크 */}
           <div className="hidden sm:flex items-center gap-1">
             {[
-              { label: "사주", onClick: () => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "가이드", onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "일진달력", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "문의하기", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.nav[0], onClick: () => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.nav[1], onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.nav[2], onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.nav[3], onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
             ].map(item => (
               <button key={item.label} onClick={item.onClick}
                 className="px-3 py-1.5 rounded-full text-sm font-semibold transition-all hover:text-white"
@@ -1018,7 +1108,7 @@ export default function MainPage() {
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
             >
               <span>📂</span>
-              <span>마이페이지</span>
+              <span>{t.mypage}</span>
             </button>
             {/* 별조각 잔액/충전 — PC only */}
             <button
@@ -1126,7 +1216,7 @@ export default function MainPage() {
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
               <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
               <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
-                {ACTIVITIES[activityIndex]}
+                {renderActivity(ACTIVITY_ENTRIES[activityIndex], lang)}
               </span>
             </div>
           </div>
@@ -1145,7 +1235,7 @@ export default function MainPage() {
 
           {/* 피처 태그 */}
           <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
-            {["격국·용신 분석", "60갑자 일주론", "신살 발견", "대운·세운표", "경도 보정", "무료"].map(tag => (
+            {t.badgeTags.map(tag => (
               <span key={tag} className="text-xs px-3 py-1.5 rounded-full font-semibold"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.5)" }}>
                 {tag}
