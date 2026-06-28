@@ -19,7 +19,7 @@ import {
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
-  getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative,
+  getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
@@ -379,6 +379,7 @@ function SpyContent() {
     getDohwaPositionNarrative(result),
     getMuinseongNarrative(result),
     getGeumMokGwadaNarrative(result),
+    getIndaSingangMaleNarrative(result, theirGender),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ];
   const extraTraitNarrative = extraNarrativeFlags.filter((s): s is string => !!s).join(" ");

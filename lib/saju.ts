@@ -3946,6 +3946,20 @@ export function getGeumMokGwadaNarrative(r: SajuResult): string | null {
   return "금(金) 일간인데 사주 안에 목(木) 기운이 3개 이상 깔린 구조예요. 금이 목을 쳐내는 작용이 과도하게 누적되어, 감정 기복이나 충동을 다스리는 힘이 약해지기 쉬운 사주예요. 자기 감정을 객관적으로 점검하고 거르는 습관을 의식적으로 들이는 게 특히 중요해요.";
 }
 
+// 22-1) 도와주는 기운이 많아 신강한 남자 (의존적 성향)
+export function isIndaSingangMale(r: SajuResult): boolean {
+  if (r.yongshin.strength !== "신강") return false;
+  if (groupStrength(r, "인성") !== "강함") return false;
+  if (groupStrength(r, "비겁") === "강함") return false;
+  return true;
+}
+
+export function getIndaSingangMaleNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  if (!isIndaSingangMale(r)) return null;
+  return "자신을 도와주는 기운이 유난히 많아 신강한 사주예요. 어른스럽고 독립적인 모습보다는 누군가에게 의지하려는 경향이 강하게 나타나고, 무뚝뚝하거나 모성애가 강한 상대에게 매력으로 비치는 경우가 많아요. 부드러운 태도와 애교로 호감을 얻는 편이지만, 관계에서는 자신이 원하는 방향으로 상대가 맞춰주길 바라는 마음이 커요. 직접 요구하기보다 차분하고 설득력 있는 말투로 천천히 자기 뜻대로 유도하는 방식을 쓰는 경향이 있고, 말투는 부드러운데 내용을 들여다보면 일관성이 없거나 자기 위주인 경우가 있어요. 주변 사람에게는 다정한 편이라 관계를 정리하기 어렵게 느껴지기도 해요. 전반적으로 게으른 편이고 서운함이나 투정을 자주 표현하며, 은근히 경제적인 도움을 요구하는 경우도 있어요. 상대를 적극적으로 보호하거나 책임지는 역할은 약한 편이고, 외모나 과거 연애 상대를 은근히 비교하는 말을 하기도 하며, 자신에게는 후하고 상대에게는 엄격한 이중적인 기준을 보이는 경향도 있어요.";
+}
+
 // 23) 학당귀인 보유자의 직업·학업 적합도
 export function getHakdangCareerNarrative(r: SajuResult): string | null {
   const count = r.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { analyzeSaju, getJijiRelations } from "@/lib/saju";
+import { analyzeSaju, getJijiRelations, isIndaSingangMale } from "@/lib/saju";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -55,6 +55,13 @@ export async function POST(req: NextRequest) {
       ? sameSlotRelations.map(r => `${r.jjA}-${r.jjB} ${r.type}`).join(", ")
       : "같은 자리(연주-연주, 월주-월주, 일주-일주, 시주-시주)끼리 성립하는 합충형파해원진 관계 없음";
 
+    const myIndaSingang = myData.gender === "male" && isIndaSingangMale(mySaju);
+    const theirIndaSingang = theirData.gender === "male" && isIndaSingangMale(theirSaju);
+    const indaSingangFact = [
+      myIndaSingang ? "나: 자신을 도와주는 기운이 많아 신강한 구조 — 의존적이고 누군가에게 기대려는 성향, 부드러운 말투로 은근히 원하는 방향을 유도하려는 경향이 있음" : null,
+      theirIndaSingang ? "그 사람: 자신을 도와주는 기운이 많아 신강한 구조 — 의존적이고 누군가에게 기대려는 성향, 부드러운 말투로 은근히 원하는 방향을 유도하려는 경향이 있음" : null,
+    ].filter(Boolean).join(" / ") || "해당 없음";
+
     const prompt = `당신은 최고 수준의 명리학 전문가입니다. 두 사람의 재회 가능성을 심층 분석하세요.
 
 ## 나 (재회를 원하는 사람)
@@ -79,6 +86,10 @@ export async function POST(req: NextRequest) {
 
 ## 두 사람의 같은 자리(연주-연주, 월주-월주, 일주-일주, 시주-시주) 지지 관계
 ${relationFacts}
+
+## 의존적 신강 성향 체크
+${indaSingangFact}
+(해당 사항이 있는 경우, currentHeart 또는 strategy 서술에 위 성향을 자연스럽게 반영하세요. 해당 없으면 언급하지 마세요.)
 
 위 관계는 이미 계산된 사실이므로 그대로 인용하고, 임의로 다른 합충 관계를 지어내지 마세요. 두 사주의 합충형파해원진 관계, 용신 관계, 일간 오행 상생상극, 현재 대운/세운 흐름을 종합해 재회 가능성을 분석하세요.
 
