@@ -31,6 +31,13 @@ const EVENT_TYPES = [
 
 const DAYS_LABEL = ["일", "월", "화", "수", "목", "금", "토"];
 
+// 지지별 전통 시간대 (해당 지지 기운이 가장 강한 두 시간)
+const JIJI_HOUR: Record<string, string> = {
+  자: "23~01시", 축: "01~03시", 인: "03~05시", 묘: "05~07시",
+  진: "07~09시", 사: "09~11시", 오: "11~13시", 미: "13~15시",
+  신: "15~17시", 유: "17~19시", 술: "19~21시", 해: "21~23시",
+};
+
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
   useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
@@ -653,9 +660,9 @@ export default function CalendarPage() {
                   </div>
                   <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
                     {classify(selectedDay.score) === "길"
-                      ? `${eventInfo?.label}에 유리한 날입니다. 12운성 ${selectedDay.uuns}의 기운이 강하게 작용합니다. 오전~오후 초를 활용하세요.`
+                      ? `${eventInfo?.label}에 유리한 날입니다. 12운성 ${selectedDay.uuns}의 기운이 강하게 작용합니다. 일지 ${selectedDay.dp.jj}의 기운이 가장 강한 ${JIJI_HOUR[selectedDay.dp.jj]} 사이를 활용하면 그날의 기운과 시간대가 맞물려 더 유리합니다.`
                       : classify(selectedDay.score) === "흉"
-                      ? `${eventInfo?.label}에 불리한 날입니다. ${selectedDay.uuns ? `12운성 ${selectedDay.uuns}` : "기운"}이 약해져 있어 중요한 결정을 피하는 것이 좋습니다.`
+                      ? `${eventInfo?.label}에 불리한 날입니다. ${selectedDay.uuns ? `12운성 ${selectedDay.uuns}` : "기운"}이 약해져 있어 중요한 결정을 피하는 것이 좋습니다. 굳이 진행해야 한다면 일지 ${selectedDay.dp.jj}의 기운이 강한 ${JIJI_HOUR[selectedDay.dp.jj]}는 피하는 것이 좋습니다.`
                       : `무난한 날입니다. 큰 길흉은 없으나 특별히 유리하지도 않습니다. 길일을 기다릴 여유가 있다면 녹색 날을 선택하세요.`}
                   </p>
                 </div>
