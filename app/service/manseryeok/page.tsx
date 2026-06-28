@@ -28,6 +28,7 @@ import {
   JIJANGAN_DISPLAY,
   getIljuAnimal,
   detectGagukPatterns,
+  getGeumMokGwadaNarrative,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE } from "@/lib/saju2";
@@ -1323,7 +1324,7 @@ function ResultView({
             );
           })}
         </div>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)}</p>
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}

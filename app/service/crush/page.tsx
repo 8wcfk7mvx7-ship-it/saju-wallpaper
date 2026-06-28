@@ -44,7 +44,7 @@ import {
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
-  getGwanseongSiksangYeonaeNarrative,
+  getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative,
 } from "@/lib/saju";
 import HapchungDiagram from "@/components/HapchungDiagram";
 
@@ -286,6 +286,7 @@ export default function CrushPage() {
         getGwanbiAmhapNarrative(sajuR, targetForm.gender),
         getGwanseongSiksangYeonaeNarrative(sajuR, targetForm.gender),
         getHwasuMultiHongyeomNarrative(sajuR),
+        getGeumMokGwadaNarrative(sajuR),
         !jipchaknamNarrative ? getHwabuJokNarrative(sajuR) : null,
       ].filter((s): s is string => !!s).join(" ");
       const moneyStyleExtra = [

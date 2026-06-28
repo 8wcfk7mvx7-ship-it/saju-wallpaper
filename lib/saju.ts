@@ -3937,7 +3937,16 @@ export function getGwanseongSiksangYeonaeNarrative(r: SajuResult, gender?: "male
   return parts.join(" ");
 }
 
-// 22) 학당귀인 보유자의 직업·학업 적합도
+// 22) 금일간 + 목 3개 이상: 금이 목을 쳐내는 기운이 과도하게 강한 구조
+export function getGeumMokGwadaNarrative(r: SajuResult): string | null {
+  const dayCg = r.pillarsDetail.day.cg;
+  const isGeumIlgan = dayCg === "경" || dayCg === "신";
+  if (!isGeumIlgan) return null;
+  if (r.rawScores.목 < 3) return null;
+  return "금(金) 일간인데 사주 안에 목(木) 기운이 3개 이상 깔린 구조예요. 금이 목을 쳐내는 작용이 과도하게 누적되어, 감정 기복이나 충동을 다스리는 힘이 약해지기 쉬운 사주예요. 자기 감정을 객관적으로 점검하고 거르는 습관을 의식적으로 들이는 게 특히 중요해요.";
+}
+
+// 23) 학당귀인 보유자의 직업·학업 적합도
 export function getHakdangCareerNarrative(r: SajuResult): string | null {
   const count = r.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;
   if (count <= 0) return null;
