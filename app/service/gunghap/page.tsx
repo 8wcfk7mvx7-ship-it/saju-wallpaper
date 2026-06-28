@@ -634,21 +634,21 @@ export default function GunghapPage(){
                 })} />
                 <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',border:'1px solid rgba(255,255,255,0.07)',marginBottom:12}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-                    <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>나</p>
+                    <p style={{color:'#f43f5e',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:0}}>나</p>
                     <button type="button" onClick={fillP1} style={{fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px'}}>내 사주로 채우기</button>
                   </div>
                   <NameInput defaultValue={p1.name} onBlur={v=>setP1({...p1,name:v})} style={{...inp(),marginBottom:12}} />
-                  <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} label="나" accent="#f43f5e" showName={false} />
+                  <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} accent="#f43f5e" showName={false} />
                 </div>
                 <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
                   {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
                 </div>
                 <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',border:'1px solid rgba(255,255,255,0.07)'}}>
-                  <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:'0 0 12px'}}>
+                  <p style={{color:'#818cf8',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:'0 0 12px'}}>
                     {selectedRelation?.p2Label||'상대방'}
                   </p>
                   <NameInput defaultValue={p2.name} onBlur={v=>setP2({...p2,name:v})} style={{...inp(),marginBottom:12}} />
-                  <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} label="상대방" accent="#818cf8" showName={false} />
+                  <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} accent="#818cf8" showName={false} />
                 </div>
                 <button onClick={calc} style={{
                   width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',
