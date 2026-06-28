@@ -89,6 +89,7 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6039288229459228"
           crossOrigin="anonymous"
         />
+        <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
       <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
         <div className="bg-waterfall" aria-hidden="true" />

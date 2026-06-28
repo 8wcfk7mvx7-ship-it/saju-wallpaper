@@ -1,12 +1,74 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
+const GOOGLE_CLIENT_ID = "890801754093-edh505ocbhojnbr2fmfkj4rum2p3recr.apps.googleusercontent.com";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (resp: { credential: string }) => void }) => void;
+          renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+        };
+      };
+    };
+  }
+}
 
 export default function LoginOptions({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
   const redirect = pathname || "/";
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function handleCredential(resp: { credential: string }) {
+      try {
+        const res = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credential: resp.credential, redirect }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          onClose?.();
+          router.push(data.redirect || "/");
+          router.refresh();
+        }
+      } catch {}
+    }
+
+    function init() {
+      if (!window.google || !googleBtnRef.current) return;
+      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredential });
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: "filled_black",
+        size: "large",
+        shape: "pill",
+        width: 320,
+        text: "continue_with",
+        locale: "ko",
+      });
+    }
+
+    if (window.google) {
+      init();
+    } else {
+      const timer = setInterval(() => {
+        if (window.google) {
+          clearInterval(timer);
+          init();
+        }
+      }, 200);
+      return () => clearInterval(timer);
+    }
+  }, [redirect, router, onClose]);
 
   return (
     <div className="w-full space-y-3">
+      <div ref={googleBtnRef} className="w-full flex justify-center" />
       <a
         href={`/api/auth/kakao?redirect=${encodeURIComponent(redirect)}`}
         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
