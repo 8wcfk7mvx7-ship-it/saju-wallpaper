@@ -85,6 +85,10 @@ const JIJANGAN_COMPAT: Record<string,string> = {
 const CG_HAP_MAP: Record<string,{partner:string;el:string}> = {};
 CHEONGAN_HAP.forEach(([a,b,el])=>{CG_HAP_MAP[a]={partner:b,el};CG_HAP_MAP[b]={partner:a,el};});
 const CG_CHUNG_SET=new Set(CHEONGAN_CHUNG.map(([a,b])=>`${a}-${b}`).concat(CHEONGAN_CHUNG.map(([a,b])=>`${b}-${a}`)));
+const CG_HAP_CANON: Record<string,string> = {};
+CHEONGAN_HAP.forEach(([a,b])=>{CG_HAP_CANON[`${a}-${b}`]=`${a}${b}`;CG_HAP_CANON[`${b}-${a}`]=`${a}${b}`;});
+const CG_CHUNG_CANON: Record<string,string> = {};
+CHEONGAN_CHUNG.forEach(([a,b])=>{CG_CHUNG_CANON[`${a}-${b}`]=`${a}${b}`;CG_CHUNG_CANON[`${b}-${a}`]=`${a}${b}`;});
 
 /* 조후(調候) — 월지 → 온도 그룹 */
 const JOHU_GROUP: Record<string,"한"|"온"|"열"|"냉"> = {
@@ -200,7 +204,7 @@ interface PillarResult {
 function analyzePillar(label:string,weight:number,cg1:string,jj1:string,cg2:string,jj2:string):PillarResult{
   const ev:PillarEvent[]=[];
   if(CG_HAP_MAP[cg1]?.partner===cg2)
-    ev.push({type:'합',desc:`천간합 ${cg1}${cg2}→${CG_HAP_MAP[cg1].el}`,score:12});
+    ev.push({type:'합',desc:`천간합 ${CG_HAP_CANON[`${cg1}-${cg2}`]}→${CG_HAP_MAP[cg1].el}`,score:12});
   if(CG_CHUNG_SET.has(`${cg1}-${cg2}`))
     ev.push({type:'충',desc:`천간충 ${cg1}↔${cg2}`,score:-10});
   const yh=JIJI_YUKHAP.find(([a,b])=>(a===jj1&&b===jj2)||(a===jj2&&b===jj1));
@@ -230,8 +234,8 @@ function analyzePillar(label:string,weight:number,cg1:string,jj1:string,cg2:stri
   // 지장간 암합/암충
   const g1=JIJANGAN_ALL[jj1]||[], g2=JIJANGAN_ALL[jj2]||[];
   for(const a of g1) for(const b of g2){
-    if(CG_HAP_MAP[a]?.partner===b) ev.push({type:'암합',desc:`지장간 ${a}${b}합`,score:5});
-    if(CG_CHUNG_SET.has(`${a}-${b}`)) ev.push({type:'암충',desc:`지장간 ${a}${b}충`,score:-4});
+    if(CG_HAP_MAP[a]?.partner===b) ev.push({type:'암합',desc:`지장간 ${CG_HAP_CANON[`${a}-${b}`]}합`,score:5});
+    if(CG_CHUNG_SET.has(`${a}-${b}`)) ev.push({type:'암충',desc:`지장간 ${CG_CHUNG_CANON[`${a}-${b}`]}충`,score:-4});
   }
   return {label,weight,cg1,jj1,cg2,jj2,events:ev,subScore:ev.reduce((s,e)=>s+e.score,0)};
 }

@@ -38,6 +38,7 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import HapchungDiagram from "@/components/HapchungDiagram";
 
 export const dynamic = "force-dynamic";
 
@@ -430,6 +431,11 @@ function SpyContent() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* 나와의 합충(合沖) 분석 — 원국 다이어그램 */}
+        {myResult && result && (
+          <HapchungDiagram mySaju={myResult} targetSaju={result} />
         )}
 
         {/* 헤더 */}

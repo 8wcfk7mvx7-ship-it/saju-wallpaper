@@ -483,6 +483,11 @@ export default function CrushPage() {
           </p>
         </div>
 
+        {/* 나와의 합충(合沖) 분석 — 원국 다이어그램 */}
+        {targetSaju && mySaju && (
+          <HapchungDiagram mySaju={mySaju} targetSaju={targetSaju} />
+        )}
+
         {/* 궁합 점수 (내 생일 입력했을 때만) */}
         {myForm.birthYear !== "" && (
           <div className="mb-6 rounded-2xl p-5 text-center"
@@ -619,11 +624,6 @@ export default function CrushPage() {
             </div>
           );
         })()}
-
-        {/* 나와의 합충(合沖) 분석 — 원국 다이어그램 */}
-        {targetSaju && mySaju && (
-          <HapchungDiagram mySaju={mySaju} targetSaju={targetSaju} />
-        )}
 
         {/* 공유 + CTA */}
         <div className="mt-6 rounded-2xl p-5 text-center"

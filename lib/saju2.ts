@@ -661,8 +661,8 @@ export const ILGAN_MALE_IDEAL: Record<string, {
 };
 
 // ─── 괴강살 경고 ─────────────────────────────────────────────────────────────
-// 괴강살: 경진(庚辰), 경술(庚戌), 임진(壬辰), 임술(壬戌) 일주 남성
-export const GWAEGANG_ILJU = ["경진", "경술", "임진", "임술"];
+// 괴강살: 경진(庚辰), 경술(庚戌), 무진(戊辰), 무술(戊戌), 임진(壬辰), 임술(壬戌) 일주
+export const GWAEGANG_ILJU = ["경진", "경술", "무진", "무술", "임진", "임술"];
 
 export function isGwaegang(cg: string, jj: string): boolean {
   return GWAEGANG_ILJU.includes(cg + jj);
