@@ -6,6 +6,8 @@ import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import HapchungDiagram from "@/components/HapchungDiagram";
+import type { SajuResult } from "@/lib/saju";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +71,8 @@ export default function ReunionPage() {
   const [myData, setMyData] = useState<BirthFormData>(defaultBirthData("male"));
   const [theirData, setTheirData] = useState<BirthFormData>(defaultBirthData("male"));
   const [result, setResult] = useState<ReunionResult | null>(null);
+  const [mySajuResult, setMySajuResult] = useState<SajuResult | null>(null);
+  const [theirSajuResult, setTheirSajuResult] = useState<SajuResult | null>(null);
   const [isPaid, setIsPaid] = useState(false);
   const [blueberries, setBlueberries] = useState(0);
   const [showering, setShowering] = useState(false);
@@ -88,6 +92,8 @@ export default function ReunionPage() {
         if (s.theirData) setTheirData(s.theirData);
         if (s.result) {
           setResult(s.result);
+          if (s.mySaju) setMySajuResult(s.mySaju);
+          if (s.theirSaju) setTheirSajuResult(s.theirSaju);
           setStep("result");
         }
         sessionStorage.removeItem(SESSION_KEY);
@@ -116,6 +122,8 @@ export default function ReunionPage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "분석 실패");
       setResult(data.result);
+      setMySajuResult(data.mySaju ?? null);
+      setTheirSajuResult(data.theirSaju ?? null);
       setStep("result");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "오류가 발생했습니다.");
@@ -124,7 +132,7 @@ export default function ReunionPage() {
   }
 
   function handleUnlock() {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ myData, theirData, result }));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ myData, theirData, result, mySaju: mySajuResult, theirSaju: theirSajuResult }));
     const orderId = `rn_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     router.push(`/reunion/pay?orderId=${orderId}`);
   }
@@ -308,6 +316,18 @@ export default function ReunionPage() {
         <BackButton />
         <StarShower active={showering} />
         <div className="w-full max-w-2xl mx-auto space-y-5" id="reunion-result">
+
+          {/* 합충 다이어그램 */}
+          {!locked && mySajuResult && theirSajuResult && (
+            <HapchungDiagram
+              mySaju={mySajuResult} targetSaju={theirSajuResult}
+              myName="나" targetName="그 사람"
+              title="나와 그 사람의 합충(合沖) 분석"
+              subtitle="재회 가능성과 함께, 두 원국 사이의 합·충·형·파·해·원진(귀문) 구조를 짚어봐요"
+              accent="#fb923c" borderColor="rgba(251,146,60,0.3)" bgColor="rgba(251,146,60,0.05)"
+              myChipColor="rgba(232,121,249,0.12)" targetChipColor="rgba(251,146,60,0.12)"
+            />
+          )}
 
           {/* 스코어 카드 */}
           <div className="rounded-2xl p-6 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>

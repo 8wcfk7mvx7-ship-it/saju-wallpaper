@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, getJijiRelations } from "@/lib/saju";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -38,6 +38,23 @@ export async function POST(req: NextRequest) {
     const thIlgan = theirSaju.pillarsDetail.day.cg;
     const now = new Date();
 
+    const myPillars = [mySaju.pillarsDetail.year, mySaju.pillarsDetail.month, mySaju.pillarsDetail.day, mySaju.pillarsDetail.hour]
+      .filter((p): p is NonNullable<typeof p> => !!p);
+    const thPillars = [theirSaju.pillarsDetail.year, theirSaju.pillarsDetail.month, theirSaju.pillarsDetail.day, theirSaju.pillarsDetail.hour]
+      .filter((p): p is NonNullable<typeof p> => !!p);
+    const myJj = myPillars.map(p => p.jj);
+    const thJj = thPillars.map(p => p.jj);
+    // 같은 자리(연-연, 월-월, 일-일, 시-시)끼리만 비교 — 자리를 건너뛰는 크로스 비교는 제외
+    const sameSlotRelations = getJijiRelations([...myJj, ...thJj]).filter(r => {
+      if ((r.a < myJj.length) === (r.b < myJj.length)) return false;
+      const mineIdx = r.a < myJj.length ? r.a : r.b;
+      const theirIdx = r.a < myJj.length ? r.b - myJj.length : r.a - myJj.length;
+      return mineIdx === theirIdx;
+    });
+    const relationFacts = sameSlotRelations.length > 0
+      ? sameSlotRelations.map(r => `${r.jjA}-${r.jjB} ${r.type}`).join(", ")
+      : "같은 자리(연주-연주, 월주-월주, 일주-일주, 시주-시주)끼리 성립하는 합충형파해원진 관계 없음";
+
     const prompt = `당신은 최고 수준의 명리학 전문가입니다. 두 사람의 재회 가능성을 심층 분석하세요.
 
 ## 나 (재회를 원하는 사람)
@@ -60,7 +77,10 @@ export async function POST(req: NextRequest) {
 
 오늘 날짜: ${now.getFullYear()}년 ${now.getMonth() + 1}월 기준으로 분석하세요.
 
-두 사주의 합충파해, 용신 관계, 일간 오행 상생상극, 현재 대운/세운 흐름을 종합해 재회 가능성을 분석하세요.
+## 두 사람의 같은 자리(연주-연주, 월주-월주, 일주-일주, 시주-시주) 지지 관계
+${relationFacts}
+
+위 관계는 이미 계산된 사실이므로 그대로 인용하고, 임의로 다른 합충 관계를 지어내지 마세요. 두 사주의 합충형파해원진 관계, 용신 관계, 일간 오행 상생상극, 현재 대운/세운 흐름을 종합해 재회 가능성을 분석하세요.
 
 반드시 아래 JSON 형식으로만 응답하세요:
 
@@ -98,7 +118,7 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    return NextResponse.json({ success: true, result });
+    return NextResponse.json({ success: true, result, mySaju, theirSaju });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "분석 실패";
     return NextResponse.json({ error: msg }, { status: 500 });

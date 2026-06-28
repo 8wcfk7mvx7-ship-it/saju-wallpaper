@@ -10,6 +10,7 @@ import {
 import { loadSajuData } from "@/lib/savedSaju";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import StarShower from "@/components/StarShower";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -688,6 +689,8 @@ export default function CalendarPage() {
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
           다른 날짜 종류로 다시 보기
         </button>
+
+        <ShareImageButton targetId="calendar-result" fileName="길일흉일" />
       </div>
     </main>
   );

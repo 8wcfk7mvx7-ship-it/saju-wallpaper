@@ -7,6 +7,7 @@ import { ILGAN_COUNTRY } from "@/lib/saju2";
 import { eunNeun } from "@/lib/josa";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 
 export const dynamic = "force-dynamic";
@@ -389,7 +390,7 @@ export default function PlacePage() {
 
       {/* ══ RESULT ══ */}
       {step === "result" && krData && (
-        <div className="max-w-2xl mx-auto px-5 py-10 pb-12">
+        <div className="max-w-2xl mx-auto px-5 py-10 pb-12" id="place-result">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
           {/* 용신 배너 */}
@@ -643,6 +644,7 @@ export default function PlacePage() {
             )}
             <p className="text-center text-xs text-white/25 mt-3">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
           </div>
+          <ShareImageButton targetId="place-result" fileName="명당" />
         </div>
       )}
     </main>

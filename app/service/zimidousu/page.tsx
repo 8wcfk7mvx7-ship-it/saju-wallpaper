@@ -7,6 +7,7 @@ import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, 
 import { calcZiwei, getHourBranchIndex, BRANCHES, type ZiweiResult } from "@/lib/ziwei";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -269,7 +270,7 @@ export default function ZimidousuPage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-purple-950/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="zimidousu-result">
         <div className="text-center mb-8">
           <p className="text-purple-400 text-xs font-bold tracking-widest mb-2">ZI WEI DOU SHU</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -513,6 +514,7 @@ export default function ZimidousuPage() {
             다시 분석하기
           </button>
         </div>
+        <ShareImageButton targetId="zimidousu-result" fileName="자미두수" />
       </div>
     </main>
   );

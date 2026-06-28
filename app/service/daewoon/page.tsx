@@ -11,6 +11,7 @@ import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -636,7 +637,7 @@ export default function DaewoonPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <BackButton />
-      <div className="max-w-2xl mx-auto px-5 py-8 pb-32">
+      <div className="max-w-2xl mx-auto px-5 py-8 pb-32" id="daewoon-result">
 
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 mb-2">
@@ -1000,6 +1001,8 @@ export default function DaewoonPage() {
             );
           })()}
         </div>
+
+        <ShareImageButton targetId="daewoon-result" fileName="대운" />
 
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
