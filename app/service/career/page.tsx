@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, ILJU_60, adjustCareerByExpression, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, getHakdangCareerNarrative, ILJU_60, adjustCareerByExpression, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSangcheong } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -356,7 +356,7 @@ export default function CareerPage() {
               </span>
             ))}
           </div>
-          <p className="text-sm text-gray-300 leading-relaxed">{careerInfo?.desc} {getJikjangSiseonNarrative(r)} {johu.desc}{iljuCareerAdjusted && ` 태어난 날의 기둥(일주) 자체로 보면, ${iljuCareerAdjusted}`}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{careerInfo?.desc} {getJikjangSiseonNarrative(r)} {johu.desc}{iljuCareerAdjusted && ` 태어난 날의 기둥(일주) 자체로 보면, ${iljuCareerAdjusted}`} {getHakdangCareerNarrative(r)}</p>
         </div>
 
         {/* 섹션 2 — 나와 안 맞는 직업/환경 */}

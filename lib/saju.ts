@@ -3374,19 +3374,19 @@ export function detectSamhapBanghap(pillarsDetail: SajuResult["pillarsDetail"]):
 
 export const HAKDANG_INSIGHT = {
   hanja: "學堂貴人",
-  rank: "귀인 중 상급. 문창·문곡귀인과 함께 명리학에서 공부 사주의 3대 길신으로 꼽힌다.",
-  triggerRule: "일간 기준으로 해당 지지가 사주(연·월·일·시) 어디에든 있으면 성립한다.",
+  rank: "귀인 중에서도 상급으로 꼽히는 기운이에요. 문창귀인·문곡귀인과 함께 공부 사주의 3대 길신으로 불려요.",
+  triggerRule: "일간을 기준으로 정해진 지지가 사주 네 자리 중 어디에든 있으면 성립해요.",
   triggerTable: {
-    갑: "해(亥)", 을: "오(午)", 병: "인(寅)", 정: "유(酉)",
-    무: "인(寅)", 기: "유(酉)", 경: "사(巳)", 신: "자(子)",
-    임: "신(申)", 계: "묘(卯)",
+    갑: "해", 을: "오", 병: "인", 정: "유",
+    무: "인", 기: "유", 경: "사", 신: "자",
+    임: "신", 계: "묘",
   },
-  vsOthers: "문창은 학습한 내용을 응용·설명하는 능력, 문곡은 정교한 필기·정리 능력에 강점이 있다. 학당귀인은 문곡과 유사한 계열이나, 특유의 어른스러운 분위기와 윗사람에게 인정받는 기운이 더해진다.",
-  coreNature: "어떤 집단에서도 무게중심 역할을 한다. 언변이나 유머가 특출나지 않아도 조용히 존재 자체로 중심에 위치한다. 윗사람(선생·상사·고위직)이 자연스럽게 주목하고 신뢰하는 기운이 있다.",
-  blessingEffect: "복(福) 기운이 함께 작용하여, 학업 성취가 낮더라도 주변에 도움을 주는 인연이 생긴다. 노력 없이 명문대에 진학한 경우라면 학당귀인 등 길신의 영향일 가능성이 높다.",
-  magnetism: "말수가 적고 내성적인 편이나 묘한 존재감이 있다. 외모·SNS·사업 포인트 등 여러 영역에서 핵심을 포착하는 능력이 있다. 표현력보다 실제 능력치가 높은 유형이다.",
-  businessAptitude: "자기 이름을 걸고 하는 일에 강하다. 대중에게 은근한 매력을 발산하는 구조라 개인 브랜드·강의·전문직 사업에 적합하다.",
-  socialShield: "어떤 환경에서도 무례하게 대하기 어려운 분위기를 자연스럽게 형성한다. 보호 받는 기운이 있어 적대적 환경에서도 정면충돌이 일어나기 어렵다.",
+  vsOthers: "문창귀인은 배운 내용을 응용하고 설명하는 능력이 강점이고, 문곡귀인은 필기와 정리 능력이 강점이에요. 학당귀인은 문곡귀인과 비슷한 계열이지만, 거기에 어른스러운 분위기와 윗사람에게 인정받는 기운이 더해져요.",
+  coreNature: "어떤 집단에서도 무게중심 역할을 해요. 말이 특출나게 많거나 유머가 뛰어나지 않아도 조용히 존재 자체로 중심에 위치하고, 윗사람이 자연스럽게 주목하고 신뢰를 보내는 기운이 있어요.",
+  blessingEffect: "복(福) 기운이 함께 작용해서, 들인 노력에 비해 더 좋은 결과나 도움을 주는 인연이 따라와요.",
+  magnetism: "말수가 적고 내성적인 편이어도 묘한 존재감이 있어요. 외모·SNS·사업 감각 등 여러 영역에서 핵심을 잘 포착하는 능력이 있고, 겉으로 드러나는 표현보다 실제 능력치가 더 높은 편이에요.",
+  businessAptitude: "자기 이름을 걸고 하는 일에 강해요. 대중에게 은근한 매력을 발산하는 구조라 개인 브랜드·강의·전문직 사업에 잘 맞아요.",
+  socialShield: "어떤 환경에서도 무례하게 대하기 어려운 분위기를 자연스럽게 만들어요. 보호받는 기운이 있어서 적대적인 상황에서도 정면충돌이 잘 일어나지 않아요.",
 };
 
 export const HYEONCHIMSAL_INSIGHT = {
@@ -3924,6 +3924,13 @@ export function getGwanseongSiksangYeonaeNarrative(r: SajuResult, gender?: "male
     parts.push("분위기를 만드는 힘과 그 분위기에 맞춰가는 힘이 함께 있어서, 둘이 만나면 연애의 호흡이 잘 맞아떨어지는 조합이에요.");
   }
   return parts.join(" ");
+}
+
+// 22) 학당귀인 보유자의 직업·학업 적합도
+export function getHakdangCareerNarrative(r: SajuResult): string | null {
+  const count = r.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;
+  if (count <= 0) return null;
+  return `${HAKDANG_INSIGHT.coreNature} ${HAKDANG_INSIGHT.businessAptitude}`;
 }
 
 const CG_BYEONGJON_DESC: Record<string, string> = {
