@@ -28,7 +28,7 @@ function ShareButton({ title, text }: { title: string; text: string }) {
   return (
     <button onClick={share} className="w-full py-3 rounded-2xl text-sm font-bold transition"
       style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
-      {copied ? "✓ 링크 복사됨" : "🔗 결과 공유하기"}
+      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
     </button>
   );
 }

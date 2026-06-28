@@ -205,8 +205,11 @@ function analyzePillar(label:string,weight:number,cg1:string,jj1:string,cg2:stri
   const ev:PillarEvent[]=[];
   if(CG_HAP_MAP[cg1]?.partner===cg2)
     ev.push({type:'합',desc:`천간합 ${CG_HAP_CANON[`${cg1}-${cg2}`]}→${CG_HAP_MAP[cg1].el}`,score:12});
-  if(CG_CHUNG_SET.has(`${cg1}-${cg2}`))
-    ev.push({type:'충',desc:`천간충 ${cg1}↔${cg2}`,score:-10});
+  if(CG_CHUNG_SET.has(`${cg1}-${cg2}`)){
+    const canon=CG_CHUNG_CANON[`${cg1}-${cg2}`];
+    const ordered=canon[0]===cg1?[cg1,cg2]:[cg2,cg1];
+    ev.push({type:'충',desc:`천간충 ${ordered[0]}↔${ordered[1]}`,score:-10});
+  }
   const yh=JIJI_YUKHAP.find(([a,b])=>(a===jj1&&b===jj2)||(a===jj2&&b===jj1));
   if(yh) ev.push({type:'합',desc:`육합 ${jj1}${jj2}→${yh[2]}`,score:14*weight});
   // 삼합 반합 (같은 주끼리 2개)
@@ -432,7 +435,10 @@ export default function GunghapPage(){
     let ohaengBonus=0;
     for(const el of r1.lacking) if(r2.dominant.includes(el)) ohaengBonus+=6;
     for(const el of r2.lacking) if(r1.dominant.includes(el)) ohaengBonus+=6;
-    const ohaengDesc=ohaengBonus>0?`서로 부족한 오행을 채워주는 조합 (+${ohaengBonus})`:'오행 보완 효과 없음';
+    const sharedLacking=r1.lacking.filter(el=>r2.lacking.includes(el));
+    const ohaengDesc=ohaengBonus>0
+      ?`서로 부족한 오행을 채워주는 조합 (+${ohaengBonus})${sharedLacking.length>0?` — 다만 ${sharedLacking.join('·')}은 두 사람 모두에게 부족해서, 이 기운만큼은 서로 채워주지 못해요.`:''}`
+      :sharedLacking.length>0?`두 사람 모두 ${sharedLacking.join('·')} 기운이 부족해서, 이 기운에 대해서는 서로 채워주지 못하고 같은 약점을 공유하는 구조예요.`:'오행 보완 효과 없음';
 
     // 총점
     let s=50;
@@ -1043,7 +1049,7 @@ export default function GunghapPage(){
               else{navigator.clipboard.writeText(window.location.href);alert('링크 복사됨!');}
             }} style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
               background:'linear-gradient(135deg,#6c5ce7,#a29bfe)',color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer',marginBottom:10}}>
-              🔗 결과 공유하기
+              ↗ 결과 공유하기
             </button>
             <button onClick={()=>{setResult(null);setStep('form');}} style={{width:'100%',padding:'12px',borderRadius:12,
               border:'1px solid rgba(255,255,255,0.08)',background:'transparent',color:'rgba(255,255,255,0.35)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>

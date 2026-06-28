@@ -200,7 +200,6 @@ export default function CalendarPage() {
   });
 
   // form state
-  const [name, setName] = useState("");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [selectedEvent, setSelectedEvent] = useState("");
   const [formError, setFormError] = useState("");
@@ -236,7 +235,6 @@ export default function CalendarPage() {
     if (sess) {
       try {
         const d = JSON.parse(sess);
-        if (d.name) setName(d.name);
         if (d.form) setForm(d.form);
         if (d.selectedEvent) setSelectedEvent(d.selectedEvent);
         if (d.userIlgan) {
@@ -258,8 +256,8 @@ export default function CalendarPage() {
           birthYear: saved.birthYear,
           birthMonth: saved.birthMonth || prev.birthMonth,
           birthDay: saved.birthDay || prev.birthDay,
+          ...(saved.name ? { name: saved.name } : {}),
         }));
-        if (saved.name) setName(saved.name);
       }
     }
   }, []);
@@ -284,7 +282,7 @@ export default function CalendarPage() {
       const r = analyzeSaju({
         birthYear: fy, birthMonth: fm, birthDay: fd,
         birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-        name: name || "나", gender: form.gender, birthPlace: form.city || "서울",
+        name: form.name || "나", gender: form.gender, birthPlace: form.city || "서울",
         style: "auto", productType: "report", useJajasi: form.useJajasi,
       });
       setUserIlgan(r.pillarsDetail.day.cg);
@@ -302,7 +300,7 @@ export default function CalendarPage() {
 
   function handleUnlock() {
     sessionStorage.setItem("sp_calendar_session", JSON.stringify({
-      name, form, selectedEvent, userIlgan, userMonthJj,
+      form, selectedEvent, userIlgan, userMonthJj,
     }));
     const orderId = `cal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     router.push(`/calendar/pay?orderId=${orderId}`);
@@ -393,13 +391,6 @@ export default function CalendarPage() {
         <p className="text-lg mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>생년월일시와 날짜 종류를 입력하세요</p>
 
         <div className="space-y-5">
-          {/* 이름 */}
-          <div>
-            <label className="block text-base text-white/50 mb-2 font-semibold uppercase tracking-wider">이름 <span className="text-[14px] font-normal normal-case text-white/25">(선택)</span></label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
-              className="w-full bg-white/5 border border-white/15 rounded-xl px-3 py-3 text-white text-base placeholder-white/20 focus:outline-none focus:border-emerald-500/50" />
-          </div>
-
           {/* 사주 입력 폼 */}
           <BirthInputForm value={form} onChange={setForm} accent="#06b6d4" />
 
@@ -447,7 +438,7 @@ export default function CalendarPage() {
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1">
             <h1 className="text-2xl font-black text-white">
-              {name ? `${name}의 ` : ""}{eventInfo?.icon} {eventInfo?.label} 길일
+              {form.name ? `${form.name}의 ` : ""}{eventInfo?.icon} {eventInfo?.label} 길일
             </h1>
             <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
               일간 <strong className="text-white">{userIlgan}</strong> 기준 · 향후 3개월
