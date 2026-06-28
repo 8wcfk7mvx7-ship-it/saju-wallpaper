@@ -12,6 +12,13 @@ import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/Bi
 import ShareImageButton from "@/components/ShareImageButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
+import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY } from "@/lib/saju";
+
+const GUNGHAP_EL_COLOR: Record<string, string> = { 목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#d1d5db", 수: "#60a5fa" };
+function gunghapJijiElement(jj: string): string {
+  const map: Record<string, string> = { 인: "목", 묘: "목", 사: "화", 오: "화", 진: "토", 술: "토", 축: "토", 미: "토", 신: "금", 유: "금", 자: "수", 해: "수" };
+  return map[jj] || "토";
+}
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -712,13 +719,34 @@ export default function GunghapPage(){
 
             {/* 사주 */}
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
-              {[{r:result.r1,p:p1},{r:result.r2,p:p2}].map(({r,p:pp},i)=>(
+              {[{r:result.r1,p:p1},{r:result.r2,p:p2}].map(({r,p:pp},i)=>{
+                const pd=r.pillarsDetail;
+                const cols=[{label:'시',d:pd.hour},{label:'일',d:pd.day},{label:'월',d:pd.month},{label:'년',d:pd.year}].filter(c=>!!c.d) as {label:string;d:NonNullable<typeof pd.day>}[];
+                return (
                 <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:12,padding:'12px',border:'1px solid rgba(255,255,255,0.06)'}}>
                   <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5,fontWeight:700}}>{pp.name}</p>
-                  <p style={{fontSize:12,color:'rgba(255,255,255,0.7)',fontFamily:'monospace',letterSpacing:'0.06em',marginBottom:3}}>{r.fourPillars}</p>
-                  <p style={{fontSize:10,color:r.yongshin.strength==='신강'?'#ff9f43':'#54a0ff',marginBottom:1}}>{r.yongshin.strength} 용신:{r.yongshin.yongshin}</p>
+                  <p style={{fontSize:10,color:r.yongshin.strength==='신강'?'#ff9f43':'#54a0ff',marginBottom:8}}>{r.yongshin.strength} 용신:{r.yongshin.yongshin}</p>
+                  <table style={{width:'100%',textAlign:'center',borderCollapse:'collapse'}}>
+                    <thead>
+                      <tr>
+                        {cols.map(c=>(<th key={c.label} style={{fontSize:9,fontWeight:800,color:'rgba(255,255,255,0.3)',paddingBottom:3}}>{c.label}</th>))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {cols.map(c=>(<td key={c.label} style={{fontSize:13,fontWeight:900,color:GUNGHAP_EL_COLOR[CHEONGAN_ELEMENT[c.d.cg]||'토'],padding:'2px 0'}}>{c.d.cg}</td>))}
+                      </tr>
+                      <tr>
+                        {cols.map(c=>(<td key={c.label} style={{fontSize:13,fontWeight:900,color:GUNGHAP_EL_COLOR[gunghapJijiElement(c.d.jj)],padding:'2px 0'}}>{c.d.jj}</td>))}
+                      </tr>
+                      <tr>
+                        {cols.map(c=>(<td key={c.label} style={{fontSize:9,color:'rgba(255,255,255,0.4)',padding:'2px 0'}}>{(JIJANGAN_DISPLAY[c.d.jj]||[]).map(j=>j.stem).join('')||'—'}</td>))}
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* 12운성 관계 에너지 */}
