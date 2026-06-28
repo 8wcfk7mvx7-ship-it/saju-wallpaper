@@ -758,7 +758,12 @@ function ResultView({
                   row: "신살", get: (d: typeof pd.year, label: string) => {
                     const pl = label === "년주" ? "연" : label === "월주" ? "월" : label === "일주" ? "일" : "시";
                     const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
-                    return names.length ? names.join(", ") : "—";
+                    if (!names.length) return "—";
+                    return (
+                      <div className="flex flex-col items-center gap-0.5">
+                        {names.map((n, i) => <span key={i}>{n}</span>)}
+                      </div>
+                    );
                   }
                 },
               ].map((rowDef, ri) => (
