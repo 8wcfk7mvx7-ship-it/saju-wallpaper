@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useCallback, useRef, type CSSProperties, type ReactNode, memo } from "react";
-import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -10,6 +9,7 @@ import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import BackButton from "@/components/BackButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
 import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY } from "@/lib/saju";
@@ -348,7 +348,6 @@ const FEATURES=[
 ];
 
 export default function GunghapPage(){
-  const router=useRouter();
   const [p1,setP1]=useState<PI>(empty());
   const [p2,setP2]=useState<PI>(empty());
   const [result,setResult]=useState<null|{
@@ -476,7 +475,10 @@ export default function GunghapPage(){
   const gradeColors:{[k:string]:string}={합:'#10ac84',삼합:'#10ac84',암합:'#4ecdc4',충:'#ee5a24',원진:'#c0392b',해:'#e67e22',파:'#e67e22',형:'#e74c3c',암충:'#e74c3c'};
 
   if(step==='loading') return (
-    <AnalysisLoading subject={`${p1.name}·${p2.name} 궁합`} onDone={()=>setStep('result')} />
+    <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0d0d1a 0%,#1a1a2e 45%,#16213e 100%)',color:'#fff'}}>
+      <BackButton />
+      <AnalysisLoading subject={`${p1.name}·${p2.name} 궁합`} onDone={()=>setStep('result')} />
+    </div>
   );
 
   return (
@@ -496,14 +498,9 @@ export default function GunghapPage(){
               width:260,height:260,borderRadius:'50%',background:'rgba(139,92,246,0.07)',filter:'blur(90px)'}}/>
           </div>
 
-          {/* 홈 버튼 */}
-          <FadeSlide delay={0} style={{position:'absolute',top:20,left:20,zIndex:10}}>
-            <button onClick={()=>router.push('/')} style={{background:'rgba(255,255,255,0.05)',
-              border:'1px solid rgba(255,255,255,0.1)',borderRadius:100,padding:'6px 14px',
-              color:'rgba(255,255,255,0.4)',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>
-              ← 여름궁전
-            </button>
-          </FadeSlide>
+          <div style={{position:'relative',zIndex:10}}>
+            <BackButton />
+          </div>
 
           <div style={{position:'relative',zIndex:1,maxWidth:640,margin:'0 auto',
             padding:'72px 24px 80px',textAlign:'center'}}>
@@ -582,7 +579,8 @@ export default function GunghapPage(){
       {/* ══ FORM + RESULT ══ */}
       {(step==='form'||step==='result')&&(
         <div>
-          <div style={{padding:'22px 18px 0',maxWidth:520,margin:'0 auto'}}>
+          <BackButton />
+          <div style={{padding:'0 18px',maxWidth:520,margin:'0 auto'}}>
             <button onClick={()=>{if(step==='result'){setResult(null);setStep('form');}else setStep('entry');}}
               style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:13,cursor:'pointer',padding:0,fontFamily:'inherit'}}>
               ← {step==='result'?'다시 입력':'처음으로'}

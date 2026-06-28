@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { analyzeSaju, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, type Element } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
@@ -8,6 +7,7 @@ import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import ShareImageButton from "@/components/ShareImageButton";
+import BackButton from "@/components/BackButton";
 
 // ─── 드롭다운 피커 ───────────────────────────────────────────────────────────
 function DropdownPicker({
@@ -275,7 +275,6 @@ interface FormState {
 
 // ─── 메인 컴포넌트 ───────────────────────────────────────────────────────────
 export default function StockPage() {
-  const router = useRouter();
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [showBtn, setShowBtn] = useState(false);
   const [counter] = useState(() => Math.floor(Math.random() * 250) + 130);
@@ -362,9 +361,7 @@ export default function StockPage() {
   if (step === "entry") {
     return (
       <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden page-fade-in">
-        <div className="fixed top-5 left-5 z-20">
-          <button onClick={() => router.push("/")} className="text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
-        </div>
+        <BackButton />
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-900/25 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-900/20 blur-[130px]" />
@@ -421,9 +418,9 @@ export default function StockPage() {
           <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-emerald-900/20 blur-[140px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[120px]" />
         </div>
+        <BackButton />
         <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16">
           <div className="flex items-center gap-3 mb-6">
-            <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 처음으로</button>
             {hasSaved && <span className="text-xs text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">✓ 저장된 사주 불러옴</span>}
           </div>
           <div className="text-center mb-8">
@@ -538,11 +535,11 @@ export default function StockPage() {
         <div className="absolute top-[-15%] left-[-15%] w-[700px] h-[700px] rounded-full bg-emerald-900/20 blur-[140px]" />
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[120px]" />
       </div>
+      <BackButton />
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="stock-result">
         {/* 상단 네비 */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-end mb-6">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 입력</button>
-          <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">홈으로</button>
         </div>
 
         {/* 헤더 */}

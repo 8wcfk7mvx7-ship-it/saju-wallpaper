@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
@@ -34,6 +35,7 @@ export default function AdultGatePage() {
   if (!confirmed) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4 page-fade-in" style={{ background: "#06060e" }}>
+        <BackButton />
         <div className="max-w-2xl w-full text-center">
           <FadeIn delay={0}>
             <div className="text-5xl mb-6">🔞</div>
@@ -53,13 +55,6 @@ export default function AdultGatePage() {
             >
               만 19세 이상입니다 — 입장하기
             </button>
-            <button
-              onClick={() => router.push("/")}
-              className="w-full py-3 rounded-2xl text-sm transition-all"
-              style={{ color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.1)" }}
-            >
-              돌아가기
-            </button>
             <p className="text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
               미성년자의 접근은 금지되어 있습니다. 허위 확인 시 모든 책임은 이용자에게 있습니다.
             </p>
@@ -71,10 +66,8 @@ export default function AdultGatePage() {
 
   return (
     <main className="min-h-screen px-4 py-12" style={{ background: "#06060e" }}>
+      <BackButton />
       <div className="max-w-2xl mx-auto">
-        <button onClick={() => router.push("/")} className="flex items-center gap-1.5 mb-8 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-          ← 홈으로
-        </button>
         <div className="text-center mb-10">
           <span className="text-4xl">🔞</span>
           <h1 className="text-2xl font-black text-white mt-3 mb-2">성인 전용 서비스</h1>

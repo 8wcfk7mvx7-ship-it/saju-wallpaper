@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
@@ -20,6 +19,7 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ShareImageButton from "@/components/ShareImageButton";
+import BackButton from "@/components/BackButton";
 
 const CY_MB = new Date().getFullYear();
 const YEARS_MB = Array.from({ length: CY_MB - 1919 }, (_, i) => CY_MB - i);
@@ -253,7 +253,6 @@ function getCompatibleSaju(ilganEl: Element, gender: "male" | "female") {
 }
 
 export default function MbtiPage() {
-  const router = useRouter();
   const [counter] = useState(() => Math.floor(Math.random() * 400) + 1600);
   const [mbti, setMbti] = useState<MBTI | "">("");
   const [sajuResult, setSajuResult] = useState<SajuResult | null>(null);
@@ -377,10 +376,13 @@ export default function MbtiPage() {
   }
 
   if (isAnalyzing) return (
-    <AnalysisLoading
-      subject={`${name || ""}님의 사주 MBTI`}
-      onDone={() => { setResult(pendingResultRef.current); setIsAnalyzing(false); }}
-    />
+    <>
+      <BackButton />
+      <AnalysisLoading
+        subject={`${name || ""}님의 사주 MBTI`}
+        onDone={() => { setResult(pendingResultRef.current); setIsAnalyzing(false); }}
+      />
+    </>
   );
 
   return (
@@ -390,9 +392,9 @@ export default function MbtiPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-950/40 blur-[140px]" />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="mbti-result">
-        <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+      <BackButton />
 
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="mbti-result">
         <FadeIn delay={0}>
           <div className="text-center mb-8">
             <div className="text-5xl mb-3">🧬</div>

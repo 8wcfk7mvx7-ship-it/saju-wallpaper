@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 import { analyzeSaju } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
@@ -235,7 +236,7 @@ export default function CharmPage() {
   // ── 엔트리 ───────────────────────────────────────────────────────────────
   if (step === "entry") return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden page-fade-in">
-      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
+      <BackButton />
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-pink-900/25 blur-[160px]" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/20 blur-[130px]" />
@@ -284,6 +285,7 @@ export default function CharmPage() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16">
+        <BackButton />
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep("entry")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 처음으로</button>
           {hasSaved && <span className="text-xs text-pink-400/70 bg-pink-500/10 border border-pink-500/20 px-3 py-1.5 rounded-full">✓ 저장된 사주 불러옴</span>}

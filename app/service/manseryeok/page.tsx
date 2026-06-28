@@ -12,6 +12,7 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 import AdBanner from "@/components/AdBanner";
+import BackButton from "@/components/BackButton";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
   analyzeSaju, calcDaewoon, getYearPillar, getSipseong, getUunseong,
@@ -1615,6 +1616,7 @@ export default function ManseryeokPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
+        <div className="w-full"><BackButton /></div>
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 rounded-full animate-spin" style={{ border: "2px solid rgba(99,102,241,0.15)", borderTopColor: "#6366f1" }} />
           <div className="absolute inset-3 rounded-full animate-spin" style={{ border: "2px solid rgba(139,92,246,0.15)", borderTopColor: "#8b5cf6", animationDirection: "reverse", animationDuration: "0.8s" }} />
@@ -1632,6 +1634,7 @@ export default function ManseryeokPage() {
   if (result && calcInput) {
     return (
       <main className="max-w-2xl mx-auto px-4 py-8">
+        <BackButton />
         <ResultView
           result={result}
           form={{ name: birthForm.name, gender: birthForm.gender, birthPlace: birthForm.city || "서울" }}
@@ -1678,6 +1681,7 @@ export default function ManseryeokPage() {
       ))}
 
       <main className="relative z-10 max-w-2xl mx-auto px-4 py-8">
+        <BackButton />
         {/* 키치 히어로 헤더 */}
         <div className="text-center pt-6 pb-8 px-2">
           <FadeIn delay={0}>

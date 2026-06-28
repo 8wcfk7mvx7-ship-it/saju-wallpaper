@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import ShareImageButton from "@/components/ShareImageButton";
+import BackButton from "@/components/BackButton";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
@@ -108,6 +109,8 @@ export default function FengshuiPage() {
       className="min-h-screen text-white"
       style={{ background: "#06060e" }}
     >
+      <BackButton />
+
       {/* Background glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div

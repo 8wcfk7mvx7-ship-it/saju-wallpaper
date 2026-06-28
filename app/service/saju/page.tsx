@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null);
@@ -55,13 +56,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden page-fade-in">
 
-      {/* 뒤로가기 */}
-      <div className="fixed top-5 left-5 z-20">
-        <button onClick={() => router.push("/")}
-          className="text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-          ← 홈
-        </button>
-      </div>
+      <BackButton />
 
       {/* 한자 배경 */}
       {mounted && BG_HANJA.map((h, i) => (

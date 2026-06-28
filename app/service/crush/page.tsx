@@ -318,8 +318,6 @@ export default function CrushPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[130px]" style={{ background: "rgba(251,113,133,0.06)" }} />
       </div>
 
-      <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
-
       <div className="relative z-10 max-w-2xl w-full text-center px-4">
         <FadeIn delay={0}>
           <div className="mb-6">
