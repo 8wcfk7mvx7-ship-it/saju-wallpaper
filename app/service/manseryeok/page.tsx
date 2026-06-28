@@ -32,7 +32,7 @@ import {
   getSipseongStrength,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -1325,7 +1325,7 @@ function ResultView({
             );
           })}
         </div>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}
@@ -1463,6 +1463,22 @@ function ResultView({
               </div>
             );
           })}
+        </div>
+      </Section>
+
+      {/* 개운법 — 색상·방향·음식·운동·아이템·숫자 랭킹 */}
+      <Section title="개운법 — 나에게 맞는 색·방향·음식·숫자" accent="#fbbf24">
+        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>오행 기운을 기준으로 좋은 오행 3가지를 우선 활용해보세요</p>
+        <div className="space-y-2.5">
+          {getGaewunRanking(result).map(g => (
+            <div key={g.element} className="rounded-xl px-4 py-3" style={{ background: g.isGood ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${g.isGood ? "rgba(251,191,36,0.25)" : "rgba(255,255,255,0.08)"}` }}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: g.isGood ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.08)", color: g.isGood ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>{g.rank}순위</span>
+                <span className="text-sm font-black" style={{ color: g.colorHex }}>{g.color}</span>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>방향 {g.direction} · 음식 {g.food} · 맛 {g.taste} · 운동 {g.exercise} · 아이템 {g.items} · 숫자 {g.numbers}</p>
+            </div>
+          ))}
         </div>
       </Section>
 
