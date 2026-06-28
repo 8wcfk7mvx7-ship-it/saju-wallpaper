@@ -11,30 +11,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
     </div>
   );
 }
-
-function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
-    }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={handleShare}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
-    >
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
-    </button>
-  );
-}
 import { useRouter } from "next/navigation";
 import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
@@ -130,7 +106,7 @@ const CRUSH_SUCCESS: Record<string, {
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 export const dynamic = "force-dynamic";
 
 type Step = "splash" | "input" | "loading" | "result";
@@ -318,7 +294,7 @@ export default function CrushPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[130px]" style={{ background: "rgba(251,113,133,0.06)" }} />
       </div>
 
-      <div className="relative z-10 max-w-2xl w-full text-center px-4">
+      <div className="relative z-10 max-w-lg w-full text-center px-4">
         <FadeIn delay={0}>
           <div className="mb-6">
             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: "rgba(244,63,94,0.1)", border: "1px solid rgba(244,63,94,0.3)" }}>
@@ -385,7 +361,7 @@ export default function CrushPage() {
   if (step === "input") return (
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
       <BackButton />
-      <div className="max-w-2xl mx-auto px-5 pt-8">
+      <div className="max-w-lg mx-auto px-5 pt-8">
 
         <div className="mb-8">
           <h2 className="text-2xl font-black text-white mb-1">그 사람 정보 입력</h2>
@@ -489,7 +465,7 @@ export default function CrushPage() {
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-24">
       <BackButton />
-      <div className="max-w-2xl mx-auto px-4 pt-8" id="crush-result">
+      <div className="max-w-lg mx-auto px-4 pt-8" id="crush-result">
 
         {/* 헤더 */}
         <div className="text-center mb-8">
@@ -656,12 +632,11 @@ export default function CrushPage() {
 
         {targetSaju && <SipseongInsight result={targetSaju} title="이 사람의 핵심 기운" />}
 
-        <ShareButton />
         <button onClick={() => setStep("input")} className="w-full mt-3 py-3 rounded-xl text-sm font-semibold transition"
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
           다시 분석하기
         </button>
-        <ShareImageButton targetId="crush-result" fileName="짝사랑" />
+        <ResultFooterActions targetId="crush-result" fileName="짝사랑" />
       </div>
     </main>
   );

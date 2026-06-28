@@ -16,7 +16,7 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
 import { SIPSEONG_DESC, ILGAN_MALE_IDEAL, isGwaegang, GWAEGANG_MALE_WARNING, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -97,7 +97,7 @@ export default function IdealTypePage() {
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-fuchsia-950/40 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
             <div className="inline-block px-3 py-1 rounded-full bg-fuchsia-900/50 border border-fuchsia-700/40 text-fuchsia-300 text-xs font-bold tracking-wider mb-8">
               ✦ 완전 무료
@@ -156,7 +156,7 @@ export default function IdealTypePage() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-fuchsia-950/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">그 사람의 생년월일 입력</h2>
             <p className="text-gray-500 text-sm">정확한 분석을 위해 상대방의 출생 정보를 입력해주세요.</p>
@@ -318,7 +318,7 @@ export default function IdealTypePage() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-fuchsia-950/30 blur-[160px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-violet-950/25 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="ideal-type-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="ideal-type-result">
         <div className="text-center mb-8">
           <p className="text-fuchsia-400 text-xs font-bold tracking-widest mb-2">THEIR TRUE IDEAL TYPE</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -481,7 +481,7 @@ export default function IdealTypePage() {
             다시 분석하기
           </button>
         </div>
-        <ShareImageButton targetId="ideal-type-result" fileName="이상형" />
+        <ResultFooterActions targetId="ideal-type-result" fileName="이상형" />
       </div>
     </main>
   );

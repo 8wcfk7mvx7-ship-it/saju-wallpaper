@@ -11,29 +11,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
-    }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={handleShare}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
-    >
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
-    </button>
-  );
-}
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import {
@@ -47,7 +24,7 @@ import {
 import AnalysisLoading from "@/components/AnalysisLoading";
 
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 import HapchungDiagram from "@/components/HapchungDiagram";
 
 export const dynamic = "force-dynamic";
@@ -224,7 +201,7 @@ function SpyContent() {
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-red-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-rose-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-4 pt-8 pb-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-4 pt-8 pb-16 text-center">
           <FadeIn delay={0}>
             <div className="inline-block px-3 py-1 rounded-full bg-red-900/50 border border-red-700/40 text-red-300 text-xs font-bold tracking-wider mb-8">
               ⚠ 이 분석은 매울 수 있습니다
@@ -288,7 +265,7 @@ function SpyContent() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full bg-red-950/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
 
 
           <div className="text-center mb-8">
@@ -436,7 +413,7 @@ function SpyContent() {
           style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-red-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="spy-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="spy-result">
 
 
 
@@ -748,13 +725,12 @@ function SpyContent() {
           </p>
         </div>
 
-        <ShareButton />
         <button
           onClick={() => { setMyForm(defaultBirthData("female")); setTheirForm(defaultBirthData("female")); setStep("form"); }}
-          className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-red-700/40 text-red-400 hover:bg-red-950/30 transition-all">
+          className="w-full py-3.5 rounded-2xl font-bold text-sm border border-red-700/40 text-red-400 hover:bg-red-950/30 transition-all">
           다른 사람 분석하기
         </button>
-        <ShareImageButton targetId="spy-result" fileName="스파이사주" />
+        <ResultFooterActions targetId="spy-result" fileName="스파이사주" />
       </div>
     </main>
   );

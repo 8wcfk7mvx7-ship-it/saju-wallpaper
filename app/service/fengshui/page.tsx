@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -123,7 +123,7 @@ export default function FengshuiPage() {
         />
       </div>
 
-      <div className="relative max-w-2xl mx-auto px-4 py-12" id="fengshui-result">
+      <div className="relative max-w-lg mx-auto px-4 py-12" id="fengshui-result">
         {/* Header */}
         <FadeIn delay={0}>
           <div className="text-center mb-10">
@@ -273,7 +273,7 @@ export default function FengshuiPage() {
         >
           풍수지리는 동양의 전통 지혜입니다. 참고용으로 활용하세요.
         </p>
-        <ShareImageButton targetId="fengshui-result" fileName="풍수" />
+        <ResultFooterActions targetId="fengshui-result" fileName="풍수" shareTitle="풍수지리 이야기" shareText="Summer Palace에서 풍수지리 이야기를 읽었어요" />
       </div>
     </main>
   );

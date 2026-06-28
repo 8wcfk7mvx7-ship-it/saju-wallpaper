@@ -7,7 +7,7 @@ import { ILGAN_COUNTRY } from "@/lib/saju2";
 import { eunNeun } from "@/lib/josa";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 
 export const dynamic = "force-dynamic";
@@ -264,7 +264,7 @@ export default function PlacePage() {
               <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 여름궁전</button>
             </div>
 
-            <div className="max-w-2xl mx-auto px-6 pt-12 pb-28 text-center">
+            <div className="max-w-lg mx-auto px-6 pt-12 pb-28 text-center">
               <div className="flex flex-col items-center gap-2 mb-8">
                 <div className="inline-flex items-center gap-2 bg-amber-500/12 border border-amber-500/28 rounded-full px-4 py-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block" />
@@ -344,7 +344,7 @@ export default function PlacePage() {
 
       {/* ══ FORM ══ */}
       {step === "form" && (
-        <div className="max-w-2xl mx-auto px-5 py-10 pb-20">
+        <div className="max-w-lg mx-auto px-5 py-10 pb-20">
 
           <h2 className="text-xl font-black text-white mb-1">생년월일 입력</h2>
           <p className="text-xs text-white/35 mb-8">사주를 분석해 내 기운과 맞는 도시를 찾습니다</p>
@@ -390,7 +390,7 @@ export default function PlacePage() {
 
       {/* ══ RESULT ══ */}
       {step === "result" && krData && (
-        <div className="max-w-2xl mx-auto px-5 py-10 pb-12" id="place-result">
+        <div className="max-w-lg mx-auto px-5 py-10 pb-12" id="place-result">
           <button onClick={() => setStep("form")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition">← 다시 입력</button>
 
           {/* 용신 배너 */}
@@ -644,7 +644,7 @@ export default function PlacePage() {
             )}
             <p className="text-center text-xs text-white/25 mt-3">5개 오행 전체 추천 도시 + 방위 완전 분석</p>
           </div>
-          <ShareImageButton targetId="place-result" fileName="명당" />
+          <ResultFooterActions targetId="place-result" fileName="명당" />
         </div>
       )}
     </main>

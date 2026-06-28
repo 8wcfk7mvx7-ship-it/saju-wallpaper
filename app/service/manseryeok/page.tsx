@@ -34,6 +34,7 @@ import {
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -377,42 +378,6 @@ function Section({ title, accent = "#60a5fa", children }: { title: string; accen
       </div>
       <div className="p-5" style={{ background: "rgba(255,255,255,0.02)" }}>{children}</div>
     </div>
-  );
-}
-
-function ShareButton({ targetId = "manseryeok-result", fileName = "내사주_만세력" }: { targetId?: string; fileName?: string }) {
-  const [saving, setSaving] = useState(false);
-  const [done, setDone] = useState(false);
-
-  async function handleSaveImage() {
-    const node = document.getElementById(targetId);
-    if (!node) return;
-    setSaving(true);
-    try {
-      const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(node, { backgroundColor: "#06060e", pixelRatio: 2 });
-      const link = document.createElement("a");
-      link.download = `${fileName}.png`;
-      link.href = dataUrl;
-      link.click();
-      setDone(true);
-      setTimeout(() => setDone(false), 2000);
-    } catch {
-      // ignore
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <button
-      onClick={handleSaveImage}
-      disabled={saving}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
-      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
-    >
-      {saving ? "저장 중..." : done ? "이미지 저장됨" : "이미지로 저장하기"}
-    </button>
   );
 }
 
@@ -1546,7 +1511,7 @@ function ResultView({
         </div>
       </div>
 
-      <ShareButton />
+      <ResultFooterActions targetId="manseryeok-result" fileName="내사주_만세력" />
 
       {/* 면책 */}
       <p className="text-[10px] text-center pb-6" style={{ color: "rgba(255,255,255,0.2)" }}>
@@ -1633,7 +1598,7 @@ export default function ManseryeokPage() {
 
   if (result && calcInput) {
     return (
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-lg mx-auto px-4 py-8">
         <BackButton />
         <ResultView
           result={result}
@@ -1680,7 +1645,7 @@ export default function ManseryeokPage() {
         }} />
       ))}
 
-      <main className="relative z-10 max-w-2xl mx-auto px-4 py-8">
+      <main className="relative z-10 max-w-lg mx-auto px-4 py-8">
         <BackButton />
         {/* 키치 히어로 헤더 */}
         <div className="text-center pt-6 pb-8 px-2">

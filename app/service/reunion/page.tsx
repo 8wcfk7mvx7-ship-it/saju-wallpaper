@@ -5,8 +5,8 @@ import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
+import ResultFooterActions from "@/components/ResultFooterActions";
 import type { SajuResult } from "@/lib/saju";
 
 export const dynamic = "force-dynamic";
@@ -29,22 +29,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
     </div>
   );
 }
-
-function ShareButton({ title, text }: { title: string; text: string }) {
-  const [copied, setCopied] = useState(false);
-  async function share() {
-    if (navigator.share) { try { await navigator.share({ title, text, url: window.location.href }); return; } catch {} }
-    await navigator.clipboard.writeText(window.location.href);
-    setCopied(true); setTimeout(() => setCopied(false), 2000);
-  }
-  return (
-    <button onClick={share} className="w-full py-3 rounded-2xl text-sm font-bold transition"
-      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
-    </button>
-  );
-}
-
 
 const SESSION_KEY = "sp_reunion_session";
 const PAID_KEY = "sp_reunion_paid";
@@ -142,7 +126,7 @@ export default function ReunionPage() {
     return (
       <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10 page-fade-in">
         <BackButton />
-        <div className="w-full max-w-2xl space-y-6 text-center px-4">
+        <div className="w-full max-w-lg space-y-6 text-center px-4">
           <FadeIn delay={0}>
             <div className="text-5xl">🔥</div>
             <h1 className="text-3xl font-black text-white leading-tight">
@@ -215,7 +199,7 @@ export default function ReunionPage() {
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
         <BackButton />
-        <div className="w-full max-w-2xl mx-auto space-y-6">
+        <div className="w-full max-w-lg mx-auto space-y-6">
 
           <div>
             <div className="flex gap-1 mb-4">
@@ -249,7 +233,7 @@ export default function ReunionPage() {
     return (
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
         <BackButton />
-        <div className="w-full max-w-2xl mx-auto space-y-6">
+        <div className="w-full max-w-lg mx-auto space-y-6">
 
           <div>
             <div className="flex gap-1 mb-4">
@@ -315,7 +299,7 @@ export default function ReunionPage() {
       <main className="min-h-screen bg-[#06060e] text-white px-5 py-10">
         <BackButton />
         <StarShower active={showering} />
-        <div className="w-full max-w-2xl mx-auto space-y-5" id="reunion-result">
+        <div className="w-full max-w-lg mx-auto space-y-5" id="reunion-result">
 
           {/* 합충 다이어그램 */}
           {!locked && mySajuResult && theirSajuResult && (
@@ -422,18 +406,15 @@ export default function ReunionPage() {
           )}
 
           {!locked && (
-            <>
-              <ShareButton title="재회 가능성 분석 결과" text={result.oneLineSummary} />
-              <button
-                onClick={() => { setStep("splash"); setResult(null); setMyData(defaultBirthData("male")); setTheirData(defaultBirthData("male")); }}
-                className="w-full py-3 rounded-2xl text-sm transition"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
-              >
-                새로 분석하기
-              </button>
-            </>
+            <button
+              onClick={() => { setStep("splash"); setResult(null); setMyData(defaultBirthData("male")); setTheirData(defaultBirthData("male")); }}
+              className="w-full py-3 rounded-2xl text-sm transition"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+            >
+              새로 분석하기
+            </button>
           )}
-          <ShareImageButton targetId="reunion-result" fileName="재회운" />
+          <ResultFooterActions targetId="reunion-result" fileName="재회운" shareTitle="재회 가능성 분석 결과" shareText={result.oneLineSummary} />
         </div>
       </main>
     );

@@ -8,7 +8,7 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
@@ -580,14 +580,14 @@ export default function GunghapPage(){
       {(step==='form'||step==='result')&&(
         <div>
           <BackButton />
-          <div style={{padding:'0 18px',maxWidth:520,margin:'0 auto'}}>
+          <div style={{padding:'0 18px',maxWidth:512,margin:'0 auto'}}>
             <button onClick={()=>{if(step==='result'){setResult(null);setStep('form');}else setStep('entry');}}
               style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:13,cursor:'pointer',padding:0,fontFamily:'inherit'}}>
               ← {step==='result'?'다시 입력':'처음으로'}
             </button>
           </div>
 
-          <div style={{maxWidth:520,margin:'0 auto',padding:'18px 16px 80px'}} id={step==='result'?'gunghap-result':undefined}>
+          <div style={{maxWidth:512,margin:'0 auto',padding:'18px 16px 80px'}} id={step==='result'?'gunghap-result':undefined}>
             {step==='form'?(
               <>
                 <div style={{textAlign:'center',marginBottom:22}}>
@@ -1070,18 +1070,11 @@ export default function GunghapPage(){
               <p style={{color:'#ffaaaa',fontSize:13,margin:'0 0 4px',fontWeight:700}}>내 친구의 궁합도 확인해보세요 →</p>
               <p style={{color:'rgba(255,255,255,0.3)',fontSize:11,margin:0}}>링크 공유하고 같이 분석해보기</p>
             </div>
-            <button onClick={()=>{
-              if(navigator.share) navigator.share({title:'사주 궁합',text:`${p1.name}+${p2.name} 궁합 ${result.totalScore}점(${result.grade})`,url:window.location.href});
-              else{navigator.clipboard.writeText(window.location.href);alert('링크 복사됨!');}
-            }} style={{width:'100%',padding:'13px',borderRadius:12,border:'none',
-              background:'linear-gradient(135deg,#6c5ce7,#a29bfe)',color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer',marginBottom:10}}>
-              ↗ 결과 공유하기
-            </button>
             <button onClick={()=>{setResult(null);setStep('form');}} style={{width:'100%',padding:'12px',borderRadius:12,
               border:'1px solid rgba(255,255,255,0.08)',background:'transparent',color:'rgba(255,255,255,0.35)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
               다시 하기
             </button>
-            <ShareImageButton targetId="gunghap-result" fileName="궁합" />
+            <ResultFooterActions targetId="gunghap-result" fileName="궁합" shareTitle="사주 궁합" shareText={`${p1.name}+${p2.name} 궁합 ${result.totalScore}점(${result.grade})`} />
               </>
             ))}
           </div>

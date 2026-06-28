@@ -3,36 +3,13 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 
-function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
-    }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={handleShare}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
-    >
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
-    </button>
-  );
-}
 import { analyzeSaju, getSexlifeInsights, type SajuResult } from "@/lib/saju";
 import { getSexEnergyAnalysis, getAppearanceAnalysis } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
@@ -355,7 +332,7 @@ function ErosContent() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/35 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">내 정보 입력</h2>
             <p className="text-gray-500 text-sm">시간을 알면 더 정밀한 분석이 가능합니다</p>
@@ -556,7 +533,7 @@ function ErosContent() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="eros-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="eros-result">
 
 
         {/* 헤더 */}
@@ -714,12 +691,11 @@ function ErosContent() {
         <DohwaFormulaList result={result} />
         <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
 
-        <ShareButton />
         <button onClick={() => { setForm(defaultBirthData("female")); setStep("form"); }}
           className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>
-        <ShareImageButton targetId="eros-result" fileName="매력살" />
+        <ResultFooterActions targetId="eros-result" fileName="매력살" shareTitle="내 사주 분석 결과" shareText="Summer Palace에서 내 사주를 분석했어요" />
       </div>
     </main>
   );

@@ -36,7 +36,7 @@ export default function AdultGatePage() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4 page-fade-in" style={{ background: "#06060e" }}>
         <BackButton />
-        <div className="max-w-2xl w-full text-center">
+        <div className="max-w-lg w-full text-center">
           <FadeIn delay={0}>
             <div className="text-5xl mb-6">🔞</div>
             <h1 className="text-2xl font-black text-white mb-3">성인 전용 서비스</h1>
@@ -67,7 +67,7 @@ export default function AdultGatePage() {
   return (
     <main className="min-h-screen px-4 py-12" style={{ background: "#06060e" }}>
       <BackButton />
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-lg mx-auto">
         <div className="text-center mb-10">
           <span className="text-4xl">🔞</span>
           <h1 className="text-2xl font-black text-white mt-3 mb-2">성인 전용 서비스</h1>

@@ -9,7 +9,7 @@ import {
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -415,7 +415,7 @@ export default function TodayFortunePage() {
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-slate-800/40 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-zinc-800/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
           <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs font-bold tracking-wider mb-8">
             🗓️ 오늘의 일운(日運)
@@ -481,7 +481,7 @@ export default function TodayFortunePage() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-15%] w-[600px] h-[600px] rounded-full bg-slate-800/40 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">생년월일 입력</h2>
             <p className="text-gray-500 text-sm">정확한 분석을 위해 출생 정보를 입력해주세요.</p>
@@ -668,7 +668,7 @@ export default function TodayFortunePage() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-slate-800/30 blur-[160px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-16" id="today-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="today-result">
         <div className="text-center mb-8">
           <p className="text-gray-400 text-xs font-bold tracking-widest mb-2">TODAY&apos;S FORTUNE</p>
           <h1 className="text-2xl font-black leading-snug">
@@ -880,7 +880,7 @@ export default function TodayFortunePage() {
             다시 분석하기
           </button>
         </div>
-        <ShareImageButton targetId="today-result" fileName="오늘의_운세" />
+        <ResultFooterActions targetId="today-result" fileName="오늘의_운세" />
         </FadeIn>
       </div>
     </main>

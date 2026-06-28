@@ -66,7 +66,7 @@ export default function OvercomePage() {
         </div>
 
 
-        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-2xl mx-auto w-full pb-12">
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-2 h-2 rounded-full bg-red-400 pulse" />
             <span className="text-xs text-gray-400">지금까지 <strong className="text-red-400">{counter.toLocaleString()}명</strong>이 확인함</span>
@@ -124,7 +124,7 @@ export default function OvercomePage() {
       </div>
 
 
-      <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-2xl mx-auto w-full pb-16">
+      <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-16">
         <div className="mb-8">
           <p className="text-xs text-red-400 font-bold tracking-widest uppercase mb-3">Step 1 / 1</p>
           <h2 className="text-3xl font-black text-white mb-2">생년월일 입력</h2>

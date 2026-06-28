@@ -18,7 +18,7 @@ import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import SipseongInsight from "@/components/SipseongInsight";
 import BirthTimePicker, { type BirthTimeValue } from "@/components/BirthTimePicker";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 
 const CY_MB = new Date().getFullYear();
@@ -394,7 +394,7 @@ export default function MbtiPage() {
 
       <BackButton />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="mbti-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="mbti-result">
         <FadeIn delay={0}>
           <div className="text-center mb-8">
             <div className="text-5xl mb-3">🧬</div>
@@ -714,7 +714,7 @@ export default function MbtiPage() {
             <div className="text-center pt-2">
               <p className="text-xs text-gray-700">본 분석은 사주·MBTI 이론 기반 오락용 콘텐츠입니다. summerpalace.ai.kr</p>
             </div>
-            <ShareImageButton targetId="mbti-result" fileName="사주MBTI" />
+            <ResultFooterActions targetId="mbti-result" fileName="사주MBTI" />
           </div>
         )}
       </div>

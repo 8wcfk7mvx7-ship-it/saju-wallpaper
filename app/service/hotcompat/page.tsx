@@ -6,7 +6,7 @@ import StarShower from "@/components/StarShower";
 import { analyzeSaju, type SajuResult, isGanyeoJidong, GANYEO_JIDONG_LOVE, WONJIN_PAIRS } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -564,7 +564,7 @@ function HotCompatContent() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] rounded-full bg-rose-950/35 blur-[140px]" />
         </div>
-        <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+        <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black mb-2">두 사람 정보 입력</h2>
             <p className="text-gray-500 text-sm">생년월일만으로 성적 케미를 분석합니다</p>
@@ -627,7 +627,7 @@ function HotCompatContent() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
         <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
       </div>
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="hotcompat-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="hotcompat-result">
 
         {/* 헤더 */}
         <div className="text-center mb-6">
@@ -860,7 +860,7 @@ function HotCompatContent() {
           className="w-full py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
           다시 분석하기
         </button>
-        <ShareImageButton targetId="hotcompat-result" fileName="연애핫매칭" />
+        <ResultFooterActions targetId="hotcompat-result" fileName="연애핫매칭" />
       </div>
     </main>
   );

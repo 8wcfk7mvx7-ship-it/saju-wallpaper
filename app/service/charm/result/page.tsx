@@ -25,7 +25,7 @@ import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import StarShower from "@/components/StarShower";
 import SipseongInsight from "@/components/SipseongInsight";
 import DohwaFormulaList from "@/components/DohwaFormulaList";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -53,30 +53,6 @@ const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
 };
 
 const CHARM_PRICE = 4900;
-
-function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
-    }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={handleShare}
-      className="w-full py-3.5 rounded-2xl font-bold text-sm border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-      style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}
-    >
-      {copied ? "✓ 링크 복사됨" : "↗ 결과 공유하기"}
-    </button>
-  );
-}
 
 function CharmResultContent() {
   const router = useRouter();
@@ -185,7 +161,7 @@ function CharmResultContent() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-32" id="charm-result">
+      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-32" id="charm-result">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => router.push("/service/charm")} className="text-xs text-gray-600 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 다시 분석</button>
@@ -522,11 +498,10 @@ function CharmResultContent() {
         <div className="text-center mt-6">
           <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 이론 기반 오락용 콘텐츠입니다.</p>
         </div>
-        <ShareButton />
         <button onClick={() => router.push("/service/charm")} className="w-full mt-4 py-3 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition">
           다시 분석하기
         </button>
-        <ShareImageButton targetId="charm-result" fileName="매력포인트" />
+        <ResultFooterActions targetId="charm-result" fileName="매력포인트" shareTitle="내 사주 분석 결과" shareText="Summer Palace에서 내 사주를 분석했어요" />
       </div>
 
       {/* 플로팅 결제 CTA */}
@@ -539,7 +514,7 @@ function CharmResultContent() {
           }}
           className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3 bg-gradient-to-t from-[#080810] via-[#080810]/95 to-transparent"
         >
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-lg mx-auto">
             {blueberries >= CHARM_PRICE ? (
               <button
                 onClick={() => {
