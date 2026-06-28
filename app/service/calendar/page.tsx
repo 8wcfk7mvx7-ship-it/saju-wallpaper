@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import {
   getDayPillar, analyzeSaju, getUunseong, getSipseong,
-  CHEONGAN_ELEMENT, JIJI_BONGI,
+  CHEONGAN_ELEMENT, JIJI_BONGI, getJijiRelations,
   type SajuResult,
 } from "@/lib/saju";
 import { loadSajuData } from "@/lib/savedSaju";
@@ -148,6 +148,23 @@ function scoreDay(userIlgan: string, dp: { cg: string; jj: string }, eventId: st
       break;
   }
   return score;
+}
+
+// 길흉 판단에 영향을 준 핵심 근거를 사람이 읽을 수 있는 문장으로 정리
+function getDayFactors(userIlgan: string, dp: { cg: string; jj: string }, eventId: string, birthMonthJj?: string): string[] {
+  const facts: string[] = [];
+  const uuns = getUunseong(userIlgan, dp.jj);
+  if (["건록", "제왕", "장생"].includes(uuns)) facts.push(`그날의 일지 기운이 ${uuns} 단계라 활동력이 강하게 받쳐줍니다.`);
+  if (["사", "묘", "절"].includes(uuns)) facts.push(`그날의 일지 기운이 ${uuns} 단계라 평소보다 기력이 가라앉습니다.`);
+  if (birthMonthJj) {
+    const b = johuBonus(birthMonthJj, dp);
+    if (b > 0) facts.push("태어난 계절에 부족한 기운을 그날이 채워주는 조후 보정이 들어갑니다.");
+    if (b < 0) facts.push("태어난 계절에 이미 넘치는 기운을 그날이 더 보태는 흐름입니다.");
+  }
+  if (["자", "오", "묘", "유"].includes(dp.jj) && (eventId === "연애" || eventId === "결혼")) facts.push("그날의 지지가 도화 기운을 띠어 사람을 끄는 매력이 커지는 날입니다.");
+  if (["인", "신", "사", "해"].includes(dp.jj) && eventId === "여행") facts.push("그날의 지지가 이동·역마 기운을 띠어 출발에 유리합니다.");
+  if (eventId === "수술" && ["사", "묘", "절"].includes(uuns)) facts.push("기력이 약해지는 날이라 회복력 면에서 불리할 수 있습니다.");
+  return facts;
 }
 
 function classify(score: number): "길" | "보통" | "흉" {
@@ -665,7 +682,20 @@ export default function CalendarPage() {
                       : classify(selectedDay.score) === "흉"
                       ? `${eventInfo?.label}에 불리한 날입니다. ${selectedDay.uuns ? `12운성 ${selectedDay.uuns}` : "기운"}이 약해져 있어 중요한 결정을 피하는 것이 좋습니다. 굳이 진행해야 한다면 일지 ${selectedDay.dp.jj}의 기운이 강한 ${JIJI_HOUR[selectedDay.dp.jj]}는 피하는 것이 좋습니다.`
                       : `무난한 날입니다. 큰 길흉은 없으나 특별히 유리하지도 않습니다. 길일을 기다릴 여유가 있다면 녹색 날을 선택하세요.`}
+                    {sajuResult && (() => {
+                      const myDayJj = sajuResult.pillarsDetail.day.jj;
+                      const rel = getJijiRelations([myDayJj, selectedDay.dp.jj])[0];
+                      if (!rel) return null;
+                      return ` 또한 그날의 일지(${selectedDay.dp.jj})는 내 일지(${myDayJj})와 ${rel.type} 관계를 맺어, 평소보다 감정·신체 반응이 또렷하게 드러나는 날입니다.`;
+                    })()}
                   </p>
+                  {userIlgan && getDayFactors(userIlgan, selectedDay.dp, selectedEvent, userMonthJj ?? undefined).length > 0 && (
+                    <ul className="mt-3 space-y-1 text-[13px]" style={{ color: "rgba(255,255,255,0.45)" }}>
+                      {getDayFactors(userIlgan, selectedDay.dp, selectedEvent, userMonthJj ?? undefined).map((f, i) => (
+                        <li key={i}>• {f}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
             </div>
