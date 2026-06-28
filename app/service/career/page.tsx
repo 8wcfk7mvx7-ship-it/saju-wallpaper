@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, analyzeSipseongPatterns, getSipseongStrength, getJijiRelations, getJohuCareerInsight, getGungseongCareerSummary, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, getHakdangCareerNarrative, ILJU_60, adjustCareerByExpression, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSangcheong } from "@/lib/saju2";
@@ -10,6 +10,16 @@ import ShareImageButton from "@/components/ShareImageButton";
 import OhaengDonut from "@/components/OhaengDonut";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 const ELEMENT_TO_CG: Record<Element, string> = { 목: "갑", 화: "병", 토: "무", 금: "경", 수: "임" };
 const SIPSEONG_OF_GROUP_LABEL: Record<string, string> = {
@@ -112,45 +122,53 @@ export default function CareerPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-sky-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-indigo-900/50 border border-indigo-700/40 text-indigo-300 text-xs font-bold tracking-wider mb-8">
-            ⚠ 적성에 안 맞는 일을 평생 하고 있을 수도 있습니다
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            내 사주에 맞는<br />
-            <span className="text-indigo-400">진짜 적성</span>은 뭘까?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            남들 따라 고른 전공, 남들 다 가는 직장.<br />
-            <span className="text-gray-300 font-medium">사주는 처음부터 알고 있었습니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            지금이라도 방향을 알면 늦지 않았습니다
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-indigo-900/50 border border-indigo-700/40 text-indigo-300 text-xs font-bold tracking-wider mb-8">
+              ⚠ 적성에 안 맞는 일을 평생 하고 있을 수도 있습니다
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              내 사주에 맞는<br />
+              <span className="text-indigo-400">진짜 적성</span>은 뭘까?
+            </h1>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              남들 따라 고른 전공, 남들 다 가는 직장.<br />
+              <span className="text-gray-300 font-medium">사주는 처음부터 알고 있었습니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              지금이라도 방향을 알면 늦지 않았습니다
+            </p>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["필요한 기운 기반 적성 진단", "사주 전체 구조에서 가장 필요한 기운이 어떤 직업군과 맞는지"],
-              ["사주 구조로 보는 강점·약점", "태어난 날 하나만 보는 게 아닌 사주 전체 구조의 균형을 진단"],
-              ["성향별 주의할 점", "잘 맞는 분야에서도 반복되는 함정과 대처법"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["필요한 기운 기반 적성 진단", "사주 전체 구조에서 가장 필요한 기운이 어떤 직업군과 맞는지"],
+                ["사주 구조로 보는 강점·약점", "태어난 날 하나만 보는 게 아닌 사주 전체 구조의 균형을 진단"],
+                ["성향별 주의할 점", "잘 맞는 분야에서도 반복되는 함정과 대처법"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료
-          </div>
+          <FadeIn delay={300} className="w-full">
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white shadow-lg shadow-indigo-900/50 transition-all active:scale-[0.98]">
-            내 적성 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white shadow-lg shadow-indigo-900/50 transition-all active:scale-[0.98]">
+              내 적성 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

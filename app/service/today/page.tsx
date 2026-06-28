@@ -13,10 +13,14 @@ import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
-function FadeIn({ children, delay }: { children: React.ReactNode; delay: number }) {
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
   useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
-  return <div style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.9s ease ${delay}ms, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>{children}</div>;
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
 }
 
 const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
@@ -418,7 +422,7 @@ export default function TodayFortunePage() {
           </div>
           </FadeIn>
           <FadeIn delay={80}>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
+          <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
             내 사주 원국 +<br />
             <span className="text-gray-300">대운·세운·오늘</span><br />
             전부 한 장의 차트로

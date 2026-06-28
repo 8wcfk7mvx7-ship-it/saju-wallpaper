@@ -498,12 +498,12 @@ export default function GunghapPage(){
             </button>
           </FadeSlide>
 
-          <div style={{position:'relative',zIndex:1,maxWidth:420,margin:'0 auto',
+          <div style={{position:'relative',zIndex:1,maxWidth:640,margin:'0 auto',
             padding:'72px 24px 80px',textAlign:'center'}}>
 
             {/* 헤드라인 */}
             <FadeSlide delay={250}>
-              <h1 style={{fontSize:32,fontWeight:900,lineHeight:1.25,marginBottom:16,
+              <h1 style={{fontSize:26,fontWeight:900,lineHeight:1.25,marginBottom:16,
                 letterSpacing:'-0.03em',color:'#fff'}}>
                 그 사람과 나,<br/>
                 <span style={{background:'linear-gradient(135deg,#c4b5fd,#818cf8,#f9a8d4)',

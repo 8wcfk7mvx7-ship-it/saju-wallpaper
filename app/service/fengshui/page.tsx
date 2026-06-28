@@ -1,6 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ShareImageButton from "@/components/ShareImageButton";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 type CategoryFilter = "전체" | "침실" | "재물" | "배치";
 
@@ -112,21 +122,23 @@ export default function FengshuiPage() {
 
       <div className="relative max-w-2xl mx-auto px-4 py-12" id="fengshui-result">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold mb-4"
-            style={{
-              background: "rgba(101,163,13,0.1)",
-              border: "1px solid rgba(101,163,13,0.25)",
-              color: "#84cc16",
-            }}>
-            <span>🏮</span>
-            <span>무료로 읽는 풍수 지혜</span>
+        <FadeIn delay={0}>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold mb-4"
+              style={{
+                background: "rgba(101,163,13,0.1)",
+                border: "1px solid rgba(101,163,13,0.25)",
+                color: "#84cc16",
+              }}>
+              <span>🏮</span>
+              <span>무료로 읽는 풍수 지혜</span>
+            </div>
+            <h1 className="text-3xl font-black text-white mb-2">풍수지리 이야기</h1>
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+              집을 바꾸면 운이 바뀐다 — 침실·현관·부엌·책상 배치의 비밀
+            </p>
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">풍수지리 이야기</h1>
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
-            집을 바꾸면 운이 바뀐다 — 침실·현관·부엌·책상 배치의 비밀
-          </p>
-        </div>
+        </FadeIn>
 
         {/* Category Filter */}
         <div className="flex gap-2 flex-wrap justify-center mb-8">

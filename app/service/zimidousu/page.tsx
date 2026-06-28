@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { JJ_OHAENG } from "@/lib/saju";
 import { PALACES, MAIN_STARS, ELEMENT_TO_STARS, JIJI_HANJA, getMyeonggungIndex, getMyeonggungJiji, getSingungJiji, getPalaceJiji, hourToJijiIndex, matchZimiTmi, getBucheoNarrative } from "@/lib/zimidousu";
@@ -9,6 +9,16 @@ import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 const STAR_COLOR: Record<string, string> = {
   자미: "#fbbf24", 천부: "#fbbf24",
@@ -109,80 +119,89 @@ export default function ZimidousuPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-fuchsia-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-purple-900/50 border border-purple-700/40 text-purple-300 text-xs font-bold tracking-wider mb-8">
-            ✨ 사주와는 또 다른 시각 — 동양 점성술의 끝판왕
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            나의 <span className="text-purple-400">명궁(命宮)</span>과<br />
-            대표 주성은?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            사주가 오행의 흐름을 본다면,<br />
-            <span className="text-gray-300 font-medium">자미두수는 별의 자리로 캐릭터를 봅니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            14개의 별 중 당신을 대표하는 별은 무엇일까요?
-          </p>
-
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["명궁(命宮) 산출", "음력 생월과 태어난 시간으로 인생의 중심 궁을 찾아요"],
-              ["대표 주성(主星) 풀이", "14주성 중 내 명궁과 대응하는 별의 성격·진로·연애 스타일"],
-              ["12궁 데이터베이스", "형제·부부·재물·관록 등 12개 궁의 의미를 한눈에"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* TOP 10 관심 주제 */}
-          <div className="w-full mb-10 text-left">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-[10px] font-black tracking-widest text-purple-400 uppercase">실제 상담에서 가장 많이 묻는 질문</span>
-              <span className="text-[10px] font-black text-fuchsia-400 bg-fuchsia-900/30 border border-fuchsia-700/30 px-2 py-0.5 rounded-full">TOP 10</span>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-purple-900/50 border border-purple-700/40 text-purple-300 text-xs font-bold tracking-wider mb-8">
+              ✨ 사주와는 또 다른 시각 — 동양 점성술의 끝판왕
             </div>
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              나의 <span className="text-purple-400">명궁(命宮)</span>과<br />
+              대표 주성은?
+            </h1>
+          </FadeIn>
+
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              사주가 오행의 흐름을 본다면,<br />
+              <span className="text-gray-300 font-medium">자미두수는 별의 자리로 캐릭터를 봅니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              14개의 별 중 당신을 대표하는 별은 무엇일까요?
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
               {[
-                ["💰", "부자 될 팔자인가"],
-                ["💍", "배우자 수준"],
-                ["💒", "결혼 시기"],
-                ["🌟", "인생 최고 전성기"],
-                ["🏢", "사업가 vs 직장인"],
-                ["✨", "외모·매력"],
-                ["🤝", "귀인복"],
-                ["🔥", "바람기"],
-                ["⚖️", "이혼수"],
-                ["🎤", "유명해질 팔자인가"],
-              ].map(([emoji, label], i) => (
-                <div key={label} className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-3 py-2.5">
-                  <span className="text-[11px] font-black text-purple-400/70 w-4 shrink-0">{i + 1}</span>
-                  <span className="text-sm">{emoji}</span>
-                  <span className="text-xs text-gray-300 font-medium">{label}</span>
+                ["명궁(命宮) 산출", "음력 생월과 태어난 시간으로 인생의 중심 궁을 찾아요"],
+                ["대표 주성(主星) 풀이", "14주성 중 내 명궁과 대응하는 별의 성격·진로·연애 스타일"],
+                ["12궁 데이터베이스", "형제·부부·재물·관록 등 12개 궁의 의미를 한눈에"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="bg-purple-950/40 border border-purple-700/20 rounded-xl px-4 py-3">
-              <p className="text-[11px] text-gray-400 leading-relaxed">
-                사람들이 자미두수에 묻는 순서는 늘 똑같아 —{" "}
-                <span className="text-purple-300 font-bold">돈 → 배우자 → 성공 → 건강 → 성격</span>.{" "}
-                재백궁·관록궁·부처궁·천이궁·복덕궁, 이 5개 궁이 그 질문에 전부 답해줌.
-              </p>
+
+            {/* TOP 10 관심 주제 */}
+            <div className="w-full mb-10 text-left">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[10px] font-black tracking-widest text-purple-400 uppercase">실제 상담에서 가장 많이 묻는 질문</span>
+                <span className="text-[10px] font-black text-fuchsia-400 bg-fuchsia-900/30 border border-fuchsia-700/30 px-2 py-0.5 rounded-full">TOP 10</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {[
+                  ["💰", "부자 될 팔자인가"],
+                  ["💍", "배우자 수준"],
+                  ["💒", "결혼 시기"],
+                  ["🌟", "인생 최고 전성기"],
+                  ["🏢", "사업가 vs 직장인"],
+                  ["✨", "외모·매력"],
+                  ["🤝", "귀인복"],
+                  ["🔥", "바람기"],
+                  ["⚖️", "이혼수"],
+                  ["🎤", "유명해질 팔자인가"],
+                ].map(([emoji, label], i) => (
+                  <div key={label} className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl px-3 py-2.5">
+                    <span className="text-[11px] font-black text-purple-400/70 w-4 shrink-0">{i + 1}</span>
+                    <span className="text-sm">{emoji}</span>
+                    <span className="text-xs text-gray-300 font-medium">{label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-purple-950/40 border border-purple-700/20 rounded-xl px-4 py-3">
+                <p className="text-[11px] text-gray-400 leading-relaxed">
+                  사람들이 자미두수에 묻는 순서는 늘 똑같아 —{" "}
+                  <span className="text-purple-300 font-bold">돈 → 배우자 → 성공 → 건강 → 성격</span>.{" "}
+                  재백궁·관록궁·부처궁·천이궁·복덕궁, 이 5개 궁이 그 질문에 전부 답해줌.
+                </p>
+              </div>
             </div>
-          </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료
-          </div>
+          <FadeIn delay={300}>
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white shadow-lg shadow-purple-900/50 transition-all active:scale-[0.98]">
-            내 명궁·주성 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white shadow-lg shadow-purple-900/50 transition-all active:scale-[0.98]">
+              내 명궁·주성 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

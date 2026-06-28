@@ -34,6 +34,16 @@ import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 export const dynamic = "force-dynamic";
 
 // ── 외모 (일간별) ────────────────────────────────────────────────────────────
@@ -290,39 +300,47 @@ function ErosContent() {
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight mt-8">
-            나의 성적<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">매력은?</span>
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            홍염살·도화살·목욕으로 보는<br />
-            <span className="text-gray-200 font-medium">타고난 이성 매력의 진짜 본질</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            본인도 몰랐던 그 매력 포인트,<br />사주가 이미 다 알고 있습니다
-          </p>
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["성적 매력 등급 S~D", "타고난 매력 신호를 종합한 점수와 등급"],
-              ["나의 외모", "사주로 보는 내 외모 특징과 분위기"],
-              ["나의 성적 능력·에너지", "타고난 매력과 에너지의 본질"],
-              ["은근한 매력", "이성이 모르게 빠져드는 나의 포인트"],
-              ["이성을 꼬시는 팁", "나에게 맞는 맞춤 공략법"],
-              ["사회적 이미지", "사회적으로 드러나는 외부 이미지"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={0}>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight mt-8">
+              나의 성적<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">매력은?</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              홍염살·도화살·목욕으로 보는<br />
+              <span className="text-gray-200 font-medium">타고난 이성 매력의 진짜 본질</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              본인도 몰랐던 그 매력 포인트,<br />사주가 이미 다 알고 있습니다
+            </p>
+          </FadeIn>
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["성적 매력 등급 S~D", "타고난 매력 신호를 종합한 점수와 등급"],
+                ["나의 외모", "사주로 보는 내 외모 특징과 분위기"],
+                ["나의 성적 능력·에너지", "타고난 매력과 에너지의 본질"],
+                ["은근한 매력", "이성이 모르게 빠져드는 나의 포인트"],
+                ["이성을 꼬시는 팁", "나에게 맞는 맞춤 공략법"],
+                ["사회적 이미지", "사회적으로 드러나는 외부 이미지"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
-            분석 시작
-          </button>
+              ))}
+            </div>
+          </FadeIn>
+          <FadeIn delay={300} className="w-full">
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              분석 시작
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

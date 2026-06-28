@@ -1,8 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, analyzeSipseongPatterns, getSipseongStrength, type SajuResult } from "@/lib/saju";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
@@ -107,45 +117,54 @@ export default function NomadPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-cyan-900/50 border border-cyan-700/40 text-cyan-300 text-xs font-bold tracking-wider mb-8">
-            🌴 회사 다니는 게 유난히 답답하게 느껴진다면
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            나는 조직형?<br />
-            <span className="text-cyan-400">사업가·노마드형</span>?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            같은 월급을 받아도 누군가는 답답하고,<br />
-            <span className="text-gray-300 font-medium">누군가는 그 안정이 더없이 편안합니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            내 사주가 원하는 방향과 반대로 살고 있을 수도 있습니다
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-cyan-900/50 border border-cyan-700/40 text-cyan-300 text-xs font-bold tracking-wider mb-8">
+              🌴 회사 다니는 게 유난히 답답하게 느껴진다면
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              나는 조직형?<br />
+              <span className="text-cyan-400">사업가·노마드형</span>?
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["나의 일 유형 진단", "사업가형 / 디지털노마드형 / 투자가형 / 안정추구형 중 어디에 가까운지"],
-              ["강점이 발휘되는 환경", "내 기운이 가장 잘 작동하는 일하는 방식"],
-              ["주의해야 할 함정", "그 유형에서 가장 흔하게 무너지는 패턴과 대처법"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              같은 월급을 받아도 누군가는 답답하고,<br />
+              <span className="text-gray-300 font-medium">누군가는 그 안정이 더없이 편안합니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              내 사주가 원하는 방향과 반대로 살고 있을 수도 있습니다
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["나의 일 유형 진단", "사업가형 / 디지털노마드형 / 투자가형 / 안정추구형 중 어디에 가까운지"],
+                ["강점이 발휘되는 환경", "내 기운이 가장 잘 작동하는 일하는 방식"],
+                ["주의해야 할 함정", "그 유형에서 가장 흔하게 무너지는 패턴과 대처법"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료
-          </div>
+          <FadeIn delay={300} className="w-full">
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
-            내 일 유형 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
+              내 일 유형 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

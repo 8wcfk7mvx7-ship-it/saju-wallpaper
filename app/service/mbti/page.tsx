@@ -1,6 +1,16 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 import { analyzeSaju, ILGAN_PERSONALITY, ILGAN_INNER_OUTER, CHEONGAN_ELEMENT } from "@/lib/saju";
 import { loadSajuData, saveSajuData } from "@/lib/savedSaju";
 import type { SajuResult } from "@/lib/saju";
@@ -383,11 +393,13 @@ export default function MbtiPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="mbti-result">
         <button onClick={() => router.push("/")} className="text-xs text-gray-600 hover:text-gray-400 mb-6 inline-flex items-center gap-1 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🧬</div>
-          <h1 className="text-2xl font-black mb-2">사주 × MBTI 조합 분석</h1>
-          <p className="text-sm text-gray-400">타고난 사주 에너지와 MBTI 성격 유형의<br />시너지를 분석합니다</p>
-        </div>
+        <FadeIn delay={0}>
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-3">🧬</div>
+            <h1 className="text-2xl font-black mb-2">사주 × MBTI 조합 분석</h1>
+            <p className="text-sm text-gray-400">타고난 사주 에너지와 MBTI 성격 유형의<br />시너지를 분석합니다</p>
+          </div>
+        </FadeIn>
 
         {!sajuResult ? (
           <>

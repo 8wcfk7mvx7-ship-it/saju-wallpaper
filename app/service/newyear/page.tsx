@@ -1,12 +1,22 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, CHEONGAN_ELEMENT, type SajuResult, type Element } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 const CHEONGAN_HAP: Record<string, string> = { 갑: "기", 을: "경", 병: "신", 정: "임", 무: "계", 기: "갑", 경: "을", 신: "병", 임: "정", 계: "무" };
 const CHEONGAN_CHUNG: Record<string, string> = { 갑: "경", 을: "신", 병: "임", 정: "계", 경: "갑", 신: "을", 임: "병", 계: "정" };
@@ -132,45 +142,54 @@ export default function NewYearPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-amber-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">
-            🐎 2026 병오년 · 🐑 2027 정미년 신년운세
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            다가올 두 해,<br />
-            <span className="text-rose-400">내 사주와 어떻게</span> 부딪힐까?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            매년 똑같은 운세를 보고 있지 않나요?<br />
-            <span className="text-gray-300 font-medium">내 일간·일지·용신 기준으로 본 진짜 흐름입니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            2026년과 2027년, 미리 알고 준비하세요
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">
+              🐎 2026 병오년 · 🐑 2027 정미년 신년운세
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              다가올 두 해,<br />
+              <span className="text-rose-400">내 사주와 어떻게</span> 부딪힐까?
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["일간 vs 세운 — 합·충·생·극", "올해의 기운이 나를 돕는지, 압박하는지 정확히 진단"],
-              ["일지 vs 세운 지지 — 변화의 신호", "이사·이직·관계 변화가 들어오기 쉬운 해인지 확인"],
-              ["용신·희신·기신 — 흐름의 총평", "이 해가 나에게 순풍인지 역풍인지 한 줄로 정리"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              매년 똑같은 운세를 보고 있지 않나요?<br />
+              <span className="text-gray-300 font-medium">내 일간·일지·용신 기준으로 본 진짜 흐름입니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              2026년과 2027년, 미리 알고 준비하세요
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["일간 vs 세운 — 합·충·생·극", "올해의 기운이 나를 돕는지, 압박하는지 정확히 진단"],
+                ["일지 vs 세운 지지 — 변화의 신호", "이사·이직·관계 변화가 들어오기 쉬운 해인지 확인"],
+                ["용신·희신·기신 — 흐름의 총평", "이 해가 나에게 순풍인지 역풍인지 한 줄로 정리"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료 · 2026 + 2027 동시 확인
-          </div>
+          <FadeIn delay={300} className="w-full">
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료 · 2026 + 2027 동시 확인
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
-            내 신년운세 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              내 신년운세 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

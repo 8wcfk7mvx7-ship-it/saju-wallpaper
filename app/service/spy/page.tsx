@@ -1,5 +1,15 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
   const [copied, setCopied] = useState(false);
@@ -131,21 +141,23 @@ const ILGAN_SPY: Record<string, {
 };
 
 // ── 등급 ─────────────────────────────────────────────────────────────────────
+// 점수가 높을수록 위험 신호가 많다는 뜻이라, 등급은 "안전 등급"이 아니라 "위험 등급"으로 읽어야 합니다.
+// A(가장 안전)~E(가장 위험) 순으로, 위험 신호가 하나라도 누적되면 B 밑으로 빠르게 떨어지도록 구간을 좁혔습니다.
 const GRADES = [
-  { min: 81, grade: "E", label: "적신호", color: "#ef4444", bg: "rgba(239,68,68,0.15)", border: "rgba(239,68,68,0.35)",
-    desc: "도화 기운이 사주 전체를 압도합니다. 냉정하게 상황을 직시할 필요가 있습니다.",
+  { min: 70, grade: "E", label: "적신호", color: "#ef4444", bg: "rgba(239,68,68,0.15)", border: "rgba(239,68,68,0.35)",
+    desc: "도화·집착·관계 불안 신호가 다수 겹쳐 사주 전체를 압도합니다. 냉정하게 상황을 직시할 필요가 있습니다.",
     verdict: "이 사주, 그냥 지나치기 어렵습니다." },
-  { min: 61, grade: "D", label: "위험 신호", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.30)",
-    desc: "도화 기운이 매우 강합니다. 주변 환경과 상대의 의지에 따라 크게 달라집니다.",
+  { min: 50, grade: "D", label: "위험 신호", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.30)",
+    desc: "여러 위험 신호가 동시에 나타납니다. 주변 환경과 상대의 의지에 따라 크게 달라집니다.",
     verdict: "상황을 면밀히 주시하세요." },
-  { min: 41, grade: "C", label: "경계 단계", color: "#fbbf24", bg: "rgba(251,191,36,0.10)", border: "rgba(251,191,36,0.25)",
-    desc: "도화 기운이 있습니다. 자극적인 상황이 주어지면 흔들릴 수 있습니다.",
+  { min: 30, grade: "C", label: "경계 단계", color: "#fbbf24", bg: "rgba(251,191,36,0.10)", border: "rgba(251,191,36,0.25)",
+    desc: "확인된 위험 신호가 있습니다. 자극적인 상황이 주어지면 흔들릴 수 있습니다.",
     verdict: "안심은 금물. 관계 점검이 필요합니다." },
-  { min: 21, grade: "B", label: "주의 필요", color: "#a3e635", bg: "rgba(163,230,53,0.08)", border: "rgba(163,230,53,0.20)",
-    desc: "도화 기운이 일부 있지만 크게 우려할 수준은 아닙니다.",
+  { min: 12, grade: "B", label: "주의 필요", color: "#a3e635", bg: "rgba(163,230,53,0.08)", border: "rgba(163,230,53,0.20)",
+    desc: "위험 신호가 한두 가지 있지만 크게 우려할 수준은 아닙니다.",
     verdict: "비교적 안정적이지만 방심은 금물." },
   { min: 0,  grade: "A", label: "안정형", color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.20)",
-    desc: "도화 기운이 거의 없습니다. 전반적으로 안정적인 관계 패턴입니다.",
+    desc: "위험 신호가 거의 없습니다. 전반적으로 안정적인 관계 패턴입니다.",
     verdict: "믿을 만한 사주입니다." },
 ];
 
@@ -212,44 +224,54 @@ function SpyContent() {
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-red-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-rose-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-red-900/50 border border-red-700/40 text-red-300 text-xs font-bold tracking-wider mb-8">
-            ⚠ 이 분석은 매울 수 있습니다
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            애인 사주<br />
-            <span className="text-red-400">염탐하기</span>
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            당신의 편은 들지 않습니다.<br />
-            <span className="text-gray-300 font-medium">오직 사실만 말합니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            나와 그 사람의 생년월일을 함께 입력합니다<br />
-            성별 무관 — 동성 커플도 분석 가능합니다
-          </p>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-4 pt-8 pb-16 text-center">
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-red-900/50 border border-red-700/40 text-red-300 text-xs font-bold tracking-wider mb-8">
+              ⚠ 이 분석은 매울 수 있습니다
+            </div>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              애인 사주<br />
+              <span className="text-red-400">염탐하기</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              당신의 편은 들지 않습니다.<br />
+              <span className="text-gray-300 font-medium">오직 사실만 말합니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              나와 그 사람의 생년월일을 함께 입력합니다<br />
+              성별 무관 — 동성 커플도 분석 가능합니다
+            </p>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["도화살 · 홍염살 · 진도화", "이성을 끌어당기는 기운이 사주에 있는지"],
-              ["일지 목욕 — 12운성의 색정 기운", "가장 위험한 바람기 신호"],
-              ["일간별 연애 패턴", "이 사람이 관계에서 어떻게 움직이는지"],
-              ["종합 바람기 위험도 A~E 등급", "냉정한 점수 판정"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={300} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["도화살 · 홍염살 · 진도화", "이성을 끌어당기는 기운이 사주에 있는지"],
+                ["일지 목욕 — 12운성의 색정 기운", "가장 위험한 바람기 신호"],
+                ["일간별 연애 패턴", "이 사람이 관계에서 어떻게 움직이는지"],
+                ["종합 바람기 위험도 A~E 등급", "냉정한 점수 판정"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
-            염탐 시작하기
-          </button>
+          <FadeIn delay={400} className="w-full">
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
+              염탐 시작하기
+            </button>
+          </FadeIn>
 
         </div>
       </main>
@@ -360,15 +382,11 @@ function SpyContent() {
   if (has역마)   rawScore += 15;
   if (hasMokYok) rawScore += 20;
   if (haHwa)     rawScore += 10;
-  const score = Math.min(rawScore, 100);
 
-  const grade   = getGrade(score);
   const ilgan   = result.pillarsDetail.day.cg;
-  const spyData = ILGAN_SPY[ilgan] ?? ILGAN_SPY["무"];
-
   const theirGender = theirForm.gender;
   const jipchaknamNarrative = getJipchaknamNarrative(result, theirGender);
-  const extraTraitNarrative = [
+  const extraNarrativeFlags = [
     jipchaknamNarrative,
     getYangpaltongNarrative(result, theirGender),
     getHwasuMultiHongyeomNarrative(result),
@@ -384,7 +402,14 @@ function SpyContent() {
     getDohwaPositionNarrative(result),
     getMuinseongNarrative(result),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
-  ].filter((s): s is string => !!s).join(" ");
+  ];
+  const extraTraitNarrative = extraNarrativeFlags.filter((s): s is string => !!s).join(" ");
+  // 위 서술형 위험 신호도 등급 점수에 함께 반영 (서술에만 노출되고 점수에 빠져있던 문제 수정)
+  rawScore += extraNarrativeFlags.filter(Boolean).length * 10;
+
+  const score = Math.min(rawScore, 100);
+  const grade   = getGrade(score);
+  const spyData = ILGAN_SPY[ilgan] ?? ILGAN_SPY["무"];
 
   const dangerSinsals: { name: string; desc: string }[] = [];
   if (has진도화) dangerSinsals.push({ name: "진도화(眞桃花)", desc: "일지 기준 진짜 도화. 이성 매력과 인기가 매우 강합니다. 유혹에 노출될 가능성이 높습니다." });
@@ -688,44 +713,29 @@ function SpyContent() {
           })}
         </div>
 
-        {/* 이상형 · 끌리는 이유 */}
+        {/* 이상형 · 끌리는 이유 · 나를 좋아하는 이유 — 하나의 흐름으로 통합 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">이 사람의 진짜 이상형</p>
-          <div className="space-y-3">
-            <div className="bg-rose-950/20 border border-rose-900/20 rounded-xl px-4 py-3">
-              <p className="text-xs text-rose-400 font-semibold mb-1">이상형</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{idealData.type}</p>
-            </div>
-            <div className="bg-white/5 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">이 사람이 상대에게 끌리는 이유</p>
-              <p className="text-sm text-gray-300 leading-relaxed">{idealData.why}</p>
-            </div>
-            <div className="bg-white/[0.03] border border-white/8 rounded-xl px-4 py-3">
-              <p className="text-xs text-gray-500 font-semibold mb-1">매력 못 느끼는 유형</p>
-              <p className="text-sm text-gray-400 leading-relaxed">{idealData.notType}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* 이 사람이 나를 좋아할 수 있는 이유 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">사주적으로 나를 좋아하는 이유</p>
-          <p className="text-xs text-gray-600 mb-3">일지 기운 분석 기반</p>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">이 사람의 진짜 이상형과 끌림의 구조</p>
           {(() => {
             const ss = result.pillarsDetail.day.sipseongJj;
             const WHY_LIKE: Record<string, string> = {
-              비견: "대등하게 맞서는 당신의 자존심과 독립심이 이 사람을 자극합니다. 질 수 없다는 본능이 끌림으로 이어집니다.",
-              겁재: "당신의 에너지와 매력이 이 사람의 소유욕을 자극합니다. 가지고 싶어지는 존재로 보입니다.",
-              식신: "당신의 따뜻함과 여유가 이 사람을 편하게 만듭니다. 옆에 있으면 행복하다고 느낍니다.",
-              상관: "당신의 자유로움과 독창성이 이 사람을 매혹합니다. 예측불허한 매력에 빠져듭니다.",
-              정재: "당신의 안정감과 신뢰감이 이 사람이 원하는 파트너상과 맞습니다.",
-              편재: "당신의 매력과 자유로움이 이 사람을 설레게 합니다. 잡고 싶은 존재로 느껴집니다.",
-              정관: "당신의 원칙과 품격이 이 사람이 추구하는 파트너와 일치합니다.",
-              편관: "당신의 강인함과 카리스마가 이 사람의 지배 본능을 자극합니다.",
-              정인: "당신의 지적 깊이와 포용력이 이 사람을 안심시킵니다. 기대고 싶어집니다.",
-              편인: "당신의 신비로움과 독립성이 이 사람의 호기심을 끊임없이 자극합니다.",
+              비견: "대등하게 맞서는 당신의 자존심과 독립심이 이 사람을 자극해요. 질 수 없다는 본능이 끌림으로 이어집니다.",
+              겁재: "당신의 에너지와 매력이 이 사람의 소유욕을 자극해요. 가지고 싶어지는 존재로 보입니다.",
+              식신: "당신의 따뜻함과 여유가 이 사람을 편하게 만들어요. 옆에 있으면 행복하다고 느낍니다.",
+              상관: "당신의 자유로움과 독창성이 이 사람을 매혹해요. 예측불허한 매력에 빠져듭니다.",
+              정재: "당신의 안정감과 신뢰감이 이 사람이 원하는 파트너상과 맞아요.",
+              편재: "당신의 매력과 자유로움이 이 사람을 설레게 해요. 잡고 싶은 존재로 느껴집니다.",
+              정관: "당신의 원칙과 품격이 이 사람이 추구하는 파트너와 일치해요.",
+              편관: "당신의 강인함과 카리스마가 이 사람의 지배 본능을 자극해요.",
+              정인: "당신의 지적 깊이와 포용력이 이 사람을 안심시켜요. 기대고 싶어집니다.",
+              편인: "당신의 신비로움과 독립성이 이 사람의 호기심을 끊임없이 자극해요.",
             };
-            return <p className="text-sm text-gray-200 leading-relaxed">{WHY_LIKE[ss] ?? "상대의 일지 기운이 당신과 공명합니다."}</p>;
+            const whyLikeMe = WHY_LIKE[ss] ?? "상대의 일지 기운이 당신과 공명해요.";
+            return (
+              <p className="text-sm text-gray-200 leading-relaxed">
+                이 사람이 진짜로 끌리는 이상형은 {idealData.type} {idealData.why} 반대로 {idealData.notType} 한편 일지 기운을 기준으로 봤을 때 {whyLikeMe} 즉 이 사람의 이상형 구조와 지금 당신에게 끌리는 이유가 같은 뿌리에서 나오는 만큼, 두 사람의 끌림은 우연이 아니라 사주 구조상 자연스럽게 발생하는 흐름이라고 볼 수 있어요.
+              </p>
+            );
           })()}
         </div>
 

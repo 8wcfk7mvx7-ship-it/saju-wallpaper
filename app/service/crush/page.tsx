@@ -2,6 +2,16 @@
 import { useState, useEffect } from "react";
 import SipseongInsight from "@/components/SipseongInsight";
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -309,57 +319,65 @@ export default function CrushPage() {
 
       <button onClick={() => router.push("/")} className="fixed top-5 left-5 z-20 text-xs text-gray-700 hover:text-gray-400 transition px-3 py-1.5 rounded-full bg-white/5 border border-white/10">← 홈</button>
 
-      <div className="relative z-10 max-w-2xl w-full text-center">
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: "rgba(244,63,94,0.1)", border: "1px solid rgba(244,63,94,0.3)" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: "#fb7185" }}>짝사랑 사주 공략법</span>
-          </div>
-          <div className="text-6xl mb-4 drop-shadow-[0_0_40px_rgba(244,63,94,0.4)]">💘</div>
-        </div>
-
-        <div className="space-y-4 mb-12">
-          {[
-            { text: "그 사람, 어떤 사람인가요?", big: false, delay: 0 },
-            { text: "사주가 다 알고 있습니다.", big: true, delay: 500 },
-            { text: "이상형·심리·공략 포인트", big: false, delay: 1000 },
-            { text: "사주로 완전 분석합니다.", big: true, delay: 1500 },
-          ].map((line, i) => (
-            <div key={i} style={{ opacity: 1, transition: `opacity 0.8s ease ${line.delay}ms` }}>
-              <p className={`leading-snug ${line.big
-                ? "text-3xl font-black"
-                : "text-xl font-medium"}`}
-                style={line.big ? {
-                  background: "linear-gradient(135deg, #fb7185, #f43f5e)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
-                } : { color: "rgba(255,255,255,0.5)" }}>
-                {line.text}
-              </p>
+      <div className="relative z-10 max-w-2xl w-full text-center px-4">
+        <FadeIn delay={0}>
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4" style={{ background: "rgba(244,63,94,0.1)", border: "1px solid rgba(244,63,94,0.3)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: "#fb7185" }}>짝사랑 사주 공략법</span>
             </div>
-          ))}
-        </div>
+            <div className="text-6xl mb-4 drop-shadow-[0_0_40px_rgba(244,63,94,0.4)]">💘</div>
+          </div>
+        </FadeIn>
 
-        <div className="mb-6 mx-auto max-w-xs text-left rounded-2xl p-4 space-y-2"
-          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          {[
-            "💡 이 사람의 이상형 유형",
-            "💡 어떻게 접근해야 마음이 열릴까",
-            "💡 연애에 얼마나 진지하게 임하는 사람인지",
-            "💡 연애할 때 조심해야 할 포인트",
-            "💡 나와의 궁합 점수 (내 생일 입력 시)",
-          ].map((t, i) => (
-            <p key={i} className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>{t}</p>
-          ))}
-        </div>
+        <FadeIn delay={100}>
+          <div className="space-y-4 mb-12">
+            {[
+              { text: "그 사람, 어떤 사람인가요?", big: false, delay: 0 },
+              { text: "사주가 다 알고 있습니다.", big: true, delay: 500 },
+              { text: "이상형·심리·공략 포인트", big: false, delay: 1000 },
+              { text: "사주로 완전 분석합니다.", big: true, delay: 1500 },
+            ].map((line, i) => (
+              <div key={i} style={{ opacity: 1, transition: `opacity 0.8s ease ${line.delay}ms` }}>
+                <p className={`leading-snug ${line.big
+                  ? "text-3xl font-black"
+                  : "text-xl font-medium"}`}
+                  style={line.big ? {
+                    background: "linear-gradient(135deg, #fb7185, #f43f5e)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+                  } : { color: "rgba(255,255,255,0.5)" }}>
+                  {line.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
 
-        <div style={{ opacity: showBtn ? 1 : 0, transform: showBtn ? "none" : "translateY(16px)", transition: "opacity 0.7s, transform 0.7s" }}>
-          <button onClick={() => setStep("input")}
-            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
-            style={{ background: "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(244,63,94,0.45)" }}>
-            그 사람 사주 분석하기 →
-          </button>
-          <p className="text-xs mt-3" style={{ color: "rgba(255,255,255,0.25)" }}>무료 · 생년월일만 있으면 됩니다</p>
-        </div>
+        <FadeIn delay={200}>
+          <div className="mb-6 mx-auto max-w-xs text-left rounded-2xl p-4 space-y-2"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            {[
+              "💡 이 사람의 이상형 유형",
+              "💡 어떻게 접근해야 마음이 열릴까",
+              "💡 연애에 얼마나 진지하게 임하는 사람인지",
+              "💡 연애할 때 조심해야 할 포인트",
+              "💡 나와의 궁합 점수 (내 생일 입력 시)",
+            ].map((t, i) => (
+              <p key={i} className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>{t}</p>
+            ))}
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={300}>
+          <div style={{ opacity: showBtn ? 1 : 0, transform: showBtn ? "none" : "translateY(16px)", transition: "opacity 0.7s, transform 0.7s" }}>
+            <button onClick={() => setStep("input")}
+              className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-lg shadow-2xl transition-all active:scale-[0.97]"
+              style={{ background: "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(244,63,94,0.45)" }}>
+              그 사람 사주 분석하기 →
+            </button>
+            <p className="text-xs mt-3" style={{ color: "rgba(255,255,255,0.25)" }}>무료 · 생년월일만 있으면 됩니다</p>
+          </div>
+        </FadeIn>
       </div>
     </main>
   );

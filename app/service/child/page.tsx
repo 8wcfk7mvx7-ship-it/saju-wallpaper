@@ -1,8 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, analyzeSipseongPatterns, type SajuResult } from "@/lib/saju";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 import { SIPSEONG_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -56,42 +66,51 @@ export default function ChildPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-cyan-900/50 border border-cyan-700/40 text-cyan-300 text-xs font-bold tracking-wider mb-8">
-            ✦ 완전 무료
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            내가 아이를<br />
-            <span className="text-cyan-400">낳는다면?</span>
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            낳고 후회하지 않을지, 잘 키울 수 있을지,<br />
-            <span className="text-gray-300 font-medium">내 인생에서 아이의 비중은 얼마나 될지.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            남들은 다 아는데 나만 모르고 있던 이야기
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-cyan-900/50 border border-cyan-700/40 text-cyan-300 text-xs font-bold tracking-wider mb-8">
+              ✦ 완전 무료
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              내가 아이를<br />
+              <span className="text-cyan-400">낳는다면?</span>
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["자녀 인연의 강도", "내 사주에 자녀운이 강한지 약한지부터 확인"],
-              ["아이가 나에게 주는 의미", "위로가 될지, 새로운 부담이 될지"],
-              ["배우자 vs 자녀, 인생의 무게중심", "둘 중 무엇이 더 중요해질지"],
-              ["성격 차이 가능성과 육아 방향", "내 기질과 충돌하지 않는 육아 팁"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              낳고 후회하지 않을지, 잘 키울 수 있을지,<br />
+              <span className="text-gray-300 font-medium">내 인생에서 아이의 비중은 얼마나 될지.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              남들은 다 아는데 나만 모르고 있던 이야기
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["자녀 인연의 강도", "내 사주에 자녀운이 강한지 약한지부터 확인"],
+                ["아이가 나에게 주는 의미", "위로가 될지, 새로운 부담이 될지"],
+                ["배우자 vs 자녀, 인생의 무게중심", "둘 중 무엇이 더 중요해질지"],
+                ["성격 차이 가능성과 육아 방향", "내 기질과 충돌하지 않는 육아 팁"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-700 to-emerald-600 hover:from-cyan-600 hover:to-emerald-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
-            내 자녀운 확인하기
-          </button>
+          <FadeIn delay={300} className="w-full">
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-700 to-emerald-600 hover:from-cyan-600 hover:to-emerald-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
+              내 자녀운 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

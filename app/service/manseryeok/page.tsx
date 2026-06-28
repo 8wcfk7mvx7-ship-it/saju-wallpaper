@@ -1,6 +1,16 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 import AdBanner from "@/components/AdBanner";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
@@ -1628,32 +1638,38 @@ export default function ManseryeokPage() {
       <main className="relative z-10 max-w-2xl mx-auto px-4 py-8">
         {/* 키치 히어로 헤더 */}
         <div className="text-center pt-6 pb-8 px-2">
-          <div style={{ animation: "rotateSlow2 18s linear infinite", display: "inline-block", fontSize: 38, marginBottom: 12 }}>☯</div>
-          <p className="text-xs font-black uppercase tracking-[0.25em] mb-3" style={{ color: "#a78bfa" }}>Summer Palace · 무료 만세력</p>
-          <h1 className="text-4xl font-black leading-tight mb-4" style={{
-            background: "linear-gradient(135deg, #e879f9, #a78bfa, #60a5fa, #e879f9)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            backgroundSize: "200% auto",
-            animation: "heroText2 4s linear infinite",
-            letterSpacing: "-0.03em",
-          }}>
-            나의 운명을<br />펼쳐드립니다
-          </h1>
-          <p className="text-sm font-bold mb-2" style={{ color: "rgba(255,255,255,0.75)" }}>
-            당신의 사주팔자, 완전 무료 해석
-          </p>
-          <p className="text-xs leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
-            생년월일시·도시를 입력하면 격국·용신·일주론·신살·대운까지 한 번에 분석해 드립니다
-          </p>
-          <div className="flex flex-wrap justify-center gap-1.5">
-            {["격국·용신","60갑자 일주론","오행 건강","직업 적성","재성 위치","신살","대운 흐름","경도 보정"].map(t => (
-              <span key={t} className="text-[10px] px-2.5 py-1 rounded-full font-bold" style={{
-                background: "rgba(139,92,246,0.18)", color: "#c4b5fd",
-                border: "1px solid rgba(139,92,246,0.35)",
-                boxShadow: "0 0 8px rgba(139,92,246,0.2)",
-              }}>{t}</span>
-            ))}
-          </div>
+          <FadeIn delay={0}>
+            <div style={{ animation: "rotateSlow2 18s linear infinite", display: "inline-block", fontSize: 38, marginBottom: 12 }}>☯</div>
+            <p className="text-xs font-black uppercase tracking-[0.25em] mb-3" style={{ color: "#a78bfa" }}>Summer Palace · 무료 만세력</p>
+            <h1 className="text-3xl font-black leading-tight mb-4" style={{
+              background: "linear-gradient(135deg, #e879f9, #a78bfa, #60a5fa, #e879f9)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              backgroundSize: "200% auto",
+              animation: "heroText2 4s linear infinite",
+              letterSpacing: "-0.03em",
+            }}>
+              나의 운명을<br />펼쳐드립니다
+            </h1>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <p className="text-sm font-bold mb-2" style={{ color: "rgba(255,255,255,0.75)" }}>
+              당신의 사주팔자, 완전 무료 해석
+            </p>
+            <p className="text-xs leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
+              생년월일시·도시를 입력하면 격국·용신·일주론·신살·대운까지 한 번에 분석해 드립니다
+            </p>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {["격국·용신","60갑자 일주론","오행 건강","직업 적성","재성 위치","신살","대운 흐름","경도 보정"].map(t => (
+                <span key={t} className="text-[10px] px-2.5 py-1 rounded-full font-bold" style={{
+                  background: "rgba(139,92,246,0.18)", color: "#c4b5fd",
+                  border: "1px solid rgba(139,92,246,0.35)",
+                  boxShadow: "0 0 8px rgba(139,92,246,0.2)",
+                }}>{t}</span>
+              ))}
+            </div>
+          </FadeIn>
         </div>
 
         {/* 폼 섹션 — 드라마틱 카드 */}

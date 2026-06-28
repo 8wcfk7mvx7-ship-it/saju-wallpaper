@@ -1,8 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseongStrength, getJijiRelations, canonicalJijiPairOrder, CHEONGAN_ELEMENT, type SajuResult } from "@/lib/saju";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 import { SIPSEONG_DESC, ILGAN_MALE_IDEAL, isGwaegang, GWAEGANG_MALE_WARNING, detectGumsuSangcheong, SIPSEONG_MOVIE, ILJI_DOHWA_FEMALE_DESC } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -88,42 +98,51 @@ export default function IdealTypePage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-fuchsia-900/50 border border-fuchsia-700/40 text-fuchsia-300 text-xs font-bold tracking-wider mb-8">
-            ✦ 완전 무료
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            그 사람의<br />
-            <span className="text-fuchsia-400">진짜 이상형</span>은?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            그 사람이 의식적으로 말하는 타입 말고,<br />
-            <span className="text-gray-300 font-medium">사주에 새겨진 진짜 끌림</span>을 확인하세요.
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            상대방의 생년월일시만 입력하면 1분 안에 결과가 나옵니다
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-fuchsia-900/50 border border-fuchsia-700/40 text-fuchsia-300 text-xs font-bold tracking-wider mb-8">
+              ✦ 완전 무료
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              그 사람의<br />
+              <span className="text-fuchsia-400">진짜 이상형</span>은?
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["일간 기반 무의식적 끌림", "그 사람이 입으로 말하는 타입과 실제로 끌리는 타입은 다릅니다"],
-              ["용신·조후로 보는 에너지 궁합", "사주의 균형을 채워줄 파트너 기운을 정확히 짚어냅니다"],
-              ["끌리는 상대의 패턴 분석", "왜 항상 비슷한 사람을 만나는지, 그 이유가 보입니다"],
-              ["피해야 할 상대 유형", "내가 그 유형에 해당하는지 미리 확인해보세요"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              그 사람이 의식적으로 말하는 타입 말고,<br />
+              <span className="text-gray-300 font-medium">사주에 새겨진 진짜 끌림</span>을 확인하세요.
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              상대방의 생년월일시만 입력하면 1분 안에 결과가 나옵니다
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["일간 기반 무의식적 끌림", "그 사람이 입으로 말하는 타입과 실제로 끌리는 타입은 다릅니다"],
+                ["용신·조후로 보는 에너지 궁합", "사주의 균형을 채워줄 파트너 기운을 정확히 짚어냅니다"],
+                ["끌리는 상대의 패턴 분석", "왜 항상 비슷한 사람을 만나는지, 그 이유가 보입니다"],
+                ["피해야 할 상대 유형", "내가 그 유형에 해당하는지 미리 확인해보세요"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-fuchsia-700 to-violet-600 hover:from-fuchsia-600 hover:to-violet-500 text-white shadow-lg shadow-fuchsia-900/50 transition-all active:scale-[0.98]">
-            그 사람의 진짜 이상형 보기
-          </button>
+          <FadeIn delay={300} className="w-full">
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-fuchsia-700 to-violet-600 hover:from-fuchsia-600 hover:to-violet-500 text-white shadow-lg shadow-fuchsia-900/50 transition-all active:scale-[0.98]">
+              그 사람의 진짜 이상형 보기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

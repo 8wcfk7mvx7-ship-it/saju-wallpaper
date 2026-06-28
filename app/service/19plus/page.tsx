@@ -1,6 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 const SERVICES = [
   {
@@ -25,29 +35,35 @@ export default function AdultGatePage() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4 page-fade-in" style={{ background: "#06060e" }}>
         <div className="max-w-2xl w-full text-center">
-          <div className="text-5xl mb-6">🔞</div>
-          <h1 className="text-2xl font-black text-white mb-3">성인 전용 서비스</h1>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.5)" }}>
-            이 페이지는 19세 이상을 위한 성인 콘텐츠를 포함합니다.<br />
-            본인이 만 19세 이상임을 확인해 주세요.
-          </p>
-          <button
-            onClick={() => setConfirmed(true)}
-            className="w-full py-4 rounded-2xl font-black text-white text-base mb-3 transition-all active:scale-[0.98]"
-            style={{ background: "linear-gradient(135deg, #7c3aed, #dc2626)" }}
-          >
-            만 19세 이상입니다 — 입장하기
-          </button>
-          <button
-            onClick={() => router.push("/")}
-            className="w-full py-3 rounded-2xl text-sm transition-all"
-            style={{ color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.1)" }}
-          >
-            돌아가기
-          </button>
-          <p className="text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
-            미성년자의 접근은 금지되어 있습니다. 허위 확인 시 모든 책임은 이용자에게 있습니다.
-          </p>
+          <FadeIn delay={0}>
+            <div className="text-5xl mb-6">🔞</div>
+            <h1 className="text-2xl font-black text-white mb-3">성인 전용 서비스</h1>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <p className="text-sm leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.5)" }}>
+              이 페이지는 19세 이상을 위한 성인 콘텐츠를 포함합니다.<br />
+              본인이 만 19세 이상임을 확인해 주세요.
+            </p>
+          </FadeIn>
+          <FadeIn delay={300}>
+            <button
+              onClick={() => setConfirmed(true)}
+              className="w-full py-4 rounded-2xl font-black text-white text-base mb-3 transition-all active:scale-[0.98]"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #dc2626)" }}
+            >
+              만 19세 이상입니다 — 입장하기
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="w-full py-3 rounded-2xl text-sm transition-all"
+              style={{ color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              돌아가기
+            </button>
+            <p className="text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
+              미성년자의 접근은 금지되어 있습니다. 허위 확인 시 모든 책임은 이용자에게 있습니다.
+            </p>
+          </FadeIn>
         </div>
       </main>
     );

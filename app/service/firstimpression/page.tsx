@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, type SajuResult } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
@@ -7,6 +7,16 @@ import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/componen
 import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 const CG_IMPRESSION: Record<string, { symbol: string; keyword: string; desc: string; merit: string; risk: string; tip: string }> = {
   갑: {
@@ -133,45 +143,54 @@ export default function FirstImpressionPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-amber-900/50 border border-amber-700/40 text-amber-300 text-xs font-bold tracking-wider mb-8">
-            ✨ 나도 모르는 사이, 남들에게 보이는 내 모습
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            사주로 보는<br />
-            <span className="text-amber-400">나의 첫인상</span>
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            처음 만난 사람에게<br />
-            <span className="text-gray-300 font-medium">나는 어떤 분위기로 비춰질까?</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            천간(天干)에 새겨진 기운으로 첫인상과 개선법까지 알려드립니다
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-amber-900/50 border border-amber-700/40 text-amber-300 text-xs font-bold tracking-wider mb-8">
+              ✨ 나도 모르는 사이, 남들에게 보이는 내 모습
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              사주로 보는<br />
+              <span className="text-amber-400">나의 첫인상</span>
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["월간(月干) 중심 분석", "사회생활에서 사람들이 가장 먼저 느끼는 핵심 인상"],
-              ["연·월·일·시 4기둥 종합", "베이스 톤부터 끝인상까지 단계별로 진단"],
-              ["맞춤 인상 개선법", "오해를 줄이고 매력을 더하는 구체적인 방법"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              처음 만난 사람에게<br />
+              <span className="text-gray-300 font-medium">나는 어떤 분위기로 비춰질까?</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              천간(天干)에 새겨진 기운으로 첫인상과 개선법까지 알려드립니다
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["월간(月干) 중심 분석", "사회생활에서 사람들이 가장 먼저 느끼는 핵심 인상"],
+                ["연·월·일·시 4기둥 종합", "베이스 톤부터 끝인상까지 단계별로 진단"],
+                ["맞춤 인상 개선법", "오해를 줄이고 매력을 더하는 구체적인 방법"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료
-          </div>
+          <FadeIn delay={300} className="w-full">
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
-            내 첫인상 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
+              내 첫인상 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

@@ -10,6 +10,16 @@ import ShareImageButton from "@/components/ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 // ── 오행/음양 매핑 ───────────────────────────────────────────────────────────
 const CHEONGAN_ELEMENT: Record<string, string> = {
   갑:"목", 을:"목", 병:"화", 정:"화", 무:"토", 기:"토", 경:"금", 신:"금", 임:"수", 계:"수"
@@ -500,39 +510,47 @@ function HotCompatContent() {
           <div className="absolute bottom-[-20%] left-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">⚠ 19금 · 보고 후회할 수 있음</div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            우리의<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">속궁합은?</span>
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            남들은 다 확인했는데<br />
-            <span className="text-gray-200 font-medium">나만 모르고 있던 우리 사이의 진짜 온도</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            친구들은 이미 다 해봤다는 그 테스트<br />
-            우리 둘만 아직 모르고 있던 진짜 순위
-          </p>
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["혹시 나만 더 좋아하는 거 아닐까?", "둘 중 누가 더 끌리고 있는지, 숨겨진 온도차를 확인하세요", "#f43f5e"],
-              ["남들이랑 비교하면 우리는?", "또래 평균보다 위인지 아래인지 — 보면 안심되거나, 불안해질 수 있음", "#f97316"],
-              ["전 애인이랑 비교당하는 기분?", "이번엔 진짜 다른지, 데이터로 확인할 차례", "#ec4899"],
-              ["같이 있을 때 그 짜릿함, 진짜였을까?", "느낌만으로는 알 수 없던 둘 사이의 폭발력 지수", "#fbbf24"],
-            ].map(([title, desc, color]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: color }} />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">⚠ 19금 · 보고 후회할 수 있음</div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              우리의<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">속궁합은?</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              남들은 다 확인했는데<br />
+              <span className="text-gray-200 font-medium">나만 모르고 있던 우리 사이의 진짜 온도</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              친구들은 이미 다 해봤다는 그 테스트<br />
+              우리 둘만 아직 모르고 있던 진짜 순위
+            </p>
+          </FadeIn>
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["혹시 나만 더 좋아하는 거 아닐까?", "둘 중 누가 더 끌리고 있는지, 숨겨진 온도차를 확인하세요", "#f43f5e"],
+                ["남들이랑 비교하면 우리는?", "또래 평균보다 위인지 아래인지 — 보면 안심되거나, 불안해질 수 있음", "#f97316"],
+                ["전 애인이랑 비교당하는 기분?", "이번엔 진짜 다른지, 데이터로 확인할 차례", "#ec4899"],
+                ["같이 있을 때 그 짜릿함, 진짜였을까?", "느낌만으로는 알 수 없던 둘 사이의 폭발력 지수", "#fbbf24"],
+              ].map(([title, desc, color]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: color }} />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
-            성적 케미 분석하기
-          </button>
+              ))}
+            </div>
+          </FadeIn>
+          <FadeIn delay={300} className="w-full">
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              성적 케미 분석하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );

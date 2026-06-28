@@ -1168,11 +1168,6 @@ export default function MainPage() {
             </button>
           </div>
 
-          {/* 소셜 프루프 한 줄 */}
-          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
-            무료 · 1분 완성 · 친구한테 공유 필수
-          </p>
-
           {/* 별점 + 누적 */}
           <div className="flex items-center justify-center gap-4 flex-wrap mt-4">
             <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
@@ -1192,16 +1187,16 @@ export default function MainPage() {
             <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
-                캡처 한 장 올려서 보는 챗봇 풀이와는 출발이 다릅니다.
+                사주를 캡처해서 AI에 올려 묻는 것과는 분석 방식 자체가 다릅니다.
               </p>
               <ul className="space-y-2.5">
                 {[
-                  { icon: "🎓", text: <>명리학 자격을 갖춘 <strong style={{ color: "#fff" }}>현직 사주 전문가의 임상 데이터</strong>를 기반으로 분석합니다</> },
-                  { icon: "📚", text: <>방대한 <strong style={{ color: "#fff" }}>사주 데이터베이스</strong>를 학습해 풀이의 깊이가 다릅니다</> },
-                  { icon: "💬", text: <>실제 <strong style={{ color: "#fff" }}>명리상담 사례</strong>를 반영해 디테일을 더했습니다</> },
+                  { text: <>명리학 원전 이론과 사주 명식 계산 로직을 직접 구현한 <strong style={{ color: "#fff" }}>전용 분석 엔진</strong>으로 풀이합니다</> },
+                  { text: <>생년월일시로 산출한 <strong style={{ color: "#fff" }}>사주 명식·십성·신살 데이터</strong>를 기준으로 항목별 풀이를 구성합니다</> },
+                  { text: <>일반 대화형 AI가 즉석에서 답하는 방식이 아니라, <strong style={{ color: "#fff" }}>정해진 명리학 규칙</strong>에 따라 일관되게 분석합니다</> },
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
-                    <span className="shrink-0">{item.icon}</span>
+                    <span className="shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>·</span>
                     <span>{item.text}</span>
                   </li>
                 ))}

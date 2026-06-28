@@ -18,6 +18,16 @@ interface ReunionResult {
   afterReunionCompat: string;
 }
 
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 function ShareButton({ title, text }: { title: string; text: string }) {
   const [copied, setCopied] = useState(false);
   async function share() {
@@ -124,60 +134,68 @@ export default function ReunionPage() {
     return (
       <main className="min-h-screen bg-[#06060e] flex flex-col items-center justify-center px-5 py-10 page-fade-in">
         <BackButton />
-        <div className="w-full max-w-2xl space-y-6 text-center">
-          <div className="text-5xl">🔥</div>
-          <h1 className="text-3xl font-black text-white leading-tight">
-            지금 이 순간,<br />
-            <span style={{ color: "#f97316" }}>그 사람 옆에</span><br />
-            누가 있을까요?
-          </h1>
+        <div className="w-full max-w-2xl space-y-6 text-center px-4">
+          <FadeIn delay={0}>
+            <div className="text-5xl">🔥</div>
+            <h1 className="text-3xl font-black text-white leading-tight">
+              지금 이 순간,<br />
+              <span style={{ color: "#f97316" }}>그 사람 옆에</span><br />
+              누가 있을까요?
+            </h1>
+          </FadeIn>
 
-          <div className="space-y-3 text-left">
-            <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
-              <p className="text-sm font-bold text-red-400 mb-1">😰 지금도 늦고 있습니다</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
-                사주에는 재회의 문이 열리는 시기가 있습니다. 그 시기를 놓치면 문은 다시 닫힙니다.
-                지금 그 시기인지 확인하지 않으면, 나중에 후회해도 늦습니다.
-              </p>
+          <FadeIn delay={100}>
+            <div className="space-y-3 text-left">
+              <div className="rounded-2xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                <p className="text-sm font-bold text-red-400 mb-1">😰 지금도 늦고 있습니다</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  사주에는 재회의 문이 열리는 시기가 있습니다. 그 시기를 놓치면 문은 다시 닫힙니다.
+                  지금 그 시기인지 확인하지 않으면, 나중에 후회해도 늦습니다.
+                </p>
+              </div>
+
+              <div className="rounded-2xl p-4" style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)" }}>
+                <p className="text-sm font-bold text-orange-400 mb-1">👀 당신이 망설이는 동안</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  더 잘 준비된 누군가가 그 빈자리를 채우고 있을 수 있습니다.
+                  두 사람의 사주가 지금 맞닿는 시기인지, 아직 기회가 있는지 지금 확인하세요.
+                </p>
+              </div>
+
+              <div className="rounded-2xl p-4" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                <p className="text-sm font-bold text-purple-400 mb-1">💡 재회에 성공한 사람들의 공통점</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  그들은 '타이밍'을 알았습니다. 사주는 언제, 어떻게 접근해야 그 사람의 마음이 열리는지
+                  정확하게 알려줍니다.
+                </p>
+              </div>
             </div>
+          </FadeIn>
 
-            <div className="rounded-2xl p-4" style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)" }}>
-              <p className="text-sm font-bold text-orange-400 mb-1">👀 당신이 망설이는 동안</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
-                더 잘 준비된 누군가가 그 빈자리를 채우고 있을 수 있습니다.
-                두 사람의 사주가 지금 맞닿는 시기인지, 아직 기회가 있는지 지금 확인하세요.
-              </p>
+          <FadeIn delay={200}>
+            <div className="rounded-2xl p-4" style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)" }}>
+              <p className="text-xs font-bold mb-2" style={{ color: "#fb923c" }}>분석 내용</p>
+              <ul className="text-xs space-y-1" style={{ color: "rgba(255,255,255,0.65)" }}>
+                <li>🔍 지금 그 사람이 나를 어떻게 생각하는지</li>
+                <li>⏰ 재회의 문이 열리는 정확한 시기</li>
+                <li>📋 단계별 재회 전략 (첫 연락→만남)</li>
+                <li>🚫 절대 하면 안 되는 행동</li>
+                <li>💫 재회 후 장기 지속 가능성</li>
+                <li>🌐 출생지 경도 보정으로 정확한 사주 계산</li>
+              </ul>
             </div>
+          </FadeIn>
 
-            <div className="rounded-2xl p-4" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
-              <p className="text-sm font-bold text-purple-400 mb-1">💡 재회에 성공한 사람들의 공통점</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
-                그들은 '타이밍'을 알았습니다. 사주는 언제, 어떻게 접근해야 그 사람의 마음이 열리는지
-                정확하게 알려줍니다.
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-2xl p-4" style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)" }}>
-            <p className="text-xs font-bold mb-2" style={{ color: "#fb923c" }}>분석 내용</p>
-            <ul className="text-xs space-y-1" style={{ color: "rgba(255,255,255,0.65)" }}>
-              <li>🔍 지금 그 사람이 나를 어떻게 생각하는지</li>
-              <li>⏰ 재회의 문이 열리는 정확한 시기</li>
-              <li>📋 단계별 재회 전략 (첫 연락→만남)</li>
-              <li>🚫 절대 하면 안 되는 행동</li>
-              <li>💫 재회 후 장기 지속 가능성</li>
-              <li>🌐 출생지 경도 보정으로 정확한 사주 계산</li>
-            </ul>
-          </div>
-
-          <button
-            onClick={() => setStep("my")}
-            className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
-            style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 8px 32px rgba(234,88,12,0.45)" }}
-          >
-            재회 가능성 확인하기 →
-          </button>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>₩3,900 · 결과 확인 후 결제</p>
+          <FadeIn delay={300}>
+            <button
+              onClick={() => setStep("my")}
+              className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
+              style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 8px 32px rgba(234,88,12,0.45)" }}
+            >
+              재회 가능성 확인하기 →
+            </button>
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>₩3,900 · 결과 확인 후 결제</p>
+          </FadeIn>
         </div>
       </main>
     );

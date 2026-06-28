@@ -256,7 +256,7 @@ export default function SajuChatPage() {
           }} />
         </div>
 
-        <div style={{ maxWidth: 460, width: "100%", zIndex: 1 }}>
+        <div style={{ maxWidth: 640, width: "100%", zIndex: 1 }}>
           {/* 상단 뱃지 */}
           <div style={{ textAlign: "center", marginBottom: 20 }}>
             <span style={{
@@ -272,7 +272,7 @@ export default function SajuChatPage() {
           {/* 메인 타이틀 */}
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <h1 style={{
-              fontSize: 34, fontWeight: 900, letterSpacing: "-0.5px",
+              fontSize: 26, fontWeight: 900, letterSpacing: "-0.5px",
               background: "linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 50%, #a78bfa 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               margin: "0 0 10px",

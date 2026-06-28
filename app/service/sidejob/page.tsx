@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getSipseong, getSipseongStrength, getJijiRelations, CHEONGAN_ELEMENT, getJikjangSiseonNarrative, type SajuResult, type Element } from "@/lib/saju";
 import { SIPSEONG_DESC } from "@/lib/saju2";
@@ -11,6 +11,16 @@ import ShareImageButton from "@/components/ShareImageButton";
 export const dynamic = "force-dynamic";
 
 const ELEMENT_TO_CG: Record<Element, string> = { 목: "갑", 화: "병", 토: "무", 금: "경", 수: "임" };
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [v, setV] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t); }, [delay]);
+  return (
+    <div className={className} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity 0.8s ease ${delay}ms, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
 
 export default function SidejobPage() {
   const router = useRouter();
@@ -48,45 +58,54 @@ export default function SidejobPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-teal-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-700/40 text-emerald-300 text-xs font-bold tracking-wider mb-8">
-            🔥 월급만으로 안 되는 시대, 본업 외 수입 가능할까?
-          </div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
-            나도 투잡,<br />
-            <span className="text-emerald-400">가능한 사주</span>일까?
-          </h1>
-          <p className="text-gray-400 text-base mb-2 leading-relaxed">
-            누구는 부업으로 월급보다 더 벌고,<br />
-            <span className="text-gray-300 font-medium">누구는 본업도 흔들립니다.</span>
-          </p>
-          <p className="text-gray-600 text-sm mb-12">
-            욕심내면 오히려 둘 다 망하는 사주도 있습니다
-          </p>
+          <FadeIn delay={0}>
+            <div className="inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-700/40 text-emerald-300 text-xs font-bold tracking-wider mb-8">
+              🔥 월급만으로 안 되는 시대, 본업 외 수입 가능할까?
+            </div>
+            <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+              나도 투잡,<br />
+              <span className="text-emerald-400">가능한 사주</span>일까?
+            </h1>
+          </FadeIn>
 
-          <div className="w-full space-y-3 mb-10 text-left">
-            {[
-              ["여러 수입원 동시 운영 가능성", "여러 수입원을 동시에 굴릴 수 있는 구조인지 진단"],
-              ["욕심내면 위험한 구조", "투잡이 오히려 본업을 망치는 패턴 체크"],
-              ["나에게 맞는 부업 방향", "사주 기운에 맞는 구체적인 부업 유형 추천"],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+          <FadeIn delay={100}>
+            <p className="text-gray-400 text-base mb-2 leading-relaxed">
+              누구는 부업으로 월급보다 더 벌고,<br />
+              <span className="text-gray-300 font-medium">누구는 본업도 흔들립니다.</span>
+            </p>
+            <p className="text-gray-600 text-sm mb-12">
+              욕심내면 오히려 둘 다 망하는 사주도 있습니다
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={200} className="w-full">
+            <div className="w-full space-y-3 mb-10 text-left">
+              {[
+                ["여러 수입원 동시 운영 가능성", "여러 수입원을 동시에 굴릴 수 있는 구조인지 진단"],
+                ["욕심내면 위험한 구조", "투잡이 오히려 본업을 망치는 패턴 체크"],
+                ["나에게 맞는 부업 방향", "사주 기운에 맞는 구체적인 부업 유형 추천"],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
-            ✦ 완전 무료
-          </div>
+          <FadeIn delay={300} className="w-full">
+            <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-wider mb-6">
+              ✦ 완전 무료
+            </div>
 
-          <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/50 transition-all active:scale-[0.98]">
-            내 투잡 가능성 확인하기
-          </button>
+            <button onClick={() => setStep("form")}
+              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/50 transition-all active:scale-[0.98]">
+              내 투잡 가능성 확인하기
+            </button>
+          </FadeIn>
         </div>
       </main>
     );
