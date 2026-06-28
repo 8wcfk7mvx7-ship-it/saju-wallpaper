@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 const ELEMENT_TO_CG: Record<Element, string> = { 목: "갑", 화: "병", 토: "무", 금: "경", 수: "임" };
 const SIPSEONG_OF_GROUP_LABEL: Record<string, string> = {
-  비겁: "비겁(비견·겁재)", 식상: "식상(식신·상관)", 재성: "재성(정재·편재)",
-  관성: "관성(정관·편관)", 인성: "인성(정인·편인)",
+  비겁: "동료·경쟁 기운", 식상: "표현·창작 기운", 재성: "재물 기운",
+  관성: "조직·책임 기운", 인성: "학습·전문성 기운",
 };
 const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
   비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
@@ -42,32 +42,32 @@ const GROUP_CAREER: Record<string, { title: string; field: string; desc: string;
   식상: {
     title: "내가 만든 결과물이 곧 가치가 되는 일",
     field: "콘텐츠·기획·요리·교육·1인 사업·프리랜서·창작",
-    desc: "용신이 식상(食傷) 계열이라, 누군가 정해놓은 규칙을 따르는 일보다 스스로 아이디어를 내고 결과물을 만들어내는 일에서 능력이 가장 잘 발휘됩니다. 기획·콘텐츠 제작·요리·강의·디자인처럼 '내 손에서 무언가가 새로 만들어지는' 직업군에서 인정받기 쉽습니다.",
-    warn: "다만 식상이 강한 만큼 한 가지에 꾸준히 머무르기보다 자극과 변화를 추구하는 성향이 함께 옵니다. 너무 많은 걸 동시에 벌이면 마무리가 약해지는 패턴이 반복될 수 있으니, 한 번에 진행하는 프로젝트 수를 의식적으로 줄이는 것이 좋습니다.",
+    desc: "표현력과 창작력을 뜻하는 기운이 강하게 작용하고 있어, 누군가 정해놓은 규칙을 따르는 일보다 스스로 아이디어를 내고 결과물을 만들어내는 일에서 능력이 가장 잘 발휘됩니다. 기획·콘텐츠 제작·요리·강의·디자인처럼 '내 손에서 무언가가 새로 만들어지는' 직업군에서 인정받기 쉽습니다.",
+    warn: "다만 이 기운이 강한 만큼 한 가지에 꾸준히 머무르기보다 자극과 변화를 추구하는 성향이 함께 옵니다. 너무 많은 걸 동시에 벌이면 마무리가 약해지는 패턴이 반복될 수 있으니, 한 번에 진행하는 프로젝트 수를 의식적으로 줄이는 것이 좋습니다.",
   },
   재성: {
     title: "직접 운영하고 굴리며 키워가는 일",
     field: "영업·무역·투자·자영업·부동산·유통",
-    desc: "용신이 재성(財星) 계열입니다. 조직 안에서 정해진 업무를 반복하기보다, 자신이 직접 거래·협상·운영의 주체가 되는 일에서 에너지가 살아납니다. 영업·무역·자영업처럼 성과가 곧바로 보상으로 연결되는 구조가 잘 맞습니다.",
-    warn: "재성이 강하면 일과 사람 관계에서 모두 '득과 실'을 빠르게 계산하는 경향이 생깁니다. 단기 성과에 집중하다 보면 동료·팀과의 관계가 소모적으로 흐를 수 있어, 의도적으로 신뢰 관계에 시간을 투자하는 것이 장기적으로 더 큰 기회를 만듭니다.",
+    desc: "재물을 뜻하는 기운이 가장 필요한 사주라, 조직 안에서 정해진 업무를 반복하기보다, 자신이 직접 거래·협상·운영의 주체가 되는 일에서 에너지가 살아납니다. 영업·무역·자영업처럼 성과가 곧바로 보상으로 연결되는 구조가 잘 맞습니다.",
+    warn: "이 기운이 강하면 일과 사람 관계에서 모두 '득과 실'을 빠르게 계산하는 경향이 생깁니다. 단기 성과에 집중하다 보면 동료·팀과의 관계가 소모적으로 흐를 수 있어, 의도적으로 신뢰 관계에 시간을 투자하는 것이 장기적으로 더 큰 기회를 만듭니다.",
   },
   관성: {
     title: "체계와 책임이 분명한 조직형 일",
     field: "공공기관·대기업·법률·행정·관리직·전문 자격직",
-    desc: "용신이 관성(官星) 계열입니다. 명확한 규칙과 위계, 책임 범위가 있는 조직 안에서 안정적으로 능력을 쌓아 올라가는 구조가 잘 맞습니다. 공공기관·대기업·법률·행정처럼 '직급과 자격'이 곧 성과로 인정되는 분야에서 신뢰를 빠르게 얻습니다.",
-    warn: "관성이 강하면 규칙을 잘 지키는 만큼, 정해진 틀을 벗어난 자유로운 환경에서는 오히려 방향을 잃기 쉽습니다. 완전한 무소속 프리랜서나 룰이 없는 초기 스타트업보다는, 어느 정도 체계가 잡힌 환경을 선택하는 것이 스트레스를 줄여줍니다.",
+    desc: "조직과 책임을 뜻하는 기운이 가장 필요한 사주입니다. 명확한 규칙과 위계, 책임 범위가 있는 조직 안에서 안정적으로 능력을 쌓아 올라가는 구조가 잘 맞습니다. 공공기관·대기업·법률·행정처럼 '직급과 자격'이 곧 성과로 인정되는 분야에서 신뢰를 빠르게 얻습니다.",
+    warn: "이 기운이 강하면 규칙을 잘 지키는 만큼, 정해진 틀을 벗어난 자유로운 환경에서는 오히려 방향을 잃기 쉽습니다. 완전한 무소속 프리랜서나 룰이 없는 초기 스타트업보다는, 어느 정도 체계가 잡힌 환경을 선택하는 것이 스트레스를 줄여줍니다.",
   },
   인성: {
     title: "배움과 전문성이 곧 경쟁력이 되는 일",
     field: "연구·교육·상담·의료·기획·전략·문서 기반 전문직",
-    desc: "용신이 인성(印星) 계열입니다. 즉흥적인 실행보다 충분한 학습과 자료를 바탕으로 판단하고 조언하는 역할에서 진가가 드러납니다. 연구·교육·상담·기획처럼 '깊이 아는 것'이 곧 신뢰가 되는 분야에서 꾸준히 성장합니다.",
-    warn: "인성이 강하면 준비와 검토에 시간을 많이 쓰는 대신, 결정과 실행의 타이밍을 놓치는 경우가 생길 수 있습니다. 완벽하게 준비된 다음에 시작하려 하지 말고, '70% 준비되면 일단 시작'하는 기준을 정해두는 것이 도움이 됩니다.",
+    desc: "학습과 전문성을 뜻하는 기운이 가장 필요한 사주입니다. 즉흥적인 실행보다 충분한 학습과 자료를 바탕으로 판단하고 조언하는 역할에서 진가가 드러납니다. 연구·교육·상담·기획처럼 '깊이 아는 것'이 곧 신뢰가 되는 분야에서 꾸준히 성장합니다.",
+    warn: "이 기운이 강하면 준비와 검토에 시간을 많이 쓰는 대신, 결정과 실행의 타이밍을 놓치는 경우가 생길 수 있습니다. 완벽하게 준비된 다음에 시작하려 하지 말고, '70% 준비되면 일단 시작'하는 기준을 정해두는 것이 도움이 됩니다.",
   },
   비겁: {
     title: "사람들과 함께, 또는 같은 분야 사람들과 경쟁하며 성장하는 일",
     field: "스포츠·영업조직·동업·커뮤니티 기반 사업·프리랜서 연합",
-    desc: "용신이 비겁(比劫) 계열입니다. 혼자 조용히 일하는 환경보다, 동료·경쟁자와 함께 자극을 받으며 성장하는 구조에서 능력이 극대화됩니다. 같은 목표를 가진 사람들과 함께하는 팀, 동업, 혹은 같은 분야 사람들과 경쁘쟁하는 환경에서 성과가 빠르게 올라갑니다.",
-    warn: "비겁이 강하면 독립심과 자존심이 강해 '내 방식'을 고집하다 주변과 마찰이 생기기 쉽습니다. 동업이나 협업을 할 때는 처음부터 역할과 지분을 명확히 문서화해 두는 것이 관계도 일도 오래 지키는 방법입니다.",
+    desc: "동료·경쟁 기운이 가장 필요한 사주입니다. 혼자 조용히 일하는 환경보다, 동료·경쟁자와 함께 자극을 받으며 성장하는 구조에서 능력이 극대화됩니다. 같은 목표를 가진 사람들과 함께하는 팀, 동업, 혹은 같은 분야 사람들과 경쟁하는 환경에서 성과가 빠르게 올라갑니다.",
+    warn: "이 기운이 강하면 독립심과 자존심이 강해 '내 방식'을 고집하다 주변과 마찰이 생기기 쉽습니다. 동업이나 협업을 할 때는 처음부터 역할과 지분을 명확히 문서화해 두는 것이 관계도 일도 오래 지키는 방법입니다.",
   },
 };
 
@@ -128,8 +128,8 @@ export default function CareerPage() {
 
           <div className="w-full space-y-3 mb-10 text-left">
             {[
-              ["용신 기반 적성 진단", "사주 전체 구조에서 가장 필요한 기운이 어떤 직업군과 맞는지"],
-              ["격국으로 보는 강점·약점", "단순 일주 풀이가 아닌 사주 전체 구조의 균형을 진단"],
+              ["필요한 기운 기반 적성 진단", "사주 전체 구조에서 가장 필요한 기운이 어떤 직업군과 맞는지"],
+              ["사주 구조로 보는 강점·약점", "태어난 날 하나만 보는 게 아닌 사주 전체 구조의 균형을 진단"],
               ["성향별 주의할 점", "잘 맞는 분야에서도 반복되는 함정과 대처법"],
             ].map(([title, desc]) => (
               <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
@@ -241,7 +241,7 @@ export default function CareerPage() {
   // "무관/무재/무인/무비겁" 패턴은 유기적 분석 결과가 "무"가 아니면 제거하고,
   // 약하지만 존재하는 경우엔 그 뉘앙스를 담은 설명으로 대체한다.
   const PATTERN_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
-    "무비겁(無比劫)": "비겁", "무재(無財)": "재성", "무관(無官)": "관성", "무인(無印)": "인성",
+    "무비겁": "비겁", "무재": "재성", "무관": "관성", "무인": "인성",
   };
   patterns = patterns.flatMap(p => {
     const group = PATTERN_GROUP[p.name];
@@ -251,7 +251,7 @@ export default function CareerPage() {
     if (info.status === "약함") {
       return [{
         ...p,
-        name: p.name.replace("무", "약(弱)").replace(/\(無.+\)/, `(${group} 약함)`),
+        name: `${SIPSEONG_OF_GROUP_LABEL[group]} 약함`,
         desc: `사주에 ${SIPSEONG_OF_GROUP_LABEL[group]}이 아예 없는 건 아니지만, ${info.reason} 그래도 흐름상 어느 정도의 영향력은 남아있어요.`,
       }];
     }
@@ -402,7 +402,7 @@ export default function CareerPage() {
           <div className="space-y-5 mb-8">
             <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 text-center">
               <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">사주 구조 진단</p>
-              <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 용신 {yongshinEl} ({yongshinGroup})</p>
+              <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 필요한 기운 {yongshinEl} ({SIPSEONG_OF_GROUP_LABEL[yongshinGroup]})</p>
               <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
             </div>
 
@@ -416,7 +416,7 @@ export default function CareerPage() {
             {/* 금수쌍청 */}
             {gumsu.level !== "해당없음" && gumsu.desc && (
               <div className="bg-sky-950/30 border border-sky-600/25 rounded-2xl p-5">
-                <p className="text-sm font-bold text-sky-300 mb-2">금수쌍청(金水雙淸){gumsu.level === "완전체" ? " ✦" : " (기질)"}</p>
+                <p className="text-sm font-bold text-sky-300 mb-2">금(金)과 수(水)가 맑게 어우러진 기운{gumsu.level === "완전체" ? " ✦" : " (기질)"}</p>
                 <p className="text-sm text-gray-300 leading-relaxed mb-2">{gumsu.desc}</p>
                 {gumsu.careerHint && <p className="text-xs text-sky-200/70 leading-relaxed">{gumsu.careerHint}</p>}
               </div>
@@ -425,7 +425,7 @@ export default function CareerPage() {
             {/* 궁성(宮星) 분석 */}
             {gungseongList.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-                <p className="text-sm font-bold text-cyan-300 mb-2">궁성(宮星)으로 보는 십성 배치</p>
+                <p className="text-sm font-bold text-cyan-300 mb-2">사주 자리별로 보는 기운의 배치</p>
                 <p className="text-sm text-gray-300 leading-relaxed">
                   {gungseongList.map((g, i) => (
                     <span key={i}>
@@ -475,7 +475,7 @@ export default function CareerPage() {
               )}
               {gishinGroup && (
                 <p className="text-xs text-gray-500 leading-relaxed mt-2 pt-2 border-t border-white/5">
-                  참고로 용신을 극하는 기신(忌神)은 <b>{gishinEl}</b> 기운, 십성으로는 <b>{SIPSEONG_OF_GROUP_LABEL[gishinGroup]}</b> 계열이에요. 이 영역의 일이나 사람에게 너무 휘둘리면 본인의 강점이 가려질 수 있으니 적당히 거리를 두는 게 좋아요.
+                  참고로 나에게 필요한 기운을 누르는 기운은 <b>{gishinEl}</b> 기운, 구체적으로는 <b>{SIPSEONG_OF_GROUP_LABEL[gishinGroup]}</b> 계열이에요. 이 영역의 일이나 사람에게 너무 휘둘리면 본인의 강점이 가려질 수 있으니 적당히 거리를 두는 게 좋아요.
                 </p>
               )}
               {bigeobExcessNote && (
@@ -496,16 +496,16 @@ export default function CareerPage() {
 
             {hasSikSangSaengGwan && (
               <div className="bg-white/[0.03] border border-emerald-700/20 rounded-2xl p-5">
-                <p className="text-sm font-bold text-emerald-300 mb-1">식상생관(食傷生官) 구조</p>
+                <p className="text-sm font-bold text-emerald-300 mb-1">표현력이 체계로 이어지는 구조</p>
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  사주 안에 식상(표현력·기획력)과 관성(체계·책임)이 함께 자리해 있습니다. 즉, 자신만의 아이디어나 콘텐츠를 만들어내는 능력과 그것을 조직·규칙 안에서 인정받는 능력이 동시에 있는 구조입니다. 기획자가 곧 관리자로 성장하거나, 전문 기술자가 조직 내 책임자로 올라가는 흐름이 자연스럽게 만들어집니다.
+                  사주 안에 표현력·기획력을 뜻하는 기운과 체계·책임을 뜻하는 기운이 함께 자리해 있습니다. 즉, 자신만의 아이디어나 콘텐츠를 만들어내는 능력과 그것을 조직·규칙 안에서 인정받는 능력이 동시에 있는 구조입니다. 기획자가 곧 관리자로 성장하거나, 전문 기술자가 조직 내 책임자로 올라가는 흐름이 자연스럽게 만들어집니다.
                 </p>
               </div>
             )}
 
             {patterns.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-                <p className="text-sm font-bold text-sky-300 mb-3">사주 구조(격국)로 보는 강점·약점</p>
+                <p className="text-sm font-bold text-sky-300 mb-3">사주 전체 구조로 보는 강점·약점</p>
                 {patterns.slice(0, 2).map((p, i) => (
                   <div key={i} className={i > 0 ? "mt-3 pt-3 border-t border-white/5" : ""}>
                     <p className="text-sm font-bold text-gray-200 mb-1">{p.name} ({p.hanja})</p>
@@ -518,7 +518,7 @@ export default function CareerPage() {
 
             {topDesc && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-                <p className="text-sm font-bold text-violet-300 mb-1">사주에서 가장 강한 기운 — {topSipseong} ({topDesc.hanja})</p>
+                <p className="text-sm font-bold text-violet-300 mb-1">사주에서 가장 강한 기운 — {SIPSEONG_OF_GROUP_LABEL[SIPSEONG_GROUP[topSipseong as string]] ?? topSipseong}</p>
                 <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
                 <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
                 <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ {topDesc.shadow}</p>

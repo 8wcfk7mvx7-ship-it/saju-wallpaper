@@ -951,19 +951,24 @@ export default function GunghapPage(){
               };
               const ss1 = result.r1.pillarsDetail.day.sipseongJj;
               const ss2 = result.r2.pillarsDetail.day.sipseongJj;
+              const SIPSEONG_PLAIN: Record<string,string> = {
+                비견:"대등한 자존심", 겁재:"강한 에너지", 식신:"따뜻한 여유", 상관:"자유로운 독창성",
+                정재:"안정과 신뢰", 편재:"다채로운 매력", 정관:"원칙과 품격", 편관:"강인한 카리스마",
+                정인:"지적인 포용력", 편인:"신비로운 독립성",
+              };
               return (
                 <div style={{borderRadius:15,padding:'16px',marginBottom:12,
                   background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}}>
                   <p style={{fontSize:13,fontWeight:900,color:'#ffd700',marginBottom:4}}>💘 사주로 보는 서로 끌리는 이유</p>
                   <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:12,lineHeight:1.5}}>
-                    일지(日支) 십성 기반 — 상대의 일지 에너지가 나에게 어떻게 작용하는지 보여줍니다.
+                    태어난 날의 기운을 기준으로 — 상대의 그 기운이 나에게 어떻게 작용하는지 보여줍니다.
                   </p>
                   <div style={{marginBottom:10}}>
                     <p style={{fontSize:12,fontWeight:800,color:'#f9a8d4',marginBottom:4}}>
                       {p1.name}이 {p2.name}에게 끌리는 이유
                     </p>
                     <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5}}>
-                      {p2.name}의 일지 십성: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss2||"—"}</span>
+                      {p2.name}의 태어난 날 기운: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss2?(SIPSEONG_PLAIN[ss2]||ss2):"—"}</span>
                     </p>
                     <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>
                       {ss2&&WHY_LIKE_MAP[ss2]?WHY_LIKE_MAP[ss2]:`${p2.name}의 일지 에너지가 ${p1.name}에게 독특한 방식으로 끌림을 만들어냅니다.`}
@@ -974,7 +979,7 @@ export default function GunghapPage(){
                       {p2.name}이 {p1.name}에게 끌리는 이유
                     </p>
                     <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5}}>
-                      {p1.name}의 일지 십성: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss1||"—"}</span>
+                      {p1.name}의 태어난 날 기운: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss1?(SIPSEONG_PLAIN[ss1]||ss1):"—"}</span>
                     </p>
                     <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>
                       {ss1&&WHY_LIKE_MAP[ss1]?WHY_LIKE_MAP[ss1]:`${p1.name}의 일지 에너지가 ${p2.name}에게 독특한 방식으로 끌림을 만들어냅니다.`}

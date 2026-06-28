@@ -1332,16 +1332,16 @@ function ResultView({
                   <p className="text-xs leading-relaxed mt-2 pt-2" style={{ color: "rgba(255,255,255,0.55)", borderTop: "1px solid rgba(251,146,60,0.15)" }}>
                     <strong style={{ color: "#fb923c" }}>이성운 — </strong>
                     {form.gender === "female"
-                      ? "여성에게 재성은 시모(媤母)·활동력을 의미해요. 무재라도 이성운 자체와는 큰 관련이 없지만, 재물보다 사람·관계에서 만족을 더 찾는 편이에요."
-                      : "남성에게 재성은 여성·배우자 인연을 의미해요. 무재라면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."}
+                      ? "여성에게 재물을 뜻하는 기운은 시어머니 인연·활동력을 의미해요. 이 기운이 약하다고 이성운 자체와 크게 관련이 있는 건 아니지만, 재물보다 사람·관계에서 만족을 더 찾는 편이에요."
+                      : "남성에게 재물을 뜻하는 기운은 여성·배우자 인연을 의미해요. 이 기운이 약하면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."}
                   </p>
                 )}
                 {p.name === "무관" && (
                   <p className="text-xs leading-relaxed mt-2 pt-2" style={{ color: "rgba(255,255,255,0.55)", borderTop: "1px solid rgba(251,146,60,0.15)" }}>
                     <strong style={{ color: "#fb923c" }}>이성운 — </strong>
                     {form.gender === "female"
-                      ? "여성에게 관성은 남성·배우자 인연을 의미해요. 무관이라면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."
-                      : "남성에게 관성은 자식·명예·조직을 의미해요. 무관이라도 이성운 자체와는 큰 관련이 없지만, 조직보다 자유로운 관계 방식을 선호하는 편이에요."}
+                      ? "여성에게 조직·책임을 뜻하는 기운은 남성·배우자 인연을 의미해요. 이 기운이 약하면 인연이 자연스럽게 들어오기보다, 본인이 적극적으로 다가가야 인연이 이어지는 경향이 있어요."
+                      : "남성에게 조직·책임을 뜻하는 기운은 자식·명예·조직을 의미해요. 이 기운이 약하다고 이성운 자체와 크게 관련이 있는 건 아니지만, 조직보다 자유로운 관계 방식을 선호하는 편이에요."}
                   </p>
                 )}
               </div>
@@ -1456,7 +1456,7 @@ function ResultView({
       </Section>
 
       {/* ⑨ 재성 위치 */}
-      <Section title="재성(財星) 위치 · 재물 스타일" accent="#fbbf24">
+      <Section title="재물 기운의 위치 · 재물 스타일" accent="#fbbf24">
         <div className="mb-3">
           <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>{jaeseongPos}에 위치</span>
         </div>

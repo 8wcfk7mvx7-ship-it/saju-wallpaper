@@ -190,14 +190,14 @@ function calcSajuMbtiAxes(result: SajuResult): SajuAxis[] {
     {
       key: "jp_like", left: "자유형(판단에 얽매이지 않음)", right: "통제형(계획·관리)", score: controlFreeScore, color: "#a78bfa",
       desc: controlFreeScore >= 50
-        ? `사주에 관성(정관·편관)의 기운이 식상보다 강해, 규칙과 체계 안에서 안정감을 느끼고 계획한 대로 차근차근 관리해 나가는 통제형이에요. 정해진 틀이 있을 때 오히려 능률이 올라가요.`
-        : `사주에 식상(식신·상관)의 기운이 관성보다 강해, 정해진 틀보다 그때그때의 흐름과 영감을 따라 움직이는 자유형이에요. 계획에 얽매이기보다 상황에 맞춰 유연하게 대응할 때 빛을 발해요.`
+        ? `사주에 규칙과 책임을 따르는 기운이 표현하고 발산하는 기운보다 강해, 규칙과 체계 안에서 안정감을 느끼고 계획한 대로 차근차근 관리해 나가는 통제형이에요. 정해진 틀이 있을 때 오히려 능률이 올라가요.`
+        : `사주에 표현하고 발산하는 기운이 규칙과 책임을 따르는 기운보다 강해, 정해진 틀보다 그때그때의 흐름과 영감을 따라 움직이는 자유형이에요. 계획에 얽매이기보다 상황에 맞춰 유연하게 대응할 때 빛을 발해요.`
     },
     {
       key: "lead_careful", left: "신중형", right: "자기주도형", score: leadCarefulScore, color: "#4ade80",
       desc: leadCarefulScore >= 50
-        ? `사주에 비겁(비견·겁재)의 기운이 인성보다 강해, 남의 의견에 기대기보다 스스로 판단하고 밀고 나가는 자기주도형이에요. 직접 부딪히며 배우는 것을 선호하고 주체성이 강해요.`
-        : `사주에 인성(편인·정인)의 기운이 비겁보다 강해, 충분히 따져보고 주변의 조언을 들은 뒤에 움직이는 신중형이에요. 성급한 결정보다 숙고를 거친 선택이 후회를 줄여줘요.`
+        ? `사주에 스스로 밀고 나가는 기운이 배우고 의지하는 기운보다 강해, 남의 의견에 기대기보다 스스로 판단하고 밀고 나가는 자기주도형이에요. 직접 부딪히며 배우는 것을 선호하고 주체성이 강해요.`
+        : `사주에 배우고 의지하는 기운이 스스로 밀고 나가는 기운보다 강해, 충분히 따져보고 주변의 조언을 들은 뒤에 움직이는 신중형이에요. 성급한 결정보다 숙고를 거친 선택이 후회를 줄여줘요.`
     },
   ];
 }
@@ -237,8 +237,8 @@ function getCompatibleSaju(ilganEl: Element, gender: "male" | "female") {
   const targetEl = gender === "female" ? EL_GENERATED_BY[ilganEl] : EL_GENERATES[ilganEl];
   const ganList = Object.entries(CHEONGAN_ELEMENT).filter(([, el]) => el === targetEl).map(([gan]) => gan);
   const reason = gender === "female"
-    ? `여성의 사주에서는 나를 생(生)해주는 기운, 즉 인성(印星)에 해당하는 오행을 가진 남성과 만났을 때 보살핌과 지지를 받는 흐름이 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})을 생(生)하는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 남성이라면, 나를 키워주고 받쳐주는 인연이 되기 쉬워요.`
-    : `남성의 사주에서는 내가 생(生)해주는 기운, 즉 식상(食傷)에 해당하는 오행을 가진 여성과 만났을 때 자연스럽게 챙겨주고 베푸는 관계가 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})이 생(生)하는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 여성이라면, 내가 자연스럽게 생을 내려주는 좋은 흐름이 만들어져요.`;
+    ? `여성의 사주에서는 나를 채워주고 길러주는 기운에 해당하는 오행을 가진 남성과 만났을 때 보살핌과 지지를 받는 흐름이 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})을 채워주는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 남성이라면, 나를 키워주고 받쳐주는 인연이 되기 쉬워요.`
+    : `남성의 사주에서는 내가 베풀어주는 기운에 해당하는 오행을 가진 여성과 만났을 때 자연스럽게 챙겨주고 베푸는 관계가 형성돼요. 내 오행 ${ilganEl}(${ELEMENT_HANJA[ilganEl]})이 채워주는 ${targetEl}(${ELEMENT_HANJA[targetEl]}) 기운의 일간을 가진 여성이라면, 내가 자연스럽게 베풀어주는 좋은 흐름이 만들어져요.`;
   return { targetEl, ganList, reason };
 }
 

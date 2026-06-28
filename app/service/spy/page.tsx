@@ -530,9 +530,9 @@ function SpyContent() {
           const loveData = SIPSEONG_LOVE[iljiSs];
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4" style={{ animation: "fadeIn 0.7s ease-out 0.7s both" }}>
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">십성 분석 — 연애 DNA</p>
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">사주 기운 분석 — 연애 DNA</p>
 
-              {/* 사주팔자 십성 그리드 */}
+              {/* 사주팔자 기운 그리드 */}
               <div className={`grid gap-2 mb-5 ${pillars.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
                 {pillars.map((p2, i) => (
                   <div key={i} className={`rounded-xl p-3 text-center border ${p2.label === "일주" ? "border-red-800/40 bg-red-950/20" : "border-white/8 bg-white/[0.03]"}`}>
@@ -546,12 +546,12 @@ function SpyContent() {
                 ))}
               </div>
 
-              {/* 일지 십성 집중 분석 */}
+              {/* 일지 기운 집중 분석 */}
               {loveData && (
                 <div className="rounded-xl p-4 border" style={{ borderColor: loveData.color + "40", backgroundColor: loveData.color + "10" }}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: loveData.color + "20", color: loveData.color }}>
-                      일지 {iljiSs}
+                      연애 본능
                     </span>
                     <span className="text-xs font-bold" style={{ color: loveData.color }}>{loveData.keyword}</span>
                   </div>
@@ -563,11 +563,11 @@ function SpyContent() {
                 </div>
               )}
 
-              {/* 편재/상관 경고 */}
+              {/* 자유로운 이성 교류 기운 경고 */}
               {(p.year.sipseongJj === "편재" || p.month.sipseongJj === "편재" || (p.hour && p.hour.sipseongJj === "편재")) && (
                 <div className="mt-3 flex items-start gap-2 bg-orange-950/30 border border-orange-700/30 rounded-xl px-4 py-3">
                   <span className="text-orange-400 text-sm mt-0.5">🔥</span>
-                  <p className="text-xs text-gray-400">편재(偏財)가 여러 곳에 있습니다. 이성 교류가 많고 다정다감한 만큼 집중도가 낮을 수 있습니다.</p>
+                  <p className="text-xs text-gray-400">다수의 이성과 자유롭게 교류하는 기운이 여러 곳에 있습니다. 이성 교류가 많고 다정다감한 만큼 집중도가 낮을 수 있습니다.</p>
                 </div>
               )}
             </div>
@@ -595,9 +595,10 @@ function SpyContent() {
           const sik = sipseongStrength.find(s => s.group === "식상");
           const gwan = sipseongStrength.find(s => s.group === "관성");
           const jae = sipseongStrength.find(s => s.group === "재성");
+          const GROUP_LABEL: Record<string, string> = { 식상: "표현·직관 기운", 관성: "책임·충성 기운", 재성: "매력·교류 기운" };
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">십성 세력 — 이 사람의 연애 본능</p>
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">기운 세력 — 이 사람의 연애 본능</p>
               <div className="space-y-2 mb-3">
                 {[sik, gwan, jae].filter(Boolean).map(s => s && (
                   <div key={s.group} className="flex items-start gap-2">
@@ -606,7 +607,7 @@ function SpyContent() {
                       s.status === "보통" ? "bg-sky-900/50 text-sky-300" :
                       s.status === "약함" ? "bg-amber-900/50 text-amber-300" :
                       "bg-white/5 text-gray-500"
-                    }`}>{s.group} · {s.status}</span>
+                    }`}>{GROUP_LABEL[s.group] ?? s.group} · {s.status}</span>
                     <p className="text-xs text-gray-400 leading-relaxed">{s.reason}</p>
                   </div>
                 ))}
@@ -614,17 +615,17 @@ function SpyContent() {
               <div className="pt-2 border-t border-white/5 space-y-1.5">
                 {sik?.status === "강함" && (
                   <p className="text-xs text-rose-300/80 leading-relaxed">
-                    ⚠ 식상이 강해 — 표현 욕구가 크고 자기 감정을 밖으로 드러내야 직성이 풀리는 타입이에요. 관계 안에서 억눌리면 밖에서 위로를 찾는 패턴이 생기기 쉬워요.
+                    ⚠ 표현·직관 기운이 강해 — 표현 욕구가 크고 자기 감정을 밖으로 드러내야 직성이 풀리는 타입이에요. 관계 안에서 억눌리면 밖에서 위로를 찾는 패턴이 생기기 쉬워요.
                   </p>
                 )}
                 {gwan?.status === "강함" && (
                   <p className="text-xs text-sky-300/80 leading-relaxed">
-                    관성이 강해 — 원칙·책임·사회적 시선을 중요하게 생각하는 타입이에요. 충동적인 바람보다는 장기적 관계를 유지하는 경향이 있어요.
+                    책임·충성 기운이 강해 — 원칙·책임·사회적 시선을 중요하게 생각하는 타입이에요. 충동적인 바람보다는 장기적 관계를 유지하는 경향이 있어요.
                   </p>
                 )}
                 {jae?.status === "강함" && (
                   <p className="text-xs text-amber-300/80 leading-relaxed">
-                    재성이 강해 — 이성에게 매력적으로 다가가는 능력과 다양한 인간관계를 동시에 유지하는 성향이 있어요. 한 사람에게만 집중하기보다 넓게 교류하는 패턴이 나타날 수 있어요.
+                    매력·교류 기운이 강해 — 이성에게 매력적으로 다가가는 능력과 다양한 인간관계를 동시에 유지하는 성향이 있어요. 한 사람에게만 집중하기보다 넓게 교류하는 패턴이 나타날 수 있어요.
                   </p>
                 )}
               </div>
@@ -701,7 +702,7 @@ function SpyContent() {
         {/* 이 사람이 나를 좋아할 수 있는 이유 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">사주적으로 나를 좋아하는 이유</p>
-          <p className="text-xs text-gray-600 mb-3">일지 십성(일지 {result.pillarsDetail.day.sipseongJj}) 기반</p>
+          <p className="text-xs text-gray-600 mb-3">일지 기운 분석 기반</p>
           {(() => {
             const ss = result.pillarsDetail.day.sipseongJj;
             const WHY_LIKE: Record<string, string> = {
@@ -716,7 +717,7 @@ function SpyContent() {
               정인: "당신의 지적 깊이와 포용력이 이 사람을 안심시킵니다. 기대고 싶어집니다.",
               편인: "당신의 신비로움과 독립성이 이 사람의 호기심을 끊임없이 자극합니다.",
             };
-            return <p className="text-sm text-gray-200 leading-relaxed">{WHY_LIKE[ss] ?? "상대의 일지 십성 에너지가 당신과 공명합니다."}</p>;
+            return <p className="text-sm text-gray-200 leading-relaxed">{WHY_LIKE[ss] ?? "상대의 일지 기운이 당신과 공명합니다."}</p>;
           })()}
         </div>
 

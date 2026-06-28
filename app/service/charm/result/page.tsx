@@ -261,7 +261,7 @@ function CharmResultContent() {
             </div>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">
               {idata.coreMagic}
-              {hasPyeongwan && ` 여기에 편관(偏官)의 기운까지 더해져서, 말 한마디 안 해도 포스가 느껴지고 함부로 대할 수 없는 압도적인 분위기가 자연스럽게 풍겨나와요. 섹시하면서도 강렬한 인상을 남기는 타입이에요. ${편관Trait.advice}`}
+              {hasPyeongwan && ` 여기에 강인함과 카리스마를 뜻하는 기운까지 더해져서, 말 한마디 안 해도 포스가 느껴지고 함부로 대할 수 없는 압도적인 분위기가 자연스럽게 풍겨나와요. 섹시하면서도 강렬한 인상을 남기는 타입이에요. ${편관Trait.advice}`}
             </p>
             <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5 mb-3">
               <p className="text-xs text-gray-500 mb-1">👁 처음 만난 사람 눈에</p>

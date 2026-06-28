@@ -206,7 +206,7 @@ function analyzeLibido(r: SajuResult, gender: "male"|"female"): LibidoResult {
                  .filter(Boolean) as string[];
   const gwanCount = allSip.filter(s => s.includes("관") || s.includes("살")).length;
   const gwanSalWarning = gwanCount >= 3 && gender === "male"
-    ? "관성이 많고 스트레스를 많이 받는 구조예요. 심리적 압박이 클 때 성욕이 감퇴하거나 발기부전 같은 문제가 나타날 수 있어요. 스트레스 관리가 성생활에도 직결됩니다."
+    ? "조직·규율에 얽매이는 기운이 많아 스트레스를 많이 받는 구조예요. 심리적 압박이 클 때 성욕이 감퇴하거나 발기부전 같은 문제가 나타날 수 있어요. 스트레스 관리가 성생활에도 직결됩니다."
     : null;
 
   let libidomsg = "";
@@ -220,7 +220,7 @@ function analyzeLibido(r: SajuResult, gender: "male"|"female"): LibidoResult {
     }
   } else {
     if (gwanSalWarning) {
-      libidomsg = "관살이 많은 구조라 외부 스트레스에 민감해요. 성욕이 심리 상태에 크게 영향을 받는 타입입니다.";
+      libidomsg = "조직·규율에 얽매이는 기운이 많은 구조라 외부 스트레스에 민감해요. 성욕이 심리 상태에 크게 영향을 받는 타입입니다.";
     } else if (waterStrong) {
       libidomsg = "수(水) 기운이 강해 성적 에너지와 욕구가 충분합니다.";
     } else if ((r.lacking ?? []).includes("수")) {
@@ -250,10 +250,10 @@ function checkSexlessRisk(r1: SajuResult, r2: SajuResult, g1: "male"|"female", g
   const maleSiksangCount = sipM.filter(s => s.includes("식") || s.includes("상")).length;
 
   if (!femaleHasJae && maleGwanCount >= 3) {
-    return "여성의 재성이 없고 남성에게 관성이 많은 조합이에요. 여성은 성적 욕구가 잘 일어나지 않고, 남성은 스트레스로 인한 성욕 감퇴가 생기기 쉬운 구조입니다. 두 사람 모두 솔직한 대화가 필요해요.";
+    return "여성에게 활동적인 재물 기운이 없고 남성에게는 조직·규율에 얽매이는 기운이 많은 조합이에요. 여성은 성적 욕구가 잘 일어나지 않고, 남성은 스트레스로 인한 성욕 감퇴가 생기기 쉬운 구조입니다. 두 사람 모두 솔직한 대화가 필요해요.";
   }
   if (!femaleHasJae && maleSiksangCount === 0) {
-    return "여성의 재성도, 남성의 식상도 사주에서 잘 보이지 않는 구조예요. 남녀 모두 성적인 욕구 표현이 적고 잠자리에 대한 관심 자체가 낮을 수 있어요. 서로 비슷하게 담백한 관계가 될 가능성이 높지만, 점차 섹스리스로 흐르기 쉽습니다.";
+    return "여성의 활동적인 재물 기운도, 남성의 표현력·창의성 기운도 사주에서 잘 보이지 않는 구조예요. 남녀 모두 성적인 욕구 표현이 적고 잠자리에 대한 관심 자체가 낮을 수 있어요. 서로 비슷하게 담백한 관계가 될 가능성이 높지만, 점차 섹스리스로 흐르기 쉽습니다.";
   }
   return null;
 }

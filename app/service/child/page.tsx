@@ -211,7 +211,7 @@ export default function ChildPage() {
 
         {patterns.length > 0 && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-fuchsia-300 mb-2">사주 구조(격국)로 보는 육아 변수</p>
+            <p className="text-sm font-bold text-fuchsia-300 mb-2">사주 전체 구조로 보는 육아 변수</p>
             {patterns.slice(0, 2).map(p => (
               <div key={p.name} className="mb-2 last:mb-0">
                 <p className="text-xs font-bold text-white mb-0.5">{p.name} ({p.hanja})</p>
@@ -248,7 +248,7 @@ export default function ChildPage() {
 
         {childDesc && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-amber-300 mb-1">자녀운의 핵심 기운 — {mainChildKey} ({childDesc.hanja})</p>
+            <p className="text-sm font-bold text-amber-300 mb-1">자녀운의 핵심 기운</p>
             <p className="text-xs text-gray-500 mb-2">{childDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{childDesc.detail}</p>
           </div>

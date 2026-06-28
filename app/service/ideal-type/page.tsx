@@ -25,16 +25,16 @@ const IDEAL: Record<string, { type: string; desc: string; trait: string; warn: s
 
 // 일지 십성 → 배우자 궁 의미
 const DAYJI_SIPSEONG_DESC: Record<string, string> = {
-  비견: "배우자 자리에 비견이 있어, 동등한 관계를 원하고 친구 같은 파트너십을 추구해요.",
-  겁재: "배우자 자리에 겁재가 앉아 있어, 경쟁심이 있는 활기찬 관계를 원하거나 파트너에게 자극을 받고 싶어 하는 경향이 있어요.",
-  식신: "배우자 자리가 식신이라, 여유롭고 나를 편하게 해주는 사람, 함께 있으면 즐거운 사람이 이상형이에요.",
-  상관: "배우자 자리에 상관이 있어, 개성 강하고 자유로운 에너지를 가진 파트너에게 끌려요. 평범한 만남보다 설레는 만남을 원해요.",
-  편재: "배우자 자리에 편재가 있어, 활동적이고 사교적인 파트너를 원해요. 같이 세상을 누비고 싶은 사람을 찾아요.",
-  정재: "배우자 자리에 정재가 자리해, 성실하고 현실적인 사람을 원해요. 함께 안정된 삶을 만들어갈 파트너가 이상적이에요.",
-  편관: "배우자 자리에 편관이 앉아, 강한 카리스마와 추진력을 가진 파트너에게 강하게 끌리는 편이에요.",
-  정관: "배우자 자리에 정관이 있어, 책임감 있고 사회적으로 신뢰받는 사람이 이상형이에요.",
-  편인: "배우자 자리에 편인이 있어, 독특한 감수성이나 예술성, 또는 정신적 깊이를 가진 파트너를 원해요.",
-  정인: "배우자 자리에 정인이 자리해, 포용력 있고 다정하게 이끌어주는 사람에게 안정감을 느껴요.",
+  비견: "배우자 자리의 기운이 '나와 동등한 관계'를 원하는 쪽이라, 동등한 관계를 원하고 친구 같은 파트너십을 추구해요.",
+  겁재: "배우자 자리의 기운이 경쟁심을 자극하는 쪽이라, 경쟁심이 있는 활기찬 관계를 원하거나 파트너에게 자극을 받고 싶어 하는 경향이 있어요.",
+  식신: "배우자 자리의 기운이 여유로운 쪽이라, 여유롭고 나를 편하게 해주는 사람, 함께 있으면 즐거운 사람이 이상형이에요.",
+  상관: "배우자 자리의 기운이 개성과 표현력 쪽이라, 개성 강하고 자유로운 에너지를 가진 파트너에게 끌려요. 평범한 만남보다 설레는 만남을 원해요.",
+  편재: "배우자 자리의 기운이 활동적이고 사교적인 쪽이라, 활동적이고 사교적인 파트너를 원해요. 같이 세상을 누비고 싶은 사람을 찾아요.",
+  정재: "배우자 자리의 기운이 성실하고 현실적인 쪽이라, 성실하고 현실적인 사람을 원해요. 함께 안정된 삶을 만들어갈 파트너가 이상적이에요.",
+  편관: "배우자 자리의 기운이 강한 카리스마 쪽이라, 강한 카리스마와 추진력을 가진 파트너에게 강하게 끌리는 편이에요.",
+  정관: "배우자 자리의 기운이 책임감과 신뢰 쪽이라, 책임감 있고 사회적으로 신뢰받는 사람이 이상형이에요.",
+  편인: "배우자 자리의 기운이 독특한 감수성 쪽이라, 독특한 감수성이나 예술성, 또는 정신적 깊이를 가진 파트너를 원해요.",
+  정인: "배우자 자리의 기운이 포용력 있는 쪽이라, 포용력 있고 다정하게 이끌어주는 사람에게 안정감을 느껴요.",
 };
 
 // 년지 십성 → 초기 이상형 이미지
@@ -50,6 +50,7 @@ const YEARJI_SIPSEONG_DESC: Record<string, string> = {
   편인: "독특하고 신비로운 매력을 가진 사람에게 끌리는 감성이 어릴 때부터 있었어요.",
   정인: "나를 진심으로 아껴줄 포근한 사람을 이상형으로 마음에 그려왔어요.",
 };
+// 위 두 객체는 일지/년지에 드러난 기운을 키로 가진 내부 매핑이며, 값으로 노출되는 문장은 모두 평이한 한국어입니다.
 
 export default function IdealTypePage() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function IdealTypePage() {
             {[
               ["일간 기반 무의식적 끌림", "그 사람이 입으로 말하는 타입과 실제로 끌리는 타입은 다릅니다"],
               ["용신·조후로 보는 에너지 궁합", "사주의 균형을 채워줄 파트너 기운을 정확히 짚어냅니다"],
-              ["관성·재성으로 보는 연애 패턴", "왜 항상 비슷한 사람을 만나는지, 그 이유가 보입니다"],
+              ["끌리는 상대의 패턴 분석", "왜 항상 비슷한 사람을 만나는지, 그 이유가 보입니다"],
               ["피해야 할 상대 유형", "내가 그 유형에 해당하는지 미리 확인해보세요"],
             ].map(([title, desc]) => (
               <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
@@ -223,26 +224,26 @@ export default function IdealTypePage() {
     const hasGyeongwan = sipseongList.includes("편관");
     const hasJeongwan = sipseongList.includes("정관");
     if (gwanStatus === "무") {
-      partnerPatternDesc = "사주에 관성이 없거나 매우 희미해요. 특정 유형의 남성상을 고집하기보다 독립적이고 자유로운 관계를 자연스럽게 선호해요. 상대가 나를 완성시켜줘야 한다는 생각보다, 각자 온전한 상태로 만나는 관계를 추구하는 편이에요.";
+      partnerPatternDesc = "사주에서 '사회적 책임감·통제력'을 뜻하는 기운이 없거나 매우 희미해요. 특정 유형의 남성상을 고집하기보다 독립적이고 자유로운 관계를 자연스럽게 선호해요. 상대가 나를 완성시켜줘야 한다는 생각보다, 각자 온전한 상태로 만나는 관계를 추구하는 편이에요.";
     } else if (hasGyeongwan) {
-      partnerPatternDesc = `편관이 ${gwanStatus}한 사주예요. 카리스마 있고 추진력 강한 남성에게 끌리는 경향이 있어요. 평범하고 무난한 사람보다 강렬한 에너지를 가진 사람이 더 매력적으로 느껴지고, 그 강함이 때로는 자신을 이끌어주길 기대하기도 해요.`;
+      partnerPatternDesc = `사주에서 강한 카리스마와 추진력을 뜻하는 기운이 ${gwanStatus}한 편이에요. 카리스마 있고 추진력 강한 남성에게 끌리는 경향이 있어요. 평범하고 무난한 사람보다 강렬한 에너지를 가진 사람이 더 매력적으로 느껴지고, 그 강함이 때로는 자신을 이끌어주길 기대하기도 해요.`;
     } else if (hasJeongwan) {
-      partnerPatternDesc = `정관이 ${gwanStatus}한 사주예요. 책임감 있고 사회적으로 인정받는 남성상을 이상적으로 생각해요. 신뢰할 수 있고 한결같은 사람에게 진지한 감정이 생기는 편이에요.`;
+      partnerPatternDesc = `사주에서 책임감과 신뢰를 뜻하는 기운이 ${gwanStatus}한 편이에요. 책임감 있고 사회적으로 인정받는 남성상을 이상적으로 생각해요. 신뢰할 수 있고 한결같은 사람에게 진지한 감정이 생기는 편이에요.`;
     } else {
-      partnerPatternDesc = `관성이 ${gwanStatus}한 편이에요. 능력 있고 사회적으로 신뢰받는 파트너를 원해요. 함께 성장할 수 있는 안정감 있는 사람이 이상형이에요.`;
+      partnerPatternDesc = `사주에서 '사회적 책임감·통제력'을 뜻하는 기운이 ${gwanStatus}한 편이에요. 능력 있고 사회적으로 신뢰받는 파트너를 원해요. 함께 성장할 수 있는 안정감 있는 사람이 이상형이에요.`;
     }
   } else {
     const jaeStatus = jaeseong?.status ?? "무";
     const hasPyeonjae = sipseongList.includes("편재");
     const hasJeongjae = sipseongList.includes("정재");
     if (jaeStatus === "무") {
-      partnerPatternDesc = "사주에 재성이 없거나 매우 희미해요. 자유롭고 독립적인 관계를 원하고, 파트너에게 많은 것을 기대하기보다 서로 자기 삶에 충실한 관계를 편하게 느껴요.";
+      partnerPatternDesc = "사주에서 '돈과 활동력'을 뜻하는 기운이 없거나 매우 희미해요. 자유롭고 독립적인 관계를 원하고, 파트너에게 많은 것을 기대하기보다 서로 자기 삶에 충실한 관계를 편하게 느껴요.";
     } else if (hasPyeonjae) {
-      partnerPatternDesc = `편재가 ${jaeStatus}한 사주예요. 자유분방하고 매력적인 여성에게 끌리는 경향이 있어요. 예측 불가능하고 활동적인 에너지를 가진 사람과 함께할 때 설레고 활력이 생겨요.`;
+      partnerPatternDesc = `사주에서 자유분방하고 활동적인 기운이 ${jaeStatus}한 편이에요. 자유분방하고 매력적인 여성에게 끌리는 경향이 있어요. 예측 불가능하고 활동적인 에너지를 가진 사람과 함께할 때 설레고 활력이 생겨요.`;
     } else if (hasJeongjae) {
-      partnerPatternDesc = `정재가 ${jaeStatus}한 사주예요. 성실하고 안정적인 여성상을 이상적으로 생각해요. 함께 현실을 꾸려나갈 수 있는 든든한 파트너를 원하는 경향이 있어요.`;
+      partnerPatternDesc = `사주에서 성실하고 현실적인 기운이 ${jaeStatus}한 편이에요. 성실하고 안정적인 여성상을 이상적으로 생각해요. 함께 현실을 꾸려나갈 수 있는 든든한 파트너를 원하는 경향이 있어요.`;
     } else {
-      partnerPatternDesc = `재성이 ${jaeStatus}한 편이에요. 현실적이고 실속 있는 파트너에게 끌려요. 함께 삶을 꾸려나갈 수 있는 감각 있는 사람이 이상형이에요.`;
+      partnerPatternDesc = `사주에서 '돈과 활동력'을 뜻하는 기운이 ${jaeStatus}한 편이에요. 현실적이고 실속 있는 파트너에게 끌려요. 함께 삶을 꾸려나갈 수 있는 감각 있는 사람이 이상형이에요.`;
     }
   }
 
@@ -339,22 +340,22 @@ export default function IdealTypePage() {
 
         {/* 일지 배우자궁 + 십성 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-cyan-300 mb-2">궁성론(宮星論) — 배우자 자리가 말해주는 이상형</p>
+          <p className="text-sm font-bold text-cyan-300 mb-2">배우자 자리가 말해주는 이상형</p>
           <p className="text-sm text-gray-300 leading-relaxed mb-3">
-            배우자 궁인 일지에 <span className="text-cyan-300 font-semibold">{dayJj}({dayJjSipseong ?? "지지"})</span>이 자리해요.
+            배우자 운을 보는 자리인 일지에 <span className="text-cyan-300 font-semibold">{dayJj}</span>이 자리해요.
             이 자리는 무의식적으로 원하는 파트너의 모습을 담고 있는데, {spouseJjDesc} 사람에게 자연스럽게 끌리는 구조예요.
             {dayJjSipseongDesc && ` ${dayJjSipseongDesc}`}
           </p>
           {yearJjSipseongDesc && (
             <p className="text-sm text-gray-400 leading-relaxed pt-3 border-t border-white/[0.06]">
-              <span className="text-cyan-300/70 font-semibold">년지({yearJj})의 {yearJjSipseong}</span> — {yearJjSipseongDesc}
+              <span className="text-cyan-300/70 font-semibold">년지({yearJj})가 보여주는 어릴 적 끌림</span> — {yearJjSipseongDesc}
             </p>
           )}
         </div>
 
         {/* 관성/재성 기반 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-2">{gender === "female" ? "관성(官星) — 그 사람이 끌리는 남성상" : "재성(財星) — 그 사람이 끌리는 여성상"}</p>
+          <p className="text-sm font-bold text-emerald-300 mb-2">{gender === "female" ? "그 사람이 끌리는 남성상" : "그 사람이 끌리는 여성상"}</p>
           <p className="text-sm text-gray-300 leading-relaxed">{partnerPatternDesc}</p>
         </div>
 
@@ -434,7 +435,7 @@ export default function IdealTypePage() {
         {/* 십성별 영화 취향 */}
         {movieData && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-pink-300 mb-2">사주로 보는 콘텐츠 취향 — {topSipseong} 기질</p>
+            <p className="text-sm font-bold text-pink-300 mb-2">사주로 보는 콘텐츠 취향</p>
             <p className="text-sm text-white font-bold mb-1">"{movieData.movie}" 같은 서사에 끌려요</p>
             <p className="text-xs text-gray-400 leading-relaxed mb-1">{movieData.reason}</p>
             <p className="text-[10px] text-pink-400/60">키워드: {movieData.vibe}</p>
@@ -444,7 +445,7 @@ export default function IdealTypePage() {
         {/* 사주 속 연애 기운 (최다 십성) */}
         {topDesc && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-            <p className="text-sm font-bold text-violet-300 mb-1">사주 속 연애 기운 — {topSipseong} ({topDesc.hanja})</p>
+            <p className="text-sm font-bold text-violet-300 mb-1">사주 속 연애 기운</p>
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
             <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ 그림자 면: {topDesc.shadow}</p>

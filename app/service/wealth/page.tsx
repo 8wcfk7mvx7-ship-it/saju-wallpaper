@@ -62,7 +62,7 @@ export default function WealthPage() {
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
           <div className="inline-block px-3 py-1 rounded-full bg-amber-900/50 border border-amber-700/40 text-amber-300 text-xs font-bold tracking-wider mb-8">
-            ⚠ &quot;무재성&quot;, &quot;재물복 없다&quot;는 말 들어본 사람 필수 확인
+            ⚠ &quot;사주에 돈 들어올 자리가 없다&quot;, &quot;재물복 없다&quot;는 말 들어본 사람 필수 확인
           </div>
           </FadeIn>
           <FadeIn delay={80}>
@@ -83,8 +83,8 @@ export default function WealthPage() {
 
           <div className="w-full space-y-3 mb-10 text-left">
             {[
-              ["재성(財星) 보유 여부", "내 사주에 돈이 들어올 자리가 있는지부터 확인"],
-              ["돈이 새는 구조 진단", "상관생재 · 일주극재 등 재물이 빠져나가는 패턴"],
+              ["재물 기운 보유 여부", "내 사주에 돈이 들어올 자리가 있는지부터 확인"],
+              ["돈이 새는 구조 진단", "재능을 돈으로 못 바꾸는 패턴 · 내가 직접 재물을 깎아먹는 패턴 등 재물이 빠져나가는 흐름"],
               ["재물운 높이는 구체적 방법", "내 오행에 맞는 색상·방향·습관 처방"],
             ].map(([title, desc], i) => (
               <FadeIn key={title} delay={220 + i * 70}>
@@ -223,34 +223,38 @@ export default function WealthPage() {
     비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
     정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
   };
+  const SIPSEONG_OF_GROUP_LABEL: Record<string, string> = {
+    비겁: "동료·경쟁 기운", 식상: "표현·창작 기운", 재성: "재물 기운",
+    관성: "조직·책임 기운", 인성: "학습·전문성 기운",
+  };
   const yongshinGroup = SIPSEONG_GROUP[yongshinSipseong] ?? "재성";
 
   const GROUP_WEALTH_ADVICE: Record<string, { title: string; desc: string }> = {
     식상: {
-      title: "식상(食傷)을 살려 재물을 만드는 구조",
+      title: "표현력·창작력을 살려 재물을 만드는 구조",
       desc: hasSikSangSaengJae
-        ? "용신이 식상 계열이면서 사주 안에 재성도 함께 있습니다. 즉 식상생재(食傷生財) 구조가 성립합니다 — 본인의 재능·아이디어·콘텐츠·기술을 직접 돈으로 연결할 때 재물운이 가장 강하게 작동합니다. 남이 만든 시스템에 들어가 월급을 받는 구조보다, 내가 만든 결과물이 곧 수익이 되는 구조(전문직, 콘텐츠, 1인 사업, 프리랜서)에서 재물운이 크게 열립니다."
-        : "용신이 식상 계열입니다. 식신·상관의 기운, 즉 표현력·기술·생산력을 적극적으로 쓸 때 재물운이 따라옵니다. 다만 사주 안에 재성이 아직 약하므로, 식상으로 만든 가치를 실제 수익 구조(상품화·계약·플랫폼 입점 등)로 연결하는 단계를 의식적으로 만들어야 재물로 전환됩니다.",
+        ? "가장 필요한 기운이 표현력·창작력 계열이면서 사주 안에 재물 기운도 함께 있습니다. 즉 표현력이 재물을 낳는 구조가 성립합니다 — 본인의 재능·아이디어·콘텐츠·기술을 직접 돈으로 연결할 때 재물운이 가장 강하게 작동합니다. 남이 만든 시스템에 들어가 월급을 받는 구조보다, 내가 만든 결과물이 곧 수익이 되는 구조(전문직, 콘텐츠, 1인 사업, 프리랜서)에서 재물운이 크게 열립니다."
+        : "가장 필요한 기운이 표현력·창작력 계열입니다. 표현력·기술·생산력을 적극적으로 쓸 때 재물운이 따라옵니다. 다만 사주 안에 재물 기운이 아직 약하므로, 그렇게 만든 가치를 실제 수익 구조(상품화·계약·플랫폼 입점 등)로 연결하는 단계를 의식적으로 만들어야 재물로 전환됩니다.",
     },
     재성: {
-      title: "재성(財星)이 직접 용신인 구조",
-      desc: "재물 자체가 용신이라, 적극적으로 돈을 벌고 굴리는 활동(영업, 투자, 사업, 부동산 등)이 사주 흐름과 정확히 맞아떨어집니다. 다만 재성이 용신이라는 건 그만큼 재물에 대한 욕심과 기복도 크다는 뜻이라, 분산투자·자동이체 같은 안전장치를 함께 마련해야 들어온 재물이 오래 유지됩니다.",
+      title: "재물 기운이 직접 가장 필요한 구조",
+      desc: "재물 자체가 가장 필요한 기운이라, 적극적으로 돈을 벌고 굴리는 활동(영업, 투자, 사업, 부동산 등)이 사주 흐름과 정확히 맞아떨어집니다. 다만 이 기운이 그만큼 강하다는 건 재물에 대한 욕심과 기복도 크다는 뜻이라, 분산투자·자동이체 같은 안전장치를 함께 마련해야 들어온 재물이 오래 유지됩니다.",
     },
     관성: {
-      title: "관성(官星)을 통해 재물이 들어오는 구조",
-      desc: "용신이 관성 계열이라, 재물이 조직·직책·사회적 신뢰를 통해 안정적으로 들어오는 흐름입니다. 직접 사업·투자로 승부하기보다, 자격·직급·평판을 쌓아 그것이 곧 수입으로 연결되는 구조(승진, 전문직 자격, 공동체 내 신뢰)가 재물운을 가장 안정적으로 키워줍니다.",
+      title: "조직·책임의 기운을 통해 재물이 들어오는 구조",
+      desc: "가장 필요한 기운이 조직·책임 계열이라, 재물이 조직·직책·사회적 신뢰를 통해 안정적으로 들어오는 흐름입니다. 직접 사업·투자로 승부하기보다, 자격·직급·평판을 쌓아 그것이 곧 수입으로 연결되는 구조(승진, 전문직 자격, 공동체 내 신뢰)가 재물운을 가장 안정적으로 키워줍니다.",
     },
     인성: {
-      title: "인성(印星)을 통해 재물의 기반을 다지는 구조",
+      title: "학습·전문성의 기운을 통해 재물의 기반을 다지는 구조",
       desc: hasJaeGeukIn
-        ? "용신은 인성 계열인데 재성이 강해 재극인(財剋印) 구조가 함께 나타납니다 — 돈 욕심이 앞서면 오히려 공부·자격·후원 같은 인성의 기운을 깎아먹어 장기적인 재물 기반이 약해질 수 있습니다. 단기적인 돈벌이보다 자격·학위·전문성 같은 '나의 가치'를 먼저 쌓는 쪽에 우선순위를 둘 때 재물이 훨씬 오래 따라옵니다."
-        : "용신이 인성 계열입니다. 공부·자격·문서·후원 같은 인성의 기운을 먼저 채워야 재물의 그릇이 커집니다. 당장의 수익보다 전문성과 신용을 쌓는 투자(교육, 자격증, 학습)가 장기적으로 훨씬 큰 재물로 돌아옵니다.",
+        ? "가장 필요한 기운은 학습·전문성 계열인데 재물 기운이 강해, 돈 욕심이 학습·전문성 기운을 깎아먹는 구조가 함께 나타납니다 — 돈 욕심이 앞서면 오히려 공부·자격·후원 같은 기운을 깎아먹어 장기적인 재물 기반이 약해질 수 있습니다. 단기적인 돈벌이보다 자격·학위·전문성 같은 '나의 가치'를 먼저 쌓는 쪽에 우선순위를 둘 때 재물이 훨씬 오래 따라옵니다."
+        : "가장 필요한 기운이 학습·전문성 계열입니다. 공부·자격·문서·후원 같은 기운을 먼저 채워야 재물의 그릇이 커집니다. 당장의 수익보다 전문성과 신용을 쌓는 투자(교육, 자격증, 학습)가 장기적으로 훨씬 큰 재물로 돌아옵니다.",
     },
     비겁: {
-      title: "비겁(比劫)의 협력을 통해 재물을 키우는 구조",
+      title: "동료와의 협력을 통해 재물을 키우는 구조",
       desc: bigeopCount >= 2 && jaeseongCount >= 1
-        ? "용신이 비겁 계열인데 재성과 비겁이 함께 자리하고 있어, 혼자보다 동업·협업·공동 투자 형태에서 재물이 커지는 구조입니다. 다만 비겁이 강하면 재물을 나눠야 하는 상황도 함께 따라오니, 동업 시 지분·역할을 명확히 문서화하는 것이 중요합니다."
-        : "용신이 비겁 계열입니다. 혼자 끌어안고 키우기보다, 믿을 만한 동료·파트너와 함께 일을 벌릴 때 재물의 그릇이 커지는 구조입니다. 사람과의 신뢰 관계 자체가 재물운의 핵심 자산이 됩니다.",
+        ? "가장 필요한 기운이 동료·경쟁 계열인데 재물 기운과 함께 자리하고 있어, 혼자보다 동업·협업·공동 투자 형태에서 재물이 커지는 구조입니다. 다만 이 기운이 강하면 재물을 나눠야 하는 상황도 함께 따라오니, 동업 시 지분·역할을 명확히 문서화하는 것이 중요합니다."
+        : "가장 필요한 기운이 동료·경쟁 계열입니다. 혼자 끌어안고 키우기보다, 믿을 만한 동료·파트너와 함께 일을 벌릴 때 재물의 그릇이 커지는 구조입니다. 사람과의 신뢰 관계 자체가 재물운의 핵심 자산이 됩니다.",
     },
   };
   const wealthAdvice = GROUP_WEALTH_ADVICE[yongshinGroup];
@@ -273,27 +277,27 @@ export default function WealthPage() {
         </div>
 
         <div className={`rounded-3xl p-6 mb-5 text-center border ${hasMuJae ? "bg-gradient-to-br from-rose-950/60 to-amber-950/40 border-rose-700/30" : "bg-gradient-to-br from-amber-950/60 to-yellow-950/40 border-amber-700/30"}`}>
-          <p className="text-amber-300 text-xs font-bold tracking-widest uppercase mb-2">재성(財星) 진단</p>
+          <p className="text-amber-300 text-xs font-bold tracking-widest uppercase mb-2">재물 기운 진단</p>
           {hasMuJae ? (
             <>
-              <p className="text-xl font-black leading-snug mb-1">무재성(無財星) 사주</p>
-              <p className="text-sm text-gray-300 leading-relaxed">사주 원국에 정재·편재가 보이지 않습니다. 흔히 &quot;재물복이 없다&quot;고 오해하는 구조지만, 정확히는 <span className="text-amber-300 font-bold">&apos;돈을 버는 방식이 다른 사람과 다르다&apos;</span>는 뜻입니다. 직접 돈을 좇기보다, 재능·전문성으로 돈이 따라오게 만드는 구조가 훨씬 유리합니다.</p>
+              <p className="text-xl font-black leading-snug mb-1">재물 기운이 보이지 않는 사주</p>
+              <p className="text-sm text-gray-300 leading-relaxed">사주 원국에 재물을 뜻하는 기운이 보이지 않습니다. 흔히 &quot;재물복이 없다&quot;고 오해하는 구조지만, 정확히는 <span className="text-amber-300 font-bold">&apos;돈을 버는 방식이 다른 사람과 다르다&apos;</span>는 뜻입니다. 직접 돈을 좇기보다, 재능·전문성으로 돈이 따라오게 만드는 구조가 훨씬 유리합니다.</p>
             </>
           ) : (
             <>
-              <p className="text-xl font-black leading-snug mb-1">재성 {jaeseongCount}개 보유</p>
-              <p className="text-sm text-gray-300 leading-relaxed">사주 안에 재물을 의미하는 정재·편재 기운이 자리하고 있습니다. 다만 재성이 있다고 끝이 아니라, 그 재물을 <span className="text-amber-300 font-bold">지키고 굴리는 구조</span>가 더 중요합니다. 아래 진단을 확인하세요.</p>
+              <p className="text-xl font-black leading-snug mb-1">재물 기운 {jaeseongCount}개 보유</p>
+              <p className="text-sm text-gray-300 leading-relaxed">사주 안에 재물을 의미하는 기운이 자리하고 있습니다. 다만 이 기운이 있다고 끝이 아니라, 그 재물을 <span className="text-amber-300 font-bold">지키고 굴리는 구조</span>가 더 중요합니다. 아래 진단을 확인하세요.</p>
             </>
           )}
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-amber-300 mb-1">
-            사주 구조 진단 — 용신 &apos;{yongshinEl}&apos; ({yongshinSipseong})
+            사주 구조 진단 — 가장 필요한 기운 &apos;{yongshinEl}&apos; ({SIPSEONG_OF_GROUP_LABEL[yongshinGroup]})
           </p>
           <p className="text-xs text-gray-500 mb-2">{r.yongshin.desc}</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            사주 전체의 기운이 균형을 이루려면 무엇이 더 필요한지를 따져보면, 이 사주가 가장 필요로 하는 기운(용신)은 &apos;{yongshinEl}&apos; — 십성으로는 {yongshinSipseong} 계열입니다. 재물운은 단순히 재성(財星)의 유무가 아니라, <span className="text-amber-300 font-bold">이 용신이 어떤 십성으로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.{ilgan === "경" && " 경금은 누군가 도와주는 기운을 크게 받기보다, 비슷한 기운이 곁에서 함께 받쳐줄 때 더 단단해지는 구조예요. 도와주는 기운이 너무 많으면 오히려 장점이 죽고, 적당히 적게 있는 정도가 가장 잘 맞습니다. 책임감을 다스리는 기운을 유독 잘 다루는 일간이라, 재물이 책임감 기운으로 흘러가는 루트를 가장 능숙하게 쓸 줄 알고, 재물을 다루는 솜씨도 좋은 편인데 단순한 사업가형보다는 판을 짜고 이끄는 통치자형에 가깝습니다."}{SPEND_TO_EARN_ILGAN[ilgan] && ` ${SPEND_TO_EARN_ILGAN[ilgan].desc} 쓰면 좋은 곳은 ${SPEND_TO_EARN_ILGAN[ilgan].where}`}
+            사주 전체의 기운이 균형을 이루려면 무엇이 더 필요한지를 따져보면, 이 사주가 가장 필요로 하는 기운은 &apos;{yongshinEl}&apos; — 구체적으로는 {SIPSEONG_OF_GROUP_LABEL[yongshinGroup]} 계열입니다. 재물운은 단순히 재물 기운의 유무가 아니라, <span className="text-amber-300 font-bold">이 필요한 기운이 어떤 형태로 작동하는지</span>에 따라 돈이 들어오는 &apos;루트&apos;가 완전히 달라집니다.{ilgan === "경" && " 경금은 누군가 도와주는 기운을 크게 받기보다, 비슷한 기운이 곁에서 함께 받쳐줄 때 더 단단해지는 구조예요. 도와주는 기운이 너무 많으면 오히려 장점이 죽고, 적당히 적게 있는 정도가 가장 잘 맞습니다. 책임감을 다스리는 기운을 유독 잘 다루는 일간이라, 재물이 책임감 기운으로 흘러가는 루트를 가장 능숙하게 쓸 줄 알고, 재물을 다루는 솜씨도 좋은 편인데 단순한 사업가형보다는 판을 짜고 이끄는 통치자형에 가깝습니다."}{SPEND_TO_EARN_ILGAN[ilgan] && ` ${SPEND_TO_EARN_ILGAN[ilgan].desc} 쓰면 좋은 곳은 ${SPEND_TO_EARN_ILGAN[ilgan].where}`}
           </p>
         </div>
 
@@ -313,7 +317,7 @@ export default function WealthPage() {
 
         {moneyCombo && (
           <div className="bg-white/[0.03] border border-rose-700/20 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-rose-300 mb-1">⚠ 돈이 새는 구조 — {moneyCombo.name} ({moneyCombo.hanja})</p>
+            <p className="text-sm font-bold text-rose-300 mb-1">⚠ 돈이 새는 구조</p>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">{moneyCombo.desc}</p>
             <p className="text-xs text-emerald-300 font-bold">▶ 처방: {moneyCombo.advice}</p>
           </div>
@@ -335,7 +339,7 @@ export default function WealthPage() {
 
         {topDesc && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-            <p className="text-sm font-bold text-violet-300 mb-1">사주에서 가장 강한 기운 — {topSipseong} ({topDesc.hanja})</p>
+            <p className="text-sm font-bold text-violet-300 mb-1">사주에서 가장 강한 기운 — {SIPSEONG_OF_GROUP_LABEL[SIPSEONG_GROUP[topSipseong as string]] ?? topSipseong}</p>
             <p className="text-xs text-gray-500 mb-2">{topDesc.short}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{topDesc.detail}</p>
             <p className="text-sm text-amber-200/80 leading-relaxed mt-3 pt-3 border-t border-white/10">⚠️ {topDesc.shadow}</p>
