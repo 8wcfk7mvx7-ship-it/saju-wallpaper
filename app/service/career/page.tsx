@@ -7,6 +7,7 @@ import { SIPSEONG_DESC, detectExcessPatterns, BIGEOB_EXCESS_DESC, detectGumsuSan
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ShareImageButton from "@/components/ShareImageButton";
+import OhaengDonut from "@/components/OhaengDonut";
 
 export const dynamic = "force-dynamic";
 
@@ -344,6 +345,10 @@ export default function CareerPage() {
             {ilgan}{r.pillarsDetail.day.jj}일주 {form.name}님
           </h1>
           <p className="text-lg font-bold text-indigo-300">{form.name}님과 잘 맞는 직업은?</p>
+        </div>
+
+        <div className="flex justify-center mb-5">
+          <OhaengDonut scores={r.scores} />
         </div>
 
         {/* 섹션 1 — 나와 잘 맞는 직업 */}
