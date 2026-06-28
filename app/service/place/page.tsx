@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import { analyzeSaju, getJohuCareerInsight, getGungseongCareerSummary, getJijiRelations, type SajuResult } from "@/lib/saju";
+import { ILGAN_COUNTRY } from "@/lib/saju2";
+import { eunNeun } from "@/lib/josa";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 
@@ -428,9 +430,9 @@ export default function PlacePage() {
                 : "bg-white/5 border-white/10"}`}>
               <p className="text-sm font-bold mb-1">
                 {currentCityEl === displayEl
-                  ? `✅ ${currentCity}은 사주와 잘 맞습니다`
+                  ? `✅ ${currentCity}${eunNeun(currentCity)} 사주와 잘 맞습니다`
                   : currentCityEl
-                    ? `⚠️ ${currentCity}은 사주와 기운이 다릅니다`
+                    ? `⚠️ ${currentCity}${eunNeun(currentCity)} 사주와 기운이 다릅니다`
                     : `🔍 ${currentCity} 기운 분석`}
               </p>
               <p className="text-xs text-white/45 leading-relaxed">
@@ -565,6 +567,15 @@ export default function PlacePage() {
               <h2 className="text-sm font-bold text-white/70">🌍 추천 해외 국가</h2>
               <span className="text-xs text-white/25">3순위 무료 공개</span>
             </div>
+            {sajuResult && (() => {
+              const ilganCountry = ILGAN_COUNTRY[sajuResult.pillarsDetail.day.cg];
+              if (!ilganCountry) return null;
+              return (
+                <p className="text-[11px] text-white/30 leading-relaxed mb-3">
+                  태어난 날의 기운(일간) 기준으로 잘 통하는 나라: {ilganCountry.countries.map(c => c.note ? `${c.name}(${c.note})` : c.name).join("·")}
+                </p>
+              );
+            })()}
             <div className="space-y-3">
               {worldData.countries.map((country, i) => {
                 const isBlurred = i < 2 && !unlocked;

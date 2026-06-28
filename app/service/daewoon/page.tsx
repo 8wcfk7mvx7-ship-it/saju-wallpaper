@@ -5,6 +5,7 @@ import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
 import { analyzeSaju, calcDaewoon, calcSewoon, ILGAN_PERSONALITY, getSipseong, getUunseong, getDayPillar, getJijiRelations, CHEONGAN_ELEMENT } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
+import { getDaewoonIljiYukhapNote } from "@/lib/saju2";
 import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
@@ -721,7 +722,7 @@ export default function DaewoonPage() {
                 {uunsF && (
                   <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.3)" }}>
                     <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {name}님에게 미치는 영향</p>
-                    <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}</p>
+                    <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj)}`}</p>
                   </div>
                 )}
 
@@ -806,7 +807,7 @@ export default function DaewoonPage() {
                   {uunsF && (
                     <div className="px-4 pb-3 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                       <p className="text-xs font-bold mt-3 mb-1.5" style={{ color: uunsF.color }}>{uunsF.label} — {p.uunseong}</p>
-                      <p className="text-xs text-gray-300 leading-relaxed">{uunsF.narrative}</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj)}`}</p>
                       <p className="text-xs text-gray-500 leading-relaxed mt-2">{uunsF.caution}</p>
                     </div>
                   )}
