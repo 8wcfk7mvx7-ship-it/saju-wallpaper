@@ -29,6 +29,7 @@ import {
   getIljuAnimal,
   detectGagukPatterns,
   getGeumMokGwadaNarrative,
+  getSipseongStrength,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE } from "@/lib/saju2";
@@ -1443,6 +1444,25 @@ function ResultView({
               </div>
             </div>
           )}
+        </div>
+      </Section>
+
+      {/* 비겁·식상·재성·관성·인성 그룹별 강약 해석 */}
+      <Section title="십성 그룹별 강약 — 비겁·식상·재성·관성·인성" accent="#a78bfa">
+        <div className="space-y-2.5">
+          {getSipseongStrength(result).map(s => {
+            const statusColor = s.status === "강함" ? "#34d399" : s.status === "보통" ? "#60a5fa" : s.status === "약함" ? "#fbbf24" : "rgba(255,255,255,0.35)";
+            const statusBg = s.status === "강함" ? "rgba(52,211,153,0.08)" : s.status === "보통" ? "rgba(96,165,250,0.08)" : s.status === "약함" ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.03)";
+            return (
+              <div key={s.group} className="rounded-xl px-4 py-3" style={{ background: statusBg, border: `1px solid ${statusColor}30` }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-black" style={{ color: statusColor }}>{s.group}</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: `${statusColor}22`, color: statusColor }}>{s.status}</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{s.reason}</p>
+              </div>
+            );
+          })}
         </div>
       </Section>
 
