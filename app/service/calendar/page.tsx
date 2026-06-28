@@ -18,17 +18,18 @@ type Step = "splash" | "input" | "result";
 type CalType = "solar" | "lunar";
 
 const EVENT_TYPES = [
-  { id: "이사", label: "이사일", icon: "🏠", desc: "새 집으로 이동하는 날" },
-  { id: "결혼", label: "결혼·혼인신고", icon: "💍", desc: "인생 최고의 날 선택" },
-  { id: "시험", label: "시험·면접", icon: "📝", desc: "중요한 시험·면접일" },
-  { id: "개업", label: "개업·창업", icon: "🏪", desc: "사업 시작일" },
-  { id: "계약", label: "계약·서류", icon: "📋", desc: "중요 계약·서명일" },
-  { id: "수술", label: "수술·시술", icon: "🏥", desc: "수술·의료 시술일" },
-  { id: "여행", label: "여행 출발", icon: "✈️", desc: "여행·출장 출발일" },
-  { id: "투자", label: "투자·거래", icon: "💰", desc: "주식·부동산 계약일" },
-  { id: "연애", label: "연애 시작", icon: "💑", desc: "고백·첫 만남일" },
-  { id: "임신", label: "임신 준비", icon: "🌱", desc: "임신·출산 준비 시작일" },
+  { id: "이사", label: "이사일", icon: "🏠", desc: "새 집으로 이동하는 날", category: "생활" },
+  { id: "결혼", label: "결혼·혼인신고", icon: "💍", desc: "인생 최고의 날 선택", category: "인연" },
+  { id: "시험", label: "시험·면접", icon: "📝", desc: "중요한 시험·면접일", category: "사업·학업" },
+  { id: "개업", label: "개업·창업", icon: "🏪", desc: "사업 시작일", category: "사업·학업" },
+  { id: "계약", label: "계약·서류", icon: "📋", desc: "중요 계약·서명일", category: "금전·계약" },
+  { id: "수술", label: "수술·시술", icon: "🏥", desc: "수술·의료 시술일", category: "건강" },
+  { id: "여행", label: "여행 출발", icon: "✈️", desc: "여행·출장 출발일", category: "생활" },
+  { id: "투자", label: "투자·거래", icon: "💰", desc: "주식·부동산 계약일", category: "금전·계약" },
+  { id: "연애", label: "연애 시작", icon: "💑", desc: "고백·첫 만남일", category: "인연" },
+  { id: "임신", label: "임신 준비", icon: "🌱", desc: "임신·출산 준비 시작일", category: "건강" },
 ];
+const EVENT_CATEGORIES = ["인연", "금전·계약", "사업·학업", "건강", "생활"];
 
 const DAYS_LABEL = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -423,18 +424,25 @@ export default function CalendarPage() {
           <div>
             <label className="block text-sm text-white/50 mb-2 font-semibold uppercase tracking-wider">궁금한 날짜 <span className="text-emerald-400">*</span></label>
             <p className="text-[13px] text-white/25 mb-3">출생일은 선택할 수 없습니다</p>
-            <div className="grid grid-cols-2 gap-2">
-              {EVENT_TYPES.map(e => (
-                <button key={e.id} onClick={() => setSelectedEvent(e.id)}
-                  className="flex items-center gap-2 px-3 py-3 rounded-xl border text-base font-semibold text-left transition"
-                  style={{
-                    borderColor: selectedEvent === e.id ? "#10b981" : "rgba(255,255,255,0.1)",
-                    background: selectedEvent === e.id ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)",
-                    color: selectedEvent === e.id ? "#34d399" : "rgba(255,255,255,0.55)",
-                  }}>
-                  <span className="text-xl shrink-0">{e.icon}</span>
-                  <span className="leading-tight text-sm">{e.label}</span>
-                </button>
+            <div className="space-y-4">
+              {EVENT_CATEGORIES.map(cat => (
+                <div key={cat}>
+                  <p className="text-[12px] font-bold mb-1.5" style={{ color: "rgba(16,185,129,0.6)" }}>{cat}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {EVENT_TYPES.filter(e => e.category === cat).map(e => (
+                      <button key={e.id} onClick={() => setSelectedEvent(e.id)}
+                        className="flex items-center gap-2 px-3 py-3 rounded-xl border text-base font-semibold text-left transition"
+                        style={{
+                          borderColor: selectedEvent === e.id ? "#10b981" : "rgba(255,255,255,0.1)",
+                          background: selectedEvent === e.id ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.04)",
+                          color: selectedEvent === e.id ? "#34d399" : "rgba(255,255,255,0.55)",
+                        }}>
+                        <span className="text-xl shrink-0">{e.icon}</span>
+                        <span className="leading-tight text-sm">{e.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
