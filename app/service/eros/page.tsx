@@ -290,8 +290,7 @@ function ErosContent() {
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">19금</div>
-          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight">
+          <h1 className="text-4xl font-black mb-4 leading-tight tracking-tight mt-8">
             나의 성적<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-400">매력은?</span>
           </h1>
@@ -365,41 +364,93 @@ function ErosContent() {
   if (!result) return null;
 
   const hasSinsal = (n: string) => result.sinsalList.some(s => s.name === n);
+  const getSinsalPillars = (n: string) => result.sinsalList.find(s => s.name === n)?.pillars ?? [];
   const has도화   = hasSinsal("도화살");
   const has홍염   = hasSinsal("홍염살");
   const has진도화  = hasSinsal("진도화");
   const has역마   = hasSinsal("역마살");
+  const has편야도화 = hasSinsal("편야도화");
+  const has나체도화 = hasSinsal("나체도화");
+  const has곤랑도화 = hasSinsal("곤랑도화");
+  const has녹방도화 = hasSinsal("녹방도화");
   const _rpd = result.pillarsDetail;
   const hasMokYok = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).some(p => p?.uunseong === "목욕");
+  const mokYokStrong = _rpd.day?.uunseong === "목욕" || _rpd.hour?.uunseong === "목욕";
   const erosAllSipseong = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
   const hasPyeongwan = erosAllSipseong.includes("편관");
   const haHwa     = result.dominant.includes("화");
 
-  // 음간(을·정·기·신·계) = 음기 강함
+  // 음간(을·정·기·신·계)=음기, 양간(갑·병·무·경·임)=양기 — 매력 보너스를 성별과 무관하게 대칭으로 계산
   const 음간목록 = ["을","정","기","신","계"];
+  const 양간목록 = ["갑","병","무","경","임"];
   const ilganForScore = result.pillarsDetail.day.cg;
   const is음간 = 음간목록.includes(ilganForScore);
-  // 수기운 점수: 수 오행 포함 기둥 수 (임·계 천간, 자·해 지지 포함)
+  const is양간 = 양간목록.includes(ilganForScore);
   const 수기운천간 = ["임","계"];
   const 수기운지지 = ["자","해","축"];
+  const 화목기운천간 = ["갑","을","병","정"];
+  const 화목기운지지 = ["인","묘","사","오"];
   const pd = result.pillarsDetail;
   const 수기운기둥수 = [pd.year, pd.month, pd.day, pd.hour].filter(p => p && (
     수기운천간.includes(p.cg) || 수기운지지.includes(p.jj))
   ).length;
+  const 화목기운기둥수 = [pd.year, pd.month, pd.day, pd.hour].filter(p => p && (
+    화목기운천간.includes(p.cg) || 화목기운지지.includes(p.jj))
+  ).length;
   const has수기운강 = 수기운기둥수 >= 2 || result.dominant.includes("수");
+  const has화목기운강 = 화목기운기둥수 >= 2 || result.dominant.includes("화") || result.dominant.includes("목");
 
-  let rawScore = 0;
-  if (has홍염)   rawScore += 30;
-  if (has진도화) rawScore += 25;
-  if (has도화)   rawScore += 20;
-  if (hasMokYok) rawScore += 25;
-  if (has역마)   rawScore += 10;
-  if (haHwa)     rawScore += 10;
-  // 여성: 수기운·음간·음기 보너스 (명기력)
-  if (form.gender === "female") {
-    if (has수기운강) rawScore += 15;
-    if (is음간)      rawScore += 10;
+  // ── 매력 점수 산출 ───────────────────────────────────────────────────────
+  // 신호 하나당 위치(연/월=약, 일/시=강) 가중치를 매기고, 신호가 여러 개 겹치면
+  // 단순 합산이 아니라 시너지 보너스가 추가로 붙는 구조. 점수 구성은 화면에 그대로 노출된다.
+  type ScoreFactor = { label: string; points: number; reason: string };
+  const factors: ScoreFactor[] = [];
+  let coreSignalCount = 0;
+
+  // 도화 계열은 "다수에게 풍기는 매력"이라 1대1 색기 신호인 홍염보다 기본적으로 더 강하게 잡는다.
+  // 편야도화/가도화는 위치 개수에 따른 상호배타적 등급, 진도화·나체도화·녹방도화·곤랑도화는 각각 독립적으로 추가된다.
+  if (has편야도화) {
+    factors.push({ label: "도화 기운 (전방위형)", points: 24, reason: "사주 곳곳에 퍼진 압도적인 인기 신호" });
+    coreSignalCount++;
+  } else if (has도화) {
+    const dohwaPillars = getSinsalPillars("도화살");
+    const strong = dohwaPillars.includes("일") || dohwaPillars.includes("시");
+    factors.push({ label: `도화 기운 (${dohwaPillars.join("·")}주)`, points: strong ? 14 : 9, reason: strong ? "본인의 매력으로 직접 드러나는 신호" : "분위기·환경에서 묻어나는 신호" });
+    coreSignalCount++;
   }
+
+  if (has홍염) { factors.push({ label: "홍염 기운", points: 21, reason: "한 사람에게 강하게 꽂히는 1대1 색기 신호" }); coreSignalCount++; }
+
+  if (has진도화)  { factors.push({ label: "도화 기운 (진성)",     points: 30, reason: "타고난 진짜 인기 신호 — 다수에게 풍기는 매력의 정점" }); coreSignalCount++; }
+  if (has나체도화) { factors.push({ label: "본능형 일주 구조",     points: 30, reason: "솔직하고 직관적인 매력의 일주" }); coreSignalCount++; }
+  if (has녹방도화) { factors.push({ label: "격있는 도화 기운",     points: 30, reason: "품격과 함께 자리한 매력" }); coreSignalCount++; }
+  if (has곤랑도화) { factors.push({ label: "합·형 색기 구조",      points: 15, reason: "흔치 않지만 결이 다른 색기 구조" }); coreSignalCount++; }
+
+  if (hasMokYok) {
+    factors.push({ label: "관능 기운", points: mokYokStrong ? 22 : 13, reason: mokYokStrong ? "본인 매력·관능이 가장 강하게 드러나는 자리" : "관능적 감각을 타고난 기운" });
+    coreSignalCount++;
+  }
+
+  if (has역마) factors.push({ label: "활동적인 매력", points: 8, reason: "자유롭고 역동적인 인상" });
+  if (haHwa)   factors.push({ label: "화(火) 기운 우세", points: 10, reason: "열정적이고 표현력 있는 매력" });
+
+  if (form.gender === "female") {
+    if (has수기운강) factors.push({ label: "깊은 음기·물 기운", points: 15, reason: "깊고 농밀한 흡인력" });
+    if (is음간)      factors.push({ label: "음간 일간", points: 10, reason: "은근하고 깊은 음기의 매력" });
+  } else {
+    if (has화목기운강) factors.push({ label: "뜨거운 양기·화목 기운", points: 15, reason: "적극적이고 강한 흡인력" });
+    if (is양간)        factors.push({ label: "양간 일간", points: 10, reason: "강하고 적극적인 양기의 매력" });
+  }
+
+  let comboBonus = 0;
+  if (coreSignalCount >= 4) comboBonus = 36;
+  else if (coreSignalCount >= 3) comboBonus = 22;
+  else if (coreSignalCount >= 2) comboBonus = 10;
+  if (comboBonus > 0) {
+    factors.push({ label: "매력 신호 동시 발현", points: comboBonus, reason: `${coreSignalCount}가지 매력 신호가 겹쳐 서로를 증폭시킴` });
+  }
+
+  const rawScore = factors.reduce((sum, f) => sum + f.points, 0);
   const score = Math.min(rawScore, 100);
 
   const grade  = getGrade(score);
@@ -492,7 +543,6 @@ function ErosContent() {
 
         {/* 헤더 */}
         <div className="text-center mb-6">
-          <div className="inline-block px-2 py-0.5 rounded-full bg-rose-900/40 border border-rose-700/30 text-rose-400 text-[10px] font-bold tracking-wider mb-2">19금</div>
           <h2 className="text-3xl font-black mb-1">나의 성적 매력</h2>
           <p className="text-gray-400 text-xs">{result.fourPillars}</p>
         </div>
@@ -515,6 +565,26 @@ function ErosContent() {
           </div>
           <p className="text-sm text-gray-300 leading-relaxed">{grade.desc}</p>
           <p className="text-sm font-bold mt-2" style={{ color: grade.color }}>→ {grade.oneliner}</p>
+
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-2.5">점수 구성</p>
+            <div className="space-y-2">
+              {factors.map((f, i) => (
+                <div key={i} className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-200">{f.label}</p>
+                    <p className="text-[11px] text-gray-500">{f.reason}</p>
+                  </div>
+                  <span className="text-sm font-bold shrink-0" style={{ color: grade.color }}>+{f.points}</span>
+                </div>
+              ))}
+            </div>
+            {rawScore > 100 && (
+              <p className="text-[11px] text-gray-500 mt-2.5 pt-2.5 border-t border-white/5">
+                합산 {rawScore}점 → 100점 만점 기준 {score}점으로 환산
+              </p>
+            )}
+          </div>
         </div>
 
         {/* ①-2 요망력 */}
