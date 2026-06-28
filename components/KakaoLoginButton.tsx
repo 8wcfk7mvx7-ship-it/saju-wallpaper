@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface NaverUser {
   naverId: string;
@@ -20,18 +21,13 @@ function parseUser(): NaverUser | null {
   }
 }
 
-const NaverIcon = ({ size = 20 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" fill="#fff"/>
-  </svg>
-);
-
 interface KakaoLoginButtonProps {
   redirectTo?: string;
   floating?: boolean;
 }
 
 export default function KakaoLoginButton({ redirectTo = "/", floating = false }: KakaoLoginButtonProps) {
+  const router = useRouter();
   const [user, setUser] = useState<NaverUser | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -69,14 +65,13 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
       );
     }
     return (
-      <a
-        href={`/api/auth/naver?redirect=${encodeURIComponent(redirectTo)}`}
+      <button
+        onClick={() => router.push(`/login-select?redirect=${encodeURIComponent(redirectTo)}`)}
         className="flex items-center justify-center gap-2.5 w-full py-3 rounded-2xl font-black text-white transition-all active:scale-[0.99] whitespace-nowrap overflow-hidden"
-        style={{ background: "#03C75A", boxShadow: "0 4px 20px rgba(3,199,90,0.3)" }}
+        style={{ background: "#6366f1", boxShadow: "0 4px 20px rgba(99,102,241,0.3)" }}
       >
-        <NaverIcon size={20} />
-        <span className="text-[14px]">네이버로 시작하기</span>
-      </a>
+        <span className="text-[14px]">로그인하기</span>
+      </button>
     );
   }
 
@@ -96,14 +91,13 @@ export default function KakaoLoginButton({ redirectTo = "/", floating = false }:
   }
 
   return (
-    <a
-      href={`/api/auth/naver?redirect=${encodeURIComponent(redirectTo)}`}
+    <button
+      onClick={() => router.push(`/login-select?redirect=${encodeURIComponent(redirectTo)}`)}
       className="inline-flex items-center gap-1.5 text-white font-black text-xs px-3 py-2 rounded-xl transition-all whitespace-nowrap"
-      style={{ background: "#03C75A" }}
+      style={{ background: "#6366f1" }}
     >
-      <NaverIcon size={16} />
-      <span>네이버로 시작하기</span>
-    </a>
+      <span>로그인하기</span>
+    </button>
   );
 }
 
