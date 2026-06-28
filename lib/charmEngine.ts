@@ -417,6 +417,17 @@ export const SAL_CHARM_DB: SalCharmData[] = [
     withoutSal: "월덕귀인은 없지만 햇빛처럼 밝고 선명한 매력이 있습니다.",
   },
   {
+    key: "학당귀인",
+    cat: "🎓 학당귀인(學堂貴人)",
+    name: "학당귀인",
+    icon: "🎓",
+    color: "linear-gradient(135deg, #5eead4, #14b8a6)",
+    charmGrade: 2,
+    oneliner: "공부 운과 복이 함께 따라오는, 가방끈 긴 귀인",
+    withSal: "학당귀인 보유자. 귀인 중에서도 상급으로 꼽히는 기운. 어떤 자리에서든 무게중심 역할을 하고, 윗사람이 먼저 신뢰를 보내는 분위기가 있습니다. 말이 많지 않아도 묘하게 시선을 끄는 존재감이 매력으로 작용합니다.",
+    withoutSal: "학당귀인은 없지만 더 활달하고 표현이 풍부한 매력이 있습니다.",
+  },
+  {
     key: "반안살",
     cat: "🛡️ 반안살(攀鞍殺)",
     name: "반안살",
@@ -841,6 +852,16 @@ export interface CharmGradeResult {
   breakdown: { sal: number; ilgan: number; base: number };
 }
 
+// 학당귀인은 개수에 따라 매력 점수가 차등 부여돼요 (1개 +2점, 2개 +3점, 3개 이상 +4점)
+export function getSalCharmGrade(sal: SalCharmData, result: SajuResult): number {
+  if (sal.key === "학당귀인") {
+    const count = result.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;
+    if (count <= 0) return 0;
+    return Math.min(count, 3) + 1;
+  }
+  return sal.charmGrade;
+}
+
 // ── 매력 점수 계산 ─────────────────────────────────────────────────────────────
 export function calcCharmGrade(result: SajuResult): CharmGradeResult {
   const sinsalNames = result.sinsalList.map(s => s.name);
@@ -850,7 +871,7 @@ export function calcCharmGrade(result: SajuResult): CharmGradeResult {
   let salScore = 0;
   for (const sal of SAL_CHARM_DB) {
     if (sinsalNames.includes(sal.key)) {
-      salScore += sal.charmGrade;
+      salScore += getSalCharmGrade(sal, result);
     }
   }
 

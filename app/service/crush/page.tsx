@@ -34,6 +34,7 @@ import {
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+  getGwanseongSiksangYeonaeNarrative,
 } from "@/lib/saju";
 import HapchungDiagram from "@/components/HapchungDiagram";
 
@@ -273,6 +274,7 @@ export default function CrushPage() {
         getSanggwanGyeongwanNarrative(sajuR, targetForm.gender),
         getGwanseongGoripNarrative(sajuR, targetForm.gender),
         getGwanbiAmhapNarrative(sajuR, targetForm.gender),
+        getGwanseongSiksangYeonaeNarrative(sajuR, targetForm.gender),
         getHwasuMultiHongyeomNarrative(sajuR),
         !jipchaknamNarrative ? getHwabuJokNarrative(sajuR) : null,
       ].filter((s): s is string => !!s).join(" ");

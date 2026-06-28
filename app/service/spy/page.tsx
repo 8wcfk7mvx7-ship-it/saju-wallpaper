@@ -32,6 +32,7 @@ import {
   getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getPporonamNarrative, getJaengjaenamNarrative,
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
+  getGwanseongSiksangYeonaeNarrative,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
@@ -378,6 +379,7 @@ function SpyContent() {
     getSanggwanGyeongwanNarrative(result, theirGender),
     getGwanseongGoripNarrative(result, theirGender),
     getGwanbiAmhapNarrative(result, theirGender),
+    getGwanseongSiksangYeonaeNarrative(result, theirGender),
     getDohwaPositionNarrative(result),
     getMuinseongNarrative(result),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
