@@ -314,7 +314,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   // 흉신(凶神)
   홍염살:   {hanja:"紅艶殺", category:"unlucky",  desc:"이성 관계가 복잡해지기 쉽고 색정 구설이 있어요"},
   양인살:   {hanja:"羊刃殺", category:"unlucky",  desc:"강한 추진력이 있으나 충동적이고 사고·부상을 주의해야 해요"},
-  백호살:   {hanja:"白虎殺", category:"unlucky",  desc:"혈광지재(血光之災). 수술·사고·혈액 관련 질환을 주의하세요"},
+  백호살:   {hanja:"白虎殺", category:"unlucky",  desc:"성격이 급하고 행동력이 빨라요. 결정과 추진이 거침없는 만큼 수술·사고·혈액 관련 건강 이슈, 그리고 일을 서두르다 생기는 실수를 주의해야 해요"},
   원진살:   {hanja:"怨嗔殺", category:"unlucky",  desc:"배우자·가까운 사람과 원망·갈등이 반복되기 쉬워요"},
   과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"연애·결혼 시기가 늦거나 독신 경향이 강해요. 영적 감수성이 뛰어나고 집중력이 강해요. 여성에게 강하게 작용해요"},
   평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"리더 기질과 강한 고집을 타고났어요. 남 밑에서 통제받는 것을 체질적으로 거부하며, 주도권을 잡아야 에너지가 살아나요. 융통성을 의도적으로 기르지 않으면 독불장군이 되기 쉬워요"},
@@ -396,8 +396,8 @@ const GEUMYEO_JJ: Record<string,string> = {
 const AMROK_JJ: Record<string,string> = {
   갑:'해', 을:'술', 병:'신', 정:'미', 무:'신',
   기:'미', 경:'사', 신:'진', 임:'인', 계:'축'};
-// 백호살: 해당 일주(천간+지지)
-const BAEHO_ILJU = new Set(['갑진','을미','병술','정축','무진','기미','경술','신축','임진','계미']);
+// 백호살: 천간+지지 조합 (갑진·을미·병술·정축·무진·임술·계축 — 사주의 어느 기둥에 있어도 성립)
+const BAEHO_ILJU = new Set(['갑진','을미','병술','정축','무진','임술','계축']);
 
 // 의처살(남자)·의부살(여자): 일지 정재/정관 암합 일주
 interface UicheoUibuEntry {
@@ -1749,9 +1749,20 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     (p.label === '연' || p.label === '월') && p.d.jj === iljiDohwa
   ).map(p => p.label);
   addSinsal('진도화', jinDohwaLabels);
-  // 백호살: 일주(일간+일지) 조합
-  if (BAEHO_ILJU.has(dayPillar.cg + dayPillar.jj)) {
-    addSinsal('백호살', ['일']);
+  // 백호살: 사주의 어느 기둥이든 천간+지지 조합이 일치하면 성립
+  {
+    const baekhoLabels = detailArr.filter(p => BAEHO_ILJU.has(p.d.cg + p.d.jj)).map(p => p.label);
+    if (baekhoLabels.length > 0) {
+      const info = SINSAL_INFO['백호살'];
+      const hasIlju = baekhoLabels.includes('일');
+      let desc = info.desc;
+      if (baekhoLabels.length >= 2) {
+        desc += `. 백호살이 ${baekhoLabels.length}개 기둥에 겹쳐 있어 그 기질이 더욱 강하게 드러나요`;
+      } else if (hasIlju) {
+        desc += `. 태어난 날 기둥에 자리해 그 기질이 평소 성격으로 강하게 나타나요`;
+      }
+      sinsalList.push({ name: '백호살', hanja: info.hanja, pillars: baekhoLabels, desc, category: info.category });
+    }
   }
   // 의처살(남)·의부살(여): 일주(일간+일지) + 성별 조합 (일지 정재/정관 암합)
   {
