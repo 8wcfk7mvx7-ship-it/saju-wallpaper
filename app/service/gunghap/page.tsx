@@ -323,6 +323,7 @@ const RELATION_TYPES: {
   { id:"짝사랑",  emoji:"🫀", label:"짝사랑",  formTitle:"짝사랑하는 그 사람,",   formSub:"사주가 허락한 인연인가요?",           p2Label:"그 사람" },
   { id:"반려동물",emoji:"🐾", label:"반려동물",formTitle:"반려동물과 나,",        formSub:"우리가 서로 잘 맞는지 알아봐요",      p2Label:"반려동물" },
   { id:"가족",    emoji:"👨‍👩‍👧", label:"가족",    formTitle:"가족과 나,",            formSub:"가족과의 사주 에너지를 확인하세요",  p2Label:"가족" },
+  { id:"기타",    emoji:"❓", label:"기타",    formTitle:"그 사람과 나,",         formSub:"사주가 처음부터 알고 있었습니다",     p2Label:"그 사람" },
 ];
 
 const FEATURES=[
@@ -618,13 +619,6 @@ export default function GunghapPage(){
                   </div>
                 </div>
 
-                <div style={{background:'rgba(167,139,250,0.07)',border:'1px solid rgba(167,139,250,0.18)',
-                  borderRadius:12,padding:'11px 16px',marginBottom:18,textAlign:'center'}}>
-                  <p style={{color:'#c4b5fd',fontSize:13,margin:0,lineHeight:1.6}}>
-                    ⚠️ 원진살 커플 + 조후 불일치 조합은<br/>
-                    3년이 지나도 결국 <strong>서로를 갉아먹습니다</strong>
-                  </p>
-                </div>
                 <ProfilePicker onSelect={p => setP1({
                   name: p.name || '',
                   birthData: {
@@ -644,7 +638,7 @@ export default function GunghapPage(){
                     <button type="button" onClick={fillP1} style={{fontSize:11,fontWeight:700,cursor:'pointer',border:'1px solid rgba(167,139,250,0.35)',background:'rgba(167,139,250,0.08)',color:'#c4b5fd',borderRadius:20,padding:'4px 12px'}}>내 사주로 채우기</button>
                   </div>
                   <NameInput defaultValue={p1.name} onBlur={v=>setP1({...p1,name:v})} style={{...inp(),marginBottom:12}} />
-                  <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} label="나" accent="#f43f5e" />
+                  <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} label="나" accent="#f43f5e" showName={false} />
                 </div>
                 <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
                   {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
@@ -654,7 +648,7 @@ export default function GunghapPage(){
                     {selectedRelation?.p2Label||'상대방'}
                   </p>
                   <NameInput defaultValue={p2.name} onBlur={v=>setP2({...p2,name:v})} style={{...inp(),marginBottom:12}} />
-                  <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} label="상대방" accent="#818cf8" />
+                  <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} label="상대방" accent="#818cf8" showName={false} />
                 </div>
                 <button onClick={calc} style={{
                   width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',

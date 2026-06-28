@@ -117,10 +117,11 @@ interface Props {
   label?: string;          // "나" | "상대방" — 두 사람 구분용
   accent?: string;         // 테마 컬러
   showGender?: boolean;    // 성별 표시 여부 (기본 true)
+  showName?: boolean;      // 이름 입력란 표시 여부 (기본 true) — 호출부에 별도 이름 입력란이 있으면 false로 중복 방지
 }
 
 export default function BirthInputForm({
-  value, onChange, label, accent = "#7c3aed", showGender = true,
+  value, onChange, label, accent = "#7c3aed", showGender = true, showName = true,
 }: Props) {
   const set = (patch: Partial<BirthFormData>) => onChange({ ...value, ...patch });
 
@@ -142,19 +143,21 @@ export default function BirthInputForm({
       )}
 
       {/* 이름 */}
-      <div>
-        <label className="text-xs font-medium block mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
-          이름 / 별명 <span style={{ color: accent }}>*</span>
-        </label>
-        <input
-          type="text"
-          value={value.name}
-          onChange={e => set({ name: e.target.value })}
-          placeholder="홍길동"
-          className="w-full px-4 py-3 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none transition"
-          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
-        />
-      </div>
+      {showName && (
+        <div>
+          <label className="text-xs font-medium block mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+            이름 / 별명 <span style={{ color: accent }}>*</span>
+          </label>
+          <input
+            type="text"
+            value={value.name}
+            onChange={e => set({ name: e.target.value })}
+            placeholder="홍길동"
+            className="w-full px-4 py-3 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none transition"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+          />
+        </div>
+      )}
 
       {/* 양음력 토글 */}
       <div>
