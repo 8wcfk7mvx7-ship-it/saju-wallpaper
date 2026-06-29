@@ -3,8 +3,29 @@ import BackButton from "@/components/BackButton";
 import { useEffect, useRef, useState } from "react";
 import { analyzeSaju, SajuResult } from "@/lib/saju";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL, SIPSEONG_GROUP_EXCESS, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO } from "@/lib/saju2";
-import { getSipseongGroupByElement, ILGAN_PERSONALITY, UUNSEONG_DETAIL } from "@/lib/saju";
+import {
+  SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, ELEMENT_DAILY_RHYTHM, INDEPENDENCE_FORTUNE, HYOSHIN_SAL,
+  SIPSEONG_GROUP_EXCESS, YONGSHIN_TRIGGER_POINT, YONGSHIN_TRIGGER_INTRO,
+  isGwaegang, GWAEGANG_MALE_WARNING, detectGumsuSangcheong, GANYEO_ERA_SHIFT_NOTE, BIGEOB_EXCESS_DESC,
+  getSexEnergyAnalysis, getAppearanceAnalysis, getSpouseFortuneAnalysis, getGaewunRanking,
+  detectStayPutPattern, getFaithfulSpouseAnalysis,
+  ILGAN_SHADOW, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE,
+} from "@/lib/saju2";
+import {
+  getSipseongGroupByElement, ILGAN_PERSONALITY, UUNSEONG_DETAIL,
+  getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
+  getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getOhaengPlaceNarrative, getGongmangNarrative,
+  getJikjangSiseonNarrative, getPporonamNarrative, getJaengjaenamNarrative, getJaeseongHonjapNarrative,
+  getGwandanyeoNarrative, getSanggwanGyeongwanNarrative, getGwanseongGoripNarrative, getGwanbiAmhapNarrative,
+  getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
+  getWoljiSingleGyeopjaeNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative,
+  getHourCheonulIntactGoodFlowNarrative, getHakdangCareerNarrative,
+  detectByeongjon, getJijiRelations, HAP_CHUNG_CHARACTER, detectChunganChung, detectGagukPatterns,
+  detectSamhapBanghap, analyzeSipseongPatterns, analyzeDohwaTypes,
+  SINGANG_TRAITS, JAESEONG_POSITION_INSIGHT, analyzeJaeseongPosition, WEOLJI_PSYCHOLOGY, YANG_YIN_TENDENCY,
+  OHAENG_CORE_WORRY, OHAENG_HEALTH, OHAENG_CAREER, getJohuCareerInsight, getGungseongCareerSummary,
+  getSexlifeInsights, isGanyeoJidong, GANYEO_JIDONG_GENERAL, GANYEO_JIDONG_ILJU,
+} from "@/lib/saju";
 
 type Step = "gate" | "input" | "chat";
 
@@ -169,6 +190,109 @@ export default function SajuChatPage() {
       ? `일주 12운성(${dayUunseong}, ${uunseongDetail.hanja}/${uunseongDetail.stage}): ${uunseongDetail.desc}`
       : "";
 
+    // ── 원국 단독 narrative 함수 일괄 수집 (lib/saju.ts getXxxNarrative) ──
+    const narrativeFns: Array<(r: SajuResult, gender?: "male" | "female") => string | null> = [
+      getJipchaknamNarrative, getHwabuJokNarrative, getMuinseongNarrative, getYangpaltongNarrative,
+      getHwasuMultiHongyeomNarrative, getBigeopMultiNarrative, getOhaengPlaceNarrative, getGongmangNarrative,
+      getJikjangSiseonNarrative, getPporonamNarrative, getJaengjaenamNarrative, getJaeseongHonjapNarrative,
+      getGwandanyeoNarrative, getSanggwanGyeongwanNarrative, getGwanseongGoripNarrative, getGwanbiAmhapNarrative,
+      getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
+      getWoljiSingleGyeopjaeNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative,
+      getHourCheonulIntactGoodFlowNarrative, getHakdangCareerNarrative,
+    ];
+    const narrativeNotes = narrativeFns.map(fn => fn(result, form.gender)).filter(Boolean).join("\n");
+
+    // ── 병존/충형파해/격국 등 패턴 감지 ──
+    const byeongjonNote = detectByeongjon(result.pillarsDetail)
+      .map(p => `${p.name}: ${p.desc} ${p.advice}`).join(" / ");
+    const chunganChungNote = detectChunganChung(result.pillarsDetail)
+      .map(c => `${c.body} 건강 주의 — ${c.desc}`).join(" / ");
+    const gagukNote = detectGagukPatterns(result)
+      .map(g => `${g.name}: ${g.desc} ${g.charmDesc}`).join(" / ");
+    const samhapBanghapNote = detectSamhapBanghap(result.pillarsDetail)
+      .map(s => `${s.name}(${s.title}): ${s.core}`).join(" / ");
+    const sipseongPatternNote = analyzeSipseongPatterns(result.pillarsDetail)
+      .map(p => `${p.name}: ${p.desc} ${p.advice}`).join(" / ");
+    const dohwaTypeNote = analyzeDohwaTypes(result.pillarsDetail)
+      .map(d => d.desc).join(" ");
+
+    // ── 합충 성향 (합다자 vs 충다자) ──
+    const jijiRelations = getJijiRelations(jjList);
+    const hapCount = jijiRelations.filter(rel => rel.type === "육합" || rel.type === "삼합" || rel.type === "반합").length;
+    const chungCount = jijiRelations.filter(rel => rel.type === "충").length;
+    const hapChungChar = hapCount > chungCount ? HAP_CHUNG_CHARACTER.합 : chungCount > 0 ? HAP_CHUNG_CHARACTER.충 : null;
+    const hapChungNote = hapChungChar ? `${hapChungChar.name}: ${hapChungChar.core} ${hapChungChar.strength} ${hapChungChar.loveStyle}` : "";
+
+    // ── 신강/신약/중화 보충 (중화는 getStrengthTraitNarrative가 다루지 않는 영역) ──
+    const junghwaNote = result.yongshin.strength === "중화"
+      ? `${SINGANG_TRAITS.중화.mindset} ${SINGANG_TRAITS.중화.mental} ${SINGANG_TRAITS.중화.caution}`
+      : "";
+
+    // ── 재성 위치(천간/지지/지장간) ──
+    const jaeseongPosition = analyzeJaeseongPosition(dayCg, result.pillarsDetail);
+    const jaeseongPositionNote = `${JAESEONG_POSITION_INSIGHT[jaeseongPosition].desc} ${JAESEONG_POSITION_INSIGHT[jaeseongPosition].wealth} ${JAESEONG_POSITION_INSIGHT[jaeseongPosition].style}`;
+
+    // ── 월지 심리, 음양 기질, 오행 근원 걱정 ──
+    const monthJjChar = result.pillarsDetail.month.jj;
+    const dayJjChar = result.pillarsDetail.day.jj;
+    const weoljiNote = WEOLJI_PSYCHOLOGY[monthJjChar] || "";
+    const isYangIlgan = ["갑", "병", "무", "경", "임"].includes(dayCg);
+    const yangYinNote = isYangIlgan
+      ? `${YANG_YIN_TENDENCY.yang} ${YANG_YIN_TENDENCY.yangInLove}`
+      : `${YANG_YIN_TENDENCY.yin} ${YANG_YIN_TENDENCY.yinInLove}`;
+    const dominantEl = result.dominant[0];
+    const lackingEl = result.lacking[0];
+    const coreWorryNote = dominantEl ? OHAENG_CORE_WORRY[dominantEl] : "";
+
+    // ── 건강/직업 적성 (강한 오행 또는 부족 오행 기준) ──
+    const healthEl = lackingEl || dominantEl;
+    const healthNote = healthEl ? `${OHAENG_HEALTH[healthEl].organs} 건강 — ${OHAENG_HEALTH[healthEl].caution} ${OHAENG_HEALTH[healthEl].lifestyle}` : "";
+    const ohaengCareerNote = dominantEl
+      ? `${OHAENG_CAREER[dominantEl].strengths}. 적성: ${OHAENG_CAREER[dominantEl].suited.slice(0, 3).join("·")} 등. 분야: ${OHAENG_CAREER[dominantEl].industries.slice(0, 3).join("·")} 등.`
+      : "";
+    const johuCareer = getJohuCareerInsight(dayCg, monthJjChar);
+    const johuCareerNote = `${johuCareer.title}: ${johuCareer.desc} 추천 분야: ${johuCareer.fields}`;
+    const gungseongCareerNote = getGungseongCareerSummary(result.pillarsDetail)
+      .map(g => `${g.palaceLabel}-${g.sipseong}: ${g.desc}`).join(" / ");
+
+    // ── 성생활/외모/배우자운 ──
+    const sexlifeNote = getSexlifeInsights(result).map(s => s.desc).join(" ");
+    const sexEnergy = getSexEnergyAnalysis(result);
+    const sexEnergyNote = `${sexEnergy.summary} ${sexEnergy.points.join(" ")}`;
+    const appearance = getAppearanceAnalysis(result);
+    const appearanceNote = `${appearance.summary} ${appearance.points.join(" ")}`;
+    const spouseFortune = getSpouseFortuneAnalysis(result, form.gender);
+    const spouseFortuneNote = spouseFortune.points.join(" ");
+    const faithfulSpouse = getFaithfulSpouseAnalysis(result);
+    const faithfulSpouseNote = faithfulSpouse?.desc || "";
+
+    // ── 개운법 (상위 2개 오행만 압축 제공) ──
+    const gaewunRanking = getGaewunRanking(result);
+    const gaewunNote = gaewunRanking.slice(0, 2)
+      .map(g => `${g.rank}순위 ${g.element}(색 ${g.color}/방향 ${g.direction}/음식 ${g.food}/운동 ${g.exercise}/숫자 ${g.numbers})`)
+      .join(", ");
+
+    // ── 엉덩이 무거운 사주(화개/간여지동), 간여지동 일주 특성, 괴강살, 금수쌍청, 시대 변화 ──
+    const stayPutNote = detectStayPutPattern(result).map(p => `${p.title}: ${p.desc} ${p.advice}`).join(" / ");
+    const iljuKey = dayCg + dayJjChar;
+    const ganyeoJidongNote = isGanyeoJidong(dayCg, dayJjChar) && GANYEO_JIDONG_ILJU[iljuKey]
+      ? `${GANYEO_JIDONG_GENERAL.desc} ${GANYEO_JIDONG_ILJU[iljuKey].specific} 키워드: ${GANYEO_JIDONG_ILJU[iljuKey].keywords.join("·")}.`
+      : "";
+    const gwaegangNote = form.gender === "male" && isGwaegang(dayCg, dayJjChar)
+      ? `${GWAEGANG_MALE_WARNING.title}: ${GWAEGANG_MALE_WARNING.desc} ${GWAEGANG_MALE_WARNING.advice}`
+      : "";
+    const gumsu = detectGumsuSangcheong(dayCg, monthJjChar, cgList, jjList);
+    const gumsuNote = gumsu.hasGumsu || gumsu.level === "미완성" ? `${gumsu.desc} ${gumsu.careerHint}` : "";
+    const eraShiftNote = GANYEO_ERA_SHIFT_NOTE[iljuKey] || "";
+    const bigeobExcessNote = (groupCounts["비겁"] || 0) >= 3 ? (BIGEOB_EXCESS_DESC[rhythmKey] || "") : "";
+
+    // ── 일간 그림자/경계감/애정 표현 방식 ──
+    const ilganShadow = ILGAN_SHADOW[dayCg];
+    const ilganShadowNote = ilganShadow ? `일간 그림자(${ilganShadow.title}): ${ilganShadow.desc}` : "";
+    const ilganBoundary = ILGAN_BOUNDARY[dayCg];
+    const ilganBoundaryNote = ilganBoundary ? `경계감(${ilganBoundary.title}): ${ilganBoundary.desc} ${ilganBoundary.advice}` : "";
+    const ilganAffectionNote = ILGAN_AFFECTION_STYLE[dayCg] ? `애정 표현 방식: ${ILGAN_AFFECTION_STYLE[dayCg]}` : "";
+
     const context = [
       `사주팔자: ${result.fourPillars}`,
       `일간: ${result.pillarsDetail.day.cg}`,
@@ -184,6 +308,38 @@ export default function SajuChatPage() {
       independenceNote,
       groupExcessNote,
       triggerInfo,
+      narrativeNotes,
+      byeongjonNote && `병존: ${byeongjonNote}`,
+      chunganChungNote && `천간충 건강: ${chunganChungNote}`,
+      gagukNote && `특수 격국: ${gagukNote}`,
+      samhapBanghapNote && `삼합/반합/방합: ${samhapBanghapNote}`,
+      sipseongPatternNote && `십성 구조: ${sipseongPatternNote}`,
+      dohwaTypeNote && `도화 유형: ${dohwaTypeNote}`,
+      hapChungNote,
+      junghwaNote && `중화 기질: ${junghwaNote}`,
+      `재성 위치: ${jaeseongPositionNote}`,
+      weoljiNote,
+      `음양 기질: ${yangYinNote}`,
+      coreWorryNote,
+      healthNote,
+      ohaengCareerNote,
+      johuCareerNote,
+      gungseongCareerNote && `궁성별 진로 신호: ${gungseongCareerNote}`,
+      sexlifeNote && `성적 경향: ${sexlifeNote}`,
+      sexEnergyNote && `성적 에너지: ${sexEnergyNote}`,
+      appearanceNote && `외모·인상: ${appearanceNote}`,
+      spouseFortuneNote && `배우자복: ${spouseFortuneNote}`,
+      faithfulSpouseNote && `배우자 정절: ${faithfulSpouseNote}`,
+      gaewunNote && `개운법: ${gaewunNote}`,
+      stayPutNote && `안정형 패턴: ${stayPutNote}`,
+      ganyeoJidongNote && `간여지동: ${ganyeoJidongNote}`,
+      gwaegangNote,
+      gumsuNote && `금수쌍청: ${gumsuNote}`,
+      eraShiftNote,
+      bigeobExcessNote && `비겁 과다: ${bigeobExcessNote}`,
+      ilganShadowNote,
+      ilganBoundaryNote,
+      ilganAffectionNote,
       `성별: ${form.gender === "male" ? "남" : "여"}`,
     ].filter(Boolean).join("\n");
 
