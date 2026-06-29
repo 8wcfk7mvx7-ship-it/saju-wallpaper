@@ -20,7 +20,7 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
-  getStrengthTraitNarrative, getWoljiSingleGyeopjaeNarrative,
+  getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative,
 } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
@@ -382,6 +382,7 @@ function SpyContent() {
     getGeumMokGwadaNarrative(result),
     getIndaSingangMaleNarrative(result, theirGender),
     getStrengthTraitNarrative(result),
+    getExtremeStrengthNarrative(result),
     getWoljiSingleGyeopjaeNarrative(result),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ];

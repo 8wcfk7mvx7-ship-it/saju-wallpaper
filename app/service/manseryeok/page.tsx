@@ -31,6 +31,7 @@ import {
   detectGagukPatterns,
   getGeumMokGwadaNarrative,
   getStrengthTraitNarrative,
+  getExtremeStrengthNarrative,
   getWoljiSingleGyeopjaeNarrative,
   getSipseongStrength,
   type SajuResult, type Element,
@@ -1298,7 +1299,7 @@ function ResultView({
             );
           })}
         </div>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getExtremeStrengthNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}

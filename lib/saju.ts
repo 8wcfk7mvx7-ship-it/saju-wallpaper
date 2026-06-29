@@ -3982,6 +3982,13 @@ export function getStrengthTraitNarrative(r: SajuResult): string | null {
   return null;
 }
 
+// 22-4) 극신강/신왕(극왕·태강) 기질 — 비견·겁재가 일간을 떠받치고 인성이 그 힘을 다시 키워주는 구조 (용어 노출 없이 성향만 서술)
+export function getExtremeStrengthNarrative(r: SajuResult): string | null {
+  const level = classifySinStrength(r.yongshin.percent);
+  if (level !== "극왕" && level !== "태강") return null;
+  return "사주 전체가 일간 본인을 떠받치는 기운으로 가득 차 있고, 그 위에 자신을 더 키워주는 기운까지 겹쳐 있어서 자기 확신과 추진력이 극단적으로 강한 구조예요. 본인의 판단을 의심하지 않고 주변의 통제나 제약을 잘 받아들이지 않으며, 자신과 비슷한 힘을 가진 존재와는 타협보다 경쟁을 택하는 경향이 강해요. 강한 자기 동력으로 조직을 만들고 사람을 끌어모으는 데는 탁월하지만, 본인보다 강한 권위나 규율 앞에서는 부딫히기 쉽고, 주변의 조언이나 견제를 무시한 채 독단적으로 밀고 나가다 고립되거나 갈등을 키우는 결과로 이어지는 경우가 많아요.";
+}
+
 // 23) 학당귀인 보유자의 직업·학업 적합도
 export function getHakdangCareerNarrative(r: SajuResult): string | null {
   const count = r.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;

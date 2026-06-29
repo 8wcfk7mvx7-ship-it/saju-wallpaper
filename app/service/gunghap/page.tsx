@@ -12,7 +12,7 @@ import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
-import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getIndaSingangMaleNarrative, getStrengthTraitNarrative, getWoljiSingleGyeopjaeNarrative } from "@/lib/saju";
+import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getIndaSingangMaleNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative } from "@/lib/saju";
 
 const GUNGHAP_EL_COLOR: Record<string, string> = { 목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#d1d5db", 수: "#60a5fa" };
 function gunghapJijiElement(jj: string): string {
@@ -957,10 +957,12 @@ export default function GunghapPage(){
                 const inda2=getIndaSingangMaleNarrative(result.r2,p2.birthData.gender);
                 const strength1=getStrengthTraitNarrative(result.r1);
                 const strength2=getStrengthTraitNarrative(result.r2);
+                const extreme1=getExtremeStrengthNarrative(result.r1);
+                const extreme2=getExtremeStrengthNarrative(result.r2);
                 const gyeopjae1=getWoljiSingleGyeopjaeNarrative(result.r1);
                 const gyeopjae2=getWoljiSingleGyeopjaeNarrative(result.r2);
-                const text1=[sf1.points.join(" "),inda1,strength1,gyeopjae1].filter(Boolean).join(" ");
-                const text2=[sf2.points.join(" "),inda2,strength2,gyeopjae2].filter(Boolean).join(" ");
+                const text1=[sf1.points.join(" "),inda1,strength1,extreme1,gyeopjae1].filter(Boolean).join(" ");
+                const text2=[sf2.points.join(" "),inda2,strength2,extreme2,gyeopjae2].filter(Boolean).join(" ");
                 if(!text1&&!text2) return null;
                 return (
                   <div style={{paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
