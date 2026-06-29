@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -185,7 +186,7 @@ function PlaceResultContent() {
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white pb-20">
-      <div className="max-w-2xl mx-auto px-5 py-8">
+      <div className="max-w-2xl mx-auto px-5 py-8" id="place-result">
         <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-4 mb-6 text-center">
           <p className="text-green-400 font-bold">✓ 결제 완료 · 전체 분석 공개</p>
         </div>
@@ -265,11 +266,8 @@ function PlaceResultContent() {
             className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-sm text-white transition">
             다른 오행으로 보기
           </button>
-          <button onClick={() => router.push("/")}
-            className="w-full py-3 rounded-xl bg-white/5 text-sm text-gray-400 transition">
-            메인으로
-          </button>
         </div>
+        <ResultFooterActions targetId="place-result" fileName="도시추천" shareTitle="내 사주 도시 추천 완전판" shareText="Summer Palace에서 내게 맞는 도시를 찾았어요" />
       </div>
     </main>
   );

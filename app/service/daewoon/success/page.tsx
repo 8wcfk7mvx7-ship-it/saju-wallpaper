@@ -3,6 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { analyzeSaju, calcDaewoon, calcSewoon } from "@/lib/saju";
 import type { DaewoonResult, SewoonItem } from "@/lib/saju";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -171,7 +172,7 @@ function DaewoonSuccessContent() {
 
   return (
     <main className="min-h-screen bg-[#0d0700] text-white pb-20">
-      <div className="max-w-2xl mx-auto px-5 py-8">
+      <div className="max-w-2xl mx-auto px-5 py-8" id="daewoon-success-result">
         {/* 성공 배너 */}
         <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-4 mb-6 text-center">
           <p className="text-green-400 font-bold">✓ 결제 완료 · 프리미엄 보고서 활성화</p>
@@ -294,12 +295,6 @@ function DaewoonSuccessContent() {
 
         {/* 하단 버튼 */}
         <div className="flex flex-col gap-3">
-          <button
-            onClick={() => router.push("/")}
-            className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-sm text-white transition"
-          >
-            메인으로
-          </button>
           <a
             href="http://pf.kakao.com/_cuksX"
             target="_blank"
@@ -309,6 +304,7 @@ function DaewoonSuccessContent() {
             카카오 채널 문의
           </a>
         </div>
+        <ResultFooterActions targetId="daewoon-success-result" fileName="대운세운분석" shareTitle="내 대운·세운 완전 분석" shareText="Summer Palace에서 내 대운·세운을 분석했어요" />
       </div>
     </main>
   );

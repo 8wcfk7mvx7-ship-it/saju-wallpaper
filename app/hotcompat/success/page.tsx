@@ -20,7 +20,7 @@ function HotCompatSuccessContent() {
         <div className="text-6xl mb-5">✅</div>
         <h1 className="text-2xl font-black text-white mb-2">결제 완료!</h1>
         <p className="text-sm mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
-          {params.get("method") === "blueberry" ? "✨ 별조각로 결제되었습니다" : "19금 사주 궁합이 잠금 해제됩니다"}
+          {params.get("method") === "blueberry" ? "✨ 별조각으로 결제되었습니다" : "19금 사주 궁합이 잠금 해제됩니다"}
         </p>
         <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>잠시 후 자동으로 이동합니다...</p>
       </div>

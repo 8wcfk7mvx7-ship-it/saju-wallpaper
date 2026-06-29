@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju } from "@/lib/saju";
 import { GANYEOJIDONG_PAIRS } from "@/lib/saju2";
-import ShareImageButton from "@/components/ShareImageButton";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -249,6 +249,7 @@ function SuccessContent() {
         )}
 
         <p className="text-center text-xs text-gray-700">본 내용은 사주 이론 기반 참고 자료입니다.</p>
+        <ResultFooterActions targetId="overcome-result" fileName="신살극복법" shareTitle="내 신살 극복법" shareText="Summer Palace에서 내 신살 극복법을 확인했어요" />
       </div>
     </main>
   );

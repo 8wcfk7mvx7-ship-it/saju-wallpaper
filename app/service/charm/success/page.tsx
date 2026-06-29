@@ -13,6 +13,7 @@ import {
   buildCharmAIPrompt,
   type CharmGradeResult,
 } from "@/lib/charmEngine";
+import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
 
@@ -280,7 +281,7 @@ function CharmSuccessContent() {
         <div className="absolute bottom-[-20%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-900/20 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-24" id="charm-success-result">
         {/* 성공 배너 */}
         <div className="text-center mb-6">
           <div className="text-5xl mb-3">✅</div>
@@ -449,9 +450,10 @@ function CharmSuccessContent() {
         <button onClick={() => router.push("/service/charm")} className="w-full mt-2 py-3 rounded-xl border border-white/10 text-gray-600 hover:text-gray-400 text-sm transition">
           다시 분석하기
         </button>
-        <div className="text-center mt-4">
+        <div className="text-center mt-4 mb-4">
           <p className="text-xs text-gray-700">본 분석은 사주 이론 기반 오락용 콘텐츠입니다. summerpalace.ai.kr</p>
         </div>
+        <ResultFooterActions targetId="charm-success-result" fileName="매력분석_프리미엄" shareTitle="내 매력 분석 프리미엄 보고서" shareText="Summer Palace에서 내 매력 등급을 분석했어요" />
       </div>
     </main>
   );
