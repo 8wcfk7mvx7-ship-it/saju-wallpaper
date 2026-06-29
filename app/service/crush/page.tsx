@@ -21,8 +21,10 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
-  getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative,
+  getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative, isWoljiSingleGyeopjae,
+  getHourCheonulIntactGoodFlowNarrative, isHourCheonulIntactGoodFlow,
 } from "@/lib/saju";
+import { trackTraits } from "@/lib/trackTrait";
 import HapchungDiagram from "@/components/HapchungDiagram";
 
 // 일간별 짝사랑 성공 비결
@@ -268,8 +270,15 @@ export default function CrushPage() {
         getStrengthTraitNarrative(sajuR),
         getExtremeStrengthNarrative(sajuR),
         getWoljiSingleGyeopjaeNarrative(sajuR),
+        getHourCheonulIntactGoodFlowNarrative(sajuR),
         !jipchaknamNarrative ? getHwabuJokNarrative(sajuR) : null,
       ].filter((s): s is string => !!s).join(" ");
+      trackTraits([
+        isWoljiSingleGyeopjae(sajuR) ? "woljiSingleGyeopjae" : null,
+        sajuR.yongshin.strength === "신강" ? "strengthTrait:신강" : sajuR.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+        getExtremeStrengthNarrative(sajuR) ? "extremeStrength" : null,
+        isHourCheonulIntactGoodFlow(sajuR) ? "hourCheonulGoodFlow" : null,
+      ], "/service/crush");
       const moneyStyleExtra = [
         getJaengjaenamNarrative(sajuR, targetForm.gender),
         getJaeseongHonjapNarrative(sajuR, targetForm.gender),

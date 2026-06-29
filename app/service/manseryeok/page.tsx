@@ -33,11 +33,15 @@ import {
   getStrengthTraitNarrative,
   getExtremeStrengthNarrative,
   getWoljiSingleGyeopjaeNarrative,
+  isWoljiSingleGyeopjae,
+  getHourCheonulIntactGoodFlowNarrative,
+  isHourCheonulIntactGoodFlow,
   getSipseongStrength,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
 import ResultFooterActions from "@/components/ResultFooterActions";
+import { trackTraits } from "@/lib/trackTrait";
 
 // ─── 한자 변환 ──────────────────────────────────────────────────────────────────
 const CG_HANJA: Record<string,string> = { 갑:"甲",을:"乙",병:"丙",정:"丁",무:"戊",기:"己",경:"庚",신:"辛",임:"壬",계:"癸" };
@@ -450,6 +454,16 @@ function ResultView({
   ];
 
   const ilgan = pd.day.cg;
+
+  useEffect(() => {
+    trackTraits([
+      isWoljiSingleGyeopjae(result) ? "woljiSingleGyeopjae" : null,
+      result.yongshin.strength === "신강" ? "strengthTrait:신강" : result.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+      getExtremeStrengthNarrative(result) ? "extremeStrength" : null,
+      isHourCheonulIntactGoodFlow(result) ? "hourCheonulGoodFlow" : null,
+    ], "/service/manseryeok");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ilgan, pd.year.cg, pd.year.jj, pd.month.cg, pd.month.jj, pd.day.jj]);
 
   // 사주 전체에서 가장 많이 나타나는 십성 (일간 자신은 비견으로 카운트되므로 제외하지 않음)
   const dominantSipseong = (() => {
@@ -1299,7 +1313,7 @@ function ResultView({
             );
           })}
         </div>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getExtremeStrengthNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getExtremeStrengthNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {getHourCheonulIntactGoodFlowNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}

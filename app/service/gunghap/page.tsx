@@ -12,7 +12,8 @@ import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
-import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getIndaSingangMaleNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative } from "@/lib/saju";
+import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getIndaSingangMaleNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative, isWoljiSingleGyeopjae, getHourCheonulIntactGoodFlowNarrative, isHourCheonulIntactGoodFlow } from "@/lib/saju";
+import { trackTraits } from "@/lib/trackTrait";
 
 const GUNGHAP_EL_COLOR: Record<string, string> = { 목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#d1d5db", 수: "#60a5fa" };
 function gunghapJijiElement(jj: string): string {
@@ -463,6 +464,16 @@ export default function GunghapPage(){
     else{grade='위험';gradeColor='#ee5a24';gradeEmoji='💀';gradeTitle='에너지를 갉아먹는 궁합';gradeDesc='상극 에너지가 강합니다. 의식적 노력 없이는 소모적인 관계가 됩니다.';}
 
     setResult({johu,samhap,pillars,baram,yongsinDesc,ohaengDesc,totalScore,grade,gradeColor,gradeEmoji,gradeTitle,gradeDesc,r1,r2});
+    trackTraits([
+      isWoljiSingleGyeopjae(r1) ? "woljiSingleGyeopjae" : null,
+      isWoljiSingleGyeopjae(r2) ? "woljiSingleGyeopjae" : null,
+      r1.yongshin.strength === "신강" ? "strengthTrait:신강" : r1.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+      r2.yongshin.strength === "신강" ? "strengthTrait:신강" : r2.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+      getExtremeStrengthNarrative(r1) ? "extremeStrength" : null,
+      getExtremeStrengthNarrative(r2) ? "extremeStrength" : null,
+      isHourCheonulIntactGoodFlow(r1) ? "hourCheonulGoodFlow" : null,
+      isHourCheonulIntactGoodFlow(r2) ? "hourCheonulGoodFlow" : null,
+    ], "/service/gunghap");
     setStep('loading');
   };
 
@@ -961,8 +972,10 @@ export default function GunghapPage(){
                 const extreme2=getExtremeStrengthNarrative(result.r2);
                 const gyeopjae1=getWoljiSingleGyeopjaeNarrative(result.r1);
                 const gyeopjae2=getWoljiSingleGyeopjaeNarrative(result.r2);
-                const text1=[sf1.points.join(" "),inda1,strength1,extreme1,gyeopjae1].filter(Boolean).join(" ");
-                const text2=[sf2.points.join(" "),inda2,strength2,extreme2,gyeopjae2].filter(Boolean).join(" ");
+                const cheonul1=getHourCheonulIntactGoodFlowNarrative(result.r1);
+                const cheonul2=getHourCheonulIntactGoodFlowNarrative(result.r2);
+                const text1=[sf1.points.join(" "),inda1,strength1,extreme1,gyeopjae1,cheonul1].filter(Boolean).join(" ");
+                const text2=[sf2.points.join(" "),inda2,strength2,extreme2,gyeopjae2,cheonul2].filter(Boolean).join(" ");
                 if(!text1&&!text2) return null;
                 return (
                   <div style={{paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>

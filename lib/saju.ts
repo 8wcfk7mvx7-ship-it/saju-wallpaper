@@ -3989,6 +3989,41 @@ export function getExtremeStrengthNarrative(r: SajuResult): string | null {
   return "사주 전체가 일간 본인을 떠받치는 기운으로 가득 차 있고, 그 위에 자신을 더 키워주는 기운까지 겹쳐 있어서 자기 확신과 추진력이 극단적으로 강한 구조예요. 본인의 판단을 의심하지 않고 주변의 통제나 제약을 잘 받아들이지 않으며, 자신과 비슷한 힘을 가진 존재와는 타협보다 경쟁을 택하는 경향이 강해요. 강한 자기 동력으로 조직을 만들고 사람을 끌어모으는 데는 탁월하지만, 본인보다 강한 권위나 규율 앞에서는 부딫히기 쉽고, 주변의 조언이나 견제를 무시한 채 독단적으로 밀고 나가다 고립되거나 갈등을 키우는 결과로 이어지는 경우가 많아요.";
 }
 
+// 22-5) 시지 천을귀인이 합충형파해 없이 온전하고, 오행 순환(상생)이 원활한 구조
+function ohaengCirculatesWell(r: SajuResult): boolean {
+  const pd = r.pillarsDetail;
+  const seq = [pd.year.cg, pd.month.cg, pd.day.cg, ...(pd.hour ? [pd.hour.cg] : [])];
+  const els = seq.map(c => CG_OHAENG[c]);
+  let saengCount = 0, geukCount = 0;
+  for (let i = 0; i < els.length - 1; i++) {
+    if (OHAENG_SAENG[els[i + 1]] === els[i]) saengCount++;
+    else if (OHAENG_GEUKHAE[els[i]] === els[i + 1] || OHAENG_GEUKHAE[els[i + 1]] === els[i]) geukCount++;
+  }
+  return geukCount === 0 && saengCount >= Math.ceil((els.length - 1) / 2);
+}
+
+export function isHourCheonulIntactGoodFlow(r: SajuResult): boolean {
+  const pd = r.pillarsDetail;
+  if (!pd.hour) return false;
+  const cheonul = r.sinsalList.find(s => s.name === "천을귀인");
+  if (!cheonul || !cheonul.pillars.includes("시")) return false;
+  const order = [
+    { label: "연", jj: pd.year.jj },
+    { label: "월", jj: pd.month.jj },
+    { label: "일", jj: pd.day.jj },
+    { label: "시", jj: pd.hour.jj },
+  ];
+  const hourIdx = order.findIndex(o => o.label === "시");
+  const rels = getJijiRelations(order.map(o => o.jj));
+  if (rels.some(rel => rel.a === hourIdx || rel.b === hourIdx)) return false;
+  return ohaengCirculatesWell(r);
+}
+
+export function getHourCheonulIntactGoodFlowNarrative(r: SajuResult): string | null {
+  if (!isHourCheonulIntactGoodFlow(r)) return null;
+  return "시지에 자리한 천을귀인이 다른 어떤 글자와도 합이나 충으로 얽히지 않고 온전한 힘을 그대로 유지하고 있어서, 어려운 순간마다 결정적인 도움을 받는 기운이 손상 없이 끝까지 살아 있는 구조예요. 여기에 더해 사주 전체 오행이 서로 부딫히지 않고 순서대로 생해주는 흐름을 이루고 있어서, 막히거나 정체되는 부분 없이 기운이 원활하게 순환돼요. 이런 구조는 성격적으로도 모난 데 없이 둥글고 온화하며, 주변과 부딫히기보다 자연스럽게 조화를 이루는 성품으로 나타나는 경우가 많아요. 전체적으로 무리 없이 풀려나가는 아주 좋은 사주 구조 중 하나로 꼽혀요.";
+}
+
 // 23) 학당귀인 보유자의 직업·학업 적합도
 export function getHakdangCareerNarrative(r: SajuResult): string | null {
   const count = r.sinsalList.find(s => s.name === "학당귀인")?.pillars.length ?? 0;

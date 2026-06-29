@@ -20,8 +20,10 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
-  getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative,
+  getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative, isWoljiSingleGyeopjae,
+  getHourCheonulIntactGoodFlowNarrative, isHourCheonulIntactGoodFlow,
 } from "@/lib/saju";
+import { trackTraits } from "@/lib/trackTrait";
 import AnalysisLoading from "@/components/AnalysisLoading";
 
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -384,9 +386,19 @@ function SpyContent() {
     getStrengthTraitNarrative(result),
     getExtremeStrengthNarrative(result),
     getWoljiSingleGyeopjaeNarrative(result),
+    getHourCheonulIntactGoodFlowNarrative(result),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ];
   const extraTraitNarrative = extraNarrativeFlags.filter((s): s is string => !!s).join(" ");
+  useEffect(() => {
+    trackTraits([
+      isWoljiSingleGyeopjae(result) ? "woljiSingleGyeopjae" : null,
+      result.yongshin.strength === "신강" ? "strengthTrait:신강" : result.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+      getExtremeStrengthNarrative(result) ? "extremeStrength" : null,
+      isHourCheonulIntactGoodFlow(result) ? "hourCheonulGoodFlow" : null,
+    ], "/service/spy");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.pillarsDetail.day.cg, result.pillarsDetail.day.jj, result.pillarsDetail.month.cg, result.pillarsDetail.month.jj, result.pillarsDetail.year.cg, result.pillarsDetail.year.jj]);
   // 위 서술형 위험 신호도 등급 점수에 함께 반영 (서술에만 노출되고 점수에 빠져있던 문제 수정)
   rawScore += extraNarrativeFlags.filter(Boolean).length * 10;
 
