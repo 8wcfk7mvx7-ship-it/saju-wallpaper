@@ -274,7 +274,7 @@ export default function DohwasalPage() {
           <div className="absolute top-[-20%] left-[-15%] w-[650px] h-[650px] rounded-full bg-rose-950/40 blur-[160px]" />
           <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-pink-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
             <div className="inline-block px-3 py-1 rounded-full bg-rose-900/50 border border-rose-700/40 text-rose-300 text-xs font-bold tracking-wider mb-8">
               🌸 왜 자꾸 사람들이 나를 신경 쓸까?

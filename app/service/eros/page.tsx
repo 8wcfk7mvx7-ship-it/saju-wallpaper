@@ -276,7 +276,7 @@ function ErosContent() {
           <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] rounded-full bg-rose-950/40 blur-[160px]" />
           <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/30 blur-[120px]" />
         </div>
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-5 py-16 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full px-5 py-16 text-center">
           <FadeIn delay={0}>
             <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight mt-8">
               나의 성적<br />

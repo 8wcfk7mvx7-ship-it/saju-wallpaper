@@ -506,7 +506,7 @@ export default function DaewoonPage() {
         </div>
 
 
-        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-2xl mx-auto w-full pb-12" style={{ animation: "fadeInUp 0.7s ease both" }}>
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-12" style={{ animation: "fadeInUp 0.7s ease both" }}>
           <style>{`@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
           <div className="flex items-center gap-2 mb-8">
@@ -1006,7 +1006,7 @@ export default function DaewoonPage() {
 
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#06060e] via-[#06060e]/95 to-transparent">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-lg mx-auto">
               {blueberries >= PRICE ? (
                 <button
                   onClick={() => {
