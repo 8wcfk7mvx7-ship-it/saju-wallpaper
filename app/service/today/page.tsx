@@ -713,7 +713,77 @@ export default function TodayFortunePage() {
         <FadeIn delay={80}>
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 mb-5">
           <p className="text-sm font-bold text-gray-300 mb-1">전체 합충형파해 분석</p>
-          <p className="text-[11px] text-gray-500 mb-4">위쪽 화살표: 천간 합·충 · 아래쪽 화살표: 지지 합충형파해 — 명식표 컬럼 위치 기준 (라벨을 누르면 설명이 보여요)</p>
+          <p className="text-[11px] text-gray-500 mb-3">위쪽 화살표: 천간 합·충 · 아래쪽 화살표: 지지 합충형파해 — 명식표 컬럼 위치 기준 (라벨을 누르면 설명이 보여요)</p>
+
+          <div className="mb-2">
+            <p className="text-[10px] text-gray-500 mb-1.5">대운 — 클릭하면 그 시기로 즉시 바뀌어요</p>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+              {daewoon.pillars.map((p, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelDaewoonIdx(i)}
+                  className="shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-full transition-all whitespace-nowrap"
+                  style={{
+                    background: i === activeDaewoonIdx ? "rgba(156,163,175,0.25)" : "rgba(255,255,255,0.04)",
+                    color: i === activeDaewoonIdx ? "#e5e7eb" : "rgba(255,255,255,0.4)",
+                    border: `1px solid ${i === activeDaewoonIdx ? "rgba(156,163,175,0.5)" : "rgba(255,255,255,0.1)"}`,
+                  }}
+                >
+                  {p.age}세 {p.cg}{p.jj}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-2">
+            <p className="text-[10px] text-gray-500 mb-1.5">세운 — 클릭하면 그 해로 즉시 바뀌어요</p>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+              {Array.from({ length: 5 }, (_, k) => thisYear - 2 + k).map(yr => {
+                const yp = getYearPillar(yr);
+                return (
+                  <button
+                    key={yr}
+                    onClick={() => setSelSewoonYear(yr)}
+                    className="shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-full transition-all whitespace-nowrap"
+                    style={{
+                      background: yr === thisYear ? "rgba(156,163,175,0.25)" : "rgba(255,255,255,0.04)",
+                      color: yr === thisYear ? "#e5e7eb" : "rgba(255,255,255,0.4)",
+                      border: `1px solid ${yr === thisYear ? "rgba(156,163,175,0.5)" : "rgba(255,255,255,0.1)"}`,
+                    }}
+                  >
+                    {yr} {yp.cg}{yp.jj}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <p className="text-[10px] text-gray-500 mb-1.5">일진 — 클릭하면 그 날로 즉시 바뀌어요</p>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+              {Array.from({ length: 5 }, (_, k) => {
+                const d = new Date(selY, selM - 1, selD);
+                d.setDate(d.getDate() - 2 + k);
+                const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                const dp = getDayPillar(d.getFullYear(), d.getMonth() + 1, d.getDate());
+                return { ds, dp, label: k === 2 ? "오늘" : `${d.getMonth() + 1}.${d.getDate()}` };
+              }).map(({ ds, dp, label }) => (
+                <button
+                  key={ds}
+                  onClick={() => setSelDateStr(ds)}
+                  className="shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-full transition-all whitespace-nowrap"
+                  style={{
+                    background: ds === selDateStr ? "rgba(156,163,175,0.25)" : "rgba(255,255,255,0.04)",
+                    color: ds === selDateStr ? "#e5e7eb" : "rgba(255,255,255,0.4)",
+                    border: `1px solid ${ds === selDateStr ? "rgba(156,163,175,0.5)" : "rgba(255,255,255,0.1)"}`,
+                  }}
+                >
+                  {label} {dp.cg}{dp.jj}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <RelationDiagram
             cols={cols}
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
