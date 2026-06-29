@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       await sb.from("payments").insert({
         order_id: orderId,
         amount: Number(amount),
-        product_name: `블루베리 충전 ${Number(amount).toLocaleString()}원`,
+        product_name: `별조각 충전 ${Number(amount).toLocaleString()}원`,
         customer_name: customerName || "고객",
         customer_email: customerEmail || null,
         payment_key: paymentKey,
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    await sendAdminNotification(orderId, Number(amount), `블루베리 충전 → ${blueberries.toLocaleString()}개`);
+    await sendAdminNotification(orderId, Number(amount), `별조각 충전 → ${blueberries.toLocaleString()}개`);
 
     return NextResponse.json({ success: true, blueberries, payment: result });
   } catch (e: unknown) {

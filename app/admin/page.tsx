@@ -35,6 +35,7 @@ interface KakaoUser {
 
 interface Stats {
   dbConnected: boolean;
+  dbDiagnostics: { table: string; error: string }[];
   todayViews: number;
   totalViews: number;
   todayRevenue: number;
@@ -43,6 +44,10 @@ interface Stats {
   totalRevenue: number;
   totalPaidCount: number;
   conversionRate: string;
+  avgOrderValue: number;
+  distinctCustomerCount: number;
+  repeatCustomerCount: number;
+  repeatRate: string;
   payments: Payment[];
   dailyViews: { date: string; count: number }[];
   dailyRevenue: { date: string; amount: number }[];
@@ -284,7 +289,20 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* KPI 6개 */}
+            {/* DB 진단 — 특정 테이블 조회가 실패하면 원인을 바로 보여줌 */}
+            {!statsLoading && (stats?.dbDiagnostics ?? []).length > 0 && (
+              <div className="rounded-2xl p-4 space-y-2" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)" }}>
+                <p className="text-xs font-bold text-red-400">⚠ 일부 데이터를 불러오지 못했어요</p>
+                {(stats?.dbDiagnostics ?? []).map((d, i) => (
+                  <p key={i} className="text-[11px] text-gray-400">
+                    <span className="font-mono text-red-300">{d.table}</span> 테이블 조회 오류 — {d.error}
+                  </p>
+                ))}
+                <p className="text-[11px] text-gray-500">테이블이 아직 없다면 &apos;트래픽&apos; 탭 하단의 Supabase SQL을 실행해주세요.</p>
+              </div>
+            )}
+
+            {/* KPI 8개 */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <KpiCard label="오늘 방문자" value={statsLoading ? "—" : (stats?.todayViews ?? 0).toLocaleString()} sub="페이지 뷰 기준" color="#38bdf8" />
               <KpiCard label="누적 방문자" value={statsLoading ? "—" : (stats?.totalViews ?? 0).toLocaleString()} color="#818cf8" />
@@ -294,6 +312,9 @@ export default function AdminPage() {
               <KpiCard label="누적 매출" value={statsLoading ? "—" : `₩${(stats?.totalRevenue ?? 0).toLocaleString()}`} color="#fbbf24" />
               <KpiCard label="결제 전환율" value={statsLoading ? "—" : `${stats?.conversionRate ?? 0}%`}
                 sub={`총 ${(stats?.totalPaidCount ?? 0).toLocaleString()}건 결제`} color="#f472b6" />
+              <KpiCard label="평균 결제 금액" value={statsLoading ? "—" : `₩${(stats?.avgOrderValue ?? 0).toLocaleString()}`} color="#22d3ee" />
+              <KpiCard label="재구매 고객 비율" value={statsLoading ? "—" : `${stats?.repeatRate ?? 0}%`}
+                sub={`최근 결제 고객 ${(stats?.distinctCustomerCount ?? 0)}명 중 ${(stats?.repeatCustomerCount ?? 0)}명`} color="#a78bfa" />
             </div>
 
             {/* 7일 방문 + 매출 차트 */}
@@ -317,7 +338,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* 카카오 유저 + 블루베리 요약 */}
+            {/* 카카오 유저 + 별조각 요약 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl p-4" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
                 <p className="text-xs text-yellow-400 font-bold mb-1">카카오 가입자</p>
@@ -517,6 +538,12 @@ create table if not exists chat_questions (
   question_norm text primary key,
   count integer not null default 1,
   updated_at timestamptz default now()
+);
+create table if not exists saju_trait_events (
+  id bigint generated always as identity primary key,
+  trait_key text not null,
+  page text not null default '/',
+  created_at timestamptz default now()
 );`}</pre>
             </div>
           </>
@@ -558,7 +585,7 @@ create table if not exists chat_questions (
                   ))}
             </div>
 
-            {/* 블루베리 충전 내역 */}
+            {/* 별조각 충전 내역 */}
             <div className="rounded-2xl p-5" style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.15)" }}>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-bold text-violet-400">별조각 충전 내역</p>

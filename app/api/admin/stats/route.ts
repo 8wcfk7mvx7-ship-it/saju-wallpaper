@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     sb.from("page_views").select("page, created_at").gte("created_at", todayStart.toISOString()),
     sb.from("kakao_users").select("id, nickname, profile_image, email, created_at, last_login").order("created_at", { ascending: false }).limit(50),
     sb.from("kakao_users").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
-    sb.from("payments").select("amount, product_name, created_at").ilike("product_name", "%블루베리%").order("created_at", { ascending: false }).limit(50),
+    sb.from("payments").select("amount, product_name, created_at").or("product_name.ilike.%블루베리%,product_name.ilike.%별조각%").order("created_at", { ascending: false }).limit(50),
     sb.from("chat_questions").select("question_norm, count").order("count", { ascending: false }).limit(20),
   ]);
 
@@ -113,11 +113,33 @@ export async function GET(req: NextRequest) {
     ? ((totalPaidCount / totalRes.count) * 100).toFixed(2)
     : "0.00";
 
+  // ── 평균 결제 금액 / 재구매 고객 비율 (최근 결제 100건 기준) ──
+  const avgOrderValue = totalPaidCount > 0 ? Math.round(totalRevenue / totalPaidCount) : 0;
+  const emailCounts: Record<string, number> = {};
+  for (const p of paymentsRes.data ?? []) {
+    if (!p.customer_email) continue;
+    emailCounts[p.customer_email] = (emailCounts[p.customer_email] || 0) + 1;
+  }
+  const distinctCustomerCount = Object.keys(emailCounts).length;
+  const repeatCustomerCount = Object.values(emailCounts).filter(c => c >= 2).length;
+  const repeatRate = distinctCustomerCount > 0
+    ? ((repeatCustomerCount / distinctCustomerCount) * 100).toFixed(1)
+    : "0.0";
+
   // ── 월령도사 인기 질문 (익명화·정규화된 문구별 누적 카운트, DB에서 이미 집계됨) ──
   const topQuestions = (chatQuestionsRes.data ?? []).map((v) => ({ question: v.question_norm, count: v.count }));
 
+  // ── DB 테이블별 조회 오류 진단 (테이블 미생성·권한 문제 등을 화면에서 바로 확인) ──
+  const dbDiagnostics = [
+    { table: "page_views", error: todayRes.error?.message || totalRes.error?.message || pageViewsWeekRes.error?.message || pageViewsTodayAllRes.error?.message || null },
+    { table: "payments", error: paymentsRes.error?.message || allPaymentsMonthRes.error?.message || allPaymentsPrevMonthRes.error?.message || blueberryPaymentsRes.error?.message || null },
+    { table: "kakao_users", error: kakaoUsersRes.error?.message || kakaoUsersTodayRes.error?.message || null },
+    { table: "chat_questions", error: chatQuestionsRes.error?.message || null },
+  ].filter((d): d is { table: string; error: string } => !!d.error);
+
   return NextResponse.json({
     dbConnected: true,
+    dbDiagnostics,
     todayViews: todayRes.count ?? 0,
     totalViews: totalRes.count ?? 0,
     todayRevenue,
@@ -126,6 +148,10 @@ export async function GET(req: NextRequest) {
     totalRevenue,
     totalPaidCount,
     conversionRate,
+    avgOrderValue,
+    distinctCustomerCount,
+    repeatCustomerCount,
+    repeatRate,
     payments: paymentsRes.data ?? [],
     dailyViews: Object.entries(dailyViewsMap).map(([date, count]) => ({ date, count })),
     dailyRevenue: Object.entries(dailyRevenueMap).map(([date, amount]) => ({ date, amount })),
