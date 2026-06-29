@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
     kakaoUsersRes, kakaoUsersTodayRes,
     blueberryPaymentsRes,
     chatQuestionsRes,
+    shareLinkTodayRes, shareLinkTotalRes,
+    saveImageTodayRes, saveImageTotalRes,
   ] = await Promise.all([
     sb.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
     sb.from("page_views").select("id", { count: "exact", head: true }),
@@ -49,6 +51,10 @@ export async function GET(req: NextRequest) {
     sb.from("kakao_users").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
     sb.from("payments").select("amount, product_name, created_at").or("product_name.ilike.%블루베리%,product_name.ilike.%별조각%").order("created_at", { ascending: false }).limit(50),
     sb.from("chat_questions").select("question_norm, count").order("count", { ascending: false }).limit(20),
+    sb.from("saju_trait_events").select("id", { count: "exact", head: true }).eq("trait_key", "share_link").gte("created_at", todayStart.toISOString()),
+    sb.from("saju_trait_events").select("id", { count: "exact", head: true }).eq("trait_key", "share_link"),
+    sb.from("saju_trait_events").select("id", { count: "exact", head: true }).eq("trait_key", "save_image").gte("created_at", todayStart.toISOString()),
+    sb.from("saju_trait_events").select("id", { count: "exact", head: true }).eq("trait_key", "save_image"),
   ]);
 
   // ── 7일 일별 방문자 ──
@@ -135,6 +141,7 @@ export async function GET(req: NextRequest) {
     { table: "payments", error: paymentsRes.error?.message || allPaymentsMonthRes.error?.message || allPaymentsPrevMonthRes.error?.message || blueberryPaymentsRes.error?.message || null },
     { table: "kakao_users", error: kakaoUsersRes.error?.message || kakaoUsersTodayRes.error?.message || null },
     { table: "chat_questions", error: chatQuestionsRes.error?.message || null },
+    { table: "saju_trait_events", error: shareLinkTodayRes.error?.message || shareLinkTotalRes.error?.message || saveImageTodayRes.error?.message || saveImageTotalRes.error?.message || null },
   ].filter((d): d is { table: string; error: string } => !!d.error);
 
   return NextResponse.json({
@@ -164,5 +171,9 @@ export async function GET(req: NextRequest) {
     blueberryPayments: blueberryPaymentsRes.data ?? [],
     blueberryRevenue: (blueberryPaymentsRes.data ?? []).reduce((s, p) => s + p.amount, 0),
     topQuestions,
+    shareLinkToday: shareLinkTodayRes.count ?? 0,
+    shareLinkTotal: shareLinkTotalRes.count ?? 0,
+    saveImageToday: saveImageTodayRes.count ?? 0,
+    saveImageTotal: saveImageTotalRes.count ?? 0,
   });
 }

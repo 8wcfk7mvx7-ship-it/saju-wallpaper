@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { trackTraits } from "@/lib/trackTrait";
 
 export default function ShareButton({ title = "내 사주 분석 결과", text = "Summer Palace에서 내 사주를 분석했어요" }: { title?: string; text?: string }) {
   const [copied, setCopied] = useState(false);
@@ -7,9 +8,14 @@ export default function ShareButton({ title = "내 사주 분석 결과", text =
   async function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
-      try { await navigator.share({ title, text, url }); return; } catch {}
+      try {
+        await navigator.share({ title, text, url });
+        trackTraits(["share_link"], window.location.pathname);
+        return;
+      } catch {}
     }
     await navigator.clipboard.writeText(url);
+    trackTraits(["share_link"], window.location.pathname);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

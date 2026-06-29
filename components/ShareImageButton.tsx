@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { trackTraits } from "@/lib/trackTrait";
 
 export default function ShareImageButton({ targetId, fileName }: { targetId: string; fileName: string }) {
   const [saving, setSaving] = useState(false);
@@ -16,6 +17,7 @@ export default function ShareImageButton({ targetId, fileName }: { targetId: str
       link.download = `${fileName}.png`;
       link.href = dataUrl;
       link.click();
+      trackTraits(["save_image"], window.location.pathname);
       setDone(true);
       setTimeout(() => setDone(false), 2000);
     } catch {

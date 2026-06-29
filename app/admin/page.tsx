@@ -60,6 +60,10 @@ interface Stats {
   blueberryPayments: { amount: number; product_name: string; created_at: string }[];
   blueberryRevenue: number;
   topQuestions: { question: string; count: number }[];
+  shareLinkToday: number;
+  shareLinkTotal: number;
+  saveImageToday: number;
+  saveImageTotal: number;
 }
 
 const TABS = [
@@ -349,6 +353,20 @@ export default function AdminPage() {
                 <p className="text-xs text-violet-400 font-bold mb-1">별조각 충전 매출</p>
                 <p className="text-2xl font-black text-white">₩{statsLoading ? "—" : (stats?.blueberryRevenue ?? 0).toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">{(stats?.blueberryPayments ?? []).length}건</p>
+              </div>
+            </div>
+
+            {/* 친구 공유 + 이미지 저장 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl p-4" style={{ background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)" }}>
+                <p className="text-xs text-sky-400 font-bold mb-1">친구에게 공유</p>
+                <p className="text-2xl font-black text-white">{statsLoading ? "—" : (stats?.shareLinkTotal ?? 0).toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">오늘 +{stats?.shareLinkToday ?? 0}회</p>
+              </div>
+              <div className="rounded-2xl p-4" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                <p className="text-xs text-emerald-400 font-bold mb-1">이미지로 저장</p>
+                <p className="text-2xl font-black text-white">{statsLoading ? "—" : (stats?.saveImageTotal ?? 0).toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">오늘 +{stats?.saveImageToday ?? 0}회</p>
               </div>
             </div>
 
