@@ -84,11 +84,11 @@ function analyzeYear(r: SajuResult, y: YearInfo) {
 
   // 용신/희신/기신 관계
   if (yearCgEl === yongshinEl || yearCgEl === heeshinEl) {
-    lines.push({ title: "용신·희신의 해 — 흐름이 나를 돕습니다", tone: "good",
-      desc: `${y.year}년의 기운(${yearCgEl})이 이 사주에 필요한 용신 또는 희신과 같은 오행입니다. 평소보다 일이 술술 풀리는 느낌을 받기 쉬운 해입니다. 다만 운이 좋다고 느낄 때일수록 기본을 다지는 작업(건강, 자산 정리, 인간관계 정비)을 함께 해두면 다음 흐름까지 안정적으로 이어집니다.` });
+    lines.push({ title: "사주의 흐름이 나를 돕는 해입니다", tone: "good",
+      desc: `${y.year}년의 기운(${yearCgEl})이 이 사주에 필요한 오행과 같습니다. 평소보다 일이 술술 풀리는 느낌을 받기 쉬운 해입니다. 다만 운이 좋다고 느낄 때일수록 기본을 다지는 작업(건강, 자산 정리, 인간관계 정비)을 함께 해두면 다음 흐름까지 안정적으로 이어집니다.` });
   } else if (yearCgEl === gishinEl) {
-    lines.push({ title: "기신의 해 — 평소보다 신중함이 필요합니다", tone: "warn",
-      desc: `${y.year}년의 기운(${yearCgEl})이 이 사주에서 꺼리는 기신과 같은 오행입니다. 평소 같으면 무리 없이 넘어갈 일도 한 번 더 발목을 잡는 듯한 느낌을 받을 수 있습니다. 큰 결정(이사, 사업 확장, 큰 투자)은 가급적 다음 해로 미루고, 올해는 내부 정비와 체력 관리에 집중하는 것이 좋습니다.` });
+    lines.push({ title: "평소보다 신중함이 필요한 해입니다", tone: "warn",
+      desc: `${y.year}년의 기운(${yearCgEl})이 이 사주에서 꺼리는 오행입니다. 평소 같으면 무리 없이 넘어갈 일도 한 번 더 발목을 잡는 듯한 느낌을 받을 수 있습니다. 큰 결정(이사, 사업 확장, 큰 투자)은 가급적 다음 해로 미루고, 올해는 내부 정비와 체력 관리에 집중하는 것이 좋습니다.` });
   }
 
   return lines;
@@ -156,7 +156,7 @@ export default function NewYearPage() {
           <FadeIn delay={100}>
             <p className="text-gray-400 text-base mb-2 leading-relaxed">
               매년 똑같은 운세를 보고 있지 않나요?<br />
-              <span className="text-gray-300 font-medium">내 일간·일지·용신 기준으로 본 진짜 흐름입니다.</span>
+              <span className="text-gray-300 font-medium">내 일간·일지·사주 전체 기준으로 본 진짜 흐름입니다.</span>
             </p>
             <p className="text-gray-600 text-sm mb-12">
               2026년과 2027년, 미리 알고 준비하세요
@@ -168,7 +168,7 @@ export default function NewYearPage() {
               {[
                 ["일간 vs 세운 — 합·충·생·극", "올해의 기운이 나를 돕는지, 압박하는지 정확히 진단"],
                 ["일지 vs 세운 지지 — 변화의 신호", "이사·이직·관계 변화가 들어오기 쉬운 해인지 확인"],
-                ["용신·희신·기신 — 흐름의 총평", "이 해가 나에게 순풍인지 역풍인지 한 줄로 정리"],
+                ["내 사주와 올해 기운 — 흐름의 총평", "이 해가 나에게 순풍인지 역풍인지 한 줄로 정리"],
               ].map(([title, desc]) => (
                 <div key={title} className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
@@ -281,7 +281,7 @@ export default function NewYearPage() {
         <div className="bg-gradient-to-br from-rose-950/60 to-amber-950/40 border border-rose-700/30 rounded-3xl p-6 mb-5 text-center">
           <p className="text-rose-300 text-xs font-bold tracking-widest uppercase mb-2">{y.year}년 — {y.label}({y.hanja})</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            {y.year}년은 천간 &apos;{y.cg}&apos;, 지지 &apos;{y.jj}&apos;의 기운이 흐르는 해입니다. 아래는 이 기운이 당신의 일간 &apos;{r.pillarsDetail.day.cg}&apos;, 일지 &apos;{r.pillarsDetail.day.jj}&apos;, 그리고 사주 전체의 용신(&apos;{r.yongshin.yongshin}&apos;)과 어떻게 맞부딫히는지를 정리한 결과입니다.
+            {y.year}년은 천간 &apos;{y.cg}&apos;, 지지 &apos;{y.jj}&apos;의 기운이 흐르는 해입니다. 아래는 이 기운이 당신의 일간 &apos;{r.pillarsDetail.day.cg}&apos;, 일지 &apos;{r.pillarsDetail.day.jj}&apos;, 그리고 사주 전체에 필요한 핵심 기운(&apos;{r.yongshin.yongshin}&apos;)과 어떻게 맞부딫히는지를 정리한 결과입니다.
           </p>
         </div>
 
@@ -300,7 +300,7 @@ export default function NewYearPage() {
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-gray-300 mb-1">월별 흐름 한눈에 보기 (음력 기준)</p>
-          <p className="text-xs text-gray-500 mb-3">각 달의 기운이 내 용신·희신·기신과 만나는지 표시했습니다. 초록은 순풍, 빨강은 신중 모드.</p>
+          <p className="text-xs text-gray-500 mb-3">각 달의 기운이 내 사주의 필요 기운·도움 기운·꺼리는 기운과 만나는지 표시했습니다. 초록은 순풍, 빨강은 신중 모드.</p>
           <div className="grid grid-cols-6 gap-2">
             {months.map((mo) => (
               <div key={mo.month} className="flex flex-col items-center gap-1 bg-white/[0.02] border border-white/5 rounded-xl py-2.5">

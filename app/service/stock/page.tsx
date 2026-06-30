@@ -579,7 +579,7 @@ export default function StockPage() {
         <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: ed.bg, borderColor: ed.border }}>
           <div className="flex items-start justify-between mb-3">
             <div>
-              <span className="text-xs font-bold tracking-widest mb-1 block" style={{ color: ed.color }}>용신 · 핵심 투자 오행</span>
+              <span className="text-xs font-bold tracking-widest mb-1 block" style={{ color: ed.color }}>핵심 투자 오행</span>
               <span className="text-2xl font-black" style={{ color: ed.color }}>{EL_HAN[yongshin]} {yongshin} — {ed.style}</span>
             </div>
           </div>
@@ -654,7 +654,7 @@ export default function StockPage() {
               </div>
               {uu.smj && (
                 <div className="mt-3 bg-red-950/40 border border-red-500/20 rounded-xl p-3">
-                  <p className="text-xs text-red-300 leading-relaxed">⚠️ 사묘절 에너지: 일간의 기력이 소진·정체·단절되는 구간입니다. <strong>큰 투자 결정 전 반드시 신중하게 검토</strong>하고, 용신 오행 환경으로 에너지를 보충하세요.</p>
+                  <p className="text-xs text-red-300 leading-relaxed">⚠️ 사묘절 에너지: 일간의 기력이 소진·정체·단절되는 구간입니다. <strong>큰 투자 결정 전 반드시 신중하게 검토</strong>하고, 사주에 필요한 오행 환경으로 에너지를 보충하세요.</p>
                 </div>
               )}
             </div>

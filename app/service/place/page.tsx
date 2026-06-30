@@ -121,7 +121,7 @@ const ELEMENT_LABELS: Record<string, { color: string; emoji: string; label: stri
 };
 
 const FEATURES = [
-  { icon: "🇰🇷", title: "한국 추천 도시 3곳", desc: "용신 오행별 국내 최적 거주지 — 동네·먹거리·에너지까지" },
+  { icon: "🇰🇷", title: "한국 추천 도시 3곳", desc: "내 사주 기운별 국내 최적 거주지 — 동네·먹거리·에너지까지" },
   { icon: "🌍", title: "해외 추천 국가 3곳", desc: "이민·유학·취업에 유리한 나라 (3순위 무료 공개)" },
   { icon: "🧭", title: "유리한 방위", desc: "침실·책상·소파 배치까지 — 공간 에너지 최적화" },
   { icon: "🏙️", title: "현재 도시 궁합 분석", desc: "지금 사는 도시가 내 사주와 맞는지 즉시 진단" },
@@ -397,7 +397,7 @@ export default function PlacePage() {
           <div className="flex items-center gap-3 mb-5 p-4 rounded-2xl" style={{ background: `${elInfo?.color}10`, border: `1px solid ${elInfo?.color}30` }}>
             <span className="text-3xl">{elInfo?.emoji}</span>
             <div className="flex-1">
-              <p className="text-xs text-white/40 mb-0.5">{form.name ? `${form.name}님 용신 기준` : "용신 기준"}</p>
+              <p className="text-xs text-white/40 mb-0.5">{form.name ? `${form.name}님 사주 기준` : "사주 기준"}</p>
               <p className="text-base font-black" style={{ color: elInfo?.color }}>{elInfo?.label} 기운을 보강하는 곳</p>
               <p className="text-xs text-white/30 mt-0.5">{elInfo?.keyword}</p>
             </div>
@@ -415,8 +415,8 @@ export default function PlacePage() {
                 </p>
                 <p className="text-xs text-white/45 leading-relaxed">
                   {isMatch
-                    ? `태어난 곳의 기운이 용신과 일치합니다. 고향 근처에서도 좋은 기운을 받을 수 있지만, 아래 추천 도시에서 더욱 크게 꽃피울 수 있어요.`
-                    : `태어난 곳의 기운과 용신이 다릅니다. 고향에서 멀어질수록 새로운 기운 안에서 더 크게 성장하는 사주입니다. 아래 추천 도시로의 이동을 고려해보세요.`}
+                    ? `태어난 곳의 기운이 내 사주에 꼭 필요한 기운과 일치합니다. 고향 근처에서도 좋은 기운을 받을 수 있지만, 아래 추천 도시에서 더욱 크게 꽃피울 수 있어요.`
+                    : `태어난 곳의 기운과 내 사주에 필요한 기운이 다릅니다. 고향에서 멀어질수록 새로운 기운 안에서 더 크게 성장하는 사주입니다. 아래 추천 도시로의 이동을 고려해보세요.`}
                 </p>
               </div>
             );
@@ -438,9 +438,9 @@ export default function PlacePage() {
               </p>
               <p className="text-xs text-white/45 leading-relaxed">
                 {currentCityEl === displayEl
-                  ? `현재 도시(${ELEMENT_LABELS[currentCityEl]?.label} 기운)가 용신 오행과 일치합니다. 지금 위치에서 운을 꽃피울 수 있습니다.`
+                  ? `현재 도시(${ELEMENT_LABELS[currentCityEl]?.label} 기운)가 내 사주에 필요한 기운과 일치합니다. 지금 위치에서 운을 꽃피울 수 있습니다.`
                   : currentCityEl
-                    ? `현재 도시는 ${ELEMENT_LABELS[currentCityEl]?.label} 기운입니다. 용신 ${elInfo?.label}과 충돌할 수 있어 아래 추천 도시로의 이동을 고려해보세요.`
+                    ? `현재 도시는 ${ELEMENT_LABELS[currentCityEl]?.label} 기운입니다. 내 사주에 필요한 기운(${elInfo?.label})과 충돌할 수 있어 아래 추천 도시로의 이동을 고려해보세요.`
                     : "해당 도시 데이터가 없습니다. 아래 추천 도시를 참고해 판단해주세요."}
               </p>
             </div>

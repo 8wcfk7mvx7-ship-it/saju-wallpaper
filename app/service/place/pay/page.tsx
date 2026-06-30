@@ -84,7 +84,7 @@ function PlacePayContent() {
           <ul className="space-y-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
             <li>✓ 해외 2·3순위 국가 완전 공개</li>
             <li>✓ 5개 오행 전체 한국 도시 비교</li>
-            <li>✓ 용신 오행별 주의해야 할 방향</li>
+            <li>✓ 내 사주 기운별 주의해야 할 방향</li>
             <li>✓ 해외 이민·유학·출장 적합도</li>
           </ul>
         </div>

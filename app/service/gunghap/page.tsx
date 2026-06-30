@@ -438,7 +438,7 @@ export default function GunghapPage(){
     const ys1=r1.yongshin.yongshin, ys2=r2.yongshin.yongshin;
     const rel=ohaengRel(ys1,ys2);
     const yongsinScore=rel==='상생'?10:rel==='상극'?-8:3;
-    const yongsinDesc=rel==='상생'?`${p1.name}의 용신(${ys1}) ↔ ${p2.name}의 용신(${ys2}) 상생 ✅`:rel==='상극'?`${p1.name}의 용신(${ys1}) ↔ ${p2.name}의 용신(${ys2}) 상극 ⚠️`:`${p1.name}의 용신(${ys1}) ↔ ${p2.name}의 용신(${ys2}) 중립`;
+    const yongsinDesc=rel==='상생'?`${p1.name}의 핵심 기운(${ys1}) ↔ ${p2.name}의 핵심 기운(${ys2}) 상생 ✅`:rel==='상극'?`${p1.name}의 핵심 기운(${ys1}) ↔ ${p2.name}의 핵심 기운(${ys2}) 상극 ⚠️`:`${p1.name}의 핵심 기운(${ys1}) ↔ ${p2.name}의 핵심 기운(${ys2}) 중립`;
     let ohaengBonus=0;
     for(const el of r1.lacking) if(r2.dominant.includes(el)) ohaengBonus+=6;
     for(const el of r2.lacking) if(r1.dominant.includes(el)) ohaengBonus+=6;
@@ -734,7 +734,7 @@ export default function GunghapPage(){
                 return (
                 <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:12,padding:'12px',border:'1px solid rgba(255,255,255,0.06)'}}>
                   <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5,fontWeight:700}}>{pp.name}</p>
-                  <p style={{fontSize:10,color:r.yongshin.strength==='신강'?'#ff9f43':'#54a0ff',marginBottom:8}}>{r.yongshin.strength} 용신:{r.yongshin.yongshin}</p>
+                  <p style={{fontSize:10,color:r.yongshin.strength==='신강'?'#ff9f43':'#54a0ff',marginBottom:8}}>{r.yongshin.strength} 핵심 기운:{r.yongshin.yongshin}</p>
                   <table style={{width:'100%',textAlign:'center',borderCollapse:'collapse'}}>
                     <thead>
                       <tr>
@@ -958,7 +958,7 @@ export default function GunghapPage(){
 
             {/* ⑤ 용신/오행 */}
             <div style={{background:'rgba(255,255,255,0.03)',borderRadius:13,padding:'14px',marginBottom:14,border:'1px solid rgba(255,255,255,0.06)'}}>
-              <p style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.35)',marginBottom:8,letterSpacing:'0.1em'}}>용신·오행 조화</p>
+              <p style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.35)',marginBottom:8,letterSpacing:'0.1em'}}>핵심 기운·오행 조화</p>
               <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',marginBottom:5,lineHeight:1.5}}>{result.yongsinDesc}</p>
               <p style={{fontSize:12,color:'rgba(255,255,255,0.45)',lineHeight:1.5,marginBottom:8}}>{result.ohaengDesc}</p>
               {(()=>{

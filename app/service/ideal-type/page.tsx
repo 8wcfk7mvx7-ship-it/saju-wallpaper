@@ -122,7 +122,7 @@ export default function IdealTypePage() {
             <div className="w-full space-y-3 mb-10 text-left">
               {[
                 ["일간 기반 무의식적 끌림", "그 사람이 입으로 말하는 타입과 실제로 끌리는 타입은 다릅니다"],
-                ["용신·조후로 보는 에너지 궁합", "사주의 균형을 채워줄 파트너 기운을 정확히 짚어냅니다"],
+                ["사주 에너지 궁합", "사주의 균형을 채워줄 파트너 기운을 정확히 짚어냅니다"],
                 ["끌리는 상대의 패턴 분석", "왜 항상 비슷한 사람을 만나는지, 그 이유가 보입니다"],
                 ["피해야 할 상대 유형", "내가 그 유형에 해당하는지 미리 확인해보세요"],
               ].map(([title, desc]) => (
@@ -344,9 +344,9 @@ export default function IdealTypePage() {
 
         {/* 용신 기반 파트너 에너지 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-violet-300 mb-2">용신({yongshinEl}) — 사주의 균형을 채울 파트너 에너지</p>
+          <p className="text-sm font-bold text-violet-300 mb-2">사주의 균형을 채울 파트너 에너지 — {yongshinEl} 기운</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            이 사주의 용신은 <span className="text-violet-200 font-semibold">{yongshinEl}(氣)</span>예요.
+            이 사주에 꼭 필요한 기운은 <span className="text-violet-200 font-semibold">{yongshinEl}(氣)</span>예요.
             {" "}{YONGSHIN_PARTNER[yongshinEl] ?? ""}
           </p>
         </div>

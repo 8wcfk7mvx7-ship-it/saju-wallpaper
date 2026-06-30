@@ -877,16 +877,16 @@ function ResultView({
         const gusinMap: Record<string,string> = { 목:"수", 화:"목", 토:"화", 금:"토", 수:"금" };
         const gusin = gusinMap[gishin] || "";
         return (
-          <Section title="격국 · 용신 · 조후 (格局用神)" accent="#a78bfa">
-            {/* 억부용신 그리드 */}
-            <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>억부용신(抑扶用神)</p>
+          <Section title="사주 구조 · 필요 기운 · 계절 균형" accent="#a78bfa">
+            {/* 필요 기운 그리드 */}
+            <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>균형 필요 기운</p>
             <div className="grid grid-cols-2 gap-2 mb-2">
               {[
                 { label: "신강/신약", value: ys.strength, color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" },
-                { label: "억부용신", value: ys.yongshin, color: EL_STYLE[ys.yongshin]?.text || "#fff" },
-                { label: "희신(喜神)", value: ys.heeshin, color: EL_STYLE[ys.heeshin]?.text || "#fff" },
-                { label: "기신(忌神)", value: gishin, color: EL_STYLE[gishin]?.text || "#fff" },
-                { label: "구신(仇神)", value: gusin, color: EL_STYLE[gusin]?.text || "#9ca3af" },
+                { label: "필요 기운", value: ys.yongshin, color: EL_STYLE[ys.yongshin]?.text || "#fff" },
+                { label: "도움 기운", value: ys.heeshin, color: EL_STYLE[ys.heeshin]?.text || "#fff" },
+                { label: "꺼리는 기운", value: gishin, color: EL_STYLE[gishin]?.text || "#fff" },
+                { label: "피할 기운", value: gusin, color: EL_STYLE[gusin]?.text || "#9ca3af" },
               ].map(item => (
                 <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                   <p className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{item.label}</p>
@@ -897,11 +897,11 @@ function ResultView({
             {/* 조후용신 */}
             {johu && (
               <div className="mb-4 rounded-xl px-4 py-3" style={{ background: jysDiff ? "rgba(251,191,36,0.06)" : "rgba(255,255,255,0.03)", border: `1px solid ${jysDiff ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.06)"}` }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: jysDiff ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>조후용신(調候用神): {johu.yongshin} · 희신: {johu.heeshin}</p>
+                <p className="text-[10px] font-bold mb-1" style={{ color: jysDiff ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>계절 균형 기운: {johu.yongshin} · 도움 기운: {johu.heeshin}</p>
                 <p className="text-xs leading-relaxed" style={{ color: jysDiff ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>{johu.desc}</p>
                 {jysDiff && (
                   <p className="text-[10px] mt-1.5 font-bold" style={{ color: "#fbbf24" }}>
-                    ※ 억부용신({ys.yongshin})과 조후용신({johu.yongshin})이 다릅니다. 둘을 함께 고려하세요.
+                    ※ 균형 필요 기운({ys.yongshin})과 계절 균형 기운({johu.yongshin})이 다릅니다. 둘을 함께 고려하세요.
                   </p>
                 )}
               </div>

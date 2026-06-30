@@ -712,8 +712,8 @@ export default function CalendarPage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-sm font-semibold mb-2 text-white">📌 길일 선택 안내</p>
           <ul className="space-y-1.5 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
-            <li>• 일간 <strong className="text-white">{userIlgan}</strong> · 월지 <strong className="text-white">{userMonthJj}</strong> 기준 12운성·조후용신·오행을 종합 분석했습니다</li>
-            <li>• 조후(調候)용신 — 태어난 계절에 필요한 오행이 있는 날을 우선 추천합니다</li>
+            <li>• 일간 <strong className="text-white">{userIlgan}</strong> · 월지 <strong className="text-white">{userMonthJj}</strong> 기준 12운성·계절 균형 기운·오행을 종합 분석했습니다</li>
+            <li>• 계절 균형 기운 — 태어난 계절에 필요한 오행이 있는 날을 우선 추천합니다</li>
             <li>• 길일이라도 음력 손 없는 날과 함께 확인하면 더욱 좋습니다</li>
             <li>• 흉일은 가급적 피하되, 불가피하다면 오전 시간을 활용하세요</li>
             <li>• 본 결과는 사주 이론 기반 참고용입니다</li>

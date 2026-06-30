@@ -367,7 +367,7 @@ export default function WealthPage() {
         )}
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-          <p className="text-sm font-bold mb-1" style={{ color: ELEMENT_BOOST[yongshinEl].color }}>보조 처방 — 용신 오행 &apos;{yongshinEl}&apos; 보강 아이템</p>
+          <p className="text-sm font-bold mb-1" style={{ color: ELEMENT_BOOST[yongshinEl].color }}>보조 처방 — 내 사주 핵심 오행 &apos;{yongshinEl}&apos; 보강 아이템</p>
           <p className="text-xs text-gray-500 mb-2">추천 아이템: {ELEMENT_BOOST[yongshinEl].item}</p>
           <p className="text-sm text-gray-300 leading-relaxed">{ELEMENT_BOOST[yongshinEl].tip}</p>
         </div>
