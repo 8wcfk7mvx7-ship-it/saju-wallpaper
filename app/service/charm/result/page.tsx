@@ -498,6 +498,16 @@ function CharmResultContent() {
                       </div>
                     ))}
                   </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="bg-black/20 rounded-xl p-3">
+                      <p className="text-xs text-gray-500 mb-1">🎯 추천 취미</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.hobbies}</p>
+                    </div>
+                    <div className="bg-black/20 rounded-xl p-3">
+                      <p className="text-xs text-gray-500 mb-1">📍 행운의 장소</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.places}</p>
+                    </div>
+                  </div>
                   <div className="bg-black/20 rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-2">💡 매력 개운 핵심 팁</p>
                     <p className="text-sm text-gray-200 leading-relaxed">{gaewun.charm_tip}</p>
