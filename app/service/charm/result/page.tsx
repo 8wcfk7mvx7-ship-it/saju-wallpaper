@@ -44,12 +44,22 @@ const UUNSEONG_CHARM: Record<string, { title: string; desc: string; score: numbe
   양: { title: "양(養) — 따뜻한 성장 매력", desc: "자라나는 생명처럼 따뜻하고 포근한 매력. 함께 성장하고 싶다는 느낌을 주는 nurturing한 에너지.", score: 70, color: "#a78bfa" },
 };
 
-const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
-  목: { look: "갸름하고 긴 얼굴형. 키가 크거나 체형이 날렵함. 이목구비가 선명하고 활기 있는 인상.", celebs: "임시완, 공유 / 아이유, 한지민" },
-  화: { look: "이목구비가 뚜렷하고 눈빛이 강렬함. 피부가 맑고 전체적으로 선명한 인상. 표정이 풍부함.", celebs: "이효리, 강호동 / 박보영, 유인나" },
-  토: { look: "계란형 또는 둥근 얼굴. 고급지고 담백한 피부결. 편안하고 품격 있는 자연스러운 인상.", celebs: "차인표, 이서진 / 김혜수, 김태리, 신민아" },
-  금: { look: "날카롭고 정제된 이목구비. 샤프하고 세련된 도시 느낌. 뼈대가 있고 각진 분위기.", celebs: "이정재, 손현주 / 전지현, 수지, 김태희, 민효린" },
-  수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
+const OHAENG_LOOK: Record<string, { look: string; celebs: string; skin: string; skinCare: string }> = {
+  목: { look: "갸름하고 긴 얼굴형. 키가 크거나 체형이 날렵함. 이목구비가 선명하고 활기 있는 인상.", celebs: "임시완, 공유 / 아이유, 한지민",
+    skin: "목(木) 기운이 많은 사주는 피부가 건조해지기 쉽고 트러블이 반복되는 경향이 있습니다. 황갈색·올리브 톤 피부가 많으며 눈가 주름이 일찍 생길 수 있어요.",
+    skinCare: "수분 공급이 최우선. 히알루론산·세라마이드 계열 보습제를 꾸준히 사용하고, 충분한 수면이 피부 회복의 핵심입니다." },
+  화: { look: "이목구비가 뚜렷하고 눈빛이 강렬함. 피부가 맑고 전체적으로 선명한 인상. 표정이 풍부함.", celebs: "이효리, 강호동 / 박보영, 유인나",
+    skin: "화(火) 기운이 많은 사주는 얼굴이 쉽게 붉어지고 홍조가 잦습니다. 열이 많아 여름에 더위를 많이 타며, 민감성·복합성 피부인 경우가 많아요.",
+    skinCare: "자극을 줄이는 것이 핵심. 순한 성분의 진정 케어 제품을 쓰고, 자외선 차단을 철저히 하세요. 실내 환기와 수분 섭취도 중요합니다." },
+  토: { look: "계란형 또는 둥근 얼굴. 고급지고 담백한 피부결. 편안하고 품격 있는 자연스러운 인상.", celebs: "차인표, 이서진 / 김혜수, 김태리, 신민아",
+    skin: "토(土) 기운이 많은 사주는 고급스럽고 담백한 피부결이 특징입니다. 살이 잘 붙는 체질이고, 피부톤이 따뜻한 웜톤인 경우가 많아요.",
+    skinCare: "과도한 당분과 기름진 음식은 줄이고, 꾸준한 루틴 관리가 피부를 지켜줍니다. 마사지로 혈액순환을 도와주세요." },
+  금: { look: "날카롭고 정제된 이목구비. 샤프하고 세련된 도시 느낌. 뼈대가 있고 각진 분위기.", celebs: "이정재, 손현주 / 전지현, 수지, 김태희, 민효린",
+    skin: "금(金) 기운이 많은 사주는 피부가 희고 맑은 편입니다. 체모가 적고 피부결이 섬세하며, 건성·민감성 피부 경향이 있어요.",
+    skinCare: "자극적인 각질 제거는 피하고, 부드러운 성분의 영양 크림으로 피부 장벽을 탄탄히 유지하세요. 광택 있는 피부 관리가 잘 맞습니다." },
+  수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중",
+    skin: "수(水) 기운이 많은 사주는 촉촉하고 물광 피부가 많습니다. 동안 경향이 강하고 피부색이 맑고 투명하지만, 부기가 생기거나 모공이 넓어질 수 있어요.",
+    skinCare: "과도한 수분 공급보다 피부 탄력 케어가 핵심. 카페인·나트륨을 줄이고, 림프 마사지로 부기를 관리하면 더욱 좋습니다." },
 };
 
 const CHARM_PRICE = 4900;
@@ -257,7 +267,14 @@ function CharmResultContent() {
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
           <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""} {getAppearanceAnalysis(result).points.join(" ")}</p>
-          <p className="text-xs text-gray-600">📺 비슷한 스타일: {olook?.celebs}</p>
+          <p className="text-xs text-gray-600 mb-3">📺 비슷한 스타일: {olook?.celebs}</p>
+          {olook?.skin && (
+            <div className="border-t border-white/5 pt-3 mt-1">
+              <p className="text-[11px] text-pink-400/70 font-bold mb-1">💧 피부 특성 & 관리법</p>
+              <p className="text-xs text-gray-400 leading-relaxed mb-1">{olook.skin}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{olook.skinCare}</p>
+            </div>
+          )}
         </div>
 
         {/* ═══ 12운성 매력 지수 ═══ */}
