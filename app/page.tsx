@@ -43,7 +43,7 @@ const UI: Record<Lang, {
     navBadge: "AI 사주",
     nav: ["사주", "가이드", "일진달력", "문의하기"],
     mypage: "마이페이지",
-    badgeTags: ["격국·용신 분석", "신살 발견", "경도 보정", "무료"],
+    badgeTags: ["오행 균형 진단", "신살 발견", "경도 보정", "완전 무료"],
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -1235,12 +1235,22 @@ export default function MainPage() {
 
           {/* 피처 태그 */}
           <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
-            {t.badgeTags.map(tag => (
-              <span key={tag} className="text-xs px-3 py-1.5 rounded-full font-semibold"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.5)" }}>
-                {tag}
-              </span>
-            ))}
+            {t.badgeTags.map((tag, i) => {
+              const colors = [
+                { bg: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", color: "#f9a8d4", dot: "#f472b6" },
+                { bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.3)", color: "#c4b5fd", dot: "#a78bfa" },
+                { bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.3)",  color: "#93c5fd", dot: "#60a5fa" },
+                { bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.3)",  color: "#6ee7b7", dot: "#34d399" },
+              ];
+              const c = colors[i % colors.length];
+              return (
+                <span key={tag} className="inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-full font-semibold"
+                  style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.dot, boxShadow: `0 0 6px ${c.dot}` }} />
+                  {tag}
+                </span>
+              );
+            })}
           </div>
 
           {/* 신뢰 메시지 */}
