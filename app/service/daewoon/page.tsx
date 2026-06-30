@@ -96,7 +96,7 @@ const SIPSEONG_COLOR: Record<string, string> = {
   편인:"#94a3b8", 정인:"#e2e8f0",
 };
 
-const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: string; desc: string; narrative: string; caution: string; keyword: string; finance: string; career: string; love: string; health: string }> = {
+const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: string; desc: string; narrative: string; caution: string; keyword: string; finance: string; career: string; love: string; health: string; todo: string; avoid: string }> = {
   장생: {
     label:"장생(長生)", score:9, color:"#4ade80",
     desc:"새로운 생명이 태어나듯 에너지가 솟구치는 시기.",
@@ -107,6 +107,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"이 시기에 시작하는 일, 첫 발을 내딛는 분야가 인생의 방향을 결정해요. 진학·창업·취업·이직 등 새로운 출발이 긍정적인 결과를 만들기 좋은 시기예요. 적극적으로 나서세요.",
     love:"이성에게 생기 있고 신선한 매력이 발산되는 시기예요. 새로운 인연이 자연스럽게 찾아오고, 이 시기에 시작된 관계는 오래 이어지는 경우가 많아요.",
     health:"체력과 면역이 전반적으로 좋아지는 시기예요. 운동이나 건강 습관을 새로 시작하기 가장 좋은 타이밍이에요. 건강한 생활 패턴을 지금 잡아두세요.",
+    todo:"새로운 시작·도전·이직·창업·입학·이사. 이 시기에 심은 씨앗이 다음 대운에서 결실을 맺어요. 인맥을 넓히고 스킬을 쌓는 데 적극 투자하세요.",
+    avoid:"경험 없는 분야의 큰 투자·무리한 확장. 넘치는 에너지를 맹목적으로 여러 방향에 쏟으면 핵심이 흐려져요.",
   },
   목욕: {
     label:"목욕(沐浴)", score:6, color:"#34d399",
@@ -118,6 +120,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"창작·예술·방송·뷰티·엔터테인먼트처럼 감각과 표현력이 필요한 분야에서 빛을 발하는 시기예요. 이성 관계가 업무에 영향을 줄 수 있으니 사적 감정과 일을 분리하는 것이 중요해요.",
     love:"이성 인연이 가장 많이 들어오는 시기예요. 도화 기운이 극도로 강해져 유혹도 많고 끌림도 강해요. 진지한 관계를 원한다면 감정적 흥분보다 상대의 본질을 보는 것이 중요해요.",
     health:"정신적 과흥분, 무절제한 생활이 체력을 소모시킬 수 있어요. 수면, 절주, 규칙적인 생활 리듬이 이 시기의 건강을 지켜줘요. 성(性) 관련 건강에도 주의가 필요해요.",
+    todo:"감각과 표현력을 살린 창작·예술·콘텐츠 활동. 이 에너지를 생산적인 방향으로 쓰면 의외로 뛰어난 결과물이 나와요.",
+    avoid:"충동적 투자·주색·연애 문제. 이 시기에 생기는 감정적 결정은 나중에 큰 후회를 남기는 경우가 많아요.",
   },
   관대: {
     label:"관대(冠帶)", score:8, color:"#60a5fa",
@@ -129,6 +133,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"자격증 취득, 학업 완성, 취업, 첫 직장 정착에 매우 좋은 흐름이에요. 멘토나 상사의 도움을 받기 쉽고, 배운 것이 실력으로 빠르게 이어지는 시기예요. 공부와 자기계발에 집중하세요.",
     love:"사회적으로 성장하며 자연스럽게 매력이 올라가는 시기예요. 성숙하고 발전 가능성이 있는 이성에게 끌리는 경향이 강해요. 학업·직장 관련 인연이 자연스럽게 형성돼요.",
     health:"체력이 충분히 뒷받침되는 시기예요. 다만 학업·업무 스트레스가 누적되지 않도록 주기적인 휴식과 규칙적인 운동이 필요해요. 피로 관리를 잘 해야 다음 대운을 건강하게 맞을 수 있어요.",
+    todo:"자격증 취득·학업 완성·기술 습득·취업 준비. 이 시기에 쌓은 실력이 건록·제왕 대운의 성공 토대가 돼요.",
+    avoid:"조급하게 치고 나가기·경험 전의 창업. 배워야 할 시기에 무리하게 성과를 내려 하면 역효과가 나요.",
   },
   건록: {
     label:"건록(建祿)", score:10, color:"#818cf8",
@@ -140,6 +146,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"실력을 가장 인정받는 최전성기예요. 승진, 중요한 프로젝트 성공, 사업 성과가 쌓이는 시기예요. 지금의 성과가 이후 제왕 대운의 도약대가 되니 최선을 다해 쌓아두세요.",
     love:"심리적 안정감이 관계에도 긍정적으로 작용해요. 안정적인 연애·결혼이 이루어지기 좋은 시기예요. 이미 관계에 있다면 신뢰가 더욱 깊어지고, 서로의 지지자가 되는 흐름이에요.",
     health:"체력이 안정적으로 유지되는 시기예요. 규칙적인 운동과 건강한 식습관으로 이 좋은 기운을 유지하는 것이 중요해요. 이 시기의 건강 투자가 이후 쇠·병 대운에서 버티는 체력이 돼요.",
+    todo:"핵심 경력 쌓기·자산 형성·장기 투자·신뢰 관계 구축. 지금이 가장 안정적인 시기이니 기반을 탄탄히 다져두세요.",
+    avoid:"편안함에 안주하여 성장을 멈추는 것. 이 시기의 풍요가 영원할 것이라는 착각이 가장 위험해요.",
   },
   제왕: {
     label:"제왕(帝旺)", score:10, color:"#c084fc",
@@ -151,6 +159,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"자기 분야의 최고 자리에 오르거나, 가장 강한 리더십을 발휘하는 시기예요. 사람들이 자연스럽게 따르고, 본인이 원하는 방향으로 일이 흘러가요. 지나친 독단과 오만은 이 좋은 시기를 단축시켜요.",
     love:"강한 카리스마와 매력으로 이성을 압도하는 시기예요. 그러나 관계에서도 지배적이 되어 상대를 힘들게 할 수 있어요. 배려하고 감사하는 마음을 잊지 마세요.",
     health:"에너지가 최고조라 무리해도 티가 잘 안 나요. 하지만 이 시기의 과로와 무절제는 이후 쇠·병 대운에서 한꺼번에 청구서가 날아와요. 지금부터 수면과 체력 관리를 철저히 해두세요.",
+    todo:"최고의 성과를 내기·리더십 발휘·중요한 계약과 협력 관계 체결. 지금이 제일 영향력이 클 때예요.",
+    avoid:"독단적 결정·오만한 태도·과도한 확장. 정점에서의 방심이 가장 큰 위험이에요.",
   },
   쇠: {
     label:"쇠(衰)", score:5, color:"#94a3b8",
@@ -162,6 +172,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"앞으로 치고 나가기보다 지금 자리를 지키는 것이 중요해요. 무리한 이직이나 사업 확장보다 기존 업무를 탄탄하게 마무리하는 데 집중하세요. 후배를 키우고 시스템을 정비하는 것도 좋아요.",
     love:"관계가 변화하거나 안정기에 접어드는 시기예요. 열정보다 신뢰와 편안함이 중요해지는 흐름이에요. 서로에 대한 감사를 표현하는 것이 관계를 유지해줘요.",
     health:"피로가 쉽게 쌓이고 회복이 느려지기 시작해요. 건강 검진을 받고, 무리한 운동이나 야식·음주를 줄이세요. 충분한 수면과 영양이 이 시기의 핵심 건강법이에요.",
+    todo:"현재 자산 보전·내실화·후계자 또는 후배 양성. 지금까지 쌓은 것을 지키고 정리하는 데 집중하세요.",
+    avoid:"새로운 사업 확장·리스크 높은 투자·무리한 이직. 에너지 대비 결과가 나오지 않는 시기예요.",
   },
   병: {
     label:"병(病)", score:3, color:"#fb923c",
@@ -173,6 +185,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"업무 성과가 잘 안 나오거나 장애물이 계속 생기는 느낌이에요. 이 시기에 무리하게 밀어붙이다 오히려 평판에 손상이 가기 쉬워요. 현재 위치를 지키며 조용히 준비하는 것이 맞아요.",
     love:"관계에서 오해와 갈등이 생기기 쉬운 시기예요. 예민해진 감정이 상대에게 상처를 주지 않도록 조심해야 해요. 이 시기에 시작된 관계는 오래 가지 않는 경우가 많아요.",
     health:"이 대운에서 가장 신경 써야 할 것은 건강이에요. 피로·면역 저하·만성 질환이 나타날 수 있어요. 정기 건강검진, 충분한 수면, 스트레스 관리가 이 시기의 최우선 과제예요.",
+    todo:"건강 검진·비상금 마련·보험 점검. 큰 결정은 미루고 몸과 마음을 회복하는 데 집중하세요.",
+    avoid:"새 사업·투자 확장·중요한 관계의 빠른 결정. 이 시기에 내리는 큰 결심은 대부분 좋지 않은 결과로 이어져요.",
   },
   사: {
     label:"사(死)", score:1, color:"#ef4444",
@@ -184,6 +198,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"새로운 시작·이직·사업은 이 시기에 맞지 않아요. 도서관·명상·공부·내면 탐구처럼 눈에 보이지 않는 곳에 시간을 투자하세요. 이 시기에 쌓은 지식이 다음 대운에서 빛을 발해요.",
     love:"감정이 고갈되고 이성에 대한 욕구가 줄어드는 경향이에요. 관계보다 혼자만의 시간이 더 필요한 시기예요. 억지로 새 인연을 찾기보다 자기 자신을 충전하는 데 집중하세요.",
     health:"체력과 면역이 가장 낮아지는 시기예요. 무기력·우울감·수면 장애가 찾아올 수 있어요. 가벼운 운동, 규칙적인 식사, 햇빛을 쬐는 것이 이 시기 최고의 건강법이에요.",
+    todo:"독서·공부·명상·내면 탐구·심리 상담. 에너지를 밖이 아닌 안으로 돌리는 것이 이 시기의 최선이에요.",
+    avoid:"새 사업·투자·결혼 같은 중요 결정. 남에게 돈 빌려주거나 보증 서는 일은 이 시기에 절대 하면 안 돼요.",
   },
   묘: {
     label:"묘(墓)", score:1, color:"#dc2626",
@@ -195,6 +211,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"직장에서 성과를 내기 어렵고, 사방이 막힌 느낌이 들어요. 무리하게 돌파하려 하기보다 조직 안에서 조용히 실력을 다지고 때를 기다리는 것이 현명해요. 창업·이직은 자제하세요.",
     love:"감정이 폐쇄적이 되어 상대방과 소통이 잘 안 되는 시기예요. 관계가 정체되거나 갈등이 해소되지 않는 패턴이 반복될 수 있어요. 상담이나 진지한 대화를 통해 묶인 감정을 풀어주세요.",
     health:"억압된 감정이 신체 증상으로 나타나기 쉬운 시기예요. 소화 장애·근육 긴장·두통 등이 올 수 있어요. 명상·요가·심리 상담으로 내면의 스트레스를 정기적으로 해소하는 것이 핵심이에요.",
+    todo:"명상·내면 공부·심리 상담·글쓰기. 외부 활동보다 내면을 정리하는 데 에너지를 써야 해요.",
+    avoid:"외부 확장·창업·이직·인간관계 무리한 확대. 폐쇄적 에너지를 억지로 뚫으려 하면 오히려 더 막혀요.",
   },
   절: {
     label:"절(絶)", score:2, color:"#9333ea",
@@ -206,6 +224,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"직장·사업·커리어의 단절이 일어나는 시기예요. 이직·해고·사업 종료 등이 본인의 의지와 상관없이 일어나기도 해요. 이 흐름을 저항하기보다 새 방향을 탐색하는 기회로 받아들이세요.",
     love:"기존 인연이 끊어지거나 심각한 이별이 오는 시기예요. 이 시기에 새로 시작된 관계는 오래 이어지기 어려워요. 혼자만의 시간을 통해 진정 원하는 관계가 어떤 것인지 탐색하는 것이 이득이에요.",
     health:"신체 에너지가 바닥을 치는 시기예요. 급격한 체중 변화, 면역 저하, 불면이 올 수 있어요. 규칙적인 생활과 충분한 영양 섭취가 필수예요. 혼자 앓지 말고 가까운 사람이나 전문가에게 도움을 요청하세요.",
+    todo:"현금 확보·고정비 절감·인간관계 정리. 기존의 잘못된 것들을 청소하는 시기로 받아들이세요.",
+    avoid:"새로운 사업·투자·결혼·중요 계약. 이 시기에 시작하는 것은 오래 가지 않는 경우가 대부분이에요.",
   },
   태: {
     label:"태(胎)", score:6, color:"#f97316",
@@ -217,6 +237,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"지금은 드러나지 않지만 새로운 커리어의 씨앗이 심어지는 시기예요. 자격 취득, 네트워크 구축, 아이디어 발굴에 집중하세요. 이 시기에 구상한 것이 장생 대운에서 현실이 돼요.",
     love:"이성에 대한 관심이 다시 살아나기 시작하는 시기예요. 새로운 만남이 소규모로 찾아와요. 진지하게 인연을 찾기보다 다양한 사람들을 만나며 자신이 원하는 사람의 모습을 구체화하는 것이 좋아요.",
     health:"조금씩 기력이 회복되기 시작하는 시기예요. 규칙적인 생활, 가벼운 운동, 좋은 음식으로 몸의 리듬을 되찾아가는 것이 중요해요.",
+    todo:"공부·자격 취득·네트워크 구축·아이디어 발굴. 눈에 보이지 않는 준비에 집중하면 나중에 빛을 발해요.",
+    avoid:"성급한 결과 요구·대규모 창업·투자. 잉태 중인 씨앗을 억지로 꺼내면 싹이 트지 않아요.",
   },
   양: {
     label:"양(養)", score:7, color:"#fbbf24",
@@ -228,6 +250,8 @@ const UUNSEONG_FORTUNE: Record<string, { label: string; score: number; color: st
     career:"빛나지는 않지만 내실이 쌓이는 시기예요. 꾸준히 업무 역량을 강화하고, 신뢰할 수 있는 동료·멘토 관계를 만들어가세요. 이 시기의 성실함이 다음 장생에서 인정받는 토대가 돼요.",
     love:"안정적이고 성실한 이성에게 끌리는 시기예요. 화려한 만남보다 일상에서 자연스럽게 형성되는 관계가 오래 가요. 기존 관계라면 서로를 더 깊이 이해하는 성숙의 시간이에요.",
     health:"몸과 마음이 서서히 회복되고 에너지가 돌아오는 시기예요. 꾸준한 운동과 균형 잡힌 식사로 체력을 쌓아두세요. 장생 대운을 건강하게 맞이하기 위한 준비 기간이에요.",
+    todo:"꾸준한 역량 강화·신뢰 관계 만들기·소액 저축. 빛나지 않아도 성실하게 쌓아가는 것이 이 시기의 최선이에요.",
+    avoid:"빠른 성과를 바라며 무리하는 것·큰 투자. 인정받지 못해도 포기하지 않는 것이 핵심이에요.",
   },
 };
 
@@ -809,6 +833,19 @@ export default function DaewoonPage() {
                 )}
 
                 {uunsF && (
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="rounded-xl p-3" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                      <p className="text-[10px] font-bold text-emerald-400 mb-1">✅ 이 시기에 할 것</p>
+                      <p className="text-xs text-emerald-200/80 leading-relaxed">{uunsF.todo}</p>
+                    </div>
+                    <div className="rounded-xl p-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
+                      <p className="text-[10px] font-bold text-red-400 mb-1">🚫 하지 말 것</p>
+                      <p className="text-xs text-red-200/80 leading-relaxed">{uunsF.avoid}</p>
+                    </div>
+                  </div>
+                )}
+
+                {uunsF && (
                   <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: "rgba(255,180,0,0.08)", border: "1px solid rgba(255,180,0,0.2)" }}>
                     <span className="text-yellow-400 shrink-0 mt-0.5">!</span>
                     <div>
@@ -886,6 +923,16 @@ export default function DaewoonPage() {
                             <p className="text-[10px] text-gray-400 leading-relaxed">{d.text}</p>
                           </div>
                         ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <div className="rounded-xl p-2.5" style={{ background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.18)" }}>
+                          <p className="text-[9px] font-bold text-emerald-400 mb-1">✅ 할 것</p>
+                          <p className="text-[10px] text-emerald-200/70 leading-relaxed">{uunsF.todo}</p>
+                        </div>
+                        <div className="rounded-xl p-2.5" style={{ background: "rgba(248,113,113,0.07)", border: "1px solid rgba(248,113,113,0.18)" }}>
+                          <p className="text-[9px] font-bold text-red-400 mb-1">🚫 하지 말 것</p>
+                          <p className="text-[10px] text-red-200/70 leading-relaxed">{uunsF.avoid}</p>
+                        </div>
                       </div>
                     </div>
                   )}
