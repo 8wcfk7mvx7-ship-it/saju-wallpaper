@@ -668,6 +668,62 @@ function HotCompatContent() {
           </div>
         )}
 
+        {/* 일지·월지 관계 다이어그램 */}
+        {(() => {
+          const mj1 = r1.pillarsDetail.month.jj;
+          const mj2 = r2.pillarsDetail.month.jj;
+          const SAMHAP_GROUPS: string[][] = [["인","오","술"],["신","자","진"],["해","묘","미"],["사","유","축"]];
+          const BANGSHAP_GROUPS: string[][] = [["인","묘","진"],["사","오","미"],["신","유","술"],["해","자","축"]];
+          function getJjRel(a: string, b: string): { type: string; color: string; bg: string; desc: string } {
+            if (JIJI_YUKHAP_LIST.some(y => (y.a===a&&y.b===b)||(y.a===b&&y.b===a)))
+              return { type: "육합", color: "#f472b6", bg: "rgba(244,114,182,0.15)", desc: "본능적으로 끌려 엉겨붙는 가장 끈끈한 합" };
+            if (SAMHAP_GROUPS.some(g => g.includes(a) && g.includes(b)))
+              return { type: "삼합", color: "#fbbf24", bg: "rgba(251,191,36,0.15)", desc: "같은 방향으로 에너지가 흐르는 강한 합" };
+            if (BANGSHAP_GROUPS.some(g => g.includes(a) && g.includes(b)))
+              return { type: "방합", color: "#34d399", bg: "rgba(52,211,153,0.15)", desc: "같은 계절 기운을 공유하는 편안한 합" };
+            if (JIJI_CHUNG_LIST.some(c => (c.a===a&&c.b===b)||(c.a===b&&c.b===a)))
+              return { type: "충", color: "#f87171", bg: "rgba(248,113,113,0.15)", desc: "서로 부딪히지만 강한 자극을 주는 관계" };
+            return { type: "무관", color: "#6b7280", bg: "rgba(107,114,128,0.1)", desc: "직접적인 관계 없음" };
+          }
+          const ilji = getJjRel(ij1, ij2);
+          const wolji = getJjRel(mj1, mj2);
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-5">일지 · 월지 관계 다이어그램</p>
+              <div className="space-y-5">
+                {([
+                  { rowLabel: "일지 — 배우자·본인 에너지", a: ij1, b: ij2, rel: ilji },
+                  { rowLabel: "월지 — 사회·활동 에너지", a: mj1, b: mj2, rel: wolji },
+                ] as { rowLabel: string; a: string; b: string; rel: ReturnType<typeof getJjRel> }[]).map(({ rowLabel, a, b, rel }) => (
+                  <div key={rowLabel}>
+                    <p className="text-[10px] text-gray-600 font-bold tracking-widest uppercase mb-3">{rowLabel}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black border-2 border-rose-400/50" style={{ background: "rgba(244,63,94,0.1)" }}>{a}</div>
+                        <span className="text-[10px] text-gray-500">나</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                        <span className="text-xs font-black px-2.5 py-1 rounded-lg" style={{ color: rel.color, background: rel.bg }}>{rel.type}</span>
+                        <div className="w-14 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, rgba(244,63,94,0.6), ${rel.color}, rgba(129,140,248,0.6))` }} />
+                        <span className="text-[9px] text-gray-600 text-center leading-tight max-w-[80px]">{rel.desc}</span>
+                      </div>
+                      <div className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black border-2 border-indigo-400/50" style={{ background: "rgba(99,102,241,0.1)" }}>{b}</div>
+                        <span className="text-[10px] text-gray-500">상대</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-x-3 gap-y-1">
+                {([["육합","#f472b6","본능적으로 끌려 엉겨붙는 합"],["삼합","#fbbf24","같은 방향으로 흐르는 강한 합"],["방합","#34d399","같은 계절 기운의 합"],["충","#f87171","부딪히지만 자극적인 관계"]] as [string,string,string][]).map(([t,c,d]) => (
+                  <span key={t} className="text-[10px] text-gray-500"><span className="font-bold" style={{ color: c }}>{t}</span> {d}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 만족도 그래프 */}
         {(() => {
           const base = Math.min(10, Math.max(4, Math.round(chem.score / 10)));

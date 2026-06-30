@@ -4856,8 +4856,8 @@ const SIPSEONG_PLAIN_LABEL: Record<string, string> = {
 export function getGungseongCareerSummary(pd: SajuResult["pillarsDetail"]): GungseongCareerItem[] {
   const items: GungseongCareerItem[] = [];
   const PALACE_LABEL: Record<"연주"|"월주"|"일지"|"시주", string> = {
-    연주: "년주(조상·사회적 뿌리)", 월주: "월주(직업·사회생활)",
-    일지: "일지(본인·배우자)", 시주: "시주(자녀·노후)",
+    연주: "조상·사회적 뿌리 자리", 월주: "직업·사회생활 자리",
+    일지: "본인·배우자 자리", 시주: "자녀·노후 자리",
   };
 
   const entries: Array<{ position: "연주"|"월주"|"일지"|"시주"; sipseong: string | undefined }> = [

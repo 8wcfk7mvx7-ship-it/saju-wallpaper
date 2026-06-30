@@ -331,12 +331,12 @@ export default function SidejobPage() {
               <p className="text-sm font-bold text-teal-300 mb-3">{userName}님의 투잡 에너지 흐름</p>
               {hapList.map((rel, i) => (
                 <p key={i} className="text-xs text-gray-300 leading-relaxed mb-1.5">
-                  <span className="text-teal-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB})</span> 자리의 기운이 서로 잘 어우러지는 구조예요. {userName}님은 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이에요.
+                  <span className="text-teal-300 font-bold">{rel.jjA}·{rel.jjB}</span> 기운이 서로 잘 어우러지는 구조예요. {userName}님은 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이에요.
                 </p>
               ))}
               {chungList.map((rel, i) => (
                 <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB})</span> 자리의 기운이 서로 부딪혀 에너지가 분산될 수 있어요. {userName}님이 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니, 집중력을 유지하는 게 중요해요.
+                  <span className="font-bold">{rel.jjA}·{rel.jjB}</span> 기운이 서로 부딪혀 에너지가 분산될 수 있어요. {userName}님이 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니, 집중력을 유지하는 게 중요해요.
                 </p>
               ))}
             </div>
