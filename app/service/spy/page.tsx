@@ -737,7 +737,7 @@ function SpyContent() {
         {/* 면책 고지 */}
         <div className="bg-white/[0.02] border border-white/8 rounded-xl px-4 py-3 mb-6">
           <p className="text-xs text-gray-600 leading-relaxed text-center">
-            본 분석은 사주 명리학 기반 엔터테인먼트 콘텐츠입니다.<br />
+            본 분석은 사주 이론 기반 오락용 콘텐츠입니다.<br />
             실제 관계 판단의 근거로 사용하지 마세요.
           </p>
         </div>

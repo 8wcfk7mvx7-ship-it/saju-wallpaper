@@ -795,7 +795,7 @@ export default function StockPage() {
 
         {/* 면책 */}
         <div className="text-center mt-4">
-          <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 오행 이론 기반 순수 오락용 콘텐츠입니다. 실제 투자에 활용하지 마세요.</p>
+          <p className="text-xs text-gray-700 leading-relaxed">본 분석은 사주 오행 이론 기반 오락용 콘텐츠입니다. 실제 투자에 활용하지 마세요.</p>
         </div>
         <button onClick={() => setStep("form")} className="w-full mt-6 py-3 rounded-xl border border-white/10 text-gray-500 hover:text-gray-300 text-sm transition">다시 분석하기</button>
         <ResultFooterActions targetId="stock-result" fileName="주식운" />

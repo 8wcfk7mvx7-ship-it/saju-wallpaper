@@ -248,7 +248,7 @@ function SuccessContent() {
           </div>
         )}
 
-        <p className="text-center text-xs text-gray-700">본 내용은 사주 이론 기반 참고 자료입니다.</p>
+        <p className="text-center text-xs text-gray-700">본 분석은 사주 이론 기반 오락용 콘텐츠입니다.</p>
         <ResultFooterActions targetId="overcome-result" fileName="신살극복법" shareTitle="내 신살 극복법" shareText="Summer Palace에서 내 신살 극복법을 확인했어요" />
       </div>
     </main>

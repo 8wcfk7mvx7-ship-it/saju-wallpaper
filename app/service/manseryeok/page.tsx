@@ -1532,7 +1532,7 @@ function ResultView({
 
       {/* 면책 */}
       <p className="text-[10px] text-center pb-6" style={{ color: "rgba(255,255,255,0.2)" }}>
-        본 서비스는 명리학 기반 참고용 엔터테인먼트 콘텐츠입니다.
+        본 분석은 사주 이론 기반 오락용 콘텐츠입니다.
       </p>
     </div>
   );
@@ -1606,7 +1606,7 @@ export default function ManseryeokPage() {
         </div>
         <div className="text-center">
           <p className="text-white font-bold text-lg mb-2">사주 완전 분석 중...</p>
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>격국·용신·일주론·신살·대운 계산 중</p>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>사주 구조·필요 기운·일주론·신살·대운 계산 중</p>
         </div>
         <AdBanner className="max-w-sm" />
       </div>
@@ -1684,12 +1684,12 @@ export default function ManseryeokPage() {
               당신의 사주팔자, 완전 무료 해석
             </p>
             <p className="text-xs leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
-              생년월일시·도시를 입력하면 격국·용신·일주론·신살·대운까지 한 번에 분석해 드립니다
+              생년월일시·도시를 입력하면 사주 구조·필요 기운·일주론·신살·대운까지 한 번에 분석해 드립니다
             </p>
           </FadeIn>
           <FadeIn delay={200}>
             <div className="flex flex-wrap justify-center gap-1.5">
-              {["격국·용신","60갑자 일주론","오행 건강","직업 적성","재성 위치","신살","대운 흐름","경도 보정"].map(t => (
+              {["사주 구조·필요기운","60갑자 일주론","오행 건강","직업 적성","재물 위치","신살","대운 흐름","경도 보정"].map(t => (
                 <span key={t} className="text-[10px] px-2.5 py-1 rounded-full font-bold" style={{
                   background: "rgba(139,92,246,0.18)", color: "#c4b5fd",
                   border: "1px solid rgba(139,92,246,0.35)",
@@ -1718,13 +1718,13 @@ export default function ManseryeokPage() {
                 animation: "pulseGlow2 2.5s ease-in-out infinite",
                 letterSpacing: "0.02em",
               }}>
-              분석 시작
+              내 사주 분석하기
             </button>
           </form>
         </div>
 
         <p className="text-center text-[10px] py-6" style={{ color: "rgba(255,255,255,0.15)" }}>
-          사주 명리학 기반 참고용 엔터테인먼트 콘텐츠
+          사주 이론 기반 오락용 콘텐츠
         </p>
       </main>
     </div>

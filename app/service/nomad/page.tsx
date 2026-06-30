@@ -192,7 +192,7 @@ export default function NomadPage() {
                 ? "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/50"
                 : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"
             }`}>
-            분석하기
+            나의 일 유형 분석하기
           </button>
         </div>
       </main>

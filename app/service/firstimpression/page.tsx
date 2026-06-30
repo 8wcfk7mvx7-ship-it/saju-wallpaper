@@ -232,7 +232,7 @@ export default function FirstImpressionPage() {
         duration={2000}
         onDone={() => setStep("result")}
         messages={[
-          "월간(月干)의 기운을 분석하는 중...",
+          "월간의 기운을 분석하는 중...",
           "연·월·일·시 4기둥을 종합하는 중...",
           "남들에게 비치는 분위기를 그려보는 중...",
           "맞춤 인상 개선법을 정리하는 중...",

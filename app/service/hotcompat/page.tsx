@@ -576,7 +576,7 @@ function HotCompatContent() {
           </div>
           <button onClick={handleAnalyze} disabled={!ready}
             className={`w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] ${ready ? "bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/40" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"}`}>
-            성적 케미 분석
+            성적 케미 분석하기
           </button>
         </div>
       </main>

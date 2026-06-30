@@ -551,7 +551,7 @@ export default function TastePage() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-gray-700 mt-6">본 추천은 사주 오행 이론 기반 오락 콘텐츠입니다.</p>
+        <p className="text-center text-xs text-gray-700 mt-6">본 분석은 사주 오행 이론 기반 오락용 콘텐츠입니다.</p>
         <div className="mt-4">
           <ResultFooterActions targetId="taste-result" fileName="취향" />
         </div>

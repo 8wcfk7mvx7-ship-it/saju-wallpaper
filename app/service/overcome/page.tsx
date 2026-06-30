@@ -147,7 +147,7 @@ export default function OvercomePage() {
         >
           {loading ? (
             <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />분석 중...</>
-          ) : "분석하기 →"}
+          ) : "극복법 분석하기 →"}
         </button>
       </div>
     </main>

@@ -341,7 +341,7 @@ function ErosContent() {
             <BirthInputForm value={form} onChange={setForm} accent="#ec4899" />
             <button onClick={handleAnalyze} disabled={!ready}
               className={`w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.98] ${ready ? "bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/40" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"}`}>
-              분석 시작
+              성적 매력 분석하기
             </button>
           </div>
         </div>
