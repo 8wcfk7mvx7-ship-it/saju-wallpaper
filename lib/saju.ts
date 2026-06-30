@@ -373,7 +373,7 @@ const HONGYEOM_JJ: Record<string, string> = {
 };
 
 // 천을귀인: 일간 기준 천을귀인 지지(들)
-const CHEONUL_JJ: Record<string, string[]> = {
+export const CHEONUL_JJ: Record<string, string[]> = {
   갑:['축','미'], 무:['축','미'], 경:['축','미'],
   을:['자','신'], 기:['자','신'],
   병:['해','유'], 정:['해','유'],

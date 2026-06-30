@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju } from "@/lib/saju";
+import { analyzeSaju, getJijiRelations, getDohwaJj, CHEONUL_JJ } from "@/lib/saju";
 import { GANYEOJIDONG_PAIRS } from "@/lib/saju2";
 import ResultFooterActions from "@/components/ResultFooterActions";
 
@@ -65,6 +65,95 @@ const ELEMENT_OVERCOME: Record<string, {
   수: { color:"#0369a1",icon:"🌊",overDesc:"우울감이 옵니다. 신장이 무거워집니다.",lackDesc:"지혜가 흐려집니다. 건망증이 생깁니다.",overFix:"황토색을 들이세요. 단맛 음식.",lackFix:"파란색·검은색을 인테리어에 넣으세요. 북쪽을 활용하세요.",chakColor:"파란색, 검은색",direction:"북쪽",numbers:"1, 6",objects:"수족관, 파란 소품",food:"짠맛 — 해산물, 된장, 미역",healthTip:"신장·방광·뼈를 챙기세요.",activity:"독서, 수영, 글쓰기·일기, 충분한 수면" },
 };
 
+const CHEONGAN_HAP_PAIRS: [string, string][] = [["갑","기"],["을","경"],["병","신"],["정","임"],["무","계"]];
+const CHEONGAN_CHUNG_PAIRS: [string, string][] = [["갑","경"],["을","신"],["병","임"],["정","계"]];
+const pairMatch = (a: string, b: string, list: [string, string][]) =>
+  list.some(([p, q]) => (p === a && q === b) || (p === b && q === a));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function computeTrashFindings(r: any, gender: string): { icon: string; title: string; desc: string }[] {
+  const findings: { icon: string; title: string; desc: string }[] = [];
+  const py = r.pillarsDetail.year, pm = r.pillarsDetail.month, pd = r.pillarsDetail.day, ph = r.pillarsDetail.hour;
+  const ilgan = pd.cg;
+  const ilji = pd.jj;
+
+  const labeled: { label: string; jj: string }[] = [
+    { label: "년", jj: py.jj }, { label: "월", jj: pm.jj }, { label: "일", jj: pd.jj },
+  ];
+  if (ph) labeled.push({ label: "시", jj: ph.jj });
+  const jjs = labeled.map(l => l.jj);
+  const rel = getJijiRelations(jjs);
+
+  // 1) 신약 + 일간이 시간/월간과 합·충
+  const otherCgs = [pm.cg, ph?.cg].filter(Boolean) as string[];
+  const dayCombines = otherCgs.some(c => pairMatch(ilgan, c, CHEONGAN_HAP_PAIRS));
+  const dayClashes = otherCgs.some(c => pairMatch(ilgan, c, CHEONGAN_CHUNG_PAIRS));
+  if (r.yongshin.strength === "신약" && (dayCombines || dayClashes)) {
+    findings.push({
+      icon: "💧",
+      title: "안 그래도 약한 기운이 자꾸 다른 데로 쏠려요",
+      desc: "본인 기운 자체가 약한 편인데, 그 기운의 중심인 일간이 바로 옆 기둥과 자꾸 묶이거나 부딪혀요. 그래서 내 의지대로 끌고 가기보다 주변 상황이나 사람에게 휘둘리기 쉬운 흐름이에요. 중요한 결정을 내릴 때는 혼자 충분히 생각할 시간을 갖고, 남의 말에 휩쓸려 급하게 움직이지 않는 게 핵심이에요.",
+    });
+  }
+
+  // 2) 가장 쓸만한 해수가 사해충
+  const haeImportant = (r.yongshin.yongshin === "수" || r.yongshin.heeshin === "수");
+  if (haeImportant && jjs.includes("해") && jjs.includes("사")) {
+    findings.push({
+      icon: "🌊",
+      title: "꼭 필요한 기운 하나가 흔들리는 자리에 있어요",
+      desc: "지금 가장 필요한 기운이 수(水)인데, 그 기운이 자리한 자리가 정반대 기운과 정면으로 부딪히는 자리예요. 평소엔 멀쩡하다가도 특정 시기(겨울·여름 환절기 등)에 갑자기 컨디션이 무너지거나 일이 꼬이는 식으로 나타나기 쉬워요. 충분한 휴식과 수면, 물 가까이 두는 습관이 이 기운을 지키는 데 도움이 돼요.",
+    });
+  }
+
+  // 3) 묘목이 도화인데 묘유충
+  const dohwaJj = getDohwaJj(py.jj);
+  if (dohwaJj === "묘" && jjs.includes("묘") && jjs.includes("유")) {
+    findings.push({
+      icon: "🌸",
+      title: "인기 끄는 매력이 자꾸 부딪히는 일을 만들어요",
+      desc: "이성에게 매력적으로 비치는 기운이 묘목 자리에 있는데, 그 자리가 정반대 기운과 정면으로 부딪혀요. 인기와 매력은 분명히 있는데, 그게 오히려 구설수나 갑작스러운 이별·갈등으로 이어지기 쉬운 구조예요. 매력을 숨기기보다, 한 사람에게 집중하고 관계를 천천히 만들어가는 연습이 도움이 돼요.",
+    });
+  }
+
+  // 4) 일지 천을귀인인데 충/파/형
+  const cheonulJjs: string[] = CHEONUL_JJ[ilgan] || [];
+  if (cheonulJjs.includes(ilji)) {
+    const iljiHit = rel.find((x: { jjA: string; jjB: string; type: string }) =>
+      (x.jjA === ilji || x.jjB === ilji) && (x.type === "충" || x.type === "파" || x.type === "형"));
+    if (iljiHit) {
+      findings.push({
+        icon: "⚠️",
+        title: "결정적일 때 도와줄 사람이 있는데, 그 자리가 흔들려요",
+        desc: "본인 자리에 위기마다 도와주는 귀인의 기운이 자리해 있는데, 그 자리가 다른 기둥과 부딪히거나 어긋나는 관계예요. 도움이 아예 없는 건 아니지만, 막상 필요한 순간에 타이밍이 어긋나거나 도움의 손길이 늦게 오는 경우가 많아요. 배우자·동업자 관계에서 갈등이 잦다면 거리를 두고 감정을 가라앉힌 뒤 대화하는 습관이 필요해요.",
+      });
+    }
+  }
+
+  // 5) 무비겁 — 같은 기운을 가진 동료/짝이 사주 안에 없는 구조
+  const allSipseong: string[] = [py.sipseongCg, py.sipseongJj, pm.sipseongCg, pm.sipseongJj, pd.sipseongJj];
+  if (ph) allSipseong.push(ph.sipseongCg, ph.sipseongJj);
+  const noBigyeop = allSipseong.every(s => s !== "비견" && s !== "겁재");
+  if (noBigyeop) {
+    findings.push({
+      icon: "🧍",
+      title: "사주 안에 나와 같은 기운을 가진 자리가 없어요",
+      desc: "사주 여덟 글자 중에 나와 똑같은 기운을 가진 자리가 하나도 없는 구조예요. 그래서 '딱 나 같은 사람'을 만나기가 유독 어렵고, 형제자매·동료·동업자 같은 동등한 관계에서도 늘 혼자 이끌거나 혼자 책임지는 위치에 서기 쉬워요. 억지로 비슷한 사람을 찾기보다, 자기 페이스를 지키며 혼자서도 단단한 삶의 구조를 만드는 쪽이 훨씬 잘 맞아요.",
+    });
+  }
+
+  // 6) 무토/기토 여성 + 토 과다 — 혼자서도 잘 사는 구조
+  if ((ilgan === "무" || ilgan === "기") && gender === "female" && r.dominant.includes("토")) {
+    findings.push({
+      icon: "🏔️",
+      title: "혼자만의 삶에 유독 강한 구조예요",
+      desc: "본인 기운 자체가 흙처럼 묵직하고 안정적인데, 그 기운이 사주 전체에 과하게 몰려 있어요. 이런 구조는 결혼이나 동거처럼 누군가와 꼭 붙어 지내는 삶보다, 혼자서도 흔들림 없이 자기 일과 생활을 꾸려가는 삶에서 오히려 더 편안하고 잘 풀리는 경우가 많아요. 비혼이나 늦은 결혼을 택해도 불안해할 필요 없는 사주예요.",
+    });
+  }
+
+  return findings;
+}
+
 type Stage = "confirming" | "done" | "error";
 
 function SuccessContent() {
@@ -77,6 +166,7 @@ function SuccessContent() {
   const [lacking, setLacking] = useState<string[]>([]);
   const [dayCg, setDayCg] = useState("");
   const [dayJj, setDayJj] = useState("");
+  const [trashFindings, setTrashFindings] = useState<{ icon: string; title: string; desc: string }[]>([]);
 
   useEffect(() => {
     try {
@@ -97,6 +187,7 @@ function SuccessContent() {
       setLacking(r.lacking);
       setDayCg(r.pillarsDetail.day.cg);
       setDayJj(r.pillarsDetail.day.jj);
+      setTrashFindings(computeTrashFindings(r, form.gender || "female"));
       setStage("done");
     } catch {
       setErrorMsg("분석 정보가 올바르지 않습니다.");
@@ -150,6 +241,29 @@ function SuccessContent() {
             </p>
           </div>
         )}
+
+        {/* 내 사주의 쓰레기력 */}
+        <div className="mb-8">
+          <h2 className="text-lg font-black text-white mb-1">내 사주의 쓰레기력은?</h2>
+          <p className="text-xs text-gray-500 mb-4">충이나 신약 자체가 나쁜 게 아니라, 특정 조합이 겹칠 때만 약점이 됩니다</p>
+          {trashFindings.length > 0 ? (
+            <div className="space-y-4">
+              {trashFindings.map((f, i) => (
+                <div key={i} className="rounded-2xl border p-5" style={{ borderColor: "rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.06)" }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">{f.icon}</span>
+                    <p className="font-black text-white">{f.title}</p>
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 rounded-2xl" style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)" }}>
+              <p className="text-sm text-green-300">✅ 특별히 약점으로 겹치는 조합이 발견되지 않았습니다.</p>
+            </div>
+          )}
+        </div>
 
         {/* 신살 극복법 */}
         {mySinsals.length > 0 ? (
