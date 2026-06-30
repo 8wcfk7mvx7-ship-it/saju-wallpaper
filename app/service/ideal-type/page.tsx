@@ -412,9 +412,9 @@ export default function IdealTypePage() {
           </p>
         </div>
 
-        {/* 조후 보정 */}
+        {/* 태어난 계절 기운 보정 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-orange-300 mb-2">조후(調候) — {monthJj}월 기운으로 보는 파트너 보완</p>
+          <p className="text-sm font-bold text-orange-300 mb-2">태어난 계절 기운({monthJj}월)으로 보는 파트너 보완</p>
           <p className="text-sm text-gray-300 leading-relaxed">{johuPartner}</p>
         </div>
 
