@@ -138,17 +138,107 @@ const ELEMENT_TASTE: Record<string, ElementTaste> = {
   },
 };
 
-const ILGAN_TASTE: Record<string, { movie: string; book: string; tag: string }> = {
-  갑: { movie: "킹 오브 씨프", book: "리더십 파이프라인", tag: "리더십형 콘텐츠" },
-  을: { movie: "브리짓 존스의 일기", book: "오늘도 나는 나를 사랑한다", tag: "공감·감성형 콘텐츠" },
-  병: { movie: "독전", book: "그릿(앤절라 더크워스)", tag: "에너지·동기부여형" },
-  정: { movie: "님아, 그 강을 건너지 마오", book: "채식주의자", tag: "따뜻한 감성형" },
-  무: { movie: "밀정", book: "사피엔스", tag: "역사·구조적 사고형" },
-  기: { movie: "기묘한 이야기(드라마)", book: "사소한 것들의 과학", tag: "세심·일상형" },
-  경: { movie: "엑스 마키나", book: "생각하는 기계", tag: "논리·기술형" },
-  신: { movie: "블랙 스완", book: "위험한 비전", tag: "완벽·예술형" },
-  임: { movie: "그래비티", book: "아직도 가야 할 길", tag: "자유·탐험형" },
-  계: { movie: "소공녀", book: "혼자서도 잘 자요", tag: "청순·감성형" },
+interface IlganTaste {
+  tag: string;
+  keyword: string;
+  movies: string[];
+  books: string[];
+  travel: string[];
+  music: string;
+  food: string;
+}
+
+const ILGAN_TASTE: Record<string, IlganTaste> = {
+  갑: {
+    tag: "리더십·개척형",
+    keyword: "목표를 향해 직진하고, 장애물은 돌파한다",
+    movies: ["킹스맨 — 노력으로 계층을 극복하는 성장 서사", "머니볼 — 전략과 소신으로 판을 바꾸는 이야기", "인터스텔라 — 인류의 한계를 넘으려는 탐구 본능", "광해, 왕이 된 남자 — 리더의 고독과 결단"],
+    books: ["리더십 파이프라인 — 조직과 성장 구조를 꿰뚫는 리더십 교과서", "원씽(게리 켈러) — 하나에 집중해 최대 성과를 내는 법", "아웃라이어(말콤 글래드웰) — 성공의 숨겨진 규칙 탐구", "넛지 — 사람을 설득하고 이끄는 구조의 힘"],
+    travel: ["히말라야·백두대간 트레킹", "아이슬란드 자연 탐험", "실크로드·역사 루트 여행"],
+    music: "록·얼터너티브 (강한 에너지, 메시지 있는 가사)",
+    food: "강한 풍미·매운 육류 요리 선호. 에너지 보충 위주 식사",
+  },
+  을: {
+    tag: "감성·공감형",
+    keyword: "섬세한 눈으로 세상을 읽고, 관계 속에서 꽃핀다",
+    movies: ["비포 선라이즈 — 감성적 대화와 감정의 결을 담은 로맨스", "브리짓 존스의 일기 — 솔직한 감정과 공감 가득한 일상", "아멜리에 — 일상 속 작은 아름다움을 포착하는 감성", "나의 아저씨 — 따뜻한 공감과 섬세한 인간관계"],
+    books: ["내 감정 사용법(게리 채프먼) — 감정을 이해하고 관계를 깊게 하는 법", "완두(김하나) — 일상의 소소한 아름다움을 담은 에세이", "82년생 김지영 — 시대와 감정을 날카롭게 관통하는 소설", "오늘도 나는 나를 사랑한다 — 자기 이해와 성장을 돕는 감성 에세이"],
+    travel: ["파리·피렌체 감성 여행", "교토 소도시 산책", "제주 올레길·감성 숙소"],
+    music: "인디 팝·어쿠스틱 (감성적, 서정적 멜로디)",
+    food: "섬세하고 정갈한 음식 선호. 카페 디저트·건강식에 관심",
+  },
+  병: {
+    tag: "에너지·사교형",
+    keyword: "강렬하게 타오르고, 사람들을 빛으로 끌어당긴다",
+    movies: ["독전 — 강렬한 에너지와 속도감 넘치는 액션", "버드맨 — 존재감과 열정, 무대 위 폭발하는 자아", "위대한 쇼맨 — 화려한 볼거리와 열정적 리더십", "닥터 스트레인지 — 스펙터클하고 역동적인 세계관"],
+    books: ["그릿(앤절라 더크워스) — 끈기와 열정으로 성공하는 법", "파친코(이민진) — 생명력 넘치는 방대한 서사에 몰입", "어린 왕자 — 순수한 감수성과 빛나는 본질 탐구", "1만 시간의 법칙 — 열정을 결과로 만드는 연습의 힘"],
+    travel: ["뉴욕·바르셀로나 도시 에너지 탐방", "방콕·발리 역동적 여행", "축제·공연 중심 여행(코첼라·에든버러 등)"],
+    music: "팝·댄스·힙합 (밝고 에너지 넘치는 비트)",
+    food: "다양한 나라 음식 도전. 새로운 맛 탐험 즐김",
+  },
+  정: {
+    tag: "섬세·예술형",
+    keyword: "촛불처럼 조용히 타오르며, 주변을 따뜻하게 밝힌다",
+    movies: ["님아, 그 강을 건너지 마오 — 깊은 사랑과 일상의 아름다움", "아멜리에 — 섬세한 감수성과 예술적 상상력", "리틀 포레스트 — 자연과 음식, 내면 치유의 여정", "나미야 잡화점의 기적 — 따뜻한 인연과 감동적 서사"],
+    books: ["채식주의자(한강) — 인간 내면의 섬세하고 무거운 심연", "오베라는 남자(프레드릭 배크만) — 따뜻하고 유머 있는 인간 탐구", "어린 왕자 — 순수한 사랑과 존재의 의미", "지구 끝의 온실(김초엽) — 감성적 세계관과 아름다운 문장"],
+    travel: ["교토·포르투갈 감성 소도시", "국내 전통 마을·한옥 숙박", "제주 올레길·힐링 카페"],
+    music: "재즈·발라드·클래식 (섬세하고 감성적인 멜로디)",
+    food: "정갈하고 섬세한 한식·일식 선호. 요리 과정 자체를 즐김",
+  },
+  무: {
+    tag: "구조·역사형",
+    keyword: "산처럼 묵직하게 서서, 큰 그림을 본다",
+    movies: ["밀정 — 역사 속 믿음과 배신, 구조적 갈등", "덩케르크 — 거대한 역사의 흐름 속 개인과 전략", "포레스트 검프 — 묵묵히 자신의 길을 걷는 삶의 여정", "인터스텔라 — 인류와 우주, 거시적 세계관에 몰입"],
+    books: ["사피엔스(유발 하라리) — 인류 역사 전체를 조망하는 구조적 사고", "총균쇠(재레드 다이아몬드) — 문명의 흥망을 결정한 요인 분석", "로마인 이야기(시오노 나나미) — 제국의 성장과 전략, 리더십", "원칙(레이 달리오) — 삶과 일에 적용하는 체계적 원칙"],
+    travel: ["유럽 역사 도시(로마·아테네·이스탄불)", "실크로드·경주 역사 탐방", "안나푸르나·대자연 트레킹"],
+    music: "어쿠스틱·클래식·재즈 (깊이 있고 묵직한 사운드)",
+    food: "전통 음식·건강식 선호. 식사를 든든하게 챙기는 편",
+  },
+  기: {
+    tag: "세심·일상형",
+    keyword: "기름진 논밭처럼 조용히 모든 것을 품어낸다",
+    movies: ["기묘한 이야기(시리즈) — 일상 속 숨겨진 신비를 포착", "벌새 — 평범한 일상 속 감정의 깊이와 디테일", "어바웃 타임 — 일상의 소중함을 일깨우는 따뜻한 드라마", "리틀 포레스트 — 자연과 음식, 안정적 일상의 회복"],
+    books: ["사소한 것들의 과학 — 일상 속 작은 것들의 놀라운 원리", "완두(김하나) — 소소한 행복을 발견하는 감성 에세이", "아몬드(손원평) — 감정과 공감에 대한 조용하고 깊은 탐구", "내 삶을 바꾸는 정리의 힘 — 공간과 마음을 정돈하는 실용 지혜"],
+    travel: ["제주도 힐링·감성 여행", "일본 소도시(나라·가마쿠라)", "국내 온천·리조트 휴양"],
+    music: "힐링 음악·포크·어쿠스틱 (편안하고 따뜻한 사운드)",
+    food: "집밥 스타일·건강식 선호. 식재료 선택에 꼼꼼한 편",
+  },
+  경: {
+    tag: "논리·결단형",
+    keyword: "도끼처럼 명확하게 판단하고, 원칙대로 밀어붙인다",
+    movies: ["엑스 마키나 — 논리와 의도의 충돌, 인공지능과 인간의 대결", "다크 나이트 — 원칙과 혼돈의 대립, 강인한 의지", "쇼생크 탈출 — 치밀한 계획과 인내로 이룬 자유", "아이언맨 — 논리와 기술, 강력한 자아의 표현"],
+    books: ["원칙(레이 달리오) — 체계적 원칙으로 최고를 이루는 법", "생각하는 기계(브라이언 크리스천) — 논리와 인공지능, 기술의 본질", "설득의 심리학(로버트 치알디니) — 설득과 의사결정의 구조", "총균쇠(재레드 다이아몬드) — 거시적 분석과 체계적 세계관"],
+    travel: ["뉴욕·두바이 도시 투어", "도쿄 정밀한 도시 탐방", "아이슬란드 대자연 개척"],
+    music: "클래식·헤비 록·재즈 (강렬하고 구조적인 음악)",
+    food: "질 좋은 육류·담백한 음식 선호. 효율적 식사 추구",
+  },
+  신: {
+    tag: "완벽·심미형",
+    keyword: "다듬어진 보석처럼, 아름다움과 정밀함을 추구한다",
+    movies: ["블랙 스완 — 완벽을 향한 집착과 예술가의 고통", "그랜드 부다페스트 호텔 — 완벽한 미장센과 정교한 구성미", "퍼펙트 블루 — 정체성과 완벽에 대한 심리적 탐구", "그녀(Her) — 감성과 기술, 섬세한 감정 표현"],
+    books: ["코스모스(칼 세이건) — 우주의 질서와 아름다움, 정밀한 과학", "우아하게 거절하는 법 — 자신의 경계를 명확히 긋는 기술", "82년생 김지영 — 날카로운 사회 분석과 구조적 문제 제기", "위험한 비전 — 예리한 통찰과 비판적 미래 탐구"],
+    travel: ["파리·교토 미적 감성 여행", "유럽 미술관·건축 투어", "일본 료칸 품격 휴양"],
+    music: "클래식·인디 팝·재즈 (세련되고 정제된 사운드)",
+    food: "고급 식재료·정교한 요리 선호. 맛과 플레이팅 모두 중시",
+  },
+  임: {
+    tag: "자유·탐험형",
+    keyword: "바다처럼 넓게 흐르며, 모든 경험을 흡수한다",
+    movies: ["그래비티 — 우주와 생존, 자유와 고독의 경계", "세 얼간이 — 틀을 깨고 자신의 길을 찾는 유쾌한 모험", "인터스텔라 — 인류의 경계를 넘어서는 탐험 본능", "빌리 엘리어트 — 자유로운 자아 표현과 꿈의 실현"],
+    books: ["아직도 가야 할 길(M. 스캇 펙) — 성장은 고통이라는 진리와 자기 탐구", "파친코(이민진) — 방대한 시간과 다양한 삶을 담은 서사", "달에게 들려주고 싶은 이야기(베르나르 베르베르) — 신비롭고 광활한 상상력", "사피엔스 — 인류 전체를 조망하는 거대하고 자유로운 탐구"],
+    travel: ["동남아 배낭여행·발리", "세계 일주·장기 여행", "바다·해안 도시(리스본·하와이)"],
+    music: "앰비언트·재즈·인디 (자유롭고 광활한 사운드)",
+    food: "다양한 나라 음식 탐험. 여행지 현지 음식 직접 체험 즐김",
+  },
+  계: {
+    tag: "직관·감성형",
+    keyword: "고요한 호수처럼 깊고, 감정의 파장을 섬세하게 느낀다",
+    movies: ["소공녀 — 자신만의 가치를 지키는 청순하고 깊은 이야기", "이터널 선샤인 — 기억과 감정의 파장, 사랑의 신비로운 결", "콜 미 바이 유어 네임 — 여름과 감정의 결, 깊은 감성적 몰입", "밀양 — 인간 내면의 심연과 신비, 존재론적 감성"],
+    books: ["혼자서도 잘 자요 — 혼자인 시간을 사랑하는 법을 담은 에세이", "불안의 서(페르난두 페소아) — 내면의 흐름을 끝없이 응시하는 문학", "구의 증명(최진영) — 사랑과 존재에 대한 절절한 감성 소설", "죽음이란 무엇인가(셸리 케이건) — 존재와 소멸에 대한 철학적 탐구"],
+    travel: ["바다·섬 여행(발리·오키나와)", "비오는 날 카페 투어·감성 숙소", "온천·스파 힐링 여행"],
+    music: "로파이·앰비언트·인디 발라드 (조용하고 감성적인 사운드)",
+    food: "섬세하고 담백한 음식 선호. 혼밥·작은 카페 분위기 즐김",
+  },
 };
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -367,19 +457,72 @@ export default function TastePage() {
           </p>
         </div>
 
-        {/* 일간 보너스 추천 */}
+        {/* 일간 맞춤 추천 */}
         {ilganTaste && (
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 mb-5">
-            <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-2">{ilgan}일간 맞춤 추천</p>
-            <p className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400 inline-block mb-2">#{ilganTaste.tag}</p>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white/[0.03] rounded-xl p-3">
-                <p className="text-xs text-gray-500 mb-1">🎬 영화</p>
-                <p className="text-sm font-bold text-white">{ilganTaste.movie}</p>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase">{ilgan}일간 맞춤 취향</p>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400">#{ilganTaste.tag}</span>
+            </div>
+            <p className="text-xs text-gray-500 italic mb-3">"{ilganTaste.keyword}"</p>
+
+            {/* 영화 */}
+            <div className="mb-3">
+              <p className="text-[11px] text-amber-400/70 font-bold mb-2">🎬 이런 영화에 끌립니다</p>
+              <div className="space-y-1.5">
+                {ilganTaste.movies.map((m, i) => {
+                  const [title, ...rest] = m.split(" — ");
+                  return (
+                    <div key={i} className="flex gap-2 items-start">
+                      <span className="text-[10px] text-gray-600 mt-0.5 shrink-0">{i + 1}</span>
+                      <div>
+                        <span className="text-xs font-bold text-white">{title}</span>
+                        {rest.length > 0 && <span className="text-[10px] text-gray-500"> — {rest.join(" — ")}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
+
+            {/* 책 */}
+            <div className="mb-3">
+              <p className="text-[11px] text-blue-400/70 font-bold mb-2">📚 이런 책에 빠집니다</p>
+              <div className="space-y-1.5">
+                {ilganTaste.books.map((b, i) => {
+                  const [title, ...rest] = b.split(" — ");
+                  return (
+                    <div key={i} className="flex gap-2 items-start">
+                      <span className="text-[10px] text-gray-600 mt-0.5 shrink-0">{i + 1}</span>
+                      <div>
+                        <span className="text-xs font-bold text-white">{title}</span>
+                        {rest.length > 0 && <span className="text-[10px] text-gray-500"> — {rest.join(" — ")}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 여행·음악·음식 */}
+            <div className="grid grid-cols-1 gap-2">
               <div className="bg-white/[0.03] rounded-xl p-3">
-                <p className="text-xs text-gray-500 mb-1">📚 책</p>
-                <p className="text-sm font-bold text-white">{ilganTaste.book}</p>
+                <p className="text-[11px] text-green-400/70 font-bold mb-1.5">✈️ 여행 스타일</p>
+                <div className="flex flex-wrap gap-1">
+                  {ilganTaste.travel.map((t, i) => (
+                    <span key={i} className="text-[10px] bg-white/5 text-gray-400 px-2 py-0.5 rounded-full">{t}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-white/[0.03] rounded-xl p-3">
+                  <p className="text-[11px] text-purple-400/70 font-bold mb-1">🎵 음악 성향</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">{ilganTaste.music}</p>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-3">
+                  <p className="text-[11px] text-orange-400/70 font-bold mb-1">🍽️ 음식 취향</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">{ilganTaste.food}</p>
+                </div>
               </div>
             </div>
           </div>
