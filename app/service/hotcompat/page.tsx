@@ -670,8 +670,12 @@ function HotCompatContent() {
 
         {/* 일지·월지 관계 다이어그램 */}
         {(() => {
+          const yj1 = r1.pillarsDetail.year.jj;
+          const yj2 = r2.pillarsDetail.year.jj;
           const mj1 = r1.pillarsDetail.month.jj;
           const mj2 = r2.pillarsDetail.month.jj;
+          const hj1 = r1.pillarsDetail.hour?.jj;
+          const hj2 = r2.pillarsDetail.hour?.jj;
           const SAMHAP_GROUPS: string[][] = [["인","오","술"],["신","자","진"],["해","묘","미"],["사","유","축"]];
           const BANGSHAP_GROUPS: string[][] = [["인","묘","진"],["사","오","미"],["신","유","술"],["해","자","축"]];
           function getJjRel(a: string, b: string): { type: string; color: string; bg: string; desc: string } {
@@ -685,35 +689,39 @@ function HotCompatContent() {
               return { type: "충", color: "#f87171", bg: "rgba(248,113,113,0.15)", desc: "서로 부딪히지만 강한 자극을 주는 관계" };
             return { type: "무관", color: "#6b7280", bg: "rgba(107,114,128,0.1)", desc: "직접적인 관계 없음" };
           }
-          const ilji = getJjRel(ij1, ij2);
-          const wolji = getJjRel(mj1, mj2);
+          const rows = [
+            { rowLabel: "년지 — 뿌리·환경 에너지", a: yj1, b: yj2 },
+            { rowLabel: "월지 — 사회·활동 에너지", a: mj1, b: mj2 },
+            { rowLabel: "일지 — 배우자·본인 에너지", a: ij1, b: ij2 },
+            ...(hj1 && hj2 ? [{ rowLabel: "시지 — 내면·욕구 에너지", a: hj1, b: hj2 }] : []),
+          ];
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-5">일지 · 월지 관계 다이어그램</p>
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-5">년지 · 월지 · 일지 · 시지 관계 다이어그램</p>
               <div className="space-y-5">
-                {([
-                  { rowLabel: "일지 — 배우자·본인 에너지", a: ij1, b: ij2, rel: ilji },
-                  { rowLabel: "월지 — 사회·활동 에너지", a: mj1, b: mj2, rel: wolji },
-                ] as { rowLabel: string; a: string; b: string; rel: ReturnType<typeof getJjRel> }[]).map(({ rowLabel, a, b, rel }) => (
-                  <div key={rowLabel}>
-                    <p className="text-[10px] text-gray-600 font-bold tracking-widest uppercase mb-3">{rowLabel}</p>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black border-2 border-rose-400/50" style={{ background: "rgba(244,63,94,0.1)" }}>{a}</div>
-                        <span className="text-[10px] text-gray-500">나</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                        <span className="text-xs font-black px-2.5 py-1 rounded-lg" style={{ color: rel.color, background: rel.bg }}>{rel.type}</span>
-                        <div className="w-14 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, rgba(244,63,94,0.6), ${rel.color}, rgba(129,140,248,0.6))` }} />
-                        <span className="text-[9px] text-gray-600 text-center leading-tight max-w-[80px]">{rel.desc}</span>
-                      </div>
-                      <div className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black border-2 border-indigo-400/50" style={{ background: "rgba(99,102,241,0.1)" }}>{b}</div>
-                        <span className="text-[10px] text-gray-500">상대</span>
+                {rows.map(({ rowLabel, a, b }) => {
+                  const rel = getJjRel(a, b);
+                  return (
+                    <div key={rowLabel}>
+                      <p className="text-[10px] text-gray-600 font-bold tracking-widest mb-3">{rowLabel}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-rose-400/50" style={{ background: "rgba(244,63,94,0.1)" }}>{a}</div>
+                          <span className="text-[10px] text-gray-500">나</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                          <span className="text-xs font-black px-2.5 py-1 rounded-lg" style={{ color: rel.color, background: rel.bg }}>{rel.type}</span>
+                          <div className="w-14 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, rgba(244,63,94,0.5), ${rel.color}, rgba(129,140,248,0.5))` }} />
+                          <span className="text-[9px] text-gray-600 text-center leading-tight max-w-[80px]">{rel.desc}</span>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-indigo-400/50" style={{ background: "rgba(99,102,241,0.1)" }}>{b}</div>
+                          <span className="text-[10px] text-gray-500">상대</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-x-3 gap-y-1">
                 {([["육합","#f472b6","본능적으로 끌려 엉겨붙는 합"],["삼합","#fbbf24","같은 방향으로 흐르는 강한 합"],["방합","#34d399","같은 계절 기운의 합"],["충","#f87171","부딪히지만 자극적인 관계"]] as [string,string,string][]).map(([t,c,d]) => (

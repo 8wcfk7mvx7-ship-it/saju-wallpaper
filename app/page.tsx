@@ -28,7 +28,7 @@ const UI: Record<Lang, {
   navBadge: string;
   nav: [string, string, string, string];
   mypage: string;
-  badgeTags: [string, string, string, string, string, string];
+  badgeTags: string[];
 }> = {
   ko: {
     h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
@@ -43,7 +43,7 @@ const UI: Record<Lang, {
     navBadge: "AI 사주",
     nav: ["사주", "가이드", "일진달력", "문의하기"],
     mypage: "마이페이지",
-    badgeTags: ["격국·용신 분석", "60갑자 일주론", "신살 발견", "대운·세운표", "경도 보정", "무료"],
+    badgeTags: ["격국·용신 분석", "신살 발견", "경도 보정", "무료"],
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -58,7 +58,7 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Guide", "Daily Calendar", "Contact"],
     mypage: "My Page",
-    badgeTags: ["Chart & Element Analysis", "60 Pillar Theory", "Sign Discovery", "Decade·Annual Chart", "Longitude Correction", "Free"],
+    badgeTags: ["Chart & Element Analysis", "Sign Discovery", "Longitude Correction", "Free"],
   },
   id: {
     h1: ["Wallpaper Anda saat ini", "mungkin menghalangi", "energi Anda"],
@@ -73,7 +73,7 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Panduan", "Kalender Harian", "Kontak"],
     mypage: "Halaman Saya",
-    badgeTags: ["Analisis Bagan & Elemen", "Teori 60 Pilar", "Penemuan Tanda", "Tabel Dekade·Tahunan", "Koreksi Bujur", "Gratis"],
+    badgeTags: ["Analisis Bagan & Elemen", "Penemuan Tanda", "Koreksi Bujur", "Gratis"],
   },
   ta: {
     h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
@@ -88,7 +88,7 @@ const UI: Record<Lang, {
     navBadge: "AI சாஜு",
     nav: ["சாஜு", "வழிகாட்டி", "தினசரி நாட்காட்டி", "தொடர்பு"],
     mypage: "என் பக்கம்",
-    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "60 நிலை கோட்பாடு", "அடையாள கண்டுபிடிப்பு", "தசா·வருட அட்டவணை", "தீர்க்கரேகை திருத்தம்", "இலவசம்"],
+    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "அடையாள கண்டுபிடிப்பு", "தீர்க்கரேகை திருத்தம்", "இலவசம்"],
   },
 };
 
@@ -1243,6 +1243,28 @@ export default function MainPage() {
             ))}
           </div>
 
+          {/* 신뢰 메시지 */}
+          <div className="max-w-sm sm:max-w-xl mx-auto px-4 mb-6">
+            <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
+                사주를 캡처해서 AI에 올려 묻는 것과는 분석 방식 자체가 다릅니다.
+              </p>
+              <ul className="space-y-2.5">
+                {[
+                  { text: <>명리학 원전 이론과 사주 명식 계산 로직을 직접 구현한 <strong style={{ color: "#fff" }}>전용 분석 엔진</strong>으로 풀이합니다</> },
+                  { text: <>생년월일시로 산출한 <strong style={{ color: "#fff" }}>사주 명식·십성·신살 데이터</strong>를 기준으로 항목별 풀이를 구성합니다</> },
+                  { text: <>일반 대화형 AI가 즉석에서 답하는 방식이 아니라, <strong style={{ color: "#fff" }}>정해진 명리학 규칙</strong>에 따라 일관되게 분석합니다</> },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+                    <span className="shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>·</span>
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
           {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
           <div className="max-w-sm mx-auto px-4 mb-4">
             <button
@@ -1269,28 +1291,6 @@ export default function MainPage() {
             <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
               <span>누적 분석 <strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>건</span>
-            </div>
-          </div>
-
-          {/* 신뢰 메시지 */}
-          <div className="mt-6 max-w-sm sm:max-w-xl mx-auto px-4">
-            <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
-                사주를 캡처해서 AI에 올려 묻는 것과는 분석 방식 자체가 다릅니다.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  { text: <>명리학 원전 이론과 사주 명식 계산 로직을 직접 구현한 <strong style={{ color: "#fff" }}>전용 분석 엔진</strong>으로 풀이합니다</> },
-                  { text: <>생년월일시로 산출한 <strong style={{ color: "#fff" }}>사주 명식·십성·신살 데이터</strong>를 기준으로 항목별 풀이를 구성합니다</> },
-                  { text: <>일반 대화형 AI가 즉석에서 답하는 방식이 아니라, <strong style={{ color: "#fff" }}>정해진 명리학 규칙</strong>에 따라 일관되게 분석합니다</> },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
-                    <span className="shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>·</span>
-                    <span>{item.text}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
 
