@@ -102,7 +102,7 @@ export default function NomadPage() {
     resultRef.current = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-      name: "나", gender: form.gender,
+      name: form.name || "나", gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
     setStep("loading");
@@ -217,9 +217,9 @@ export default function NomadPage() {
   // ── 결과 ──
   const r = resultRef.current;
   if (!r) return null;
-  const ilgan = r.pillarsDetail.day.cg;
+  const userName = form.name || "나";
+  const displayName = userName === "나" ? "님" : `${userName}님`;
 
-  // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
     r.pillarsDetail.year.sipseongCg,
     r.pillarsDetail.month.sipseongCg,
@@ -242,6 +242,39 @@ export default function NomadPage() {
   const strengthInfo = getSipseongStrength(r);
   const strengthMap = Object.fromEntries(strengthInfo.map(s => [s.group, s])) as Record<"비겁" | "식상" | "재성" | "관성" | "인성", typeof strengthInfo[number]>;
 
+  // 신살 기반 직업 힌트
+  const sinsalNames = r.sinsalList.map((s: { name: string }) => s.name);
+  const hasYeokma = sinsalNames.includes("역마살");
+  const hwagaePillars = (r.sinsalList.find((s: { name: string; pillars: string[] }) => s.name === "화개살")?.pillars as string[] | undefined) ?? [];
+  const hasHwagaeIlji = hwagaePillars.includes("일");
+  const hasHwagaeMulti = hwagaePillars.length >= 2;
+
+  const sinsalHints: { emoji: string; label: string; desc: string; jobs: string[] }[] = [];
+  if (hasYeokma && groupCounts["관성"] >= 1 && !(groupCounts["식상"] >= 1 && groupCounts["재성"] >= 1)) {
+    sinsalHints.push({
+      emoji: "✈️",
+      label: "출장형 커리어",
+      desc: `${displayName}은 이동 기운과 조직 체계가 맞물린 구조예요. 한자리에 앉아 있는 일보다 필드를 뛰어다니고 외부 미팅이 잦을 때 에너지가 살아납니다. ${displayName}한테 '출장 다녀오세요'는 스트레스가 아니라 선물이에요.`,
+      jobs: ["해외영업·무역 담당", "영업직·외근 중심 직군", "컨설턴트·파견 전문직", "공공기관 현장·감리직"]
+    });
+  }
+  if (hasYeokma && groupCounts["식상"] >= 1 && groupCounts["재성"] >= 1) {
+    sinsalHints.push({
+      emoji: "🌏",
+      label: "이동형 창업·무역",
+      desc: `${displayName}은 새로운 것을 만들고 돈으로 바꾸는 힘에 이동 기운이 더해진 구조예요. 한 곳에서 대박을 노리는 것보다 여러 채널·여러 시장에서 수익을 만드는 방식이 훨씬 잘 맞아요. ${displayName}이 멈추면 기운이 막히고, 움직이면 돈이 따라와요.`,
+      jobs: ["무역·수출입·해외 소싱", "이동형 자영업 (푸드트럭·팝업)", "글로벌 플랫폼 1인 사업", "온라인 셀러·다채널 마케팅"]
+    });
+  }
+  if (hasHwagaeIlji || hasHwagaeMulti) {
+    sinsalHints.push({
+      emoji: "🎨",
+      label: "창작·예술형 기운",
+      desc: `${displayName} 사주에 화개살이 두드러지게 자리해요. 혼자만의 공간에서 집중할 때 창의력이 폭발하는 타입이에요. 주류에 섞이기 어렵다고 느꼈다면, 그건 약점이 아니라 창작자로서의 본능이에요. ${displayName}이 가장 빛나는 건 남들과 다른 길을 걸을 때예요.`,
+      jobs: ["예술·디자인·사진·영상", "작가·유튜버·크리에이터", "명상·상담·코칭·치유", "학문·연구·종교 계통"]
+    });
+  }
+
   return (
     <main className="min-h-screen bg-[#0a0a14] text-white">
       <BackButton />
@@ -252,24 +285,44 @@ export default function NomadPage() {
         <div className="text-center mb-8">
           <p className="text-cyan-400 text-xs font-bold tracking-widest mb-2">WORK STYLE</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주, 당신의 일 유형
+            {displayName}의 일 유형
           </h1>
         </div>
 
         <div className="bg-gradient-to-br from-cyan-950/60 to-blue-950/40 border border-cyan-700/30 rounded-3xl p-6 mb-5 text-center">
           <div className="text-4xl mb-2">{matched.emoji}</div>
           <p className="text-cyan-300 text-xs font-bold tracking-widest uppercase mb-2">{matched.id}</p>
-          <p className="text-xl font-black leading-snug mb-4">{matched.title}</p>
+          <p className="text-xl font-black leading-snug mb-4">{displayName}은 {matched.title}</p>
           <div className="text-sm text-gray-300 leading-relaxed text-left space-y-3">
-            <p>{matched.desc} {matched.env}</p>
-            <p>구체적으로는 {matched.jobs.join(", ")} 같은 분야에서 이 기운이 잘 풀려요.</p>
+            <p>{matched.desc}</p>
+            <p>{displayName}한테 잘 맞는 환경: {matched.env}</p>
+            <p>구체적으로는 {matched.jobs.join(", ")} 같은 분야에서 {displayName}의 기운이 잘 풀려요.</p>
             <p>{matched.warn}</p>
-            <p className="text-cyan-200">{matched.action}</p>
+            <p className="text-cyan-200">{displayName}, {matched.action}</p>
           </div>
         </div>
 
+        {sinsalHints.length > 0 && (
+          <div className="bg-white/[0.03] border border-cyan-500/20 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-cyan-300 mb-3">⭐ {displayName} 사주에 새겨진 직업 신호</p>
+            <div className="space-y-4">
+              {sinsalHints.map((h, i) => (
+                <div key={i} className={i > 0 ? "pt-4 border-t border-white/5" : ""}>
+                  <p className="text-xs font-bold text-cyan-400 mb-1">{h.emoji} {h.label}</p>
+                  <p className="text-sm text-gray-200 leading-relaxed mb-2">{h.desc}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {h.jobs.map(j => (
+                      <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-cyan-900/40 border border-cyan-700/30 text-cyan-300">{j}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-          <p className="text-sm font-bold text-sky-300 mb-3">다섯 기운으로 보는 나의 균형</p>
+          <p className="text-sm font-bold text-sky-300 mb-3">다섯 기운으로 보는 {displayName}의 균형</p>
           <div className="space-y-2 mb-4">
             {Object.entries(groupCounts).map(([g, n]) => (
               <div key={g} className="flex items-center gap-2">
