@@ -86,16 +86,17 @@ export const REL_TYPE_COLOR: Record<string, string> = {
   원진: "#c084fc",
 };
 
-// 세력 강도 순서: 강한 것부터 약한 것 순 (삼합 > 육합/반합 > 충 > 형 > 파 > 해 > 원진)
+// 세력 강도 순서: 강한 것부터 약한 것 순 (방합 > 육합 > 삼합 > 반합 > 충 > 형 > 파 > 해 > 원진)
+// 방합은 3체(體) 관계라 JijiRelation 타입에 없지만 실제 강도는 육합보다 위
 export const REL_STRENGTH_ORDER: Record<JijiRelation["type"], number> = {
-  삼합: 0,
-  육합: 1,
-  반합: 1,
-  충: 2,
-  형: 3,
-  파: 4,
-  해: 5,
-  원진: 6,
+  육합: 0,
+  삼합: 1,
+  반합: 2,
+  충: 3,
+  형: 4,
+  파: 5,
+  해: 6,
+  원진: 7,
 };
 
 // 같은 관계 유형 내에서도 왕지(자오묘유) > 생지(인신사해) > 고지(진술축미) 순으로 강하다.
@@ -105,10 +106,53 @@ const JIJI_TIER: Record<string, number> = {
   진: 2, 술: 2, 축: 2, 미: 2,
 };
 
+// 육합 쌍별 강도 (낮을수록 강함): 생합(인해·오미·진유) > 극합(자축·묘술·사신)
+const YUKHAP_PAIR_STRENGTH: Record<string, number> = {
+  인해: 0, 해인: 0,
+  오미: 1, 미오: 1,
+  진유: 1, 유진: 1,
+  자축: 2, 축자: 2,
+  묘술: 2, 술묘: 2,
+  사신: 2, 신사: 2,
+};
+
+// 충 쌍별 강도 (낮을수록 강함): 묘유 > 자오 > 사해 > 진술 > 축미 > 인신
+const CHUNG_PAIR_STRENGTH: Record<string, number> = {
+  묘유: 0, 유묘: 0,
+  자오: 1, 오자: 1,
+  사해: 2, 해사: 2,
+  진술: 3, 술진: 3,
+  축미: 4, 미축: 4,
+  인신: 5, 신인: 5,
+};
+
+// 원진 쌍별 강도 (낮을수록 강함): 인유·묘신 > 자미·진해 > 사술·축오
+export const WONJIN_PAIR_TIER: Record<string, number> = {
+  인유: 0, 유인: 0,
+  묘신: 0, 신묘: 0,
+  자미: 1, 미자: 1,
+  진해: 1, 해진: 1,
+  사술: 2, 술사: 2,
+  축오: 2, 오축: 2,
+};
+
 export function sortJijiRelationsByStrength(relations: JijiRelation[]): JijiRelation[] {
   return [...relations].sort((a, b) => {
     const typeDiff = REL_STRENGTH_ORDER[a.type] - REL_STRENGTH_ORDER[b.type];
     if (typeDiff !== 0) return typeDiff;
+    const pk = (r: JijiRelation) => `${r.jjA}${r.jjB}`;
+    if (a.type === "육합") {
+      const diff = (YUKHAP_PAIR_STRENGTH[pk(a)] ?? 2) - (YUKHAP_PAIR_STRENGTH[pk(b)] ?? 2);
+      if (diff !== 0) return diff;
+    }
+    if (a.type === "충") {
+      const diff = (CHUNG_PAIR_STRENGTH[pk(a)] ?? 3) - (CHUNG_PAIR_STRENGTH[pk(b)] ?? 3);
+      if (diff !== 0) return diff;
+    }
+    if (a.type === "원진") {
+      const diff = (WONJIN_PAIR_TIER[pk(a)] ?? 1) - (WONJIN_PAIR_TIER[pk(b)] ?? 1);
+      if (diff !== 0) return diff;
+    }
     const tierA = Math.min(JIJI_TIER[a.jjA] ?? 1, JIJI_TIER[a.jjB] ?? 1);
     const tierB = Math.min(JIJI_TIER[b.jjA] ?? 1, JIJI_TIER[b.jjB] ?? 1);
     return tierA - tierB;
@@ -315,7 +359,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   홍염살:   {hanja:"紅艶殺", category:"unlucky",  desc:"이성 관계가 복잡해지기 쉽고 색정 구설이 있어요"},
   양인살:   {hanja:"羊刃殺", category:"unlucky",  desc:"강한 추진력이 있으나 충동적이고 사고·부상을 주의해야 해요"},
   백호살:   {hanja:"白虎殺", category:"unlucky",  desc:"성격이 급하고 행동력이 빨라요. 결정과 추진이 거침없는 만큼 수술·사고·혈액 관련 건강 이슈, 그리고 일을 서두르다 생기는 실수를 주의해야 해요"},
-  원진살:   {hanja:"怨嗔殺", category:"unlucky",  desc:"배우자·가까운 사람과 원망·갈등이 반복되기 쉬워요"},
+  원진살:   {hanja:"怨嗔殺", category:"unlucky",  desc:"배우자·가까운 사람과 원망·갈등이 반복되기 쉬워요. 원진도 강도 차이가 있어요 — 인유·묘신 조합이 가장 강하고, 자미·진해가 중간, 사술·축오가 상대적으로 약한 편이에요. 무시할 수준은 아니지만, 내 원진이 어떤 강도인지 파악하고 그러려니 하는 마음으로 넘기는 게 중요해요."},
   과숙살:   {hanja:"寡宿殺", category:"unlucky",  desc:"연애·결혼 시기가 늦거나 독신 경향이 강해요. 영적 감수성이 뛰어나고 집중력이 강해요. 여성에게 강하게 작용해요"},
   평두살:   {hanja:"平頭殺", category:"unlucky",  desc:"리더 기질과 강한 고집을 타고났어요. 남 밑에서 통제받는 것을 체질적으로 거부하며, 주도권을 잡아야 에너지가 살아나요. 융통성을 의도적으로 기르지 않으면 독불장군이 되기 쉬워요"},
   나체도화: {hanja:"裸體桃花", category:"neutral",  desc:"매력이 직관적으로 드러나 숨길 수 없어요. 어디서든 시선을 끌고 이성이 자연스럽게 모이는 기운이에요. 그만큼 구설수·치정·스캔들에 휘말리기 쉽고 감정 기복으로 스스로 피곤해지는 경향이 있어요"},
@@ -509,6 +553,9 @@ function getUicheoUibuNarrative(dayCg: string, dayJj: string, gender: "male" | "
 const GWIMUN_PAIRS = [['자','유'],['축','오'],['인','미'],['묘','신'],['진','해'],['사','술']];
 // 원진살: 지지 쌍
 export const WONJIN_PAIRS: [string, string][] = [['자','미'],['축','오'],['인','유'],['묘','신'],['진','해'],['사','술']];
+// 미(未)토 보유자 원진 고충 메모: 미토가 있는 사람은 주변 인기가 많은 편이나, 원진 관계가 겹치면 정신적 고충이 생각보다 큼.
+// 단 자미 원진은 전체 원진 중 중간 강도(인유·묘신 > 자미·진해 > 사술·축오).
+export const MI_WONJIN_NOTE = "미(未)가 있는 분들은 주변에서 인기가 많은 편인데, 원진 기운이 겹치면 생각보다 정신적으로 지치는 시기가 와요. 크게 걱정할 수준은 아니지만, 소모되는 시기가 오면 혼자만의 충전 시간을 충분히 챙기는 게 중요해요.";
 // 천주귀인: 일간 기준 지지
 const CHEONJU_JJ: Record<string,string> = {
   갑:'사', 을:'오', 병:'사', 정:'유', 무:'해',

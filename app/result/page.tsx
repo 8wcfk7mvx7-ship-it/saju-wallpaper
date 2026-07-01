@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ILJU_60, ILGAN_PERSONALITY, SINGANG_TRAITS, OHAENG_HEALTH, OHAENG_CAREER,
-  detectSamhapBanghap, adjustCareerByExpression
+  detectSamhapBanghap, adjustCareerByExpression, WONJIN_PAIR_TIER, MI_WONJIN_NOTE
 } from "@/lib/saju";
 
 // ── 스크롤 페이드인 컴포넌트 ────────────────────────────────────────────────
@@ -1339,6 +1339,27 @@ export default function ResultPage() {
                           <span className="text-lg flex-shrink-0">⚠️</span>
                         </div>
                         <p className="text-xs text-gray-300 leading-relaxed">{s.desc}</p>
+                        {s.name === "원진살" && (() => {
+                          const pd = sajuResult.pillarsDetail;
+                          if (!pd) return null;
+                          const pillarMap: Record<string, string> = {
+                            연: pd.year?.jj ?? "", 월: pd.month?.jj ?? "", 일: pd.day?.jj ?? "", 시: pd.hour?.jj ?? ""
+                          };
+                          const jjs = (s.pillars as string[]).map(p => pillarMap[p]).filter(j => j);
+                          const pairKey = jjs.length === 2 ? `${jjs[0]}${jjs[1]}` : "";
+                          const tier = WONJIN_PAIR_TIER[pairKey] ?? -1;
+                          const tierLabel = tier === 0 ? "이 원진은 상대적으로 강한 편이에요 (인유·묘신 계열)."
+                            : tier === 1 ? "이 원진은 중간 강도예요 (자미·진해 계열)."
+                            : tier === 2 ? "이 원진은 세 종류 중 가장 약한 편이에요 (사술·축오 계열)." : null;
+                          const allJjs = [pd.year?.jj, pd.month?.jj, pd.day?.jj, pd.hour?.jj].filter(Boolean);
+                          const hasMi = allJjs.includes("미");
+                          return (
+                            <>
+                              {tierLabel && <p className="text-[11px] text-purple-400 mt-1.5 leading-relaxed">{tierLabel}</p>}
+                              {hasMi && <p className="text-[11px] text-purple-300 mt-1 leading-relaxed">{MI_WONJIN_NOTE}</p>}
+                            </>
+                          );
+                        })()}
                         <p className="text-[11px] text-gray-500 mt-1.5">💡 용신 오행의 환경을 가까이하면 흉신의 영향이 완화됩니다.</p>
                       </div>
                     ))}
