@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { analyzeSaju, getJijiRelations, getDohwaJj, CHEONUL_JJ } from "@/lib/saju";
+import { analyzeSaju, getJijiRelations, getDohwaJj, CHEONUL_JJ, calcDaewoon } from "@/lib/saju";
 import { GANYEOJIDONG_PAIRS } from "@/lib/saju2";
 import ResultFooterActions from "@/components/ResultFooterActions";
 
@@ -178,6 +178,196 @@ function computeTrashFindings(r: any, gender: string): { icon: string; title: st
   return findings;
 }
 
+const CURRENT_YEAR = 2026;
+
+const JIJI_CHUNG_PAIRS: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
+const WONJIN_PAIRS: [string, string][] = [["자","미"],["축","오"],["인","유"],["묘","신"],["진","해"],["사","술"]];
+const PA_PAIRS: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
+const HYEONG_GROUPS: string[][] = [["인","사","신"],["축","술","미"],["자","묘"]];
+// 삼합/반합 완화 맵: natal 지지 → [완화해주는 대운 지지들]
+const SAMHAP_MITIGATE: Record<string, string[]> = {
+  "인": ["오","술"],   "오": ["인","술"],   "술": ["인","오"],
+  "사": ["유","축"],   "유": ["사","축"],   "축": ["사","유"],
+  "신": ["자","진"],   "자": ["신","진"],   "진": ["신","자"],
+  "해": ["묘","미"],   "묘": ["해","미"],   "미": ["해","묘"],
+};
+// 육합 완화 맵: natal 지지 → 완화해주는 대운 지지
+const YUKHAP_MITIGATE: Record<string, string> = {
+  "자":"축","축":"자","인":"해","해":"인","묘":"술","술":"묘","진":"유","유":"진","사":"신","신":"사","오":"미","미":"오",
+};
+
+// 사생지(인신사해)·사왕지(자오묘유)·사고지(진술축미)
+const SASAENGJI = new Set(["인","신","사","해"]);
+const SAWANGJI = new Set(["자","오","묘","유"]);
+const SAGOJI = new Set(["진","술","축","미"]);
+
+function jjPairMatch(a: string, b: string, list: [string,string][]): boolean {
+  return list.some(([p,q]) => (p===a&&q===b)||(p===b&&q===a));
+}
+function hyeongMatch(a: string, b: string): boolean {
+  return HYEONG_GROUPS.some(g => g.includes(a) && g.includes(b));
+}
+
+interface DaewoonInsight {
+  type: "good" | "warn" | "neutral";
+  icon: string;
+  title: string;
+  desc: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function computeDaewoonInsights(r: any, form: { year: number; month: number; day: number; gender: string }): DaewoonInsight[] {
+  const insights: DaewoonInsight[] = [];
+  const gender = (form.gender === "male" ? "male" : "female") as "male" | "female";
+  const ilgan: string = r.pillarsDetail.day.cg;
+  const monthPillar = { cg: r.pillarsDetail.month.cg, jj: r.pillarsDetail.month.jj };
+
+  let daewoonResult;
+  try {
+    daewoonResult = calcDaewoon(form.year, form.month, form.day, gender, ilgan, monthPillar);
+  } catch { return insights; }
+
+  const pillars = daewoonResult.pillars as { yearStart: number; jj: string; cg: string; age: number }[];
+  const currentPillar = pillars.find(p => p.yearStart <= CURRENT_YEAR && CURRENT_YEAR < p.yearStart + 10);
+  if (!currentPillar) return insights;
+
+  const dj = currentPillar.jj; // 현재 대운 지지
+  const age = CURRENT_YEAR - form.year + 1; // 만 나이 근사
+  const remaining = (currentPillar.yearStart + 10) - CURRENT_YEAR;
+
+  const py = r.pillarsDetail.year, pm = r.pillarsDetail.month, pd = r.pillarsDetail.day, ph = r.pillarsDetail.hour;
+  const natalJjs: string[] = [py.jj, pm.jj, pd.jj];
+  if (ph) natalJjs.push(ph.jj);
+
+  // 사생지 분석: 인신사해는 이동·변동·시작의 강한 기운
+  const sasaengNatal = natalJjs.filter(j => SASAENGJI.has(j));
+  if (sasaengNatal.length >= 2) {
+    insights.push({
+      type: "neutral",
+      icon: "🌀",
+      title: "강한 변화 에너지 — 흐름을 막으면 역효과예요",
+      desc: `사주에 인·신·사·해처럼 변화·시작의 기운이 ${sasaengNatal.length}개나 있어요. 이런 구조는 억지로 한 자리에 고정시키면 기운이 막혀 오히려 사고·이탈·충돌로 나타납니다. 직업·거주지 변화를 적으로 삼지 말고, 이동과 새로운 시작을 의식적으로 설계해서 내 것으로 만드세요. 기운을 긍정적으로 이용하는 게 극복법입니다.`,
+    });
+  }
+
+  // 사왕지 분석: 자오묘유는 왕성한 기운 — 한 방향으로 집중
+  const sawangNatal = natalJjs.filter(j => SAWANGJI.has(j));
+  if (sawangNatal.length >= 2) {
+    insights.push({
+      type: "neutral",
+      icon: "⚡",
+      title: "기운이 한 방향으로 강하게 쏠려요",
+      desc: `자·오·묘·유처럼 왕성한 에너지를 가진 지지가 ${sawangNatal.length}개예요. 이 기운은 한 방향으로 집중하면 폭발적인 성과를 내지만, 분산되면 충돌과 소진으로 이어집니다. 한 가지 목표에 에너지를 집중하고, 여러 일을 동시에 벌이는 건 피하세요. 에너지가 많다는 게 장점이니 이걸 무기로 삼으세요.`,
+    });
+  }
+
+  // 사고지 분석: 진술축미는 저장·마무리·창고
+  const sagoNatal = natalJjs.filter(j => SAGOJI.has(j));
+  if (sagoNatal.length >= 2) {
+    insights.push({
+      type: "neutral",
+      icon: "🏔️",
+      title: "쌓고 저장하는 에너지 — 마무리에 강해요",
+      desc: `진·술·축·미처럼 저장·마무리의 기운이 ${sagoNatal.length}개예요. 처음 시작보다 기존 것을 완성·관리·축적하는 역할에서 빛납니다. 창업보다 기존 조직 안에서 자기 포지션을 단단히 굳히는 쪽이 유리하고, 무엇이든 꾸준히 쌓는 사람으로 이름을 낼 수 있어요.`,
+    });
+  }
+
+  // 대운 지지가 natal 충을 완화하는지 확인 (삼합·반합·육합)
+  for (const nj of natalJjs) {
+    const chungPartner = JIJI_CHUNG_PAIRS.find(([a,b]) => a===nj||b===nj)?.find(x=>x!==nj);
+    if (!chungPartner || !natalJjs.includes(chungPartner)) continue;
+    // nj와 chungPartner가 natal에 충하는 상황
+    // 대운 지지가 삼합으로 nj 또는 chungPartner를 합하면 충 완화
+    const mitigateSrc = (SAMHAP_MITIGATE[nj] || []).includes(dj) ? nj :
+                        (SAMHAP_MITIGATE[chungPartner] || []).includes(dj) ? chungPartner : null;
+    const mitigateYukhap = YUKHAP_MITIGATE[nj] === dj ? nj : YUKHAP_MITIGATE[chungPartner] === dj ? chungPartner : null;
+    if (mitigateSrc || mitigateYukhap) {
+      const target = mitigateSrc || mitigateYukhap;
+      insights.push({
+        type: "good",
+        icon: "🤝",
+        title: `지금 대운이 ${nj}${chungPartner} 충돌을 완화해줘요`,
+        desc: `사주 안에서 ${nj}과 ${chungPartner}이 서로 부딪히는 구조인데, 지금 대운 ${dj}이 들어와 ${target}을 합으로 감싸주면서 충돌이 완화됩니다. 앞으로 ${remaining}년간은 이 기운이 안정되는 흐름이에요. 이 시기에 그동안 미뤄왔던 일을 밀고 나가기 좋습니다.`,
+      });
+    }
+  }
+
+  // 대운 지지가 natal 충을 강화하는지 (대운이 충 상대방과 삼합·반합)
+  for (const nj of natalJjs) {
+    const chungPartner = JIJI_CHUNG_PAIRS.find(([a,b]) => a===nj||b===nj)?.find(x=>x!==nj);
+    if (!chungPartner || !natalJjs.includes(chungPartner)) continue;
+    // 대운이 충 상대방을 강화하는지
+    const amplifiesPartner = (SAMHAP_MITIGATE[chungPartner] || []).includes(dj);
+    if (amplifiesPartner) {
+      insights.push({
+        type: "warn",
+        icon: "⚠️",
+        title: `지금 대운이 ${nj}${chungPartner} 충돌을 더 강하게 만들어요`,
+        desc: `사주 안에서 ${nj}과 ${chungPartner}이 이미 부딪히는 구조인데, 지금 대운 ${dj}이 ${chungPartner} 세력을 더 강하게 만들어요. 앞으로 ${remaining}년간 이 기운의 영향이 커집니다. 무리한 확장·이직·투자보다 현재 자리를 지키고 내실을 다지는 데 집중하세요.`,
+      });
+    }
+  }
+
+  // 대운에서 원진 들어올 때
+  for (const nj of natalJjs) {
+    if (jjPairMatch(nj, dj, WONJIN_PAIRS)) {
+      insights.push({
+        type: "warn",
+        icon: "😤",
+        title: `지금 대운에서 ${nj}과 원진(怨嗔) 기운이 들어와요`,
+        desc: `원진은 서로 껄끄럽고 어긋나는 기운이에요. 사람과의 관계에서 이유 없이 안 맞는 느낌, 노력해도 공 인정받기 어려운 상황, 주변과의 불화가 이 기간에 더 빈번하게 나타날 수 있어요. 앞으로 ${remaining}년간은 대인관계에서 너무 완벽한 이해를 기대하지 말고, 소수의 신뢰할 수 있는 관계에 집중하세요. 억울함은 내려놓는 연습이 필요합니다.`,
+      });
+    }
+  }
+
+  // 대운에서 파(破) 들어올 때
+  for (const nj of natalJjs) {
+    if (jjPairMatch(nj, dj, PA_PAIRS)) {
+      insights.push({
+        type: "warn",
+        icon: "💔",
+        title: `지금 대운에서 ${nj}과 파(破) 기운이 들어와요`,
+        desc: `파는 시작은 좋은데 끝에 가서 어긋나거나 깨지는 기운이에요. 프로젝트·계약·관계가 마무리 단계에서 틀어지는 경험을 할 수 있어요. 앞으로 ${remaining}년간은 중요한 계약이나 마무리 단계에서 꼼꼼하게 점검하세요. 시작의 들뜬 감정에 치우치지 말고, 끝까지 세부 사항을 확인하는 습관이 손실을 막아줍니다.`,
+      });
+    }
+  }
+
+  // 대운에서 형(刑) 들어올 때
+  for (const nj of natalJjs) {
+    if (hyeongMatch(nj, dj)) {
+      insights.push({
+        type: "warn",
+        icon: "🔒",
+        title: `지금 대운에서 ${nj}과 형(刑) 기운이 들어와요`,
+        desc: `형은 겉으로는 비슷한 것 같은데 서로 억압하거나 옭아매는 기운이에요. 법적 문제·규칙과의 충돌·억압적인 환경에 놓일 수 있어요. 앞으로 ${remaining}년간은 계약서를 꼼꼼히 읽고, 규정을 어기는 행동은 최대한 자제하세요. 억울하게 엮이는 상황을 예방하는 게 최우선입니다.`,
+      });
+    }
+  }
+
+  // 대운 지지가 나의 사생지와 충
+  if (SASAENGJI.has(dj)) {
+    const chungNatal = natalJjs.find(nj => jjPairMatch(nj, dj, JIJI_CHUNG_PAIRS));
+    if (chungNatal) {
+      insights.push({
+        type: "warn",
+        icon: "🌪️",
+        title: `대운의 강한 변화 기운이 사주 내 기둥을 흔들어요`,
+        desc: `지금 대운 ${dj}은 강한 이동·변화의 기운인데, 내 사주 ${chungNatal}과 정면으로 충돌해요. 이 시기에 의도치 않은 큰 변화(이사·이직·이별)가 찾아올 수 있습니다. 앞으로 ${remaining}년간은 변화를 막으려 버티기보다, 내가 주도적으로 변화를 설계하고 미리 움직이는 게 훨씬 낫습니다.`,
+      });
+    }
+  }
+
+  // 대운 세력 설명 — age 표시
+  insights.unshift({
+    type: "neutral",
+    icon: "🌊",
+    title: `현재 대운 (${age}세 전후, ${currentPillar.cg}${currentPillar.jj} 대운)`,
+    desc: `지금은 ${currentPillar.cg}${currentPillar.jj} 대운 안에 있어요. 이 대운은 ${currentPillar.yearStart}년부터 시작해 앞으로 ${remaining}년이 남아 있습니다. 아래는 이 대운이 내 사주와 어떻게 맞물리는지 분석한 내용이에요.`,
+  });
+
+  return insights;
+}
+
 type Stage = "confirming" | "done" | "error";
 
 function SuccessContent() {
@@ -191,6 +381,7 @@ function SuccessContent() {
   const [dayCg, setDayCg] = useState("");
   const [dayJj, setDayJj] = useState("");
   const [trashFindings, setTrashFindings] = useState<{ icon: string; title: string; desc: string }[]>([]);
+  const [daewoonInsights, setDaewoonInsights] = useState<DaewoonInsight[]>([]);
 
   useEffect(() => {
     try {
@@ -212,6 +403,7 @@ function SuccessContent() {
       setDayCg(r.pillarsDetail.day.cg);
       setDayJj(r.pillarsDetail.day.jj);
       setTrashFindings(computeTrashFindings(r, form.gender || "female"));
+      setDaewoonInsights(computeDaewoonInsights(r, { year: form.year, month: form.month, day: form.day, gender: form.gender || "female" }));
       setStage("done");
     } catch {
       setErrorMsg("분석 정보가 올바르지 않습니다.");
@@ -324,6 +516,29 @@ function SuccessContent() {
         ) : (
           <div className="mb-8 p-4 rounded-2xl" style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)" }}>
             <p className="text-sm text-green-300">✅ 주요 흉살이 없는 사주입니다.</p>
+          </div>
+        )}
+
+        {/* 대운 흐름 분석 */}
+        {daewoonInsights.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-black text-white mb-1">지금 대운 흐름</h2>
+            <p className="text-xs text-gray-500 mb-4">현재 10년 대운이 내 사주와 어떻게 맞물리는지</p>
+            <div className="space-y-4">
+              {daewoonInsights.map((ins, i) => {
+                const borderColor = ins.type === "good" ? "rgba(34,197,94,0.3)" : ins.type === "warn" ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.1)";
+                const bgColor = ins.type === "good" ? "rgba(34,197,94,0.06)" : ins.type === "warn" ? "rgba(248,113,113,0.06)" : "rgba(255,255,255,0.03)";
+                return (
+                  <div key={i} className="rounded-2xl border p-5" style={{ borderColor, background: bgColor }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">{ins.icon}</span>
+                      <p className="font-black text-white">{ins.title}</p>
+                    </div>
+                    <p className="text-xs text-gray-300 leading-relaxed">{ins.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
