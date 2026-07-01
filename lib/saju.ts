@@ -2078,6 +2078,7 @@ export const PRICES = {
 export interface DaewoonPillar {
   age: number;        // 대운 시작 나이 (만)
   yearStart: number;  // 대운 시작 추정 연도
+  dateStart: { year: number; month: number; day: number }; // 교운기 정확 날짜
   cg: string; jj: string;
   sipseongCg: string; // 일간 기준 십성 (천간)
   sipseongJj: string; // 일간 기준 십성 (지지 본기)
@@ -2139,6 +2140,17 @@ export function calcDaewoon(
   // 3일 = 1년, 1일 = 4개월 → 반올림하여 대운 시작 나이 결정
   const startAge = Math.round(daysDiff / 3.0);
 
+  // 교운기 정확 날짜 계산: 3일=1년, 1일=4개월
+  // 첫 교운 = 생일 + floor(daysDiff/3)년 + (daysDiff%3)*4개월
+  function addYearsMonths(y: number, m: number, d: number, addY: number, addM: number) {
+    let rm = m + addM;
+    let ry = y + addY + Math.floor((rm - 1) / 12);
+    rm = ((rm - 1) % 12 + 12) % 12 + 1;
+    const maxD = new Date(ry, rm, 0).getDate();
+    return { year: ry, month: rm, day: Math.min(d, maxD) };
+  }
+  const firstDate = addYearsMonths(birthYear, birthMonth, birthDay, Math.floor(daysDiff / 3), (daysDiff % 3) * 4);
+
   // ③ 대운 기둥 8개 생성
   const monthCgIdx = CHEONGAN.indexOf(monthPillar.cg);
   const monthJjIdx = JIJI.indexOf(monthPillar.jj);
@@ -2154,6 +2166,7 @@ export function calcDaewoon(
     pillars.push({
       age: startAge + i * 10,
       yearStart: birthYear + startAge + i * 10,
+      dateStart: addYearsMonths(firstDate.year, firstDate.month, firstDate.day, i * 10, 0),
       cg, jj,
       sipseongCg: getSipseong(ilgan, cg),
       sipseongJj: getSipseong(ilgan, bongi),

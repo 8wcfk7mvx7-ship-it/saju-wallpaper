@@ -478,7 +478,7 @@ export default function DaewoonPage() {
                     <div className="text-center min-w-[52px]">
                       <p className="text-2xl font-black" style={{ color: elStyle.text }}>{p.cg}{p.jj}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{p.age}세</p>
-                      <p className="text-[10px] text-gray-600">{p.yearStart}년~</p>
+                      <p className="text-[10px] text-gray-600">{p.dateStart ? `${p.dateStart.year}.${String(p.dateStart.month).padStart(2,"0")}.${String(p.dateStart.day).padStart(2,"0")}` : `${p.yearStart}년`}</p>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap gap-1.5 mb-2">

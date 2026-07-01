@@ -733,6 +733,11 @@ export default function DaewoonPage() {
         <div className="bg-violet-500/10 border border-violet-500/25 rounded-2xl p-4 mb-6">
           <p className="text-xs text-violet-400 font-semibold mb-1">⏰ 교운기 (첫 대운 진입)</p>
           <p className="text-2xl font-black text-violet-300">{daewoon.startAge}세</p>
+          {daewoon.pillars[0]?.dateStart && (
+            <p className="text-sm font-bold text-violet-200 mt-1">
+              {daewoon.pillars[0].dateStart.year}년 {daewoon.pillars[0].dateStart.month}월 {daewoon.pillars[0].dateStart.day}일
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-1">
             출생 후 {daewoon.startAge}세에 첫 대운이 시작됩니다.
             이후 10년마다 대운이 바뀌며 인생의 큰 흐름이 전환됩니다.
@@ -889,7 +894,9 @@ export default function DaewoonPage() {
                   <div className="flex items-center gap-3 px-4 pt-4 pb-3">
                     <div className="text-center shrink-0 min-w-[44px]">
                       <p className="text-xl font-black leading-none" style={{ color: elStyle.text }}>{p.cg}{p.jj}</p>
-                      <p className="text-[10px] text-gray-500 mt-1">{p.yearStart}년~</p>
+                      <p className="text-[10px] text-gray-500 mt-1">
+                        {p.dateStart ? `${p.dateStart.year}.${String(p.dateStart.month).padStart(2,"0")}.${String(p.dateStart.day).padStart(2,"0")}` : `${p.yearStart}년`}
+                      </p>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
