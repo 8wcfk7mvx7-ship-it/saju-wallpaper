@@ -5,14 +5,13 @@ import { loadSajuData } from "@/lib/savedSaju";
 import ProfilePicker from "@/components/ProfilePicker";
 import SaveProfilePrompt from "@/components/SaveProfilePrompt";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import SipseongInsight from "@/components/SipseongInsight";
 import ProfileSaveModal from "@/components/ProfileSaveModal";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import ResultFooterActions from "@/components/ResultFooterActions";
 import BackButton from "@/components/BackButton";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import { getSpouseFortuneAnalysis, getFaithfulSpouseAnalysis } from "@/lib/saju2";
-import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getIndaSingangMaleNarrative, getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative, isWoljiSingleGyeopjae, getHourCheonulIntactGoodFlowNarrative, isHourCheonulIntactGoodFlow } from "@/lib/saju";
+import { CHEONGAN_ELEMENT, JIJANGAN_DISPLAY, getExtremeStrengthNarrative, isWoljiSingleGyeopjae, isHourCheonulIntactGoodFlow } from "@/lib/saju";
 import { trackTraits } from "@/lib/trackTrait";
 
 const GUNGHAP_EL_COLOR: Record<string, string> = { 목: "#4ade80", 화: "#f87171", 토: "#fbbf24", 금: "#d1d5db", 수: "#60a5fa" };
@@ -360,8 +359,6 @@ export default function GunghapPage(){
   }>(null);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
   const [step,setStep]=useState<'entry'|'form'|'loading'|'result'>('entry');
-  const [relationType,setRelationType]=useState('');
-  const selectedRelation=RELATION_TYPES.find(r=>r.id===relationType)||null;
   useEffect(()=>{const t=setTimeout(()=>setShowEntryBtn(true),3400);return()=>clearTimeout(t);},[]);
 
   const fillP1=useCallback(()=>{
@@ -530,7 +527,7 @@ export default function GunghapPage(){
 
             {/* 서브타이틀 */}
             <FadeSlide delay={400}>
-              <p style={{color:'rgba(255,255,255,0.45)',fontSize:14,lineHeight:1.75,marginBottom:32}}>
+              <p style={{color:'rgba(255,255,255,0.75)',fontSize:14,lineHeight:1.75,marginBottom:32}}>
                 느낌만으로 관계를 판단하는 시대는 끝났습니다.<br/>
                 당신 주변의 누군가는 이미 사주로 확인했습니다.
               </p>
@@ -563,7 +560,7 @@ export default function GunghapPage(){
                 ].map((s,i)=>(
                   <div key={i} style={{textAlign:'center'}}>
                     <p style={{fontSize:22,fontWeight:900,color:'#fff',margin:'0 0 3px'}}>{s.val}</p>
-                    <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:0}}>{s.label}</p>
+                    <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',margin:0}}>{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -593,7 +590,7 @@ export default function GunghapPage(){
           <BackButton />
           <div style={{padding:'0 18px',maxWidth:512,margin:'0 auto'}}>
             <button onClick={()=>{if(step==='result'){setResult(null);setStep('form');}else setStep('entry');}}
-              style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:13,cursor:'pointer',padding:0,fontFamily:'inherit'}}>
+              style={{background:'none',border:'none',color:'rgba(255,255,255,0.85)',fontSize:13,cursor:'pointer',padding:0,fontFamily:'inherit'}}>
               ← {step==='result'?'다시 입력':'처음으로'}
             </button>
           </div>
@@ -603,46 +600,14 @@ export default function GunghapPage(){
               <>
                 <div style={{textAlign:'center',marginBottom:22}}>
                   <h1 style={{fontSize:24,fontWeight:900,lineHeight:1.35,marginBottom:10}}>
-                    {selectedRelation?selectedRelation.formTitle:'그 사람과 나,'}<br/>
+                    그 사람과 나,<br/>
                     <span style={{color:'#a78bfa'}}>
-                      {selectedRelation?selectedRelation.formSub:'진짜 내 편인가요?'}
+                      진짜 내 편인가요?
                     </span>
                   </h1>
-                  <p style={{color:'rgba(255,255,255,0.45)',fontSize:13,lineHeight:1.6}}>
+                  <p style={{color:'rgba(255,255,255,0.75)',fontSize:13,lineHeight:1.6}}>
                     조후·삼합·합충·원진살·바람기 — <strong style={{color:'rgba(255,255,255,0.7)'}}>사주가 처음부터 알고 있었습니다</strong>
                   </p>
-                </div>
-
-                {/* 관계 선택 드롭다운 */}
-                <div style={{marginBottom:18}}>
-                  <p style={{color:'rgba(255,255,255,0.4)',fontSize:11,fontWeight:700,
-                    letterSpacing:'0.12em',marginBottom:8}}>어떤 관계인가요?</p>
-                  <div style={{position:'relative'}}>
-                    <select
-                      value={relationType}
-                      onChange={e=>setRelationType(e.target.value)}
-                      style={{
-                        width:'100%',padding:'13px 40px 13px 14px',
-                        border:'1.5px solid rgba(167,139,250,0.35)',
-                        borderRadius:12,fontSize:14,fontWeight:700,
-                        background:'rgba(167,139,250,0.08)',
-                        color:relationType?'#c4b5fd':'rgba(255,255,255,0.35)',
-                        outline:'none',cursor:'pointer',
-                        appearance:'none' as const,fontFamily:'inherit',
-                      }}
-                    >
-                      <option value="" style={{background:'#1a1a2e',color:'rgba(255,255,255,0.5)'}}>
-                        관계를 선택하세요
-                      </option>
-                      {RELATION_TYPES.map(rt=>(
-                        <option key={rt.id} value={rt.id} style={{background:'#1a1a2e',color:'#fff'}}>
-                          {rt.emoji} {rt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <span style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',
-                      color:'rgba(255,255,255,0.3)',fontSize:10,pointerEvents:'none'}}>▼</span>
-                  </div>
                 </div>
 
                 <ProfilePicker onSelect={p => setP1({
@@ -666,13 +631,9 @@ export default function GunghapPage(){
                   <NameInput defaultValue={p1.name} onBlur={v=>setP1({...p1,name:v})} style={{...inp(),marginBottom:12}} />
                   <BirthInputForm value={p1.birthData} onChange={v=>setP1({...p1,birthData:v})} accent="#f43f5e" showName={false} />
                 </div>
-                <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>
-                  {selectedRelation?`${selectedRelation.emoji} ${selectedRelation.label} 궁합`:'VS'}
-                </div>
+                <div style={{textAlign:'center',padding:'8px 0',fontSize:14,color:'rgba(255,255,255,0.2)',fontWeight:900}}>VS</div>
                 <div style={{background:'rgba(255,255,255,0.04)',borderRadius:18,padding:'18px 16px',border:'1px solid rgba(255,255,255,0.07)'}}>
-                  <p style={{color:'#818cf8',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:'0 0 12px'}}>
-                    {selectedRelation?.p2Label||'상대방'}
-                  </p>
+                  <p style={{color:'#818cf8',fontSize:11,fontWeight:700,letterSpacing:'0.12em',margin:'0 0 12px'}}>상대방</p>
                   <NameInput defaultValue={p2.name} onBlur={v=>setP2({...p2,name:v})} style={{...inp(),marginBottom:12}} />
                   <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} accent="#818cf8" showName={false} />
                 </div>
@@ -692,15 +653,7 @@ export default function GunghapPage(){
             {/* 점수 */}
             <div style={{textAlign:'center',marginBottom:20}}>
               <div style={{fontSize:44,marginBottom:4}}>{result.gradeEmoji}</div>
-              {selectedRelation&&(
-                <div style={{marginBottom:6}}>
-                  <span style={{fontSize:11,fontWeight:700,padding:'3px 12px',borderRadius:100,
-                    background:'rgba(167,139,250,0.15)',border:'1px solid rgba(167,139,250,0.3)',color:'#c4b5fd'}}>
-                    {selectedRelation.emoji} {selectedRelation.label} 궁합
-                  </span>
-                </div>
-              )}
-              <div style={{fontSize:12,color:'rgba(255,255,255,0.3)',marginBottom:4}}>
+              <div style={{fontSize:12,color:'rgba(255,255,255,0.85)',marginBottom:4}}>
                 {p1.name}({p1.birthData.birthYear}) {p1.birthData.gender==='male'?'👨':'👩'} &nbsp;+&nbsp; {p2.name}({p2.birthData.birthYear}) {p2.birthData.gender==='male'?'👨':'👩'}
               </div>
               <div style={{width:120,height:120,borderRadius:'50%',margin:'12px auto',
@@ -709,12 +662,12 @@ export default function GunghapPage(){
                 <div style={{width:94,height:94,borderRadius:'50%',background:'#0d0d1a',
                   display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
                   <span style={{fontSize:28,fontWeight:900,color:result.gradeColor,lineHeight:1}}>{result.totalScore}</span>
-                  <span style={{fontSize:9,color:'rgba(255,255,255,0.3)'}}>/ 99</span>
+                  <span style={{fontSize:9,color:'rgba(255,255,255,0.85)'}}>/ 99</span>
                 </div>
               </div>
               <div style={{fontSize:17,fontWeight:900,color:result.gradeColor,marginBottom:5}}>{result.grade}</div>
               <div style={{fontSize:14,fontWeight:800,marginBottom:5}}>{result.gradeTitle}</div>
-              <div style={{fontSize:13,color:'rgba(255,255,255,0.45)',lineHeight:1.6}}>{result.gradeDesc}</div>
+              <div style={{fontSize:13,color:'rgba(255,255,255,0.75)',lineHeight:1.6}}>{result.gradeDesc}</div>
               <SaveProfilePrompt
                 name={p1.name}
                 birthYear={Number(p1.birthData.birthYear) || 0}
@@ -733,12 +686,11 @@ export default function GunghapPage(){
                 const cols=[{label:'시',d:pd.hour},{label:'일',d:pd.day},{label:'월',d:pd.month},{label:'년',d:pd.year}].filter(c=>!!c.d) as {label:string;d:NonNullable<typeof pd.day>}[];
                 return (
                 <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:12,padding:'12px',border:'1px solid rgba(255,255,255,0.06)'}}>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5,fontWeight:700}}>{pp.name}</p>
-                  <p style={{fontSize:10,color:r.yongshin.strength==='신강'?'#ff9f43':'#54a0ff',marginBottom:8}}>{r.yongshin.strength} 핵심 기운:{r.yongshin.yongshin}</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:5,fontWeight:700}}>{pp.name}</p>
                   <table style={{width:'100%',textAlign:'center',borderCollapse:'collapse'}}>
                     <thead>
                       <tr>
-                        {cols.map(c=>(<th key={c.label} style={{fontSize:9,fontWeight:800,color:'rgba(255,255,255,0.3)',paddingBottom:3}}>{c.label}</th>))}
+                        {cols.map(c=>(<th key={c.label} style={{fontSize:9,fontWeight:800,color:'rgba(255,255,255,0.85)',paddingBottom:3}}>{c.label}</th>))}
                       </tr>
                     </thead>
                     <tbody>
@@ -772,14 +724,14 @@ export default function GunghapPage(){
                     {[{name:p1.name,uu:uu1,d:d1},{name:p2.name,uu:uu2,d:d2}].map((x,i)=>x.d&&(
                       <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:10,padding:'10px',
                         border:x.d.smj?'1px solid rgba(248,113,113,0.25)':'1px solid rgba(255,255,255,0.06)'}}>
-                        <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:'0 0 4px'}}>{x.name}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',margin:'0 0 4px'}}>{x.name}</p>
                         <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:5,flexWrap:'wrap'}}>
                           <span style={{fontSize:13,fontWeight:900,color:x.d.color}}>{x.uu}</span>
                           {x.d.smj&&<span style={{fontSize:9,background:'rgba(248,113,113,0.2)',color:'#fca5a5',
                             border:'1px solid rgba(248,113,113,0.25)',borderRadius:4,padding:'1px 5px'}}>사묘절</span>}
                         </div>
                         <p style={{fontSize:10,color:x.d.color,marginBottom:4,fontWeight:700}}>{x.d.keyword}</p>
-                        <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',lineHeight:1.5,margin:0}}>{x.d.desc}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.8)',lineHeight:1.5,margin:0}}>{x.d.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -806,16 +758,16 @@ export default function GunghapPage(){
                 <div style={{borderRadius:15,padding:'16px',marginBottom:12,
                   background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}}>
                   <p style={{fontSize:13,fontWeight:900,color:'#ffd700',marginBottom:4}}>🌀 지장간 — 숨은 궁합 에너지</p>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:10,lineHeight:1.5}}>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.85)',marginBottom:10,lineHeight:1.5}}>
                     일지(日支) 안에 숨어 있는 천간의 기운이 상대에게 어떻게 작용하는지 보여줍니다.
                   </p>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
                     {([{name:p1.name,jj:jj1,desc:desc1},{name:p2.name,jj:jj2,desc:desc2}] as {name:string;jj:string;desc:string|null}[]).map((x,i)=>x.desc&&(
                       <div key={i} style={{background:'rgba(255,255,255,0.04)',borderRadius:10,padding:'10px',
                         border:'1px solid rgba(255,255,255,0.06)'}}>
-                        <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',margin:'0 0 3px'}}>{x.name}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',margin:'0 0 3px'}}>{x.name}</p>
                         <p style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,0.7)',margin:'0 0 5px'}}>일지 {x.jj}</p>
-                        <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',lineHeight:1.5,margin:0}}>{x.desc}</p>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.8)',lineHeight:1.5,margin:0}}>{x.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -836,16 +788,16 @@ export default function GunghapPage(){
               </div>
               <div style={{display:'flex',gap:8,marginBottom:8}}>
                 <div style={{flex:1,background:'rgba(255,255,255,0.05)',borderRadius:8,padding:'8px',textAlign:'center'}}>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:3}}>{p1.name}</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:3}}>{p1.name}</p>
                   <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g1 as string]}</p>
                 </div>
                 <div style={{display:'flex',alignItems:'center',color:'rgba(255,255,255,0.2)',fontSize:18}}>↔</div>
                 <div style={{flex:1,background:'rgba(255,255,255,0.05)',borderRadius:8,padding:'8px',textAlign:'center'}}>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:3}}>{p2.name}</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:3}}>{p2.name}</p>
                   <p style={{fontSize:14,fontWeight:700}}>{JOHU_LABEL[result.johu.g2 as string]}</p>
                 </div>
               </div>
-              <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6,margin:0}}>{result.johu.desc}</p>
+              <p style={{fontSize:13,color:'rgba(255,255,255,0.88)',lineHeight:1.6,margin:0}}>{result.johu.desc}</p>
             </div>
 
             {/* ② 삼합 크로스 */}
@@ -887,7 +839,7 @@ export default function GunghapPage(){
                 {([{name:p1.name,dohwa:result.baram.p1dohwa,hongyeom:result.baram.p1hongyeom},
                   {name:p2.name,dohwa:result.baram.p2dohwa,hongyeom:result.baram.p2hongyeom}]).map((b,i)=>(
                   <div key={i} style={{flex:1,background:'rgba(255,255,255,0.04)',borderRadius:8,padding:'8px'}}>
-                    <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:4}}>{b.name}</p>
+                    <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:4}}>{b.name}</p>
                     <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
                       {b.dohwa.map((_,j)=><span key={j} style={{fontSize:10,background:'rgba(255,107,107,0.3)',color:'#ffaaaa',borderRadius:4,padding:'2px 6px'}}>도화살</span>)}
                       {b.hongyeom&&<span style={{fontSize:10,background:'rgba(255,200,50,0.3)',color:'#ffe082',borderRadius:4,padding:'2px 6px'}}>홍염살</span>}
@@ -896,13 +848,13 @@ export default function GunghapPage(){
                   </div>
                 ))}
               </div>
-              <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.5,margin:0}}>{result.baram.desc}</p>
+              <p style={{fontSize:13,color:'rgba(255,255,255,0.85)',lineHeight:1.5,margin:0}}>{result.baram.desc}</p>
               {(()=>{
                 const fs1=getFaithfulSpouseAnalysis(result.r1);
                 const fs2=getFaithfulSpouseAnalysis(result.r2);
                 if(!fs1&&!fs2) return null;
                 return (
-                  <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.5,margin:'8px 0 0',paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+                  <p style={{fontSize:13,color:'rgba(255,255,255,0.85)',lineHeight:1.5,margin:'8px 0 0',paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
                     {fs1&&`${p1.name} ▸ ${fs1.desc}`}
                     {fs1&&fs2&&<br/>}
                     {fs2&&`${p2.name} ▸ ${fs2.desc}`}
@@ -913,7 +865,7 @@ export default function GunghapPage(){
 
             {/* ④ 주별 분석 */}
             <div style={{marginBottom:12}}>
-              <p style={{fontSize:12,color:'rgba(255,255,255,0.35)',fontWeight:700,letterSpacing:'0.1em',marginBottom:6}}>주별 합충 분석</p>
+              <p style={{fontSize:12,color:'rgba(255,255,255,0.88)',fontWeight:700,letterSpacing:'0.1em',marginBottom:6}}>주별 합충 분석</p>
               <p style={{fontSize:11,color:'rgba(255,255,255,0.22)',lineHeight:1.6,marginBottom:10}}>
                 충(沖)은 무조건 나쁜 게 아닙니다. 두 사람 사이에 강한 자극과 긴장을 만들어 처음엔 강하게 끌리게 하는 에너지이기도 합니다. 자극추구형 커플에게는 충이 오히려 케미의 원천이 됩니다.
               </p>
@@ -939,7 +891,7 @@ export default function GunghapPage(){
                       padding:'4px 0',borderTop:'1px solid rgba(255,255,255,0.04)'}}>
                       <div style={{display:'flex',alignItems:'center',gap:5}}>
                         <span style={{fontSize:10,background:gradeColors[ev.type]||'#666',color:'#fff',borderRadius:3,padding:'1px 5px',fontWeight:700}}>{ev.type}</span>
-                        <span style={{fontSize:12,color:'rgba(255,255,255,0.6)'}}>{ev.desc}</span>
+                        <span style={{fontSize:12,color:'rgba(255,255,255,0.85)'}}>{ev.desc}</span>
                       </div>
                       <span style={{fontSize:11,color:ev.score>=0?'#10ac84':'#ee5a24',fontWeight:700,flexShrink:0,marginLeft:6}}>
                         {ev.score>=0?'+':''}{Math.round(ev.score)}
@@ -956,34 +908,11 @@ export default function GunghapPage(){
               myName={p1.name || "나"} targetName={p2.name || "그 사람"}
             />
 
-            {/* ⑤ 용신/오행 */}
+            {/* ⑤ 오행 조화 */}
             <div style={{background:'rgba(255,255,255,0.03)',borderRadius:13,padding:'14px',marginBottom:14,border:'1px solid rgba(255,255,255,0.06)'}}>
-              <p style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.35)',marginBottom:8,letterSpacing:'0.1em'}}>핵심 기운·오행 조화</p>
-              <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',marginBottom:5,lineHeight:1.5}}>{result.yongsinDesc}</p>
-              <p style={{fontSize:12,color:'rgba(255,255,255,0.45)',lineHeight:1.5,marginBottom:8}}>{result.ohaengDesc}</p>
-              {(()=>{
-                const sf1=getSpouseFortuneAnalysis(result.r1,p1.birthData.gender);
-                const sf2=getSpouseFortuneAnalysis(result.r2,p2.birthData.gender);
-                const inda1=getIndaSingangMaleNarrative(result.r1,p1.birthData.gender);
-                const inda2=getIndaSingangMaleNarrative(result.r2,p2.birthData.gender);
-                const strength1=getStrengthTraitNarrative(result.r1);
-                const strength2=getStrengthTraitNarrative(result.r2);
-                const extreme1=getExtremeStrengthNarrative(result.r1);
-                const extreme2=getExtremeStrengthNarrative(result.r2);
-                const gyeopjae1=getWoljiSingleGyeopjaeNarrative(result.r1);
-                const gyeopjae2=getWoljiSingleGyeopjaeNarrative(result.r2);
-                const cheonul1=getHourCheonulIntactGoodFlowNarrative(result.r1);
-                const cheonul2=getHourCheonulIntactGoodFlowNarrative(result.r2);
-                const text1=[sf1.points.join(" "),inda1,strength1,extreme1,gyeopjae1,cheonul1].filter(Boolean).join(" ");
-                const text2=[sf2.points.join(" "),inda2,strength2,extreme2,gyeopjae2,cheonul2].filter(Boolean).join(" ");
-                if(!text1&&!text2) return null;
-                return (
-                  <div style={{paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
-                    {text1&&<p style={{fontSize:12,color:'rgba(255,255,255,0.5)',lineHeight:1.6,marginBottom:text2?6:0}}>{p1.name} ▸ {text1}</p>}
-                    {text2&&<p style={{fontSize:12,color:'rgba(255,255,255,0.5)',lineHeight:1.6,margin:0}}>{p2.name} ▸ {text2}</p>}
-                  </div>
-                );
-              })()}
+              <p style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.55)',marginBottom:8,letterSpacing:'0.1em'}}>오행 궁합</p>
+              <p style={{fontSize:13,color:'rgba(255,255,255,0.8)',marginBottom:5,lineHeight:1.5}}>{result.yongsinDesc}</p>
+              <p style={{fontSize:13,color:'rgba(255,255,255,0.75)',lineHeight:1.5}}>{result.ohaengDesc}</p>
             </div>
 
             {/* 끌리는 이유 */}
@@ -1011,17 +940,17 @@ export default function GunghapPage(){
                 <div style={{borderRadius:15,padding:'16px',marginBottom:12,
                   background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}}>
                   <p style={{fontSize:13,fontWeight:900,color:'#ffd700',marginBottom:4}}>💘 사주로 보는 서로 끌리는 이유</p>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:12,lineHeight:1.5}}>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.85)',marginBottom:12,lineHeight:1.5}}>
                     태어난 날의 기운을 기준으로 — 상대의 그 기운이 나에게 어떻게 작용하는지 보여줍니다.
                   </p>
                   <div style={{marginBottom:10}}>
                     <p style={{fontSize:12,fontWeight:800,color:'#f9a8d4',marginBottom:4}}>
                       {p1.name}이 {p2.name}에게 끌리는 이유
                     </p>
-                    <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5}}>
+                    <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:5}}>
                       {p2.name}의 태어난 날 기운: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss2?(SIPSEONG_PLAIN[ss2]||ss2):"—"}</span>
                     </p>
-                    <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>
+                    <p style={{fontSize:13,color:'rgba(255,255,255,0.88)',lineHeight:1.6}}>
                       {ss2&&WHY_LIKE_MAP[ss2]?WHY_LIKE_MAP[ss2]:`${p2.name}의 일지 에너지가 ${p1.name}에게 독특한 방식으로 끌림을 만들어냅니다.`}
                     </p>
                   </div>
@@ -1029,10 +958,10 @@ export default function GunghapPage(){
                     <p style={{fontSize:12,fontWeight:800,color:'#93c5fd',marginBottom:4}}>
                       {p2.name}이 {p1.name}에게 끌리는 이유
                     </p>
-                    <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginBottom:5}}>
+                    <p style={{fontSize:11,color:'rgba(255,255,255,0.88)',marginBottom:5}}>
                       {p1.name}의 태어난 날 기운: <span style={{color:'#c4b5fd',fontWeight:700}}>{ss1?(SIPSEONG_PLAIN[ss1]||ss1):"—"}</span>
                     </p>
-                    <p style={{fontSize:13,color:'rgba(255,255,255,0.65)',lineHeight:1.6}}>
+                    <p style={{fontSize:13,color:'rgba(255,255,255,0.88)',lineHeight:1.6}}>
                       {ss1&&WHY_LIKE_MAP[ss1]?WHY_LIKE_MAP[ss1]:`${p1.name}의 일지 에너지가 ${p2.name}에게 독특한 방식으로 끌림을 만들어냅니다.`}
                     </p>
                   </div>
@@ -1058,11 +987,11 @@ export default function GunghapPage(){
                 <div style={{borderRadius:15,padding:'16px',marginBottom:12,
                   background:'rgba(238,90,36,0.06)',border:'1px solid rgba(238,90,36,0.2)'}}>
                   <p style={{fontSize:13,fontWeight:900,color:'#ff9f43',marginBottom:4}}>⚡ 우리의 마찰 원인은?</p>
-                  <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:10,lineHeight:1.5}}>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.85)',marginBottom:10,lineHeight:1.5}}>
                     두 사람의 사주에서 가장 강하게 부딪히는 지점과, 그걸 다루는 방법입니다.
                   </p>
                   {top.length===0 ? (
-                    <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.6,margin:0}}>
+                    <p style={{fontSize:13,color:'rgba(255,255,255,0.85)',lineHeight:1.6,margin:0}}>
                       {result.johu.desc}<br/>큰 충돌 요소는 적지만, 같은 기운끼리는 자극이 부족해 자칫 권태로워질 수 있으니 의도적으로 새로운 자극을 만들어보세요.
                     </p>
                   ):top.map((ev,i)=>(
@@ -1072,7 +1001,7 @@ export default function GunghapPage(){
                         <span style={{fontSize:10,background:gradeColors[ev.type]||'#666',color:'#fff',borderRadius:3,padding:'1px 5px',fontWeight:700}}>{ev.type}</span>
                         <span style={{fontSize:12,fontWeight:800,color:'rgba(255,255,255,0.7)'}}>{(ev as any).label} — {ev.desc}</span>
                       </div>
-                      <p style={{fontSize:13,color:'rgba(255,255,255,0.6)',lineHeight:1.6,margin:0}}>
+                      <p style={{fontSize:13,color:'rgba(255,255,255,0.85)',lineHeight:1.6,margin:0}}>
                         {FRICTION_ADVICE[ev.type]||"서로 다른 기운이 부딪히는 지점입니다. 차이를 인정하고 거리를 조절하는 것이 핵심입니다."}
                       </p>
                     </div>
@@ -1081,18 +1010,13 @@ export default function GunghapPage(){
               );
             })()}
 
-            <div style={{marginBottom:12}}>
-              <SipseongInsight result={result.r1} title={`${p1.name}의 핵심 기운`} />
-              <SipseongInsight result={result.r2} title={`${p2.name}의 핵심 기운`} />
-            </div>
-
             {/* 공유 */}
             <div style={{background:'rgba(255,107,107,0.06)',border:'1px solid rgba(255,107,107,0.15)',borderRadius:12,padding:'12px',marginBottom:12,textAlign:'center'}}>
               <p style={{color:'#ffaaaa',fontSize:13,margin:'0 0 4px',fontWeight:700}}>내 친구의 궁합도 확인해보세요 →</p>
-              <p style={{color:'rgba(255,255,255,0.3)',fontSize:11,margin:0}}>링크 공유하고 같이 분석해보기</p>
+              <p style={{color:'rgba(255,255,255,0.85)',fontSize:11,margin:0}}>링크 공유하고 같이 분석해보기</p>
             </div>
             <button onClick={()=>{setResult(null);setStep('form');}} style={{width:'100%',padding:'12px',borderRadius:12,
-              border:'1px solid rgba(255,255,255,0.08)',background:'transparent',color:'rgba(255,255,255,0.35)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
+              border:'1px solid rgba(255,255,255,0.08)',background:'transparent',color:'rgba(255,255,255,0.88)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
               다시 하기
             </button>
             <ResultFooterActions targetId="gunghap-result" fileName="궁합" shareTitle="사주 궁합" shareText={`${p1.name}+${p2.name} 궁합 ${result.totalScore}점(${result.grade})`} />
