@@ -29,7 +29,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "클라이언트 ID 불일치" }, { status: 401 });
     }
 
-    const googleId = String(payload.sub);
+    // naverId는 모든 소셜 로그인이 공유하는 쿠키 내 사용자 ID 필드명
+    // kakao_users 테이블은 전체 소셜 로그인 공용 테이블 (kakao_id 컬럼 = social_id)
+    const naverId = String(payload.sub);
     const nickname = payload.name || "사용자";
     const profileImage = payload.picture || null;
     const email = payload.email || null;
@@ -40,16 +42,16 @@ export async function POST(req: NextRequest) {
       const { data: existing } = await sb
         .from("kakao_users")
         .select("id")
-        .eq("kakao_id", googleId)
+        .eq("kakao_id", naverId)
         .single();
       isNewUser = !existing;
       await sb.from("kakao_users").upsert(
-        { kakao_id: googleId, nickname, profile_image: profileImage, email, last_login: new Date().toISOString() },
+        { kakao_id: naverId, nickname, profile_image: profileImage, email, last_login: new Date().toISOString() },
         { onConflict: "kakao_id" }
       );
     }
 
-    const userInfo = JSON.stringify({ naverId: googleId, nickname, profileImage, email, isNewUser });
+    const userInfo = JSON.stringify({ naverId, nickname, profileImage, email, isNewUser });
     const encodedUser = Buffer.from(userInfo).toString("base64");
 
     const response = NextResponse.json({ ok: true, redirect: typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/" });
