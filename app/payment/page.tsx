@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
-import { getBalance, deductBalance } from "@/lib/blueberry";
+import { getBalanceServer, deductBalanceServer } from "@/lib/blueberry";
 
 const PRODUCT_INFO: Record<string, { name: string; desc: string; icon: string; detail: string[] }> = {
   mobile: {
@@ -56,7 +56,7 @@ function PaymentContent() {
         setName(f.name || "");
       }
     } catch {}
-    setStarBalance(getBalance());
+    getBalanceServer().then(setStarBalance);
   }, []);
 
   async function handlePayment() {
@@ -68,7 +68,7 @@ function PaymentContent() {
     setError("");
 
     if (payMethod === "starpiece") {
-      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      if (!await deductBalanceServer(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
       router.push(`/payment/success?productType=${productType}&orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
       return;
     }

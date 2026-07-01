@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
-import { getBalance, deductBalance } from "@/lib/blueberry";
+import { getBalanceServer, deductBalanceServer } from "@/lib/blueberry";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ function CharmPayContent() {
         setName(form.name || "");
       }
     } catch {}
-    setStarBalance(getBalance());
+    getBalanceServer().then(setStarBalance);
     if (params.get("error") === "true") setError("결제가 취소되었거나 실패하였습니다.");
   }, [params]);
 
@@ -39,7 +39,7 @@ function CharmPayContent() {
     setLoading(true); setError("");
 
     if (method === "starpiece") {
-      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      if (!await deductBalanceServer(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
       router.push(`/service/charm/success?orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
       return;
     }
