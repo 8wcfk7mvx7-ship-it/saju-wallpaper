@@ -184,6 +184,18 @@ function SpyContent() {
   const [theirForm, setTheirForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef   = useRef<SajuResult | null>(null);
   const myResultRef = useRef<SajuResult | null>(null);
+  // 훅은 조건부 early return 앞에 선언해야 함 (Rules of Hooks)
+  useEffect(() => {
+    if (step !== "result" || !resultRef.current) return;
+    const r = resultRef.current;
+    trackTraits([
+      isWoljiSingleGyeopjae(r) ? "woljiSingleGyeopjae" : null,
+      r.yongshin.strength === "신강" ? "strengthTrait:신강" : r.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
+      getExtremeStrengthNarrative(r) ? "extremeStrength" : null,
+      isHourCheonulIntactGoodFlow(r) ? "hourCheonulGoodFlow" : null,
+    ], "/service/spy");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   async function handleAnalyze() {
     if (!myForm.birthYear || !myForm.birthMonth || !myForm.birthDay ||
@@ -421,15 +433,6 @@ function SpyContent() {
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ];
   const extraTraitNarrative = extraNarrativeFlags.filter((s): s is string => !!s).join(" ");
-  useEffect(() => {
-    trackTraits([
-      isWoljiSingleGyeopjae(result) ? "woljiSingleGyeopjae" : null,
-      result.yongshin.strength === "신강" ? "strengthTrait:신강" : result.yongshin.strength === "신약" ? "strengthTrait:신약" : null,
-      getExtremeStrengthNarrative(result) ? "extremeStrength" : null,
-      isHourCheonulIntactGoodFlow(result) ? "hourCheonulGoodFlow" : null,
-    ], "/service/spy");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.pillarsDetail.day.cg, result.pillarsDetail.day.jj, result.pillarsDetail.month.cg, result.pillarsDetail.month.jj, result.pillarsDetail.year.cg, result.pillarsDetail.year.jj]);
   // 위 서술형 위험 신호도 등급 점수에 함께 반영 (서술에만 노출되고 점수에 빠져있던 문제 수정)
   rawScore += extraNarrativeFlags.filter(Boolean).length * 10;
 
