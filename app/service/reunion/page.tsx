@@ -30,6 +30,19 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
+const CONTACT_PATTERN_REUNION: Record<string, string> = {
+  갑: "연락이 완전히 끊겼다가 어느 날 목적 있는 한 마디로 돌아옵니다. 재회를 원한다면 직접적이고 당당하게 접근하는 것이 효과적입니다.",
+  을: "간접 신호(SNS 반응, 공통 지인 통한 안부)를 먼저 보낸 뒤 서서히 개인 연락으로 발전합니다. 직접 연락이 왔다면 오래 생각한 끝에 용기를 낸 것입니다.",
+  병: "먼저 적극적으로 연락할 가능성이 높습니다. 연락이 갑자기 끊기면 마음이 완전히 떠난 신호입니다. 재회를 원한다면 활기찬 자리에서 자연스럽게 만날 기회를 만드세요.",
+  정: "감성적인 콘텐츠를 공유하거나 새벽에 갑자기 연락하는 패턴이 있습니다. 재회를 원한다면 감성적 교감을 먼저 회복하는 것이 중요합니다.",
+  무: "오랜 침묵 뒤 조용한 안부 한 마디가 전형적인 신호입니다. 먼저 연락이 왔다면 이미 많이 고민한 것입니다. 서두르지 말고 신뢰를 다시 쌓아가세요.",
+  기: "직접 연락보다 SNS 조회·반응으로 존재를 먼저 알립니다. '밥 먹었어?'처럼 일상 안부성 메시지로 접근하는 것이 이 사람의 방식입니다. 재회 시도도 서서히 빈도를 높이는 형태로 나타납니다.",
+  경: "침묵 아니면 직격탄입니다. 먼저 연락이 왔다면 이미 결심이 선 것입니다. 재회를 원한다면 돌려 말하지 말고 직접적으로 의사를 밝히세요.",
+  신: "타이밍을 계산한 뒤 정성스럽게 다듬은 메시지를 보냅니다. 기념일이나 의미 있는 날에 연락이 올 가능성이 높습니다. 재회를 원한다면 감각적이고 준비된 만남을 제안하세요.",
+  임: "가볍게 먼저 연락하다가 갑자기 사라지기도 합니다. 잠수 후 아무렇지 않게 돌아오는 것이 이 사람의 방식입니다. 자유로운 분위기 속에서 새로운 경험을 함께하는 것이 재회의 열쇠입니다.",
+  계: "감정이 쌓이면 새벽에 갑자기 연락하거나 감성적인 콘텐츠를 공유합니다. 직접 고백보다 분위기로 감정을 전달하는 방식을 선호합니다. 재회를 원한다면 감성적 교감을 먼저 회복하세요.",
+};
+
 const SESSION_KEY = "sp_reunion_session";
 const PAID_KEY = "sp_reunion_paid";
 
@@ -347,6 +360,19 @@ export default function ReunionPage() {
               <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{result.currentHeart}</p>
             )}
           </div>
+
+          {/* 그 사람의 연락 패턴 */}
+          {theirSajuResult && (() => {
+            const ilgan = theirSajuResult.pillarsDetail.day.cg;
+            const pattern = CONTACT_PATTERN_REUNION[ilgan];
+            if (!pattern) return null;
+            return (
+              <div className="rounded-2xl p-5" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.2)" }}>
+                <p className="text-xs font-bold mb-2" style={{ color: "#60a5fa" }}>📱 그 사람의 연락 패턴 — {ilgan}일간</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{pattern}</p>
+              </div>
+            );
+          })()}
 
           {/* 잠긴 항목들 */}
           {([

@@ -1313,7 +1313,7 @@ function ResultView({
             );
           })}
         </div>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getExtremeStrengthNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {getHourCheonulIntactGoodFlowNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{result.personality} {getGeumMokGwadaNarrative(result)} {getStrengthTraitNarrative(result)} {getExtremeStrengthNarrative(result)} {getWoljiSingleGyeopjaeNarrative(result)} {getHourCheonulIntactGoodFlowNarrative(result)} {detectStayPutPattern(result).map(p => `${p.desc} ${p.advice}`).join(" ")}{result.pillarsDetail.day.jj === "해" ? " 일지가 해(亥)인 사람은 수집가 기질이 강합니다. 기억력이 좋고 과거의 것을 잘 보존하며, 물건·지식·경험을 쌓아두는 성향이 있어 좀처럼 버리지 못합니다. 오래된 것에서 가치를 발견하고, 한번 모은 것은 끝까지 지키려 합니다." : ""}</p>
       </Section>
 
       {/* 십성 구조 패턴: 무비겁·무재·쟁재·병존 등 특이구조 */}
