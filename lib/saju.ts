@@ -1412,6 +1412,19 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     if (bongiEl) rawScores[bongiEl] += 1;
   });
 
+  // === 지장간 투출 보정 ===
+  // 지지 속 지장간 천간이 사주 천간에 그대로 나타나면(투출) 해당 오행 15% 강화
+  const allCheonganSet = new Set(pillars.map(p => p.cg));
+  for (const { jj, weight } of pillars) {
+    const jijangStr = JIJANGAN_STR[jj] || "";
+    for (const stem of jijangStr.split("")) {
+      if (allCheonganSet.has(stem)) {
+        const el = CHEONGAN_ELEMENT[stem];
+        if (el) scores[el] += weight * 0.18;
+      }
+    }
+  }
+
   // === 천간합 보정 ===
   const CHEONGAN_HAP_CORRECT = [
     {a:"갑",b:"기",el:"토" as Element},{a:"을",b:"경",el:"금" as Element},
