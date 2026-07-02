@@ -536,10 +536,15 @@ function ContactSection() {
 }
 
 // ── 서비스 목록 ───────────────────────────────────────────────────────────────
+const PREMIUM_COLOR = "#fbbf24";
+const PREMIUM_BADGE_BG = "linear-gradient(135deg, rgba(180,83,9,0.97) 0%, rgba(161,98,7,0.97) 100%)";
+const PREMIUM_BORDER = "rgba(202,138,4,0.5)";
+const PREMIUM_GLOW = "rgba(202,138,4,0.2)";
+
 const SERVICES: {
   id: string; emoji: string; title: string; viral: string; desc: string;
   tags: string[]; href: string; badge: string; color: string; badgeBg: string;
-  border: string; glow: string; categories: Category[];
+  border: string; glow: string; categories: Category[]; premium?: boolean;
 }[] = [
   {
     id: "chat", emoji: "🔮", title: "월령도사 — 사주 AI 채팅",
@@ -555,7 +560,7 @@ const SERVICES: {
     viral: "지금 배경화면이 에너지를 갉아먹고 있을 수 있습니다",
     desc: "내 사주에 부족한 오행을 채워주는 AI 맞춤 배경화면. 목·화·토·금·수 중 내가 보완해야 할 기운을 찾아드립니다.",
     tags: ["AI 생성", "오행 보정", "모바일·PC"],
-    href: "/service/saju", badge: "완전 무료",
+    href: "/service/saju", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "라이프"],
@@ -566,7 +571,7 @@ const SERVICES: {
     viral: "지금 만나는 사람, 내 에너지를 갉아먹는 사주일 수 있어요",
     desc: "원진살·귀문관살·합충 관계로 보는 깊은 궁합. 바람기 DNA부터 이별 위험도까지 전부 분석합니다.",
     tags: ["원진살", "합충", "바람기 분석"],
-    href: "/service/gunghap", badge: "완전 무료",
+    href: "/service/gunghap", badge: "",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -577,7 +582,7 @@ const SERVICES: {
     viral: "이 사람, 내가 꼬실 수 있는 사주인지 확인해보세요",
     desc: "짝사랑하는 상대의 이상형·심리 패턴·공략 포인트를 사주로 완전 분석. 얼마나 진지한 사람인지, 어떻게 다가가야 심장이 흔들리는지 알려드립니다.",
     tags: ["이상형 분석", "공략법", "심리 분석"],
-    href: "/service/crush", badge: "완전 무료",
+    href: "/service/crush", badge: "",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -588,10 +593,10 @@ const SERVICES: {
     viral: "지금 그 사람, 다른 누군가와 함께하고 있을지도 모릅니다",
     desc: "헤어진 그 사람과 다시 이어질 수 있는지, 지금이 재회의 시기인지 사주로 완전 분석합니다. 망설이는 동안 기회의 문이 닫힙니다.",
     tags: ["재회 가능성", "경도 보정", "대운 분석"],
-    href: "/service/reunion", badge: "",
-    color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
-    border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
-    categories: ["전체", "연애·궁합", "Special"],
+    href: "/service/reunion", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "연애·궁합", "Special"], premium: true,
   },
   {
     id: "spy", emoji: "🕵️",
@@ -599,7 +604,7 @@ const SERVICES: {
     viral: "당신의 편은 들지 않습니다. 오직 사실만 말합니다.",
     desc: "바람기·도화살·불륜 가능성까지. 매운맛 분석입니다. 애인의 생년월일만 입력하세요.",
     tags: ["바람기", "도화살", "이성 관계"],
-    href: "/service/spy", badge: "완전 무료",
+    href: "/service/spy", badge: "",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -610,7 +615,7 @@ const SERVICES: {
     viral: "내가 의식적으로 말하는 타입 말고, 사주에 새겨진 진짜 끌림",
     desc: "왜 항상 비슷한 사람만 만나는지, 내가 진짜 끌리는 사람의 유형과 피해야 할 상대를 사주로 완전 분석합니다.",
     tags: ["이상형", "끌림", "연애 패턴"],
-    href: "/service/ideal-type", badge: "완전 무료",
+    href: "/service/ideal-type", badge: "",
     color: "#f472b6", badgeBg: "rgba(219,39,119,0.85)",
     border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.12)",
     categories: ["전체", "무료", "연애·궁합"],
@@ -621,7 +626,7 @@ const SERVICES: {
     viral: "\"무재성\", \"재물복 없다\"는 말 들어본 사람 필수 확인",
     desc: "내 사주에 재성이 있는지, 돈이 새는 구조는 아닌지, 재물운을 높이는 구체적인 방법까지 완전 공개합니다.",
     tags: ["재물운", "무재성", "재테크"],
-    href: "/service/wealth", badge: "완전 무료",
+    href: "/service/wealth", badge: "",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -632,7 +637,7 @@ const SERVICES: {
     viral: "낳고 후회하지 않을지, 배우자와 자녀 중 뭐가 더 중요할지",
     desc: "자녀와의 인연, 아이가 나에게 주는 의미, 배우자와 자녀 사이의 무게중심까지 사주로 미리 확인합니다.",
     tags: ["자녀운", "육아", "인생 우선순위"],
-    href: "/service/child", badge: "완전 무료",
+    href: "/service/child", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프", "연애·궁합"],
@@ -643,7 +648,7 @@ const SERVICES: {
     viral: "결혼이 무조건 답일까? 비혼이 더 잘 맞는 사람 따로 있음",
     desc: "결혼 적합도 vs 비혼 적합도 비교부터, 배우자에게 기 빨리는 구조인지, 비혼일 때 신경 써야 할 부분과 추천 도전까지.",
     tags: ["비혼", "결혼운", "인생설계"],
-    href: "/service/solo", badge: "완전 무료",
+    href: "/service/solo", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프", "연애·궁합"],
@@ -654,7 +659,7 @@ const SERVICES: {
     viral: "내 사주 원국 + 대운·세운 + 오늘 일운까지, 모든 합충을 한 장으로",
     desc: "원국·대운·세운·오늘 일진을 하나의 명식표로 펼쳐 합·충·형·파·해를 분석하고, 총운·재물·애정·건강·공부운까지 상세하게.",
     tags: ["오늘의운세", "일운", "합충분석"],
-    href: "/service/today", badge: "완전 무료",
+    href: "/service/today", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -665,7 +670,7 @@ const SERVICES: {
     viral: "남들 따라 고른 전공, 남들 다 가는 직장 — 사주는 처음부터 알고 있었다",
     desc: "사주 구조와 핵심 기운으로 보는 나에게 맞는 분야, 강점과 함정까지 한 번에 진단합니다.",
     tags: ["적성", "진로", "핵심기운"],
-    href: "/service/career", badge: "완전 무료",
+    href: "/service/career", badge: "",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -676,7 +681,7 @@ const SERVICES: {
     viral: "누구는 부업으로 월급보다 더 벌고, 누구는 본업도 흔들린다",
     desc: "식상의 힘으로 보는 투잡 가능성, 욕심내면 위험한 구조, 나에게 맞는 부업 유형까지.",
     tags: ["투잡", "부업", "식상"],
-    href: "/service/sidejob", badge: "완전 무료",
+    href: "/service/sidejob", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "금전·투자", "라이프"],
@@ -687,7 +692,7 @@ const SERVICES: {
     viral: "같은 월급도 누군가는 답답하고, 누군가는 그 안정이 편안하다",
     desc: "사업가형·디지털노마드형·투자가형·안정추구형 중 내 사주에 가장 맞는 일하는 방식과 그 안에서 흔히 무너지는 함정까지.",
     tags: ["사업", "투자", "디지털노마드"],
-    href: "/service/nomad", badge: "완전 무료",
+    href: "/service/nomad", badge: "",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -698,7 +703,7 @@ const SERVICES: {
     viral: "사주가 오행을 본다면, 자미두수는 별의 자리로 캐릭터를 본다",
     desc: "음력 생월·생시로 명궁을 산출하고, 14주성 중 나를 대표하는 별의 성격·진로·연애 스타일을 확인하세요.",
     tags: ["자미두수", "명궁", "주성"],
-    href: "/service/zimidousu", badge: "완전 무료",
+    href: "/service/zimidousu", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -709,7 +714,7 @@ const SERVICES: {
     viral: "병오년·정미년, 내 사주와 부딪히는 진짜 흐름은?",
     desc: "일간·일지·사주 핵심 기운 기준으로 다가올 두 해의 합·충·생·극을 분석해, 순풍인지 역풍인지 알려드립니다.",
     tags: ["신년운세", "병오년", "정미년"],
-    href: "/service/newyear", badge: "완전 무료",
+    href: "/service/newyear", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -720,7 +725,7 @@ const SERVICES: {
     viral: "홍염살·목욕·도화살. 타고난 이성 매력의 진짜 본질",
     desc: "외모·음기·은근한 매력·꼬시는 팁까지. 사주로 보는 나의 성적 매력 완전 분석.",
     tags: ["홍염살", "도화살", "이성 매력"],
-    href: "/service/eros", badge: "완전 무료",
+    href: "/service/eros", badge: "",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "연애·궁합", "매력"],
@@ -731,7 +736,7 @@ const SERVICES: {
     viral: "나체도화·곤랑도화·녹방도화... 내 매력의 '종류'와 부작용",
     desc: "7가지 도화살 유형 중 나에게 해당하는 것은? 주변의 질투·부러움부터 놓치면 안 되는 타이밍, 조심해야 할 위험 신호까지.",
     tags: ["도화살", "나체도화", "홍염살"],
-    href: "/service/dohwasal", badge: "완전 무료",
+    href: "/service/dohwasal", badge: "",
     color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
     border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
     categories: ["전체", "무료", "연애·궁합", "매력"],
@@ -742,10 +747,10 @@ const SERVICES: {
     viral: "인해합목·정임합·자오충. 성적 케미의 진짜 순위",
     desc: "두 사람의 성적 케미를 사주로 분석합니다. 지지 육합부터 자오충까지 완전 공개.",
     tags: ["육합", "정임합", "자오충"],
-    href: "/service/hotcompat", badge: "",
-    color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
-    border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "연애·궁합", "매력", "Special"],
+    href: "/service/hotcompat", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "연애·궁합", "매력", "Special"], premium: true,
   },
   {
     id: "charm", emoji: "✨",
@@ -753,10 +758,10 @@ const SERVICES: {
     viral: "본인만 모르는 숨겨진 이성 매력이 있습니다",
     desc: "도화살·홍염살·12운성으로 보는 이성 매력. 나도 몰랐던 타고난 매력 포인트를 완전히 공개합니다.",
     tags: ["도화살", "홍염살", "이성운"],
-    href: "/service/charm", badge: "",
-    color: "#f87171", badgeBg: "rgba(220,38,38,0.85)",
-    border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "매력", "Special"],
+    href: "/service/charm", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "매력", "Special"], premium: true,
   },
   {
     id: "mbti", emoji: "🧬",
@@ -764,7 +769,7 @@ const SERVICES: {
     viral: "MBTI만으로는 절반밖에 모릅니다",
     desc: "사주 오행 + MBTI 16유형의 시너지 분석. 타고난 나를 두 가지 렌즈로 완전 해석하고 최적 직업을 제안합니다.",
     tags: ["MBTI", "성격 분석", "직업 추천"],
-    href: "/service/mbti", badge: "완전 무료",
+    href: "/service/mbti", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -775,7 +780,7 @@ const SERVICES: {
     viral: "맞춤 인상 개선법까지 알려드립니다",
     desc: "월간(月干) 중심으로 연·월·일·시 천간을 종합해, 남들에게 비치는 첫인상과 오해받기 쉬운 부분, 맞춤 개선법까지 알려드립니다.",
     tags: ["월간", "첫인상", "인상 개선법"],
-    href: "/service/firstimpression", badge: "완전 무료",
+    href: "/service/firstimpression", badge: "",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -786,7 +791,7 @@ const SERVICES: {
     viral: "말아먹는 사주가 따로 있습니다. 지금 확인하세요",
     desc: "오행·12운성으로 보는 투자 DNA. ETF·개별주·코인·레버리지 중 내 사주에 맞는 투자 방식을 찾아드립니다.",
     tags: ["주식", "코인", "ETF·레버리지"],
-    href: "/service/stock", badge: "완전 무료",
+    href: "/service/stock", badge: "",
     color: "#fbbf24", badgeBg: "rgba(217,119,6,0.85)",
     border: "rgba(251,191,36,0.3)", glow: "rgba(251,191,36,0.12)",
     categories: ["전체", "무료", "금전·투자"],
@@ -797,10 +802,10 @@ const SERVICES: {
     viral: "내 인생이 몇 살에 터지는지 사주가 직접 알려줍니다",
     desc: "10년 단위 대운 8개, 세운 14년 흐름, 교운기 리스크까지. 당신의 인생 타임라인을 완전히 해석합니다.",
     tags: ["대운", "세운", "교운기 전략"],
-    href: "/service/daewoon", badge: "",
-    color: "#fbbf24", badgeBg: "rgba(161,98,7,0.9)",
-    border: "rgba(202,138,4,0.3)", glow: "rgba(161,98,7,0.15)",
-    categories: ["전체", "운명·대운", "Special"],
+    href: "/service/daewoon", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "운명·대운", "Special"], premium: true,
   },
   {
     id: "place", emoji: "🌍",
@@ -808,10 +813,10 @@ const SERVICES: {
     viral: "지금 사는 곳이 내 기운과 안 맞을 수 있습니다",
     desc: "내 사주 오행 방위로 찾는 최적의 거주지. 해외 이민·유학·출장에 유리한 나라를 오행 분석으로 추천합니다.",
     tags: ["거주지", "해외 추천", "사주 방위"],
-    href: "/service/place", badge: "",
-    color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
-    border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
-    categories: ["전체", "운명·대운", "라이프", "Special"],
+    href: "/service/place", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "운명·대운", "라이프", "Special"], premium: true,
   },
   {
     id: "overcome", emoji: "⚡",
@@ -819,10 +824,10 @@ const SERVICES: {
     viral: "역마살·귀문관살도 방향 맞으면 최강 무기입니다",
     desc: "내 신살과 오행 불균형을 제대로 알고 극복하는 완벽 가이드. 나쁜 사주도 방향 틀면 달라집니다.",
     tags: ["신살 극복", "오행 보완", "개운법"],
-    href: "/service/overcome", badge: "Special",
-    color: "#fca5a5", badgeBg: "rgba(185,28,28,0.9)",
-    border: "rgba(239,68,68,0.3)", glow: "rgba(239,68,68,0.12)",
-    categories: ["전체", "운명·대운", "Special"],
+    href: "/service/overcome", badge: "👑 프리미엄",
+    color: PREMIUM_COLOR, badgeBg: PREMIUM_BADGE_BG,
+    border: PREMIUM_BORDER, glow: PREMIUM_GLOW,
+    categories: ["전체", "운명·대운", "Special"], premium: true,
   },
   {
     id: "calendar", emoji: "📅",
@@ -841,7 +846,7 @@ const SERVICES: {
     viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
     desc: "오행별 영화·책·음악·여행 취향 완전 분석. 지금까지 좋아했던 것들이 사주로 다 설명됩니다.",
     tags: ["영화", "책", "여행 스타일"],
-    href: "/service/taste", badge: "완전 무료",
+    href: "/service/taste", badge: "",
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -852,7 +857,7 @@ const SERVICES: {
     viral: "남들 공부법 따라 하면 안 되는 이유가 사주에 있습니다",
     desc: "오행 집중력 유형·공부 골든타임·합격 전략·학습 길신까지. 내 기운에 맞는 공부법을 찾으면 결과가 달라집니다.",
     tags: ["시험운", "합격운", "공부법"],
-    href: "/service/exam", badge: "완전 무료",
+    href: "/service/exam", badge: "",
     color: "#a78bfa", badgeBg: "rgba(124,58,237,0.85)",
     border: "rgba(167,139,250,0.3)", glow: "rgba(167,139,250,0.12)",
     categories: ["전체", "무료", "라이프"],
@@ -891,16 +896,26 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
             ? hovered
               ? "linear-gradient(145deg, #1c0545 0%, #0f0228 50%, #1a0a3d 100%)"
               : "linear-gradient(145deg, rgba(109,40,217,0.28) 0%, rgba(6,4,20,0.97) 55%, rgba(91,33,182,0.18) 100%)"
+            : svc.premium
+              ? hovered
+                ? "linear-gradient(145deg, #1a1100 0%, #0f0a00 50%, #1a1200 100%)"
+                : "linear-gradient(145deg, rgba(161,98,7,0.18) 0%, rgba(6,4,0,0.97) 55%, rgba(120,70,0,0.12) 100%)"
             : hovered
               ? `linear-gradient(135deg, rgba(15,5,35,0.97) 0%, rgba(20,8,50,0.97) 100%)`
               : "rgba(11,4,28,0.85)",
           border: svc.id === "chat"
             ? `1px solid ${hovered ? "rgba(196,181,253,0.7)" : "rgba(139,92,246,0.5)"}`
+            : svc.premium
+              ? `1px solid ${hovered ? "rgba(251,191,36,0.7)" : "rgba(202,138,4,0.4)"}`
             : `1px solid ${hovered ? svc.color : "rgba(255,255,255,0.08)"}`,
           boxShadow: svc.id === "chat"
             ? hovered
               ? `0 0 0 1px rgba(139,92,246,0.4), 0 16px 56px rgba(124,58,237,0.4), inset 0 1px 0 rgba(196,181,253,0.1)`
               : `0 0 24px rgba(124,58,237,0.2), inset 0 1px 0 rgba(196,181,253,0.06)`
+            : svc.premium
+              ? hovered
+                ? `0 0 0 1px rgba(202,138,4,0.4), 0 16px 56px rgba(161,98,7,0.35), inset 0 1px 0 rgba(251,191,36,0.08)`
+                : `0 0 20px rgba(161,98,7,0.18), inset 0 1px 0 rgba(251,191,36,0.05)`
             : hovered
               ? `0 0 0 1px ${svc.border}, 0 12px 48px ${svc.glow}, inset 0 1px 0 rgba(255,255,255,0.06)`
               : "inset 0 1px 0 rgba(255,255,255,0.03)",
@@ -918,6 +933,22 @@ function ServiceCard({ svc, index, startLabel }: { svc: typeof SERVICES[0]; inde
               position: "absolute", bottom: "-20%", left: "5%", width: "40%", height: "80%",
               background: "radial-gradient(ellipse, rgba(99,102,241,0.14) 0%, transparent 70%)",
               transition: "opacity 0.4s", opacity: hovered ? 1 : 0.5,
+            }} />
+          </div>
+        )}
+
+        {/* 프리미엄 골드 오라 오버레이 */}
+        {svc.premium && (
+          <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden" aria-hidden>
+            <div style={{
+              position: "absolute", top: "-30%", right: "-10%", width: "55%", height: "130%",
+              background: "radial-gradient(ellipse, rgba(202,138,4,0.16) 0%, transparent 70%)",
+              transition: "opacity 0.4s", opacity: hovered ? 1 : 0.5,
+            }} />
+            <div style={{
+              position: "absolute", bottom: "-20%", left: "5%", width: "40%", height: "80%",
+              background: "radial-gradient(ellipse, rgba(161,98,7,0.12) 0%, transparent 70%)",
+              transition: "opacity 0.4s", opacity: hovered ? 1 : 0.4,
             }} />
           </div>
         )}
