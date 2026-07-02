@@ -279,7 +279,7 @@ export default function SidejobPage() {
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-sky-300 mb-1">{userName}님에게 필요한 기운 — &apos;{yongshinEl}&apos;</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} 부업을 고를 때도 이 기운과 맞는 분야를 우선 고려하면, {userName}님은 본업과 부업 사이의 에너지 소모를 줄일 수 있어요. {getJikjangSiseonNarrative(r)}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc} 부업을 고를 때도 이 기운과 맞는 분야를 우선 고려하면, {userName}님은 본업과 부업 사이의 에너지 소모를 줄일 수 있어요. {getJikjangSiseonNarrative(r)} 이 기운이 강해지는 환경이나 분야에서 활동하면 피로가 줄고, 반대로 이 기운과 충돌하는 환경에서는 같은 시간을 써도 소진이 훨씬 빠릅니다. 부업 아이템을 고를 때 단순히 '수익이 날 것 같아서'보다, 활동 후에 지치지 않고 계속 하고 싶은 마음이 드는지 여부를 1순위 기준으로 삼아보세요.</p>
         </div>
 
         {/* 재성·식상 세력 심화 분석 */}
@@ -331,12 +331,12 @@ export default function SidejobPage() {
               <p className="text-sm font-bold text-teal-300 mb-3">{userName}님의 투잡 에너지 흐름</p>
               {hapList.map((rel, i) => (
                 <p key={i} className="text-xs text-gray-300 leading-relaxed mb-1.5">
-                  <span className="text-teal-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB})</span> 자리의 기운이 서로 잘 어우러지는 구조예요. {userName}님은 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이에요.
+                  <span className="text-teal-300 font-bold">{rel.jjA}·{rel.jjB}</span> 기운이 서로 잘 어우러지는 구조예요. {userName}님은 부업을 시작해도 흐름이 크게 흔들리지 않고 꾸준히 굴러가는 편이에요.
                 </p>
               ))}
               {chungList.map((rel, i) => (
                 <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1.5">
-                  <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB})</span> 자리의 기운이 서로 부딪혀 에너지가 분산될 수 있어요. {userName}님이 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니, 집중력을 유지하는 게 중요해요.
+                  <span className="font-bold">{rel.jjA}·{rel.jjB}</span> 기운이 서로 부딪혀 에너지가 분산될 수 있어요. {userName}님이 동시에 여러 일을 벌이면 어느 것도 제대로 마무리하지 못하는 패턴이 나타날 수 있으니, 집중력을 유지하는 게 중요해요.
                 </p>
               ))}
             </div>
@@ -359,7 +359,7 @@ export default function SidejobPage() {
                 </p>
               ) : (
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  {userName}님은 오행 기운이 비교적 순환하는 구조예요. 한쪽으로만 에너지가 집중되지 않아서 투잡을 해도 체력·감정·재물 사이에서 균형을 어느 정도 유지할 수 있는 편이에요.
+                  {userName}님은 오행 기운이 비교적 순환하는 구조예요. 한쪽으로만 에너지가 집중되지 않아서 투잡을 해도 체력·감정·재물 사이에서 균형을 어느 정도 유지할 수 있는 편이에요. 순환하는 기운은 장기 운영에 강하고, 번아웃 없이 꾸준히 지속하는 데 유리한 구조입니다. 다만 이 균형감이 오히려 '아직 무리는 아니겠지'라는 판단으로 이어져 과부하가 쌓이는 것을 늦게 인식하는 경향이 생길 수도 있으니, 주기적으로 체력 상태를 점검하는 습관을 들이세요.
                 </p>
               )}
               {gishinEl && (

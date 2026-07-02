@@ -86,7 +86,7 @@ const ELEMENT_COLOR: Record<Element, string> = {
   화: "#f87171", // 빨강
   토: "#fbbf24", // 노랑
   금: "#f3f4f6", // 흰색(밝은 회백)
-  수: "#52525b", // 흑색(어두운 배경에서 보이도록 짙은 회흑색)
+  수: "#3b82f6", // 파란색
 };
 
 // 육합화기(六合化氣): 두 지지가 합쳐져 만들어내는 오행
@@ -464,7 +464,7 @@ export default function TodayFortunePage() {
 
           <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
-            className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-slate-600 to-zinc-600 hover:from-slate-500 hover:to-zinc-500 text-white shadow-lg shadow-black/50 transition-all active:scale-[0.98] flex items-center justify-center">
+            className="w-full py-5 rounded-2xl font-black text-base tracking-tight bg-gradient-to-r from-slate-600 to-zinc-600 hover:from-slate-500 hover:to-zinc-500 text-white shadow-lg shadow-black/50 transition-all active:scale-[0.98] flex items-center justify-center px-4">
             오늘의 운세 확인하기
           </button>
           </FadeIn>
@@ -558,10 +558,62 @@ export default function TodayFortunePage() {
     { label: "오늘", cg: dayPillar.cg, jj: dayPillar.jj, sipseongCg: todaySipseongCg },
   ];
 
-  // 합충형파해 분석 — 원국 4지지 + 대운 + 세운 + 오늘 지지 전체
+  // 합충형파해 분석
   const allJjLabels = cols.map(c => c.label);
   const allJjs = cols.map(c => c.jj);
-  const relations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
+
+  // 원국 내부 지지는 날짜와 무관하게 항상 고정 표시 (cols 0~3)
+  const natalColCount = r.pillarsDetail.hour ? 4 : 3;
+  const natalJjs = allJjs.slice(0, natalColCount);
+  const natalRawRels = getJijiRelations(natalJjs); // 인덱스가 0..natalColCount-1 기준
+
+  // 전체(원국+대운+세운+오늘) 지지 관계에서 교차 기둥이 포함된 것만
+  const allRawRels = getJijiRelations(allJjs);
+  const crossRawRels = allRawRels.filter(rel => rel.a >= natalColCount || rel.b >= natalColCount);
+
+  // 원국 내부 관계를 cols 인덱스로 재매핑 (인덱스 오프셋 없음, 이미 0기반)
+  const natalRelsRemapped = natalRawRels.map(rel => ({ ...rel }));
+
+  // 합쳐서 정렬
+  const rawRelations = sortJijiRelationsByStrength([...natalRelsRemapped, ...crossRawRels]);
+
+  // 삼합 3개 모두 있을 때 → 단일 레이블로 합침 (원국 내부 반합은 유지)
+  type MergedRel = (typeof rawRelations)[0] & { mergedGroup?: string[] };
+  const relations: MergedRel[] = (() => {
+    const used = new Set<number>();
+    const result: MergedRel[] = [];
+    for (const grp of SAMHAP_HWA) {
+      // 전체 allJjs 기준으로 3개 모두 있는지 확인
+      const presentIdx = grp.group.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
+      if (presentIdx.length === 3) {
+        const pairIndices: number[] = [];
+        rawRelations.forEach((rel, ri) => {
+          if ((rel.type === "삼합" || rel.type === "반합") &&
+              grp.group.includes(rel.jjA) && grp.group.includes(rel.jjB)) {
+            pairIndices.push(ri);
+            used.add(ri);
+          }
+        });
+        if (pairIndices.length > 0) {
+          const sortedIdx = [...presentIdx].sort((a, b) => a - b);
+          const first = rawRelations.find((_, ri) => pairIndices.includes(ri))!;
+          result.push({
+            ...first,
+            a: sortedIdx[0], b: sortedIdx[sortedIdx.length - 1],
+            jjA: allJjs[sortedIdx[0]], jjB: allJjs[sortedIdx[sortedIdx.length - 1]],
+            type: "삼합",
+            mergedGroup: grp.group,
+          });
+        }
+      }
+    }
+    rawRelations.forEach((rel, ri) => {
+      if (!used.has(ri)) {
+        result.push(rel.type === "삼합" ? { ...rel, type: "반합" } : rel);
+      }
+    });
+    return result;
+  })();
 
   // 천라지망(天羅地網): 원국·대운·세운·오늘 전체 지지 중 술+해(天羅) 또는 진+사(地網) 조합이 있는지 검사
   const allJjSet = new Set(allJjs);
@@ -602,6 +654,27 @@ export default function TodayFortunePage() {
           const aIdx = f.cg === x ? f.colIdx : wIdx;
           const bIdx = f.cg === x ? wIdx : f.colIdx;
           cgRelations.push({ from: f.label, to: w.label, a: x, b: y, type: "충", aIdx, bIdx });
+        }
+      }
+    }
+  }
+  // 원국 내부 천간 합충 (날짜와 무관하게 항상 고정)
+  for (let i = 0; i < wonguk천간.length; i++) {
+    for (let j = i + 1; j < wonguk천간.length; j++) {
+      const wi = wonguk천간[i], wj = wonguk천간[j];
+      const iIdx = wongukColIdx[wi.label], jIdx = wongukColIdx[wj.label];
+      for (const [x, y] of CG_HAP) {
+        if ((wi.cg === x && wj.cg === y) || (wi.cg === y && wj.cg === x)) {
+          const aIdx = wi.cg === x ? iIdx : jIdx;
+          const bIdx = wi.cg === x ? jIdx : iIdx;
+          cgRelations.push({ from: wi.label, to: wj.label, a: x, b: y, type: "합", aIdx, bIdx });
+        }
+      }
+      for (const [x, y] of CG_CHUNG) {
+        if ((wi.cg === x && wj.cg === y) || (wi.cg === y && wj.cg === x)) {
+          const aIdx = wi.cg === x ? iIdx : jIdx;
+          const bIdx = wi.cg === x ? jIdx : iIdx;
+          cgRelations.push({ from: wi.label, to: wj.label, a: x, b: y, type: "충", aIdx, bIdx });
         }
       }
     }
@@ -787,7 +860,14 @@ export default function TodayFortunePage() {
           <RelationDiagram
             cols={cols}
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
-            jjLines={relations.map(rel => { const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type); return { aIdx: rel.a, bIdx: rel.b, label: `${ja}${jb}${rel.type}`, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) }; })}
+            jjLines={relations.map(rel => {
+              const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
+              const mg = (rel as MergedRel).mergedGroup;
+              const label = mg
+                ? `${mg[0]}·${mg[1]}·${mg[2]}삼합`
+                : `${ja}${jb}${rel.type}`;
+              return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
+            })}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>

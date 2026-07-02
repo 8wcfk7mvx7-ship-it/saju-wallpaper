@@ -230,7 +230,7 @@ function DaewoonSuccessContent() {
                   <div className="text-center min-w-[60px]">
                     <p className="text-3xl font-black" style={{ color: elStyle.text }}>{p.cg}{p.jj}</p>
                     <p className="text-xs text-gray-400 mt-1">{p.age}세~</p>
-                    <p className="text-[10px] text-gray-600">{p.yearStart}년~</p>
+                    <p className="text-[10px] text-gray-600">{p.dateStart ? `${p.dateStart.year}.${String(p.dateStart.month).padStart(2,"0")}.${String(p.dateStart.day).padStart(2,"0")}` : `${p.yearStart}년`}</p>
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap gap-1.5 mb-2">

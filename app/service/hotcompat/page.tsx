@@ -43,11 +43,11 @@ const CHEONGAN_HAP_MAP: Record<string, { partner: string; name: string; hanja: s
   병: { partner: "신", name: "병신합", hanja: "丙辛合", desc: "위제지합(威制之合) — 강렬한 화(火)와 금(金)의 만남. 지배·복종의 에너지. 뜨겁고 강렬한 끌림.", score: 25 },
   정: { partner: "임", name: "정임합", hanja: "丁壬合", desc: "음란지합(淫亂之合) — 사주에서 성적 화합이 가장 강한 합. 촛불과 깊은 강물의 결합. 거부 불가능한 끌림.", score: 40 },
   무: { partner: "계", name: "무계합", hanja: "戊癸合", desc: "무정지합(無情之合) — 겉은 차갑지만 속이 뜨거운 조합. 표현하지 않지만 강한 내면의 끌림.", score: 20 },
-  기: { partner: "갑", name: "갑기합", hanja: "甲己合", desc: "중정지합(中正之合) — 가장 안정적이고 바른 결합.", score: 20 },
-  경: { partner: "을", name: "을경합", hanja: "乙庚合", desc: "인의지합(仁義之合) — 부드러움이 강함을 감아드는 케미.", score: 15 },
-  신: { partner: "병", name: "병신합", hanja: "丙辛合", desc: "위제지합(威制之合) — 강렬한 지배·복종 케미.", score: 25 },
-  임: { partner: "정", name: "정임합", hanja: "丁壬合", desc: "음란지합(淫亂之合) — 사주에서 성적 화합이 가장 강한 합.", score: 40 },
-  계: { partner: "무", name: "무계합", hanja: "戊癸合", desc: "무정지합(無情之合) — 겉은 차갑지만 속이 뜨거운 조합.", score: 20 },
+  기: { partner: "갑", name: "갑기합", hanja: "甲己合", desc: "중정지합(中正之合) — 가장 안정적이고 바른 결합. 기토(己)가 갑목(甲)의 뿌리를 품어주는 구조라, 돌봄과 안정을 주는 관계에서 성적 신뢰와 편안함이 자연스럽게 형성됩니다.", score: 20 },
+  경: { partner: "을", name: "을경합", hanja: "乙庚合", desc: "인의지합(仁義之合) — 부드러운 을목이 강한 경금을 감아드는 케미. 강함이 부드러움에 무너지는 구조라, 을목이 주도적으로 접근하면 경금이 의외로 쉽게 녹습니다.", score: 15 },
+  신: { partner: "병", name: "병신합", hanja: "丙辛合", desc: "위제지합(威制之合) — 병화의 강렬한 열기가 신금을 달구는 지배·복종 케미. 신금의 차가운 도도함이 병화의 기운에 서서히 무너지는 구조라, 처음엔 밀고 당기다 결국 서로에게 강하게 끌리게 됩니다.", score: 25 },
+  임: { partner: "정", name: "정임합", hanja: "丁壬合", desc: "음란지합(淫亂之合) — 사주에서 성적 화합이 가장 강한 합. 촛불(丁)과 큰 강(壬)이 만나 서로를 완전히 채워주는 구조라, 본능적으로 끌리고 떨어지기 어려운 인연이 됩니다.", score: 40 },
+  계: { partner: "무", name: "무계합", hanja: "戊癸合", desc: "무정지합(無情之合) — 겉은 차갑지만 속이 뜨거운 조합. 계수의 빗물이 무토의 광활한 땅에 스며드는 구조라, 표면적으로는 담담해 보여도 내면에서 강한 연결감과 의존이 형성됩니다.", score: 20 },
 };
 
 // 지지 육합
@@ -63,10 +63,10 @@ const JIJI_YUKHAP_LIST: { a: string; b: string; name: string; result: string; de
 const JIJI_CHUNG_LIST: { a: string; b: string; name: string; desc: string; score: number }[] = [
   { a: "자", b: "오", name: "자오충(子午沖)", desc: "극과 극의 전기 케미. 차가운 물(水)과 뜨거운 불(火)의 충돌. 거부할 수 없는 강렬한 자극. 함께 있으면 항상 짜릿합니다.", score: 35 },
   { a: "묘", b: "유", name: "묘유충(卯酉沖)", desc: "두 도화살 지지의 충돌. 서로의 매력을 끊임없이 자극합니다. 보기만 해도 끌리는 섹시한 긴장감.", score: 28 },
-  { a: "진", b: "술", name: "진술충(辰戌沖)", desc: "강한 마찰과 자극. 갈등 속에서도 강하게 끌리는 에너지.", score: 20 },
-  { a: "사", b: "해", name: "사해충(巳亥沖)", desc: "강한 화(火)와 수(水)의 충돌. 다른 극이 강하게 끌어당기는 케미.", score: 20 },
-  { a: "인", b: "신", name: "인신충(寅申沖)", desc: "충동적인 자극과 에너지 교환.", score: 15 },
-  { a: "축", b: "미", name: "축미충(丑未沖)", desc: "안정된 토끼리의 마찰. 중간 강도의 자극.", score: 12 },
+  { a: "진", b: "술", name: "진술충(辰戌沖)", desc: "두 창고 기운이 맞부딪히는 충이라, 품어두었던 에너지가 폭발합니다. 갈등 속에서도 강하게 끌리는 에너지라 싸우고 화해하는 과정에서 오히려 더 깊이 엮이는 경우가 많아요.", score: 20 },
+  { a: "사", b: "해", name: "사해충(巳亥沖)", desc: "사(巳)의 뜨거운 불기운과 해(亥)의 깊은 물기운이 정면으로 맞서는 구조예요. 극과 극이 강하게 당기는 케미라 처음 만나는 순간부터 묘하게 시선이 끌리고, 쉽게 인연을 끊기 어려운 자력이 있습니다.", score: 20 },
+  { a: "인", b: "신", name: "인신충(寅申沖)", desc: "나무(寅)와 금속(申)의 충돌. 서로 강하게 흔들어 깨우는 관계라, 만날 때마다 새로운 자극을 주고받으며 쉽게 지루해지지 않아요.", score: 15 },
+  { a: "축", b: "미", name: "축미충(丑未沖)", desc: "같은 토(土) 기운끼리의 마찰. 처음엔 비슷해 보이다 가까워질수록 미묘한 결이 다름을 느끼게 됩니다. 지루하지 않게 적당한 긴장감을 유지하는 조합이에요.", score: 12 },
 ];
 
 // ── 천간×지지 조합 분석 ──────────────────────────────────────────────────────
@@ -418,21 +418,21 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
 // ── 등급 ─────────────────────────────────────────────────────────────────────
 const GRADES = [
   { min: 95, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
-    verdict: "사주에 새겨진 인연입니다. 이 조합, 운명입니다." },
+    verdict: "사주에 새겨진 인연입니다. 몇 세기를 돌아도 다시 만날 수밖에 없는 구조예요. 이 정도 조합은 매우 드뭅니다." },
   { min: 75, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
-    verdict: "강렬한 성적 끌림이 사주에 나타납니다." },
+    verdict: "강렬한 성적 끌림이 사주에 뚜렷하게 나타납니다. 처음 만나는 순간부터 이유 없이 자꾸 생각나는 타입이에요." },
   { min: 60, grade: "A+", label: "환장 케미", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.28)",
-    verdict: "서로에게 빠져들 수밖에 없는 궁합이에요." },
+    verdict: "서로에게 빠져들 수밖에 없는 궁합이에요. 화학적 반응이 강하게 일어나는 조합이라, 함께하는 시간이 길어질수록 더 깊이 끌립니다." },
   { min: 45, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
-    verdict: "성적 화합이 강합니다. 자연스럽게 이끌립니다." },
+    verdict: "성적 화합이 강합니다. 억지로 맞추지 않아도 자연스럽게 이끌리고, 함께할수록 리듬이 맞아들어가는 느낌이 있어요." },
   { min: 30, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
-    verdict: "잘 맞는 케미입니다. 함께할수록 깊어집니다." },
+    verdict: "잘 맞는 케미입니다. 처음에는 평균처럼 느껴질 수 있지만, 함께하는 시간이 늘수록 서로에게 더 편안하고 깊어지는 관계예요." },
   { min: 18, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
-    verdict: "노력과 이해가 필요합니다." },
+    verdict: "노력과 이해가 필요합니다. 본능적인 끌림보다는 서로를 알아가면서 만들어가는 케미예요. 감정적 교감이 쌓이면 더 나아질 수 있습니다." },
   { min: 8,  grade: "D",  label: "화합 약함", color: "#4f46e5", bg: "rgba(79,70,229,0.07)", border: "rgba(79,70,229,0.18)",
-    verdict: "성적 기운의 방향이 많이 다릅니다." },
+    verdict: "성적 기운의 방향이 많이 다릅니다. 서로의 속도와 표현 방식이 잘 맞지 않아 불만이 쌓이기 쉬운 구조예요. 솔직한 대화가 필수입니다." },
   { min: 0,  grade: "F",  label: "섹스리스 위험", color: "#64748b", bg: "rgba(100,116,139,0.07)", border: "rgba(100,116,139,0.18)",
-    verdict: "서로의 성적 에너지가 잘 연결되지 않는 구조입니다." },
+    verdict: "서로의 성적 에너지가 잘 연결되지 않는 구조입니다. 관계를 유지하려면 성적인 부분 외의 정서적 교감과 배려에 집중하는 것이 현실적인 방법이에요." },
 ];
 
 function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GRADES[GRADES.length - 1]; }
@@ -667,6 +667,70 @@ function HotCompatContent() {
             <p className="text-xs text-gray-400 leading-relaxed">{chem.cgJjCombo.combo_desc}</p>
           </div>
         )}
+
+        {/* 일지·월지 관계 다이어그램 */}
+        {(() => {
+          const yj1 = r1.pillarsDetail.year.jj;
+          const yj2 = r2.pillarsDetail.year.jj;
+          const mj1 = r1.pillarsDetail.month.jj;
+          const mj2 = r2.pillarsDetail.month.jj;
+          const hj1 = r1.pillarsDetail.hour?.jj;
+          const hj2 = r2.pillarsDetail.hour?.jj;
+          const SAMHAP_GROUPS: string[][] = [["인","오","술"],["신","자","진"],["해","묘","미"],["사","유","축"]];
+          const BANGSHAP_GROUPS: string[][] = [["인","묘","진"],["사","오","미"],["신","유","술"],["해","자","축"]];
+          function getJjRel(a: string, b: string): { type: string; color: string; bg: string; desc: string } {
+            if (JIJI_YUKHAP_LIST.some(y => (y.a===a&&y.b===b)||(y.a===b&&y.b===a)))
+              return { type: "육합", color: "#f472b6", bg: "rgba(244,114,182,0.15)", desc: "본능적으로 끌려 엉겨붙는 가장 끈끈한 합" };
+            if (SAMHAP_GROUPS.some(g => g.includes(a) && g.includes(b)))
+              return { type: "삼합", color: "#fbbf24", bg: "rgba(251,191,36,0.15)", desc: "같은 방향으로 에너지가 흐르는 강한 합" };
+            if (BANGSHAP_GROUPS.some(g => g.includes(a) && g.includes(b)))
+              return { type: "방합", color: "#34d399", bg: "rgba(52,211,153,0.15)", desc: "같은 계절 기운을 공유하는 편안한 합" };
+            if (JIJI_CHUNG_LIST.some(c => (c.a===a&&c.b===b)||(c.a===b&&c.b===a)))
+              return { type: "충", color: "#f87171", bg: "rgba(248,113,113,0.15)", desc: "서로 부딪히지만 강한 자극을 주는 관계" };
+            return { type: "무관", color: "#6b7280", bg: "rgba(107,114,128,0.1)", desc: "직접적인 관계 없음" };
+          }
+          const rows = [
+            { rowLabel: "년지 — 뿌리·환경 에너지", a: yj1, b: yj2 },
+            { rowLabel: "월지 — 사회·활동 에너지", a: mj1, b: mj2 },
+            { rowLabel: "일지 — 배우자·본인 에너지", a: ij1, b: ij2 },
+            ...(hj1 && hj2 ? [{ rowLabel: "시지 — 내면·욕구 에너지", a: hj1, b: hj2 }] : []),
+          ];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-5">년지 · 월지 · 일지 · 시지 관계 다이어그램</p>
+              <div className="space-y-5">
+                {rows.map(({ rowLabel, a, b }) => {
+                  const rel = getJjRel(a, b);
+                  return (
+                    <div key={rowLabel}>
+                      <p className="text-[10px] text-gray-600 font-bold tracking-widest mb-3">{rowLabel}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-rose-400/50" style={{ background: "rgba(244,63,94,0.1)" }}>{a}</div>
+                          <span className="text-[10px] text-gray-500">나</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                          <span className="text-xs font-black px-2.5 py-1 rounded-lg" style={{ color: rel.color, background: rel.bg }}>{rel.type}</span>
+                          <div className="w-14 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, rgba(244,63,94,0.5), ${rel.color}, rgba(129,140,248,0.5))` }} />
+                          <span className="text-[9px] text-gray-600 text-center leading-tight max-w-[80px]">{rel.desc}</span>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-indigo-400/50" style={{ background: "rgba(99,102,241,0.1)" }}>{b}</div>
+                          <span className="text-[10px] text-gray-500">상대</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-x-3 gap-y-1">
+                {([["육합","#f472b6","본능적으로 끌려 엉겨붙는 합"],["삼합","#fbbf24","같은 방향으로 흐르는 강한 합"],["방합","#34d399","같은 계절 기운의 합"],["충","#f87171","부딪히지만 자극적인 관계"]] as [string,string,string][]).map(([t,c,d]) => (
+                  <span key={t} className="text-[10px] text-gray-500"><span className="font-bold" style={{ color: c }}>{t}</span> {d}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 만족도 그래프 */}
         {(() => {

@@ -30,26 +30,36 @@ import ResultFooterActions from "@/components/ResultFooterActions";
 export const dynamic = "force-dynamic";
 
 const UUNSEONG_CHARM: Record<string, { title: string; desc: string; score: number; color: string }> = {
-  장생: { title: "장생(長生) — 생기 있는 매력", desc: "자라나는 생명력처럼 신선하고 활기찬 매력. 이성에게 건강미와 긍정 에너지로 어필. 만나면 기분이 좋아지는 타입.", score: 85, color: "#4ade80" },
-  목욕: { title: "목욕(沐浴) — 이성 최강 매력", desc: "전통적으로 가장 강한 이성 매력의 12운성. 타고난 에로틱한 분위기와 매혹적 외모. 이성이 본능적으로 끌리는 에너지.", score: 98, color: "#c4b5fd" },
-  관대: { title: "관대(冠帶) — 당당한 매력", desc: "자신감 넘치는 자태. 사회적 지위와 능력에서 오는 매력. 존재 자체가 당당하고 믿음직스럽습니다.", score: 80, color: "#86efac" },
-  건록: { title: "건록(建祿) — 독립적 매력", desc: "스스로 서는 자립적 매력. 의지가 강하고 자기 영역이 뚜렷한 타입. 의존하지 않는 모습이 이성에게 매력적.", score: 75, color: "#fbbf24" },
-  제왕: { title: "제왕(帝旺) — 카리스마 최강", desc: "최고조의 에너지와 압도적 존재감. 모든 공간을 장악하는 리더십 매력. 이성이 본능적으로 따르게 됩니다.", score: 90, color: "#f59e0b" },
-  쇠: { title: "쇠(衰) — 성숙한 매력", desc: "완숙하고 안정된 매력. 젊은 열기보다 깊이 있는 성숙함이 이성에게 신뢰감을 줍니다.", score: 65, color: "#94a3b8" },
-  병: { title: "병(病) — 여린 예술적 매력", desc: "섬세하고 예술적인 분위기. 여리지만 독특한 아우라. 지적이고 감성적인 이성에게 깊이 어필합니다.", score: 60, color: "#64748b" },
-  사: { title: "사(死) — 깊고 어두운 매력", desc: "정적이고 깊은 강렬함. 표면은 조용하지만 내면의 에너지가 미스터리한 매력을 형성합니다.", score: 65, color: "#f87171" },
-  묘: { title: "묘(墓) — 신비로운 매력", desc: "감추어진 신비. 쉽게 파악되지 않는 미스터리함이 이성을 호기심으로 끌어당깁니다.", score: 60, color: "#ef4444" },
-  절: { title: "절(絶) — 순간적 강렬한 매력", desc: "순간적으로 불타오르는 매력. 이별과 새 만남을 반복하지만, 그 순간의 강렬함이 인상적입니다.", score: 70, color: "#dc2626" },
-  태: { title: "태(胎) — 순수한 천진난만 매력", desc: "아이처럼 순수하고 꾸밈없는 매력. 보호본능을 자극하는 천진난만함이 이성의 마음을 열게 합니다.", score: 72, color: "#818cf8" },
-  양: { title: "양(養) — 따뜻한 성장 매력", desc: "자라나는 생명처럼 따뜻하고 포근한 매력. 함께 성장하고 싶다는 느낌을 주는 nurturing한 에너지.", score: 70, color: "#a78bfa" },
+  장생: { title: "장생(長生) — 생기 있는 매력", desc: "자라나는 생명력처럼 신선하고 활기찬 매력. 이성에게 건강미와 긍정 에너지로 어필합니다. 만나면 기분이 좋아지는 타입이라, 주변에 자연스럽게 사람이 모이고 이성이 먼저 다가오는 경우가 많아요.", score: 85, color: "#4ade80" },
+  목욕: { title: "목욕(沐浴) — 이성 최강 매력", desc: "전통적으로 가장 강한 이성 매력의 12운성. 타고난 에로틱한 분위기와 매혹적 외모를 가진 타입입니다. 이성이 본능적으로 끌리는 에너지를 발산하며, 이 매력은 꾸미지 않아도 자연스럽게 드러납니다.", score: 98, color: "#c4b5fd" },
+  관대: { title: "관대(冠帶) — 당당한 매력", desc: "자신감 넘치는 자태. 사회적 지위와 능력에서 오는 매력으로 존재 자체가 당당하고 믿음직스럽습니다. 어디서든 리더처럼 보이는 분위기가 이성에게 강한 신뢰감과 끌림을 동시에 줍니다.", score: 80, color: "#86efac" },
+  건록: { title: "건록(建祿) — 독립적 매력", desc: "스스로 서는 자립적 매력. 의지가 강하고 자기 영역이 뚜렷한 타입으로, 의존하지 않는 모습이 이성에게 매력적으로 비칩니다. 자신의 페이스를 지키는 모습이 오히려 이성을 더 끌어당기는 구조예요.", score: 75, color: "#fbbf24" },
+  제왕: { title: "제왕(帝旺) — 카리스마 최강", desc: "최고조의 에너지와 압도적 존재감. 모든 공간을 장악하는 리더십 매력으로 이성이 본능적으로 따르게 됩니다. 말 한마디 없이도 포스가 느껴지는 타입이라, 이성에게 강렬한 첫인상을 남깁니다.", score: 90, color: "#f59e0b" },
+  쇠: { title: "쇠(衰) — 성숙한 매력", desc: "완숙하고 안정된 매력. 젊은 열기보다 깊이 있는 성숙함이 이성에게 신뢰감을 줍니다. 나이가 들수록 더 빛나는 타입으로, 차분하고 여유 있는 태도가 이성에게 든든함과 안정감을 줍니다.", score: 65, color: "#94a3b8" },
+  병: { title: "병(病) — 여린 예술적 매력", desc: "섬세하고 예술적인 분위기. 여리지만 독특한 아우라를 가진 타입입니다. 지적이고 감성적인 이성에게 깊이 어필하며, 가까워질수록 드러나는 내면의 깊이가 진짜 무기예요.", score: 60, color: "#64748b" },
+  사: { title: "사(死) — 깊고 어두운 매력", desc: "정적이고 깊은 강렬함. 표면은 조용하지만 내면의 에너지가 미스터리한 매력을 형성합니다. 쉽게 속을 드러내지 않는 특성이 이성의 호기심을 자극하고, 알수록 빠져드는 중독성 있는 매력으로 이어집니다.", score: 65, color: "#f87171" },
+  묘: { title: "묘(墓) — 신비로운 매력", desc: "감추어진 신비. 쉽게 파악되지 않는 미스터리함이 이성을 호기심으로 끌어당깁니다. 완전히 알 수 없다는 느낌이 오히려 이성이 더 다가오게 만드는 강력한 끌림의 원천이에요.", score: 60, color: "#ef4444" },
+  절: { title: "절(絶) — 순간적 강렬한 매력", desc: "순간적으로 불타오르는 매력. 이별과 새 만남의 사이클이 있지만, 그 순간의 강렬함과 신선함이 인상적입니다. 처음 만남의 설렘을 잘 살리는 타입으로, 첫인상이 유독 강렬하게 남아요.", score: 70, color: "#dc2626" },
+  태: { title: "태(胎) — 순수한 천진난만 매력", desc: "아이처럼 순수하고 꾸밈없는 매력. 보호본능을 자극하는 천진난만함이 이성의 마음을 열게 합니다. 계산 없는 순수한 에너지가 이성에게 희귀하게 느껴져서 오히려 더 소중하게 여기게 만드는 타입이에요.", score: 72, color: "#818cf8" },
+  양: { title: "양(養) — 따뜻한 성장 매력", desc: "자라나는 생명처럼 따뜻하고 포근한 매력. 함께 성장하고 싶다는 느낌을 주는 따뜻한 에너지를 발산합니다. 곁에 있으면 자연스럽게 편안해지고 안정감이 생기는 타입으로, 장기 관계에서 더 빛이 납니다.", score: 70, color: "#a78bfa" },
 };
 
-const OHAENG_LOOK: Record<string, { look: string; celebs: string }> = {
-  목: { look: "갸름하고 긴 얼굴형. 키가 크거나 체형이 날렵함. 이목구비가 선명하고 활기 있는 인상.", celebs: "임시완, 공유 / 아이유, 한지민" },
-  화: { look: "이목구비가 뚜렷하고 눈빛이 강렬함. 피부가 맑고 전체적으로 선명한 인상. 표정이 풍부함.", celebs: "이효리, 강호동 / 박보영, 유인나" },
-  토: { look: "계란형 또는 둥근 얼굴. 고급지고 담백한 피부결. 편안하고 품격 있는 자연스러운 인상.", celebs: "차인표, 이서진 / 김혜수, 김태리, 신민아" },
-  금: { look: "날카롭고 정제된 이목구비. 샤프하고 세련된 도시 느낌. 뼈대가 있고 각진 분위기.", celebs: "이정재, 손현주 / 전지현, 수지, 김태희, 민효린" },
-  수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중" },
+const OHAENG_LOOK: Record<string, { look: string; celebs: string; skin: string; skinCare: string }> = {
+  목: { look: "갸름하고 긴 얼굴형. 키가 크거나 체형이 날렵함. 이목구비가 선명하고 활기 있는 인상.", celebs: "임시완, 공유 / 아이유, 한지민",
+    skin: "목(木) 기운이 많은 사주는 피부가 건조해지기 쉽고 트러블이 반복되는 경향이 있습니다. 황갈색·올리브 톤 피부가 많으며 눈가 주름이 일찍 생길 수 있어요.",
+    skinCare: "수분 공급이 최우선. 히알루론산·세라마이드 계열 보습제를 꾸준히 사용하고, 충분한 수면이 피부 회복의 핵심입니다." },
+  화: { look: "이목구비가 뚜렷하고 눈빛이 강렬함. 피부가 맑고 전체적으로 선명한 인상. 표정이 풍부함.", celebs: "이효리, 강호동 / 박보영, 유인나",
+    skin: "화(火) 기운이 많은 사주는 얼굴이 쉽게 붉어지고 홍조가 잦습니다. 열이 많아 여름에 더위를 많이 타며, 민감성·복합성 피부인 경우가 많아요.",
+    skinCare: "자극을 줄이는 것이 핵심. 순한 성분의 진정 케어 제품을 쓰고, 자외선 차단을 철저히 하세요. 실내 환기와 수분 섭취도 중요합니다." },
+  토: { look: "계란형 또는 둥근 얼굴. 고급지고 담백한 피부결. 편안하고 품격 있는 자연스러운 인상.", celebs: "차인표, 이서진 / 김혜수, 김태리, 신민아",
+    skin: "토(土) 기운이 많은 사주는 고급스럽고 담백한 피부결이 특징입니다. 살이 잘 붙는 체질이고, 피부톤이 따뜻한 웜톤인 경우가 많아요.",
+    skinCare: "과도한 당분과 기름진 음식은 줄이고, 꾸준한 루틴 관리가 피부를 지켜줍니다. 마사지로 혈액순환을 도와주세요." },
+  금: { look: "날카롭고 정제된 이목구비. 샤프하고 세련된 도시 느낌. 뼈대가 있고 각진 분위기.", celebs: "이정재, 손현주 / 전지현, 수지, 김태희, 민효린",
+    skin: "금(金) 기운이 많은 사주는 피부가 희고 맑은 편입니다. 체모가 적고 피부결이 섬세하며, 건성·민감성 피부 경향이 있어요.",
+    skinCare: "자극적인 각질 제거는 피하고, 부드러운 성분의 영양 크림으로 피부 장벽을 탄탄히 유지하세요. 광택 있는 피부 관리가 잘 맞습니다." },
+  수: { look: "맑은 피부, 촉촉하고 깊은 눈빛. 자연스러운 분위기. 나이 들어도 동안인 경우 많음.", celebs: "공유, 황정민 / 한효주, 김고은, 김아중",
+    skin: "수(水) 기운이 많은 사주는 촉촉하고 물광 피부가 많습니다. 동안 경향이 강하고 피부색이 맑고 투명하지만, 부기가 생기거나 모공이 넓어질 수 있어요.",
+    skinCare: "과도한 수분 공급보다 피부 탄력 케어가 핵심. 카페인·나트륨을 줄이고, 림프 마사지로 부기를 관리하면 더욱 좋습니다." },
 };
 
 const CHARM_PRICE = 4900;
@@ -257,7 +267,14 @@ function CharmResultContent() {
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
           <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""} {getAppearanceAnalysis(result).points.join(" ")}</p>
-          <p className="text-xs text-gray-600">📺 비슷한 스타일: {olook?.celebs}</p>
+          <p className="text-xs text-gray-600 mb-3">📺 비슷한 스타일: {olook?.celebs}</p>
+          {olook?.skin && (
+            <div className="border-t border-white/5 pt-3 mt-1">
+              <p className="text-[11px] text-pink-400/70 font-bold mb-1">💧 피부 특성 & 관리법</p>
+              <p className="text-xs text-gray-400 leading-relaxed mb-1">{olook.skin}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{olook.skinCare}</p>
+            </div>
+          )}
         </div>
 
         {/* ═══ 12운성 매력 지수 ═══ */}
@@ -480,6 +497,16 @@ function CharmResultContent() {
                         <p className="text-sm text-gray-200">{item.value}</p>
                       </div>
                     ))}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="bg-black/20 rounded-xl p-3">
+                      <p className="text-xs text-gray-500 mb-1">🎯 추천 취미</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.hobbies}</p>
+                    </div>
+                    <div className="bg-black/20 rounded-xl p-3">
+                      <p className="text-xs text-gray-500 mb-1">📍 행운의 장소</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.places}</p>
+                    </div>
                   </div>
                   <div className="bg-black/20 rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-2">💡 매력 개운 핵심 팁</p>

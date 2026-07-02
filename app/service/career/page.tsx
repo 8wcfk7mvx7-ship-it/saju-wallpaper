@@ -53,31 +53,31 @@ const GROUP_CAREER: Record<string, { title: string; field: string; desc: string;
   식상: {
     title: "내가 만든 결과물이 곧 가치가 되는 일",
     field: "콘텐츠·기획·요리·교육·1인 사업·프리랜서·창작",
-    desc: "표현력과 창작력을 뜻하는 기운이 강하게 작용하고 있어, 누군가 정해놓은 규칙을 따르는 일보다 스스로 아이디어를 내고 결과물을 만들어내는 일에서 능력이 가장 잘 발휘됩니다. 기획·콘텐츠 제작·요리·강의·디자인처럼 '내 손에서 무언가가 새로 만들어지는' 직업군에서 인정받기 쉽습니다.",
+    desc: "표현력과 창작력을 뜻하는 기운이 강하게 작용하고 있어, 누군가 정해놓은 규칙을 따르는 일보다 스스로 아이디어를 내고 결과물을 만들어내는 일에서 능력이 가장 잘 발휘됩니다. 기획·콘텐츠 제작·요리·강의·디자인처럼 '내 손에서 무언가가 새로 만들어지는' 직업군에서 인정받기 쉽습니다. 외부 평가 기준보다 스스로 만족할 수 있는 결과물을 낼 때 성취감이 가장 크게 올라오는 구조예요.",
     warn: "다만 이 기운이 강한 만큼 한 가지에 꾸준히 머무르기보다 자극과 변화를 추구하는 성향이 함께 옵니다. 너무 많은 걸 동시에 벌이면 마무리가 약해지는 패턴이 반복될 수 있으니, 한 번에 진행하는 프로젝트 수를 의식적으로 줄이는 것이 좋습니다.",
   },
   재성: {
     title: "직접 운영하고 굴리며 키워가는 일",
     field: "영업·무역·투자·자영업·부동산·유통",
-    desc: "재물을 뜻하는 기운이 가장 필요한 사주라, 조직 안에서 정해진 업무를 반복하기보다, 자신이 직접 거래·협상·운영의 주체가 되는 일에서 에너지가 살아납니다. 영업·무역·자영업처럼 성과가 곧바로 보상으로 연결되는 구조가 잘 맞습니다.",
+    desc: "재물을 뜻하는 기운이 가장 필요한 사주라, 조직 안에서 정해진 업무를 반복하기보다, 자신이 직접 거래·협상·운영의 주체가 되는 일에서 에너지가 살아납니다. 영업·무역·자영업처럼 성과가 곧바로 보상으로 연결되는 구조가 잘 맞습니다. 매출이나 계약처럼 명확한 숫자로 성과를 확인할 수 있는 환경일수록 동기부여가 강해지고 능력이 빠르게 성장합니다.",
     warn: "이 기운이 강하면 일과 사람 관계에서 모두 '득과 실'을 빠르게 계산하는 경향이 생깁니다. 단기 성과에 집중하다 보면 동료·팀과의 관계가 소모적으로 흐를 수 있어, 의도적으로 신뢰 관계에 시간을 투자하는 것이 장기적으로 더 큰 기회를 만듭니다.",
   },
   관성: {
     title: "체계와 책임이 분명한 조직형 일",
     field: "공공기관·대기업·법률·행정·관리직·전문 자격직",
-    desc: "조직과 책임을 뜻하는 기운이 가장 필요한 사주입니다. 명확한 규칙과 위계, 책임 범위가 있는 조직 안에서 안정적으로 능력을 쌓아 올라가는 구조가 잘 맞습니다. 공공기관·대기업·법률·행정처럼 '직급과 자격'이 곧 성과로 인정되는 분야에서 신뢰를 빠르게 얻습니다.",
+    desc: "조직과 책임을 뜻하는 기운이 가장 필요한 사주입니다. 명확한 규칙과 위계, 책임 범위가 있는 조직 안에서 안정적으로 능력을 쌓아 올라가는 구조가 잘 맞습니다. 공공기관·대기업·법률·행정처럼 '직급과 자격'이 곧 성과로 인정되는 분야에서 신뢰를 빠르게 얻습니다. 승진이나 자격 취득처럼 단계적으로 올라가는 경로가 있는 조직에서 실력이 가장 잘 드러납니다.",
     warn: "이 기운이 강하면 규칙을 잘 지키는 만큼, 정해진 틀을 벗어난 자유로운 환경에서는 오히려 방향을 잃기 쉽습니다. 완전한 무소속 프리랜서나 룰이 없는 초기 스타트업보다는, 어느 정도 체계가 잡힌 환경을 선택하는 것이 스트레스를 줄여줍니다.",
   },
   인성: {
     title: "배움과 전문성이 곧 경쟁력이 되는 일",
     field: "연구·교육·상담·의료·기획·전략·문서 기반 전문직",
-    desc: "학습과 전문성을 뜻하는 기운이 가장 필요한 사주입니다. 즉흥적인 실행보다 충분한 학습과 자료를 바탕으로 판단하고 조언하는 역할에서 진가가 드러납니다. 연구·교육·상담·기획처럼 '깊이 아는 것'이 곧 신뢰가 되는 분야에서 꾸준히 성장합니다.",
+    desc: "학습과 전문성을 뜻하는 기운이 가장 필요한 사주입니다. 즉흥적인 실행보다 충분한 학습과 자료를 바탕으로 판단하고 조언하는 역할에서 진가가 드러납니다. 연구·교육·상담·기획처럼 '깊이 아는 것'이 곧 신뢰가 되는 분야에서 꾸준히 성장합니다. 지식을 쌓는 데서 그치지 않고 타인에게 설명하거나 적용하는 역할로 이어질 때 가장 큰 만족감을 느끼는 구조예요.",
     warn: "이 기운이 강하면 준비와 검토에 시간을 많이 쓰는 대신, 결정과 실행의 타이밍을 놓치는 경우가 생길 수 있습니다. 완벽하게 준비된 다음에 시작하려 하지 말고, '70% 준비되면 일단 시작'하는 기준을 정해두는 것이 도움이 됩니다.",
   },
   비겁: {
     title: "사람들과 함께, 또는 같은 분야 사람들과 경쟁하며 성장하는 일",
     field: "스포츠·영업조직·동업·커뮤니티 기반 사업·프리랜서 연합",
-    desc: "동료·경쟁 기운이 가장 필요한 사주입니다. 혼자 조용히 일하는 환경보다, 동료·경쟁자와 함께 자극을 받으며 성장하는 구조에서 능력이 극대화됩니다. 같은 목표를 가진 사람들과 함께하는 팀, 동업, 혹은 같은 분야 사람들과 경쟁하는 환경에서 성과가 빠르게 올라갑니다.",
+    desc: "동료·경쟁 기운이 가장 필요한 사주입니다. 혼자 조용히 일하는 환경보다, 동료·경쟁자와 함께 자극을 받으며 성장하는 구조에서 능력이 극대화됩니다. 같은 목표를 가진 사람들과 함께하는 팀, 동업, 혹은 같은 분야 사람들과 경쟁하는 환경에서 성과가 빠르게 올라갑니다. 경쟁 자극이 있어야 오히려 실력이 올라오는 구조라, 자극 없는 환경에서는 잠재력이 충분히 발휘되지 않는 경우가 많습니다.",
     warn: "이 기운이 강하면 독립심과 자존심이 강해 '내 방식'을 고집하다 주변과 마찰이 생기기 쉽습니다. 동업이나 협업을 할 때는 처음부터 역할과 지분을 명확히 문서화해 두는 것이 관계도 일도 오래 지키는 방법입니다.",
   },
 };
@@ -340,14 +340,14 @@ export default function CareerPage() {
   const hasJikjangChung = chungList.some(rel => rel.a === 1 || rel.b === 1) || chungList.length > 0;
   const hasJikjangHap = hapList.length > 0;
   const moveNarrative = hasJikjangChung
-    ? "사주에 형충(刑沖)의 흐름이 있어서, 한 자리에 가만히 머무르기보다 이직·부서이동·이사처럼 환경이 바뀌는 변화를 자연스럽게 겪는 구조예요. 새로운 자리로 옮길 때마다 불안하게 느껴질 수 있지만, 사주에서는 이런 흐름 자체가 다음 단계로 가는 과정에 가까워요."
+    ? "사주 안에 기운들이 서로 충돌하는 흐름이 있어서, 한 자리에 가만히 머무르기보다 이직·부서이동·이사처럼 환경이 바뀌는 변화를 자연스럽게 겪는 구조예요. 새로운 자리로 옮길 때마다 불안하게 느껴질 수 있지만, 이런 변화 자체가 다음 단계로 가는 과정에 가까워요."
     : hasJikjangHap
-    ? "사주 지지들이 서로 합(合)을 이루며 안정적으로 묶여 있어서, 한번 자리를 잡으면 비교적 오래 머무르는 흐름이 자연스러운 사주예요. 잦은 변화보다 한 곳에서 관계와 신뢰를 쌓아가는 쪽이 잘 맞아요."
+    ? "사주 기운들이 서로 어우러지며 안정적으로 묶여 있어서, 한번 자리를 잡으면 비교적 오래 머무르는 흐름이 자연스러운 사주예요. 잦은 변화보다 한 곳에서 관계와 신뢰를 쌓아가는 쪽이 잘 맞아요."
     : "사주 안에서 큰 충돌이나 강한 결속이 두드러지지 않아서, 극단적으로 자주 옮기거나 극단적으로 한곳에 묶이기보다 그때그때 상황에 맞춰 유연하게 움직이는 흐름이에요.";
   const stayVsMoveNarrative = hasJikjangChung
-    ? "여러 곳을 거치며 경험을 쌓아가는 편이 본인 사주에는 더 잘 맞아요. 한 곳에 오래 못 정착한다고 자책하지 않아도 돼요 — 사주에서는 이게 오히려 자연스러운 성장 방식이고, 옮겨 다니며 쌓은 경험이 나중에 더 큰 자산이 돼요."
+    ? "여러 곳을 거치며 경험을 쌓아가는 편이 사주 흐름에 더 잘 맞아요. 한 곳에 오래 못 정착한다고 자책하지 않아도 돼요 — 이게 오히려 자연스러운 성장 방식이고, 옮겨 다니며 쌓은 경험이 나중에 더 큰 자산이 돼요."
     : hasJikjangHap
-    ? "한 곳에서 차근차근 쌓아가는 흐름이 본인 사주에는 더 잘 맞아요. 주변에서 이직하는 사람들을 보며 흔들릴 필요 없어요 — 변화가 적다고 도태되는 게 아니라, 꾸준함 자체가 본인의 경쟁력이 되는 구조예요."
+    ? "한 곳에서 차근차근 쌓아가는 흐름이 사주에 더 잘 맞아요. 주변에서 이직하는 사람들을 보며 흔들릴 필요 없어요 — 변화가 적다고 도태되는 게 아니라, 꾸준함 자체가 경쟁력이 되는 구조예요."
     : "한 곳에 오래 머무르든, 몇 번의 변화를 거치든 둘 다 무리 없이 받아들일 수 있는 유연한 구조예요. 지금 상황에 너무 불안해하지 않아도 괜찮아요.";
 
   return (
@@ -425,13 +425,13 @@ export default function CareerPage() {
           <div className="space-y-5 mb-8">
             <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 text-center">
               <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">사주 구조 진단</p>
-              <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength} · 필요한 기운 {yongshinEl} ({SIPSEONG_OF_GROUP_LABEL[yongshinGroup]})</p>
+              <p className="text-xl font-black leading-snug mb-1">{r.yongshin.strength === "신약" ? "에너지 보충이 필요한 사주" : r.yongshin.strength === "신강" ? "에너지가 넘치는 사주" : "균형 잡힌 사주"} · 힘을 키워주는 기운 {yongshinEl} ({SIPSEONG_OF_GROUP_LABEL[yongshinGroup]})</p>
               <p className="text-sm text-gray-300 leading-relaxed">{r.yongshin.desc}</p>
             </div>
 
             {/* 조후(調候) 분석 */}
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-              <p className="text-sm font-bold text-orange-300 mb-1">조후(調候)로 보는 일하기 좋은 환경 — {johu.climate}</p>
+              <p className="text-sm font-bold text-orange-300 mb-1">태어난 계절 기운으로 보는 일하기 좋은 환경 — {johu.climate}</p>
               <p className="text-sm text-gray-300 leading-relaxed mb-2">{johu.desc}</p>
               <p className="text-xs text-emerald-300 leading-relaxed">▶ 추천 분야: {johu.fields}</p>
             </div>
@@ -467,7 +467,7 @@ export default function CareerPage() {
                   <div className="mb-2">
                     {hapList.map((rel, i) => (
                       <p key={i} className="text-xs text-gray-400 leading-relaxed mb-1">
-                        <span className="text-emerald-300 font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 영역이 서로 끌어당기며 협력하는 구조라, 해당 기둥이 나타내는 영역(예: {rel.a === 1 || rel.b === 1 ? "직업·사회생활" : "주변 환경"})에서 안정적인 관계나 협업이 잘 풀려요.
+                        <span className="text-emerald-300 font-bold">{rel.jjA}·{rel.jjB} 어울림</span> — 두 기운이 서로 끌어당기며 협력하는 구조라, {rel.a === 1 || rel.b === 1 ? "직업·사회생활" : "주변 환경"} 영역에서 안정적인 관계나 협업이 잘 풀려요.
                       </p>
                     ))}
                   </div>
@@ -476,7 +476,7 @@ export default function CareerPage() {
                   <div>
                     {chungList.map((rel, i) => (
                       <p key={i} className="text-xs text-amber-300/80 leading-relaxed mb-1">
-                        <span className="font-bold">{POS_LABEL[rel.a]}({rel.jjA})·{POS_LABEL[rel.b]}({rel.jjB}) {rel.type}</span> — 두 영역 사이에 부딪힘이 있어, {rel.a === 1 || rel.b === 1 ? "직업·진로가 한 번에 정착되기보다 몇 번의 변화를 거치며 자리를 잡는 흐름" : "환경 변화에 따라 마음이 흔들릴 수 있는 구간"}이 있을 수 있어요. 변화를 나쁜 신호로 보지 말고, 그 자체를 다음 단계로 가는 과정으로 받아들이는 게 좋아요.
+                        <span className="font-bold">{rel.jjA}·{rel.jjB} 충돌</span> — 두 기운 사이에 부딪힘이 있어, {rel.a === 1 || rel.b === 1 ? "직업·진로가 한 번에 정착되기보다 몇 번의 변화를 거치며 자리를 잡는 흐름" : "환경 변화에 따라 마음이 흔들릴 수 있는 구간"}이 있을 수 있어요. 변화를 나쁜 신호로 보지 말고, 그 자체를 다음 단계로 가는 과정으로 받아들이는 게 좋아요.
                       </p>
                     ))}
                   </div>
@@ -486,7 +486,7 @@ export default function CareerPage() {
 
             {/* 극(克) 관계 분석 */}
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-              <p className="text-sm font-bold text-rose-300 mb-1">오행이 서로 극(克)하는 관계</p>
+              <p className="text-sm font-bold text-rose-300 mb-1">오행 에너지 균형 진단</p>
               {dominantControlsLacking ? (
                 <p className="text-sm text-gray-300 leading-relaxed">
                   사주에서 가장 강한 기운인 <b>{dominantEl}</b>이 가장 부족한 기운인 <b>{lackingEl}</b>을 극(克)하고 있어요. 강한 기운이 약한 기운을 계속 누르는 구조라, 부족한 쪽에 해당하는 영역(인간관계·체력·꾸준함 등 {lackingEl} 기운이 상징하는 부분)이 쉽게 소모될 수 있어요. 일할 때는 강한 기운을 발산하는 일에만 몰두하기보다, 부족한 기운을 채워주는 활동(휴식·관계 관리)을 의식적으로 배치하는 게 중요해요.
@@ -531,7 +531,7 @@ export default function CareerPage() {
                 <p className="text-sm font-bold text-sky-300 mb-3">사주 전체 구조로 보는 강점·약점</p>
                 {patterns.slice(0, 2).map((p, i) => (
                   <div key={i} className={i > 0 ? "mt-3 pt-3 border-t border-white/5" : ""}>
-                    <p className="text-sm font-bold text-gray-200 mb-1">{p.name} ({p.hanja})</p>
+                    <p className="text-sm font-bold text-gray-200 mb-1">{p.name}</p>
                     <p className="text-xs text-gray-500 mb-1 leading-relaxed">{p.desc}</p>
                     <p className="text-xs text-emerald-300 leading-relaxed">▶ {p.advice}</p>
                   </div>

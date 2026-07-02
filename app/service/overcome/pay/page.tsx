@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import PaymentMethodSelector, { type PaymentMethod } from "@/components/PaymentMethodSelector";
-import { getBalance, deductBalance } from "@/lib/blueberry";
+import { getBalanceServer, deductBalanceServer } from "@/lib/blueberry";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
 export const dynamic = "force-dynamic";
@@ -61,7 +61,7 @@ function OvercomePayContent() {
       const raw = sessionStorage.getItem("overcomeData");
       if (raw) setInfo(JSON.parse(raw).form ?? null);
     } catch {}
-    setStarBalance(getBalance());
+    getBalanceServer().then(setStarBalance);
   }, [orderId, router]);
 
   function sendCode() {
@@ -84,7 +84,7 @@ function OvercomePayContent() {
     setError("");
 
     if (method === "starpiece") {
-      if (!deductBalance(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
+      if (!await deductBalanceServer(amount)) { setError("별조각이 부족합니다."); setLoading(false); return; }
       router.push(`/service/overcome/success?orderId=${orderId}&amount=${amount}&paymentKey=STARPIECE`);
       return;
     }

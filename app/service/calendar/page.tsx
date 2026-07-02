@@ -218,7 +218,6 @@ const MONTH_OPTS = Array.from({ length: 12 }, (_, i) => i + 1);
 export default function CalendarPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("splash");
-  const [showBtn, setShowBtn] = useState(false);
   const [counter] = useState(() => {
     const kstH = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
     const isNight = kstH >= 23 || kstH < 7;
@@ -248,8 +247,6 @@ export default function CalendarPage() {
     const d = new Date(todayDate.getFullYear(), todayDate.getMonth() + i, 1);
     return { year: d.getFullYear(), month: d.getMonth() + 1 };
   });
-
-  useEffect(() => { const t = setTimeout(() => setShowBtn(true), 2500); return () => clearTimeout(t); }, []);
 
   useEffect(() => {
     setIsPaid(localStorage.getItem("sp_admin") === "true" || localStorage.getItem("sp_calendar_paid") === "true");
@@ -344,63 +341,42 @@ export default function CalendarPage() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-900/15 blur-[130px]" />
       </div>
 
-      <div className="relative z-10 max-w-lg w-full text-center">
-        <FadeIn delay={0} className="mb-6">
-          <div className="flex flex-col items-center gap-4">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
-              <span className="pulse w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-              <span className="text-base font-bold text-emerald-300 tracking-widest uppercase">Summer Palace · 길일 선택</span>
-            </div>
-            <div className="text-7xl drop-shadow-[0_0_40px_rgba(16,185,129,0.4)]">📅</div>
+      <div className="relative z-10 max-w-lg w-full text-center px-5">
+        <FadeIn delay={0}>
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-700/40 text-emerald-300 text-xs font-bold tracking-wider mb-8">
+            지금 {counter.toLocaleString()}명이 길일·흉일 확인 중
           </div>
+          <h1 className="text-3xl font-black mb-4 leading-tight tracking-tight">
+            이사·결혼·수술…<br />
+            <span className="text-emerald-400">날짜가 결과를 바꿉니다.</span>
+          </h1>
+        </FadeIn>
+        <FadeIn delay={100}>
+          <p className="text-gray-400 text-base mb-2 leading-relaxed">
+            아무 날이나 고르면 안 됩니다.<br />
+            <span className="text-gray-300 font-medium">사주에 맞는 날을 골라야 기운이 따릅니다.</span>
+          </p>
+          <p className="text-gray-600 text-sm mb-12">앞으로 3개월치 길일·흉일을 모두 무료로 확인하세요</p>
         </FadeIn>
 
-        <FadeIn delay={100} className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse" />
-            <span className="text-lg font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
-              지금 <strong className="text-white">{counter.toLocaleString()}명</strong>이 길일·흉일 확인 중
-            </span>
-          </div>
-        </FadeIn>
-
-        <div className="space-y-4 mb-12">
-          {[
-            { text: "이사·결혼·수술…", big: false, delay: 200 },
-            { text: "날짜가 결과를 바꿉니다.", big: true, delay: 700 },
-            { text: "사주에 맞는 날을 골라야", big: false, delay: 1200 },
-            { text: "기운이 따릅니다.", big: true, delay: 1700 },
-          ].map((line, i) => (
-            <FadeIn key={i} delay={line.delay}>
-              <p className={`leading-snug ${line.big
-                ? "text-5xl font-black bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent"
-                : "text-3xl text-gray-400 font-medium"}`}>
-                {line.text}
-              </p>
-            </FadeIn>
-          ))}
-        </div>
-
-        <FadeIn delay={2100} className="mb-8">
-          <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+        <FadeIn delay={200} className="w-full">
+          <div className="grid grid-cols-2 gap-2 mb-10 text-left">
             {EVENT_TYPES.slice(0, 4).map(e => (
-              <div key={e.id} className="rounded-xl p-3 text-left" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <div key={e.id} className="rounded-xl p-3 bg-white/[0.03] border border-white/10">
                 <span className="text-2xl">{e.icon}</span>
-                <p className="text-base font-bold text-white mt-1">{e.label}</p>
-                <p className="text-[14px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{e.desc}</p>
+                <p className="text-sm font-bold text-white mt-1">{e.label}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{e.desc}</p>
               </div>
             ))}
           </div>
         </FadeIn>
 
-        <div style={{ opacity: showBtn ? 1 : 0, transform: showBtn ? "none" : "translateY(20px) scale(0.96)", transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)" }}>
+        <FadeIn delay={300} className="w-full">
           <button onClick={() => setStep("input")}
-            className="w-full max-w-xs mx-auto block font-bold py-5 px-10 rounded-2xl text-2xl shadow-2xl transition-all active:scale-[0.97]"
-            style={{ background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", color: "#fff", boxShadow: "0 8px 32px -4px rgba(5,150,105,0.45)" }}>
-            길일·흉일 확인하기 →
+            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/50 transition-all active:scale-[0.98]">
+            길일·흉일 확인하기
           </button>
-          <p className="text-base text-gray-600 mt-4">앞으로 3개월치 길일·흉일을 모두 무료로 확인하세요</p>
-        </div>
+        </FadeIn>
       </div>
     </main>
   );
