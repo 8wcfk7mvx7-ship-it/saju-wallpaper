@@ -100,6 +100,16 @@ const SAMHAP_HWA: { group: string[]; el: Element }[] = [
   { group: ["신", "자", "진"], el: "수" },
   { group: ["해", "묘", "미"], el: "목" },
 ];
+const SAMHYEONG_GROUPS: string[][] = [
+  ["인", "사", "신"], // 무은지형
+  ["축", "술", "미"], // 지세지형
+];
+const BANGHAP_GROUPS: { group: string[]; el: Element }[] = [
+  { group: ["인", "묘", "진"], el: "목" },
+  { group: ["사", "오", "미"], el: "화" },
+  { group: ["신", "유", "술"], el: "금" },
+  { group: ["해", "자", "축"], el: "수" },
+];
 // 천간합화기(天干合化氣)
 const CG_HWA: Record<string, Element> = {
   "갑기": "토", "을경": "금", "병신": "수", "정임": "목", "무계": "화",
@@ -191,6 +201,7 @@ interface LineRel {
   label: string;
   color: string | [string, string]; // 단색 또는 [좌측색, 우측색] 반반 색상
   desc: string; // 호버/탭 설명
+  midDotColIdx?: number; // 3체 관계(삼합/삼형/방합)의 중간 지지 컬럼 인덱스
 }
 
 interface DiagramProps {
@@ -205,7 +216,7 @@ const LABEL_H = 14;
 const ROW_GAP = 6;
 
 // 화살표 마커가 달린 커넥터 라인 — 시작/끝 양쪽에 삼각형 화살촉 + 중앙 레이블 배지(호버/탭 시 설명 표시)
-function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: number; xB: number; y: number; color: string | [string, string]; label: string; desc: string; width: number; height: number }) {
+function ConnectorLine({ xA, xB, y, color, label, desc, width, height, midDotX }: { xA: number; xB: number; y: number; color: string | [string, string]; label: string; desc: string; width: number; height: number; midDotX?: number }) {
   const [open, setOpen] = useState(false);
   const lo = Math.min(xA, xB);
   const hi = Math.max(xA, xB);
@@ -226,6 +237,8 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height }: { xA: n
         {/* 양쪽 화살촉 (서로 바깥쪽을 향함) */}
         <polygon points={`${lo},${y} ${lo + tri},${y - tri / 1.6} ${lo + tri},${y + tri / 1.6}`} fill={cA} opacity={0.9} />
         <polygon points={`${hi},${y} ${hi - tri},${y - tri / 1.6} ${hi - tri},${y + tri / 1.6}`} fill={cB} opacity={0.9} />
+        {/* 3체 중간 지지 표시 점 */}
+        {midDotX !== undefined && <circle cx={midDotX} cy={y} r={4} fill={cA} opacity={0.9} />}
       </svg>
       {/* 중앙 레이블 배지 — title(PC 호버) + onClick(모바일 탭) 둘 다 지원 */}
       <div
@@ -364,6 +377,7 @@ function RelationDiagram({ cols, jjLines, cgLines }: DiagramProps) {
             xA={colCenterX(rel.aIdx)} xB={colCenterX(rel.bIdx)}
             y={jjLinesTop + i * LINE_H + LINE_H / 2}
             color={rel.color} label={rel.label} desc={rel.desc} width={totalW} height={totalH}
+            midDotX={rel.midDotColIdx !== undefined ? colCenterX(rel.midDotColIdx) : undefined}
           />
         ))}
       </div>
@@ -577,13 +591,14 @@ export default function TodayFortunePage() {
   // 합쳐서 정렬
   const rawRelations = sortJijiRelationsByStrength([...natalRelsRemapped, ...crossRawRels]);
 
-  // 삼합 3개 모두 있을 때 → 단일 레이블로 합침 (원국 내부 반합은 유지)
-  type MergedRel = (typeof rawRelations)[0] & { mergedGroup?: string[] };
+  // 삼합/삼형/방합 3개 모두 있을 때 → 단일 레이블로 합침 (원국 내부 반합은 유지)
+  type MergedRel = (typeof rawRelations)[0] & { mergedGroup?: string[]; mergeType?: string; midJjIdx?: number };
   const relations: MergedRel[] = (() => {
     const used = new Set<number>();
     const result: MergedRel[] = [];
+
+    // 삼합 merge
     for (const grp of SAMHAP_HWA) {
-      // 전체 allJjs 기준으로 3개 모두 있는지 확인
       const presentIdx = grp.group.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
       if (presentIdx.length === 3) {
         const pairIndices: number[] = [];
@@ -603,10 +618,58 @@ export default function TodayFortunePage() {
             jjA: allJjs[sortedIdx[0]], jjB: allJjs[sortedIdx[sortedIdx.length - 1]],
             type: "삼합",
             mergedGroup: grp.group,
+            mergeType: "삼합",
+            midJjIdx: sortedIdx[1],
           });
         }
       }
     }
+
+    // 삼형 merge (인사신, 축술미)
+    for (const grp of SAMHYEONG_GROUPS) {
+      const presentIdx = grp.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
+      if (presentIdx.length === 3) {
+        const pairIndices: number[] = [];
+        rawRelations.forEach((rel, ri) => {
+          if (rel.type === "형" && grp.includes(rel.jjA) && grp.includes(rel.jjB)) {
+            pairIndices.push(ri);
+            used.add(ri);
+          }
+        });
+        if (pairIndices.length > 0) {
+          const sortedIdx = [...presentIdx].sort((a, b) => a - b);
+          const first = rawRelations.find((_, ri) => pairIndices.includes(ri))!;
+          result.push({
+            ...first,
+            a: sortedIdx[0], b: sortedIdx[sortedIdx.length - 1],
+            jjA: allJjs[sortedIdx[0]], jjB: allJjs[sortedIdx[sortedIdx.length - 1]],
+            type: "형",
+            mergedGroup: grp,
+            mergeType: "삼형",
+            midJjIdx: sortedIdx[1],
+          });
+        }
+      }
+    }
+
+    // 방합 감지 (getJijiRelations에서 반환되지 않으므로 직접 추가)
+    for (const { group, el } of BANGHAP_GROUPS) {
+      const presentIdx = group.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
+      if (presentIdx.length === 3) {
+        const sortedIdx = [...presentIdx].sort((a, b) => a - b);
+        const elColor = EL_STYLE[el]?.text ?? "#34d399";
+        result.push({
+          a: sortedIdx[0], b: sortedIdx[sortedIdx.length - 1],
+          jjA: allJjs[sortedIdx[0]], jjB: allJjs[sortedIdx[sortedIdx.length - 1]],
+          type: "삼합" as const,
+          mergedGroup: group,
+          mergeType: "방합",
+          midJjIdx: sortedIdx[1],
+        } as MergedRel);
+        void elColor; // color is handled via relColor("삼합", ...)
+      }
+    }
+
     rawRelations.forEach((rel, ri) => {
       if (!used.has(ri)) {
         result.push(rel.type === "삼합" ? { ...rel, type: "반합" } : rel);
@@ -861,12 +924,19 @@ export default function TodayFortunePage() {
             cols={cols}
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
             jjLines={relations.map(rel => {
+              const mr = rel as MergedRel;
               const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
-              const mg = (rel as MergedRel).mergedGroup;
+              const mg = mr.mergedGroup;
               const label = mg
-                ? `${mg[0]}·${mg[1]}·${mg[2]}삼합`
+                ? `${mg[0]}·${mg[1]}·${mg[2]}${mr.mergeType ?? "삼합"}`
                 : `${ja}${jb}${rel.type}`;
-              return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
+              const midDotColIdx = mg && mr.midJjIdx !== undefined ? mr.midJjIdx : undefined;
+              const desc = mr.mergeType === "삼형"
+                ? "세 지지가 동시에 부딪혀 강한 긴장과 시비·구설이 생기기 쉬운 관계예요."
+                : mr.mergeType === "방합"
+                ? "같은 계절 세 지지가 모여 해당 오행을 강하게 강화하는 관계예요."
+                : jjRelDesc(rel.type);
+              return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc, midDotColIdx };
             })}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
