@@ -558,21 +558,34 @@ export default function TodayFortunePage() {
     { label: "오늘", cg: dayPillar.cg, jj: dayPillar.jj, sipseongCg: todaySipseongCg },
   ];
 
-  // 합충형파해 분석 — 원국 4지지 + 대운 + 세운 + 오늘 지지 전체
+  // 합충형파해 분석
   const allJjLabels = cols.map(c => c.label);
   const allJjs = cols.map(c => c.jj);
-  const rawRelations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
 
-  // 삼합 3개 모두 있으면 pairwise 반합/삼합을 제거하고 하나의 merged entry로 교체
-  // merged entry: { a, b, jjA, jjB, type:"삼합", merged: [g0,g1,g2] }
+  // 원국 내부 지지는 날짜와 무관하게 항상 고정 표시 (cols 0~3)
+  const natalColCount = r.pillarsDetail.hour ? 4 : 3;
+  const natalJjs = allJjs.slice(0, natalColCount);
+  const natalRawRels = getJijiRelations(natalJjs); // 인덱스가 0..natalColCount-1 기준
+
+  // 전체(원국+대운+세운+오늘) 지지 관계에서 교차 기둥이 포함된 것만
+  const allRawRels = getJijiRelations(allJjs);
+  const crossRawRels = allRawRels.filter(rel => rel.a >= natalColCount || rel.b >= natalColCount);
+
+  // 원국 내부 관계를 cols 인덱스로 재매핑 (인덱스 오프셋 없음, 이미 0기반)
+  const natalRelsRemapped = natalRawRels.map(rel => ({ ...rel }));
+
+  // 합쳐서 정렬
+  const rawRelations = sortJijiRelationsByStrength([...natalRelsRemapped, ...crossRawRels]);
+
+  // 삼합 3개 모두 있을 때 → 단일 레이블로 합침 (원국 내부 반합은 유지)
   type MergedRel = (typeof rawRelations)[0] & { mergedGroup?: string[] };
   const relations: MergedRel[] = (() => {
-    const used = new Set<number>(); // rawRelations index
+    const used = new Set<number>();
     const result: MergedRel[] = [];
     for (const grp of SAMHAP_HWA) {
+      // 전체 allJjs 기준으로 3개 모두 있는지 확인
       const presentIdx = grp.group.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
       if (presentIdx.length === 3) {
-        // Find and mark all pairwise 삼합/반합 relations in this group
         const pairIndices: number[] = [];
         rawRelations.forEach((rel, ri) => {
           if ((rel.type === "삼합" || rel.type === "반합") &&
@@ -582,7 +595,6 @@ export default function TodayFortunePage() {
           }
         });
         if (pairIndices.length > 0) {
-          // Use first + last column index of the group members as the anchor pair
           const sortedIdx = [...presentIdx].sort((a, b) => a - b);
           const first = rawRelations.find((_, ri) => pairIndices.includes(ri))!;
           result.push({
@@ -595,7 +607,6 @@ export default function TodayFortunePage() {
         }
       }
     }
-    // Append remaining non-merged relations; change leftover 삼합 pairwise to 반합
     rawRelations.forEach((rel, ri) => {
       if (!used.has(ri)) {
         result.push(rel.type === "삼합" ? { ...rel, type: "반합" } : rel);
@@ -643,6 +654,27 @@ export default function TodayFortunePage() {
           const aIdx = f.cg === x ? f.colIdx : wIdx;
           const bIdx = f.cg === x ? wIdx : f.colIdx;
           cgRelations.push({ from: f.label, to: w.label, a: x, b: y, type: "충", aIdx, bIdx });
+        }
+      }
+    }
+  }
+  // 원국 내부 천간 합충 (날짜와 무관하게 항상 고정)
+  for (let i = 0; i < wonguk천간.length; i++) {
+    for (let j = i + 1; j < wonguk천간.length; j++) {
+      const wi = wonguk천간[i], wj = wonguk천간[j];
+      const iIdx = wongukColIdx[wi.label], jIdx = wongukColIdx[wj.label];
+      for (const [x, y] of CG_HAP) {
+        if ((wi.cg === x && wj.cg === y) || (wi.cg === y && wj.cg === x)) {
+          const aIdx = wi.cg === x ? iIdx : jIdx;
+          const bIdx = wi.cg === x ? jIdx : iIdx;
+          cgRelations.push({ from: wi.label, to: wj.label, a: x, b: y, type: "합", aIdx, bIdx });
+        }
+      }
+      for (const [x, y] of CG_CHUNG) {
+        if ((wi.cg === x && wj.cg === y) || (wi.cg === y && wj.cg === x)) {
+          const aIdx = wi.cg === x ? iIdx : jIdx;
+          const bIdx = wi.cg === x ? jIdx : iIdx;
+          cgRelations.push({ from: wi.label, to: wj.label, a: x, b: y, type: "충", aIdx, bIdx });
         }
       }
     }
