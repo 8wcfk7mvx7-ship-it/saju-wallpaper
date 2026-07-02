@@ -561,7 +561,48 @@ export default function TodayFortunePage() {
   // 합충형파해 분석 — 원국 4지지 + 대운 + 세운 + 오늘 지지 전체
   const allJjLabels = cols.map(c => c.label);
   const allJjs = cols.map(c => c.jj);
-  const relations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
+  const rawRelations = sortJijiRelationsByStrength(getJijiRelations(allJjs));
+
+  // 삼합 3개 모두 있으면 pairwise 반합/삼합을 제거하고 하나의 merged entry로 교체
+  // merged entry: { a, b, jjA, jjB, type:"삼합", merged: [g0,g1,g2] }
+  type MergedRel = (typeof rawRelations)[0] & { mergedGroup?: string[] };
+  const relations: MergedRel[] = (() => {
+    const used = new Set<number>(); // rawRelations index
+    const result: MergedRel[] = [];
+    for (const grp of SAMHAP_HWA) {
+      const presentIdx = grp.group.map(jj => allJjs.indexOf(jj)).filter(i => i >= 0);
+      if (presentIdx.length === 3) {
+        // Find and mark all pairwise 삼합/반합 relations in this group
+        const pairIndices: number[] = [];
+        rawRelations.forEach((rel, ri) => {
+          if ((rel.type === "삼합" || rel.type === "반합") &&
+              grp.group.includes(rel.jjA) && grp.group.includes(rel.jjB)) {
+            pairIndices.push(ri);
+            used.add(ri);
+          }
+        });
+        if (pairIndices.length > 0) {
+          // Use first + last column index of the group members as the anchor pair
+          const sortedIdx = [...presentIdx].sort((a, b) => a - b);
+          const first = rawRelations.find((_, ri) => pairIndices.includes(ri))!;
+          result.push({
+            ...first,
+            a: sortedIdx[0], b: sortedIdx[sortedIdx.length - 1],
+            jjA: allJjs[sortedIdx[0]], jjB: allJjs[sortedIdx[sortedIdx.length - 1]],
+            type: "삼합",
+            mergedGroup: grp.group,
+          });
+        }
+      }
+    }
+    // Append remaining non-merged relations; change leftover 삼합 pairwise to 반합
+    rawRelations.forEach((rel, ri) => {
+      if (!used.has(ri)) {
+        result.push(rel.type === "삼합" ? { ...rel, type: "반합" } : rel);
+      }
+    });
+    return result;
+  })();
 
   // 천라지망(天羅地網): 원국·대운·세운·오늘 전체 지지 중 술+해(天羅) 또는 진+사(地網) 조합이 있는지 검사
   const allJjSet = new Set(allJjs);
@@ -787,7 +828,14 @@ export default function TodayFortunePage() {
           <RelationDiagram
             cols={cols}
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
-            jjLines={relations.map(rel => { const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type); return { aIdx: rel.a, bIdx: rel.b, label: `${ja}${jb}${rel.type}`, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) }; })}
+            jjLines={relations.map(rel => {
+              const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
+              const mg = (rel as MergedRel).mergedGroup;
+              const label = mg
+                ? `${mg[0]}·${mg[1]}·${mg[2]}삼합`
+                : `${ja}${jb}${rel.type}`;
+              return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
+            })}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>
