@@ -62,6 +62,29 @@ const ELEMENT_STUDY_TYPE: Record<Element, { label: string; strength: string; wea
   },
 };
 
+const STUDY_FIT: Record<Element, { good: string[]; bad: string[] }> = {
+  목: {
+    good: ["스토리텔링 (역사·세계사 등 맥락이 있는 공부)", "탐구·발견형 학습 (왜?를 쫓는 방식)", "가르치면서 공부 (설명할 때 이해가 깊어짐)"],
+    bad: ["단순암기 (의미 없이 반복 외우기)", "반복 훈련 위주의 단순 계산"],
+  },
+  화: {
+    good: ["가르치면서 공부 (설명할 때 불꽃 집중이 생김)", "스토리텔링·감성 연결 학습", "토론·발표 중심 공부"],
+    bad: ["단순암기", "복잡한 계산 (흥미 없으면 집중력이 급격히 저하됨)"],
+  },
+  토: {
+    good: ["반복 훈련", "단순암기 (꾸준 누적이 최강)", "루틴화된 계산 연습"],
+    bad: ["스토리텔링 (전체 맥락보다 현재 범위 집중 성향)", "즉흥적인 창의형 공부법"],
+  },
+  금: {
+    good: ["계산 (정밀하게 파고드는 수학·통계·논리)", "복잡한 계산 (오류 없이 끝까지 추적하는 능력)", "오답 분석·정밀 복습"],
+    bad: ["가르치면서 공부 (완벽주의 성향상 남에게 설명하기 부담스러울 수 있음)", "스토리텔링 방식"],
+  },
+  수: {
+    good: ["스토리텔링 (역사·세계사·맥락 중심 공부가 최적)", "가르치면서 공부 (연결고리 포착 능력이 강점)", "연상·연결형 암기법"],
+    bad: ["단순암기 (반복 암기에서 빨리 지루함을 느낌)", "반복 훈련 위주 계산"],
+  },
+};
+
 // 십성 기반 시험 합격 전략
 const SIPSEONG_EXAM: Record<string, { title: string; desc: string; tip: string }> = {
   비견: {
@@ -149,6 +172,7 @@ export default function ExamPage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -162,6 +186,7 @@ export default function ExamPage() {
         if (sol?.year) { y = sol.year; m = sol.month; d = sol.day; }
       } catch {}
     }
+    nameRef.current = form.name?.trim() || "당신";
     resultRef.current = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
@@ -280,6 +305,9 @@ export default function ExamPage() {
   const r = resultRef.current;
   if (!r) return null;
 
+  const userName = nameRef.current;
+  const N = userName === "당신" ? "당신" : `${userName}님`;
+
   const ilgan = r.pillarsDetail.day.cg;
   const ilganEl: Element = CHEONGAN_ELEMENT[ilgan] as Element;
   const studyType = ELEMENT_STUDY_TYPE[ilganEl];
@@ -326,8 +354,8 @@ export default function ExamPage() {
             📚 시험운·합격운 분석
           </div>
           <h1 className="text-2xl font-black mb-2 leading-tight">
-            {ilgan}일간의<br />
-            <span className="text-violet-400">나만의 합격 전략</span>
+            {N}의<br />
+            <span className="text-violet-400">합격 전략</span>
           </h1>
           <p className="text-gray-500 text-sm">오행과 기운 구조로 분석한 맞춤 공부법</p>
         </FadeIn>
@@ -337,7 +365,7 @@ export default function ExamPage() {
           <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-2 h-2 rounded-full" style={{ background: elBadge }} />
-              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">집중력 유형</p>
+              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">{N}에게 맞는 집중력 유형</p>
             </div>
             <p className="text-lg font-black text-white mb-3" style={{ color: elBadge }}>{studyType.label}</p>
             <p className="text-sm text-gray-300 leading-relaxed mb-3">{studyType.strength}</p>
@@ -354,9 +382,43 @@ export default function ExamPage() {
           <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">공부 골든타임</p>
+              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">{N}의 공부 골든타임</p>
             </div>
             <p className="text-sm text-gray-300 leading-relaxed">{studyType.timing}</p>
+          </div>
+        </FadeIn>
+
+        {/* 맞는 공부 vs 안 맞는 공부 */}
+        <FadeIn delay={200} className="mb-5">
+          <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-teal-400" />
+              <p className="text-xs font-bold tracking-wider uppercase" style={{ color: "rgba(255,255,255,0.5)" }}>{N}에게 맞는 공부 vs 안 맞는 공부</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs font-bold text-teal-300 mb-2">✓ 잘 맞는 공부</p>
+                <div className="space-y-1.5">
+                  {STUDY_FIT[ilganEl].good.map((item, i) => (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <span className="text-teal-400 text-xs mt-0.5 shrink-0">▸</span>
+                      <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.82)" }}>{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-orange-400 mb-2">✗ 안 맞는 공부</p>
+                <div className="space-y-1.5">
+                  {STUDY_FIT[ilganEl].bad.map((item, i) => (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <span className="text-orange-400 text-xs mt-0.5 shrink-0">▸</span>
+                      <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </FadeIn>
 
@@ -381,7 +443,7 @@ export default function ExamPage() {
           <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">에너지 관리 전략</p>
+              <p className="text-xs font-bold text-gray-400 tracking-wider uppercase">{N}의 에너지 전략</p>
             </div>
             <p className="text-base font-bold text-emerald-300 mb-2">{strengthAdvice.label}</p>
             <p className="text-sm text-gray-300 leading-relaxed">{strengthAdvice.advice}</p>
@@ -426,7 +488,7 @@ export default function ExamPage() {
               <p className="text-xs font-bold text-violet-300 tracking-wider uppercase">합격 마인드셋</p>
             </div>
             <p className="text-sm text-gray-300 leading-relaxed">
-              사주는 타고난 기운의 지도입니다. 어떤 공부법이 세상에서 좋다고 해도, 내 기운에 맞지 않으면 반쪽짜리 효율입니다.
+              {N}의 사주는 타고난 기운의 지도입니다. 어떤 공부법이 세상에서 좋다고 해도, {N}의 기운에 맞지 않으면 반쪽짜리 효율입니다.
               남들이 새벽 4시에 일어나서 공부한다고 따라 할 필요 없습니다 — 내 피크 시간이 따로 있으니까요.
               지금까지 '열심히 해도 안 된다'는 감각이 있었다면, 방법이 틀린 게 아니라 내 기운에 맞는 방식을 아직 찾지 못한 것일 수 있습니다.
               <span className="text-violet-300 font-medium"> 오행이 알려주는 나만의 리듬으로, 다음 시험은 달라질 수 있습니다.</span>

@@ -127,6 +127,7 @@ export default function IdealTypePage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -140,10 +141,11 @@ export default function IdealTypePage() {
         if (sol?.year) { y = sol.year; m = sol.month; d = sol.day; }
       } catch {}
     }
+    nameRef.current = form.name?.trim() || "그 사람";
     resultRef.current = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-      name: "나", gender: form.gender,
+      name: form.name?.trim() || "그 사람", gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
     setStep("loading");
@@ -326,6 +328,33 @@ export default function IdealTypePage() {
     }
   }
 
+  // 이상형 육각형 점수 (외모/성격/능력/재력/가치관/지능)
+  type RadarKey = "외모" | "성격" | "능력" | "재력" | "가치관" | "지능";
+  function calcRadarScores(): Record<RadarKey, number> {
+    const base: Record<RadarKey, number> = {
+      목: { 외모: 45, 성격: 85, 능력: 70, 재력: 40, 가치관: 90, 지능: 80 },
+      화: { 외모: 82, 성격: 75, 능력: 62, 재력: 50, 가치관: 60, 지능: 58 },
+      토: { 외모: 42, 성격: 92, 능력: 68, 재력: 82, 가치관: 85, 지능: 52 },
+      금: { 외모: 72, 성격: 62, 능력: 88, 재력: 65, 가치관: 78, 지능: 88 },
+      수: { 외모: 58, 성격: 78, 능력: 72, 재력: 48, 가치관: 70, 지능: 95 },
+    }[ilganEl] ?? { 외모: 60, 성격: 70, 능력: 65, 재력: 55, 가치관: 70, 지능: 65 };
+    const scores = { ...base };
+    // 관성/재성 보정
+    if (gender === "female" && gwanseong) {
+      const boost = gwanseong.status === "강함" ? 20 : gwanseong.status === "약함" ? 5 : 0;
+      scores["능력"] = Math.min(99, scores["능력"] + boost);
+    }
+    if (gender === "male" && jaeseong) {
+      const boost = jaeseong.status === "강함" ? 20 : jaeseong.status === "약함" ? 5 : 0;
+      scores["외모"] = Math.min(99, scores["외모"] + boost);
+    }
+    return scores;
+  }
+  const radarScores = calcRadarScores();
+
+  const personName = nameRef.current || "그 사람";
+  const N = personName === "그 사람" ? "그 사람" : `${personName}님`;
+
   // 외모 이상형 (일간 오행 기반)
   const LOOKS_BY_EL: Record<string, string> = {
     목: "키가 크거나 날씬한 체형, 자연스럽고 꾸미지 않은 듯한 스타일에 끌려요. 지나치게 화려하거나 인위적인 외모보다 청량하고 자연미 있는 사람이 눈에 들어와요.",
@@ -382,47 +411,114 @@ export default function IdealTypePage() {
         <div className="text-center mb-8">
           <p className="text-fuchsia-400 text-xs font-bold tracking-widest mb-2">THEIR TRUE IDEAL TYPE</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{dayJj}일주, 그 사람이 진짜 끌리는 사람은
+            {N}이 진짜 끌리는 사람은
           </h1>
+          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>{ilgan}{dayJj}일주 분석</p>
         </div>
 
         {/* 핵심 요약 */}
         <div className="bg-gradient-to-br from-fuchsia-950/60 to-violet-950/40 border border-fuchsia-700/30 rounded-3xl p-6 mb-5 text-center">
-          <p className="text-fuchsia-300 text-xs font-bold tracking-widest uppercase mb-2">한 줄 요약</p>
+          <p className="text-fuchsia-300 text-xs font-bold tracking-widest uppercase mb-2">{N}의 한 줄 이상형</p>
           <p className="text-xl font-black leading-snug">{idealData.type}</p>
         </div>
 
+        {/* 진짜 중요하게 여기는 것 — 육각형 다이어그램 */}
+        {(() => {
+          const keys: (keyof typeof radarScores)[] = ["외모", "성격", "능력", "재력", "가치관", "지능"];
+          const cx = 120, cy = 120, r = 90;
+          const angles = keys.map((_, i) => (Math.PI * 2 * i / keys.length) - Math.PI / 2);
+          const pts = (scale: number) => keys.map((_, i) => {
+            const a = angles[i];
+            return [cx + Math.cos(a) * r * scale, cy + Math.sin(a) * r * scale];
+          });
+          const gridLines = [0.25, 0.5, 0.75, 1].map(s => {
+            const p = pts(s);
+            return p.map((pt, i) => `${i === 0 ? "M" : "L"}${pt[0].toFixed(1)},${pt[1].toFixed(1)}`).join(" ") + "Z";
+          });
+          const scorePts = pts(1).map((pt, i) => {
+            const scale = (radarScores[keys[i]] ?? 50) / 100;
+            const a = angles[i];
+            return [cx + Math.cos(a) * r * scale, cy + Math.sin(a) * r * scale];
+          });
+          const scorePath = scorePts.map((pt, i) => `${i === 0 ? "M" : "L"}${pt[0].toFixed(1)},${pt[1].toFixed(1)}`).join(" ") + "Z";
+          const top2 = [...keys].sort((a, b) => radarScores[b] - radarScores[a]).slice(0, 2);
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-sm font-bold text-fuchsia-300 mb-1">{N}이 파트너에게 진짜 중요하게 여기는 것</p>
+              <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>사주에 새겨진 무의식 속 우선순위예요</p>
+              <div className="flex items-center gap-4">
+                <svg width={240} height={240} viewBox={`0 0 ${cx*2} ${cy*2}`} style={{ flexShrink: 0 }}>
+                  {gridLines.map((d, i) => <path key={i} d={d} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />)}
+                  {keys.map((_, i) => {
+                    const [x1, y1] = pts(1)[i];
+                    return <line key={i} x1={cx} y1={cy} x2={x1.toFixed(1)} y2={y1.toFixed(1)} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />;
+                  })}
+                  <path d={scorePath} fill="rgba(217,70,239,0.25)" stroke="#d946ef" strokeWidth="1.5" strokeLinejoin="round" />
+                  {scorePts.map(([x, y], i) => <circle key={i} cx={x.toFixed(1)} cy={y.toFixed(1)} r="3" fill="#d946ef" />)}
+                  {keys.map((key, i) => {
+                    const [x, y] = pts(1.22)[i];
+                    const score = radarScores[key];
+                    const isTop = top2.includes(key);
+                    return (
+                      <text key={i} x={x.toFixed(1)} y={y.toFixed(1)} textAnchor="middle" dominantBaseline="middle"
+                        fill={isTop ? "#f0abfc" : "rgba(255,255,255,0.65)"} fontSize="9" fontWeight={isTop ? "bold" : "normal"}>
+                        {key} {score}
+                      </text>
+                    );
+                  })}
+                </svg>
+                <div className="flex-1 space-y-2">
+                  {keys.sort((a, b) => radarScores[b] - radarScores[a]).map(key => (
+                    <div key={key}>
+                      <div className="flex justify-between mb-0.5">
+                        <span className="text-xs" style={{ color: top2.includes(key) ? "#f0abfc" : "rgba(255,255,255,0.7)" }}>{key}</span>
+                        <span className="text-xs font-bold" style={{ color: "rgba(255,255,255,0.6)" }}>{radarScores[key]}</span>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${radarScores[key]}%`, background: top2.includes(key) ? "linear-gradient(90deg,#d946ef,#a855f7)" : "rgba(255,255,255,0.25)" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs mt-3 pt-3 border-t border-white/[0.06]" style={{ color: "rgba(255,255,255,0.65)" }}>
+                {N}이 가장 중요하게 보는 건 <span className="text-fuchsia-300 font-bold">{top2[0]}</span>과 <span className="text-fuchsia-300 font-bold">{top2[1]}</span>이에요.
+              </p>
+            </div>
+          );
+        })()}
+
         {/* 성격 이상형 — 일간 기반 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-fuchsia-300 mb-2">일간 {ilgan}({ilganEl}) — 무의식 속 끌림의 뿌리</p>
+          <p className="text-sm font-bold text-fuchsia-300 mb-2">{N}이 무의식적으로 끌리는 이유</p>
           <p className="text-sm text-gray-300 leading-relaxed">{idealData.desc}</p>
           <p className="text-sm text-gray-300 leading-relaxed mt-3">{idealData.attracted}</p>
           <p className="text-sm text-gray-300 leading-relaxed mt-3">
-            끌리는 핵심 키워드는 <span className="text-fuchsia-300 font-semibold">'{idealData.trait}'</span>이에요.
+            {N}이 끌리는 핵심 키워드는 <span className="text-fuchsia-300 font-semibold">'{idealData.trait}'</span>이에요.
             반대로, {idealData.warn}
           </p>
         </div>
 
         {/* 용신 기반 파트너 에너지 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-violet-300 mb-2">사주의 균형을 채울 파트너 에너지 — {yongshinEl} 기운</p>
+          <p className="text-sm font-bold text-violet-300 mb-2">{N}의 사주에 꼭 필요한 파트너 에너지 — {yongshinEl} 기운</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            이 사주에 꼭 필요한 기운은 <span className="text-violet-200 font-semibold">{yongshinEl}(氣)</span>예요.
+            {N}의 사주에 꼭 필요한 기운은 <span className="text-violet-200 font-semibold">{yongshinEl}(氣)</span>예요.
             {" "}{YONGSHIN_PARTNER[yongshinEl] ?? ""}
           </p>
         </div>
 
         {/* 태어난 계절 기운 보정 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-orange-300 mb-2">태어난 계절 기운({monthJj}월)으로 보는 파트너 보완</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{johuPartner}</p>
+          <p className="text-sm font-bold text-orange-300 mb-2">{N}이 태어난 계절 기운({monthJj}월)으로 보는 파트너 보완</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{N}이 태어난 계절이 {johuPartner}</p>
         </div>
 
         {/* 일지 배우자궁 + 십성 분석 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-cyan-300 mb-2">배우자 자리가 말해주는 이상형</p>
           <p className="text-sm text-gray-300 leading-relaxed mb-3">
-            배우자 운을 보는 자리인 일지에 <span className="text-cyan-300 font-semibold">{dayJj}</span>이 자리해요.
+            {N}의 배우자 자리인 일지에 <span className="text-cyan-300 font-semibold">{dayJj}</span>이 자리해요.
             이 자리는 무의식적으로 원하는 파트너의 모습을 담고 있는데, {spouseJjDesc} 사람에게 자연스럽게 끌리는 구조예요.
             {dayJjSipseongDesc && ` ${dayJjSipseongDesc}`}
           </p>
@@ -435,7 +531,7 @@ export default function IdealTypePage() {
 
         {/* 관성/재성 기반 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-2">{gender === "female" ? "그 사람이 끌리는 남성상" : "그 사람이 끌리는 여성상"}</p>
+          <p className="text-sm font-bold text-emerald-300 mb-2">{gender === "female" ? `${N}이 끌리는 남성상` : `${N}이 끌리는 여성상`}</p>
           <p className="text-sm text-gray-300 leading-relaxed">{partnerPatternDesc}</p>
         </div>
 
