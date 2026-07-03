@@ -37,6 +37,7 @@ import {
   getHourCheonulIntactGoodFlowNarrative,
   isHourCheonulIntactGoodFlow,
   getSipseongStrength,
+  classifySinStrength,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
@@ -880,9 +881,51 @@ function ResultView({
           <Section title="사주 구조 · 필요 기운 · 계절 균형" accent="#a78bfa">
             {/* 필요 기운 그리드 */}
             <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>균형 필요 기운</p>
+            {/* 신강/신약 게이지 */}
+            {(() => {
+              const LEVELS = ["극약","태약","신약","중화신약","중화신강","신강","태왕","극왕"] as const;
+              const level = classifySinStrength(ys.percent);
+              const pct = Math.max(0, Math.min(100, ys.percent));
+              const barGradient = "linear-gradient(to right, #166534, #4ade80, #86efac, #fbbf24, #f97316, #ef4444, #7f1d1d)";
+              return (
+                <div className="mt-4 mb-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-gray-400">신강 · 신약</span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{
+                      background: pct >= 60 ? "rgba(239,68,68,0.15)" : pct <= 40 ? "rgba(96,165,250,0.15)" : "rgba(74,222,128,0.15)",
+                      color: pct >= 60 ? "#f87171" : pct <= 40 ? "#60a5fa" : "#4ade80",
+                      border: `1px solid ${pct >= 60 ? "rgba(239,68,68,0.3)" : pct <= 40 ? "rgba(96,165,250,0.3)" : "rgba(74,222,128,0.3)"}`,
+                    }}>{level}</span>
+                  </div>
+                  <div style={{ position: "relative", height: 8, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "visible" }}>
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 4, background: barGradient, opacity: 0.85 }} />
+                    {/* 중앙선 */}
+                    <div style={{ position: "absolute", left: "50%", top: -2, width: 1, height: 12, background: "rgba(255,255,255,0.3)" }} />
+                    {/* 바늘 */}
+                    <div style={{
+                      position: "absolute", top: "50%", left: `${pct}%`,
+                      transform: "translate(-50%, -50%)",
+                      width: 14, height: 14, borderRadius: "50%",
+                      background: "#fff", border: "2.5px solid #1a1a2e",
+                      boxShadow: "0 0 0 2px rgba(255,255,255,0.3)",
+                      zIndex: 2,
+                    }} />
+                  </div>
+                  {/* 8단계 레이블 */}
+                  <div className="flex justify-between mt-1.5">
+                    {LEVELS.map((l) => (
+                      <span key={l} style={{
+                        fontSize: 9, fontWeight: l === level ? 800 : 500,
+                        color: l === level ? "#fff" : "rgba(255,255,255,0.3)",
+                        textAlign: "center", flex: 1,
+                      }}>{l === "중화신약" ? "중화↙" : l === "중화신강" ? "중화↗" : l}</span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="grid grid-cols-2 gap-2 mb-2">
               {[
-                { label: "신강/신약", value: ys.strength, color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" },
                 { label: "필요 기운", value: ys.yongshin, color: EL_STYLE[ys.yongshin]?.text || "#fff" },
                 { label: "도움 기운", value: ys.heeshin, color: EL_STYLE[ys.heeshin]?.text || "#fff" },
                 { label: "꺼리는 기운", value: gishin, color: EL_STYLE[gishin]?.text || "#fff" },

@@ -44,7 +44,7 @@ export interface SinsalItem {
 }
 
 // 신강/신약 8단계 세분류 (지수 0~100 기준)
-export const SIN_STRENGTH_LEVELS = ["극약", "태약", "신약", "중화신약", "중화신강", "신강", "태강", "극왕"] as const;
+export const SIN_STRENGTH_LEVELS = ["극약", "태약", "신약", "중화신약", "중화신강", "신강", "태왕", "극왕"] as const;
 export type SinStrengthLevel = typeof SIN_STRENGTH_LEVELS[number];
 
 // 각 단계의 상한선(%) — 마지막 극왕은 상한 없음
@@ -1173,11 +1173,28 @@ function getHourPillar(dayCgIdx: number, hour: number, minute: number): {cg: str
 // ── 득령(得令) 판단 ────────────────────────────────────────────────────────
 // 일간이 월지(月支) 지장간에서 비겁(같은 오행) 또는 인성(나를 생하는 오행)을 만나면 득령
 // 득령이면 신강 방향, 실령이면 신약 방향의 제1 기준
-function isDeukllyeong(ilgan: string, monthJj: string): boolean {
+// 월지 득령 강도: 본기(정기)/중기/여기 구분
+// 본기에 비겁·인성 있으면 완전 득령(1.35), 중기에만 있으면 약득령(1.10),
+// 여기에만 있으면 거의 실령(0.92), 없으면 완전 실령(0.75)
+function getDeukllyeongFactor(ilgan: string, monthJj: string): number {
   const ilEl = CHEONGAN_ELEMENT[ilgan] as Element;
   const GENERATED_BY: Record<string, Element> = {목:"수",화:"목",토:"화",금:"토",수:"금"};
-  const inEl = GENERATED_BY[ilEl]; // 인성 오행
-  return (JIJANGAN[monthJj] || []).some(j => j.element === ilEl || j.element === inEl);
+  const inEl = GENERATED_BY[ilEl];
+  const jijangStr = JIJANGAN_STR[monthJj] || "";
+  // JIJANGAN_STR 순서: 여기-중기-본기 (길이 2면 중기-본기, 길이 1이면 본기만)
+  const stems = jijangStr.split("");
+  const bongi = stems[stems.length - 1];
+  const junggi = stems.length >= 2 ? stems[stems.length - 2] : null;
+  const yeogi = stems.length >= 3 ? stems[stems.length - 3] : null;
+  const relevant = (s: string | null) => {
+    if (!s) return false;
+    const el = CHEONGAN_ELEMENT[s] as Element;
+    return el === ilEl || el === inEl;
+  };
+  if (relevant(bongi)) return 1.35;
+  if (relevant(junggi)) return 1.10;
+  if (relevant(yeogi)) return 0.92;
+  return 0.75;
 }
 
 // ── 용신 계산 ──────────────────────────────────────────────────────────────
@@ -1201,28 +1218,19 @@ function computeYongshin(
   const gwanseongEl= CONTROLLED_BY[ilganEl];    // 관성: 나를 극하는
 
   const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
-  const jiwon = scores[ilganEl] + scores[inseongEl]; // 일간을 직·간접 지원하는 기운
 
   // ── 득령/실령 보정 ──────────────────────────────────────────────────────
-  // 1단계: 월지 득령 여부
-  const isDG = isDeukllyeong(ilgan, monthJj);
-  // 2단계: 월지·일지 12운성으로 추가 보정
-  const monthUU = getUunseong(ilgan, monthJj);
-  const dayUU   = getUunseong(ilgan, dayJj);
-  // 기운이 매우 약해지는 운성
+  // 득령 강도: 본기/중기/여기 구분으로 연속값 반환
+  const deuklFactor = getDeukllyeongFactor(ilgan, monthJj);
+  const isDG = deuklFactor >= 1.10; // 중기 이상이면 득령으로 간주 (desc용)
+  // 일지 통근 보정
+  const dayUU = getUunseong(ilgan, dayJj);
   const WEAK_UU   = new Set(["사","묘","절","병"]);
-  // 기운이 강해지는 운성
   const STRONG_UU = new Set(["장생","관대","건록","제왕"]);
 
-  let jiwonAdj = jiwon;
-  if (isDG) {
-    jiwonAdj *= 1.35; // 득령 → 신강 방향 강화
-    if (STRONG_UU.has(monthUU)) jiwonAdj *= 1.10; // 장생·건록·제왕월 추가 보강
-  } else {
-    jiwonAdj *= 0.75; // 실령 → 신약 방향
-    if (WEAK_UU.has(monthUU)) jiwonAdj *= 0.82; // 사·묘·절·병지 추가 패널티
-  }
-  // 일지 통근 보정 (일지 강·약도 반영, 절반만)
+  // 인성은 나를 생하는 기운이지 내 자신이 아니므로 65% 반영 (인성 과다 신강 오판 방지)
+  const jiwon = scores[ilganEl] * 1.0 + scores[inseongEl] * 0.65;
+  let jiwonAdj = jiwon * deuklFactor;
   if (STRONG_UU.has(dayUU)) jiwonAdj *= 1.06;
   else if (WEAK_UU.has(dayUU)) jiwonAdj *= 0.94;
 
@@ -1231,13 +1239,15 @@ function computeYongshin(
   let heeshin: Element | undefined;
   let desc: string;
 
-  if (jiwonAdj > total * 0.55) {
+  const rawPercent = (jiwonAdj / total) * 100;
+  const sinLevel = classifySinStrength(rawPercent);
+  if (["신강","태왕","극왕"].includes(sinLevel)) {
     strength = "신강";
     // 강한 일간 → 설기(식상) > 재성 > 관성 중 가장 부족한 것
     const cands: Element[] = [siksangEl, jaeseongEl, gwanseongEl];
     yongshin = cands.reduce((a, b) => scores[a] <= scores[b] ? a : b);
     desc = `일간 ${ilgan}의 기운이 강합니다(신강·身强). ${isDG?"월지 득령(得令)으로 기운이 왕성해요. ":""}강한 에너지를 발산·활용하는 ${yongshin} 기운이 용신이에요. 표현·결과물을 만드는 기운과 돈·사회적 책임의 기운을 활용하는 삶이 유리해요.`;
-  } else if (jiwonAdj < total * 0.40) {
+  } else if (["극약","태약","신약"].includes(sinLevel)) {
     strength = "신약";
     // 신약은 일간을 직접 생조하는 인성(印星)을 우선 용신으로 본다.
     // 단, 인성이 비겁의 절반에도 못 미칠 만큼 빈약하면 비겁(일간과 같은 오행)을 용신으로 삼는다.
@@ -1254,7 +1264,7 @@ function computeYongshin(
   heeshin ??= GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
   const gishin  = CONTROLLED_BY[yongshin] as Element; // 용신을 극하는 → 기신
 
-  const percent = Math.max(0, Math.min(100, (jiwonAdj / total) * 100));
+  const percent = Math.max(0, Math.min(100, rawPercent));
 
   return { strength, percent, yongshin, heeshin, gishin, desc };
 }
@@ -4058,7 +4068,7 @@ export function getStrengthTraitNarrative(r: SajuResult): string | null {
 // 22-4) 극신강/신왕(극왕·태강) 기질 — 비견·겁재가 일간을 떠받치고 인성이 그 힘을 다시 키워주는 구조 (용어 노출 없이 성향만 서술)
 export function getExtremeStrengthNarrative(r: SajuResult): string | null {
   const level = classifySinStrength(r.yongshin.percent);
-  if (level !== "극왕" && level !== "태강") return null;
+  if (level !== "극왕" && level !== "태왕") return null;
   return "사주 전체가 일간 본인을 떠받치는 기운으로 가득 차 있고, 그 위에 자신을 더 키워주는 기운까지 겹쳐 있어서 자기 확신과 추진력이 극단적으로 강한 구조예요. 본인의 판단을 의심하지 않고 주변의 통제나 제약을 잘 받아들이지 않으며, 자신과 비슷한 힘을 가진 존재와는 타협보다 경쟁을 택하는 경향이 강해요. 강한 자기 동력으로 조직을 만들고 사람을 끌어모으는 데는 탁월하지만, 본인보다 강한 권위나 규율 앞에서는 부딫히기 쉽고, 주변의 조언이나 견제를 무시한 채 독단적으로 밀고 나가다 고립되거나 갈등을 키우는 결과로 이어지는 경우가 많아요.";
 }
 
