@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SipseongInsight from "@/components/SipseongInsight";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -178,6 +178,7 @@ export default function CrushPage() {
   // 내 정보 (선택)
   const [myForm, setMyForm] = useState<BirthFormData>(defaultBirthData("female"));
 
+  const nameRef = useRef<string>("");
   const [formError, setFormError] = useState("");
   const [result, setResult] = useState<CrushResult | null>(null);
   const [targetSaju, setTargetSaju] = useState<SajuResult | null>(null);
@@ -193,6 +194,7 @@ export default function CrushPage() {
       setFormError("상대방의 생년월일을 모두 입력해주세요."); return;
     }
     setFormError("");
+    nameRef.current = myForm.name?.trim() || "당신";
     setStep("loading");
 
     let fy = targetYear, fm = targetMonth, fd = targetDay;
@@ -481,6 +483,8 @@ export default function CrushPage() {
 
   // ── RESULT ────────────────────────────────────────────────────────────────────
   if (!result) return null;
+  const myName = nameRef.current;
+  const N = myName === "당신" ? "당신" : `${myName}님`;
 
   const gradeColors: Record<string, string> = {
     S: "#fbbf24", A: "#34d399", B: "#60a5fa", C: "#a78bfa", D: "#f87171",
@@ -495,7 +499,7 @@ export default function CrushPage() {
         {/* 헤더 */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">💘</div>
-          <h1 className="text-2xl font-black text-white mb-1">그 사람 사주 완전 분석</h1>
+          <h1 className="text-2xl font-black text-white mb-1">{N}을 위한 그 사람 사주 완전 분석</h1>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
             {targetForm.gender === "male" ? "남성" : "여성"} · {targetForm.birthYear}년 {targetForm.birthMonth}월 {targetForm.birthDay}일생
           </p>
@@ -510,7 +514,7 @@ export default function CrushPage() {
         {myForm.birthYear !== "" && (
           <div className="mb-6 rounded-2xl p-5 text-center"
             style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.25)" }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>나와의 궁합 점수</p>
+            <p className="text-xs font-semibold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>{N}과의 궁합 점수</p>
             <div className="flex items-baseline justify-center gap-3 mb-2">
               <span className="text-5xl font-black" style={{ color: gradeColor }}>{result.grade}</span>
               <span className="text-3xl font-black text-white">{result.score}점</span>

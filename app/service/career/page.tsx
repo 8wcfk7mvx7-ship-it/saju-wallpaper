@@ -91,9 +91,11 @@ export default function CareerPage() {
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [showDetail, setShowDetail] = useState(false);
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
+    nameRef.current = form.name?.trim() || "당신";
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
     if (form.calendarType === "lunar") {
       try {
@@ -223,6 +225,8 @@ export default function CareerPage() {
   const r = resultRef.current;
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
+  const userName = nameRef.current;
+  const N = userName === "당신" ? "당신" : `${userName}님`;
 
   // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
@@ -360,9 +364,9 @@ export default function CareerPage() {
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MY APTITUDE</p>
           <h1 className="text-2xl font-black leading-snug mb-1">
-            {ilgan}{r.pillarsDetail.day.jj}일주 {form.name}님
+            {ilgan}{r.pillarsDetail.day.jj}일주 {N}
           </h1>
-          <p className="text-lg font-bold text-indigo-300">{form.name}님과 잘 맞는 직업은?</p>
+          <p className="text-lg font-bold text-indigo-300">{N}에게 잘 맞는 직업은?</p>
         </div>
 
         <div className="flex justify-center mb-5">
@@ -371,7 +375,7 @@ export default function CareerPage() {
 
         {/* 섹션 1 — 나와 잘 맞는 직업 */}
         <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 mb-5">
-          <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">✦ 나와 잘 맞는 직업</p>
+          <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">✦ {N}에게 잘 맞는 직업</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {jobList.map(job => (
               <span key={job} className="text-xs font-bold px-3 py-1.5 rounded-full bg-indigo-500/15 border border-indigo-400/30 text-indigo-200">

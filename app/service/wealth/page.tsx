@@ -34,9 +34,11 @@ export default function WealthPage() {
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
   const daewoonRef = useRef<DaewoonResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
+    nameRef.current = form.name?.trim() || "당신";
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
     if (form.calendarType === "lunar") {
       try {
@@ -161,6 +163,8 @@ export default function WealthPage() {
   const dw = daewoonRef.current;
   if (!r || !dw) return null;
   const ilgan = r.pillarsDetail.day.cg;
+  const userName = nameRef.current;
+  const N = userName === "당신" ? "당신" : `${userName}님`;
 
   // 대운별 재물운 등급
   function daewoonWealthGrade(sipseongCg: string, sipseongJj: string): { grade: "좋음" | "보통" | "주의"; color: string; label: string; reason: string } {
@@ -310,12 +314,12 @@ export default function WealthPage() {
         <div className="text-center mb-8">
           <p className="text-amber-400 text-xs font-bold tracking-widest mb-2">MY WEALTH FORTUNE</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주, 당신의 재물운 진단
+            {ilgan}{r.pillarsDetail.day.jj}일주, {N}의 재물운 진단
           </h1>
         </div>
 
         <div className={`rounded-3xl p-6 mb-5 text-center border ${hasMuJae ? "bg-gradient-to-br from-rose-950/60 to-amber-950/40 border-rose-700/30" : "bg-gradient-to-br from-amber-950/60 to-yellow-950/40 border-amber-700/30"}`}>
-          <p className="text-amber-300 text-xs font-bold tracking-widest uppercase mb-2">재물 기운 진단</p>
+          <p className="text-amber-300 text-xs font-bold tracking-widest uppercase mb-2">{N}의 재물 기운 진단</p>
           {hasMuJae ? (
             <>
               <p className="text-xl font-black leading-snug mb-1">재물 기운이 보이지 않는 사주</p>
@@ -402,7 +406,7 @@ export default function WealthPage() {
 
         {/* ── 대운별 재물운 타임라인 ── */}
         <div className="bg-white/[0.03] border border-amber-700/20 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-amber-300 mb-1">대운 흐름으로 본 재물운 타임라인</p>
+          <p className="text-sm font-bold text-amber-300 mb-1">{N}의 대운 흐름으로 본 재물운 타임라인</p>
           <p className="text-xs text-gray-500 mb-4">{dw.direction} · 첫 대운 시작 {dw.startAge}세</p>
           <div className="space-y-2.5">
             {daewoonWithGrade.map((p) => (

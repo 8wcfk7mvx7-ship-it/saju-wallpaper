@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
@@ -476,6 +476,7 @@ export default function DaewoonPage() {
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const { name, gender, birthYear, birthMonth, birthDay, birthHour, useJajasi, calendarType, isLeapMonth } = form;
   const birthPlace = form.city;
+  const nameRef = useRef<string>("");
   const [daewoon, setDaewoon] = useState<DaewoonResult | null>(null);
   const [sewoon, setSewoon] = useState<SewoonItem[]>([]);
   const [ilgan, setIlgan] = useState("");
@@ -549,6 +550,7 @@ export default function DaewoonPage() {
       ]);
       setDaewoon(dw);
       setSewoon(sw);
+      nameRef.current = name?.trim() || "당신";
       setStep("loading");
     } catch {
       alert("사주 정보를 다시 확인해주세요.");
@@ -705,6 +707,8 @@ export default function DaewoonPage() {
 
   // ── 미리보기 / 결과 화면 ──
   if (!daewoon) return null;
+  const dN = nameRef.current;
+  const N = dN === "당신" ? "당신" : `${dN}님`;
 
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
@@ -716,7 +720,7 @@ export default function DaewoonPage() {
             <span className="text-xs text-gray-500 uppercase tracking-widest">Summer Palace</span>
           </div>
           <h1 className="text-xl font-black">
-            {name ? `${name}님의 ` : ""}대운·세운
+            {N}의 대운·세운
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             일간 <strong className="text-white">{ilgan}</strong> ·
@@ -764,7 +768,7 @@ export default function DaewoonPage() {
         {/* ── 대운 흐름 ── */}
         <div className="mb-8">
           <div className="flex items-end gap-2 mb-4">
-            <h2 className="text-base font-black text-white">대운 흐름 — 80년 인생 지도</h2>
+            <h2 className="text-base font-black text-white">{N}의 대운 흐름 — 80년 인생 지도</h2>
             <span className="text-xs text-gray-600 mb-0.5">10년 단위</span>
           </div>
 
@@ -799,7 +803,7 @@ export default function DaewoonPage() {
 
                 {uunsF && (
                   <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.3)" }}>
-                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {name}님에게 미치는 영향</p>
+                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {N}에게 미치는 영향</p>
                     <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj)}`}</p>
                   </div>
                 )}

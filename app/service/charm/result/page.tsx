@@ -163,6 +163,8 @@ function CharmResultContent() {
     router.push(`/charm/pay?orderId=${orderId}&amount=${CHARM_PRICE}`);
   };
 
+  const N = name ? `${name}님` : "당신";
+
   return (
     <main className="min-h-screen bg-[#080810] text-white">
       <StarShower active={showering} />
@@ -182,7 +184,7 @@ function CharmResultContent() {
         <div className="text-center mb-6">
           <div className="text-4xl mb-3 drop-shadow-[0_0_30px_rgba(244,114,182,0.6)]">{grade.emoji}</div>
           <h1 className="text-2xl font-black mb-1 bg-gradient-to-r from-pink-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">
-            {name}님의 매력 분석
+            {N}의 매력 분석
           </h1>
           <p className="text-gray-500 text-sm">{result.fourPillars}</p>
         </div>
@@ -203,7 +205,7 @@ function CharmResultContent() {
           <div className="p-6 text-center">
             <div className="text-5xl mb-2">{grade.emoji}</div>
             <div className="text-xs font-bold tracking-[0.3em] mb-2" style={{ color: grade.color }}>
-              CHARM GRADE
+              {N}의 CHARM GRADE
             </div>
             <div className="text-6xl font-black mb-1" style={{ color: grade.color }}>
               {grade.grade}등급
