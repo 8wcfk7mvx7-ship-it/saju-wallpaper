@@ -415,24 +415,20 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   return { score: Math.min(score, 100), highlights, hapName, hapDesc, chungName, chungDesc, cgJjCombo };
 }
 
-// ── 등급 ─────────────────────────────────────────────────────────────────────
+// ── 등급 (A–F, 100점 6등분) ───────────────────────────────────────────────────
 const GRADES = [
-  { min: 95, grade: "SS", label: "전생 연인", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
-    verdict: "사주에 새겨진 인연입니다. 몇 세기를 돌아도 다시 만날 수밖에 없는 구조예요. 이 정도 조합은 매우 드뭅니다." },
-  { min: 75, grade: "S",  label: "폭발적 케미", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
-    verdict: "강렬한 성적 끌림이 사주에 뚜렷하게 나타납니다. 처음 만나는 순간부터 이유 없이 자꾸 생각나는 타입이에요." },
-  { min: 60, grade: "A+", label: "환장 케미", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.28)",
-    verdict: "서로에게 빠져들 수밖에 없는 궁합이에요. 화학적 반응이 강하게 일어나는 조합이라, 함께하는 시간이 길어질수록 더 깊이 끌립니다." },
-  { min: 45, grade: "A",  label: "강한 끌림", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
-    verdict: "성적 화합이 강합니다. 억지로 맞추지 않아도 자연스럽게 이끌리고, 함께할수록 리듬이 맞아들어가는 느낌이 있어요." },
-  { min: 30, grade: "B",  label: "좋은 케미", color: "#8b5cf6", bg: "rgba(139,92,246,0.10)", border: "rgba(139,92,246,0.24)",
-    verdict: "잘 맞는 케미입니다. 처음에는 평균처럼 느껴질 수 있지만, 함께하는 시간이 늘수록 서로에게 더 편안하고 깊어지는 관계예요." },
-  { min: 18, grade: "C",  label: "보통 케미", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
-    verdict: "노력과 이해가 필요합니다. 본능적인 끌림보다는 서로를 알아가면서 만들어가는 케미예요. 감정적 교감이 쌓이면 더 나아질 수 있습니다." },
-  { min: 8,  grade: "D",  label: "화합 약함", color: "#4f46e5", bg: "rgba(79,70,229,0.07)", border: "rgba(79,70,229,0.18)",
-    verdict: "성적 기운의 방향이 많이 다릅니다. 서로의 속도와 표현 방식이 잘 맞지 않아 불만이 쌓이기 쉬운 구조예요. 솔직한 대화가 필수입니다." },
-  { min: 0,  grade: "F",  label: "섹스리스 위험", color: "#64748b", bg: "rgba(100,116,139,0.07)", border: "rgba(100,116,139,0.18)",
-    verdict: "서로의 성적 에너지가 잘 연결되지 않는 구조입니다. 관계를 유지하려면 성적인 부분 외의 정서적 교감과 배려에 집중하는 것이 현실적인 방법이에요." },
+  { min: 84, grade: "A", label: "환장 케미", color: "#f43f5e", bg: "rgba(244,63,94,0.18)", border: "rgba(244,63,94,0.40)",
+    verdict: "몸이 먼저 알아보는 궁합이에요. 사주에 성적 화합이 강하게 새겨져 있고, 함께할수록 더 깊이 끌려드는 구조입니다. 이 정도 조합은 쉽게 나오지 않아요." },
+  { min: 67, grade: "B", label: "강한 끌림", color: "#ec4899", bg: "rgba(236,72,153,0.14)", border: "rgba(236,72,153,0.32)",
+    verdict: "강한 성적 끌림이 사주에 뚜렷하게 나타납니다. 억지로 맞추지 않아도 자연스럽게 이끌리고, 함께할수록 리듬이 맞아들어가는 느낌이 있어요." },
+  { min: 50, grade: "C", label: "좋은 케미", color: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.28)",
+    verdict: "잘 맞는 케미입니다. 처음엔 평균처럼 느껴질 수 있지만, 함께하는 시간이 늘수록 서로에게 더 편안하고 깊어지는 관계예요." },
+  { min: 33, grade: "D", label: "보통 케미", color: "#a855f7", bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)",
+    verdict: "노력과 이해가 필요합니다. 본능적 끌림보다는 서로를 알아가면서 쌓아가는 케미예요. 감정적 교감이 쌓이면 달라집니다." },
+  { min: 17, grade: "E", label: "화합 약함", color: "#6366f1", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.20)",
+    verdict: "성적 기운의 방향이 꽤 다릅니다. 서로의 속도와 표현 방식이 잘 맞지 않아 불만이 쌓이기 쉬운 구조예요. 솔직한 대화가 필수입니다." },
+  { min: 0,  grade: "F", label: "섹스리스 위험", color: "#64748b", bg: "rgba(100,116,139,0.07)", border: "rgba(100,116,139,0.18)",
+    verdict: "서로의 성적 에너지가 잘 연결되지 않는 구조입니다. 관계를 유지하려면 성적인 부분 외의 정서적 교감과 배려에 집중하는 것이 현실적이에요." },
 ];
 
 function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GRADES[GRADES.length - 1]; }
@@ -637,7 +633,7 @@ function HotCompatContent() {
             <span className="text-gray-600">×</span>
             <span className="text-2xl font-black">{ig2}{ij2}일주</span>
           </div>
-          <p className="text-gray-600 text-xs">{r1.fourPillars} × {r2.fourPillars}</p>
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{r1.fourPillars} × {r2.fourPillars}</p>
         </div>
 
         {/* 종합 등급 */}
@@ -662,9 +658,9 @@ function HotCompatContent() {
         {/* 천간×지지 관계 요약 — 항상 노출 */}
         {chem.cgJjCombo.combo_title && (
           <div className="bg-white/[0.04] border border-rose-500/20 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-2">배우자궁 × 일간 관계</p>
+            <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>배우자궁 × 일간 관계</p>
             <p className="text-sm font-black text-rose-300 mb-2">{chem.cgJjCombo.combo_title}</p>
-            <p className="text-xs text-gray-400 leading-relaxed">{chem.cgJjCombo.combo_desc}</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.8)" }}>{chem.cgJjCombo.combo_desc}</p>
           </div>
         )}
 
@@ -689,36 +685,69 @@ function HotCompatContent() {
               return { type: "충", color: "#f87171", bg: "rgba(248,113,113,0.15)", desc: "서로 부딪히지만 강한 자극을 주는 관계" };
             return { type: "무관", color: "#6b7280", bg: "rgba(107,114,128,0.1)", desc: "직접적인 관계 없음" };
           }
+          function getRowNarrative(pos: string, rel: { type: string; desc: string }, a: string, b: string): string {
+            const pair = `${a}${b}`;
+            if (pos === "년지") {
+              if (rel.type === "육합") return `두 사람은 태어난 환경의 뿌리부터 본능적으로 맞닿아 있어요. 처음 만나는 순간부터 낯설지 않고, 어디서 왔는지도 모르게 자꾸 생각나는 묘한 인연입니다.`;
+              if (rel.type === "삼합") return `삶의 방향성이 같은 방향을 향하고 있는 두 사람이에요. 가치관이 통하고 서로의 존재 자체가 에너지를 북돋아주는 구조입니다.`;
+              if (rel.type === "방합") return `같은 계절의 기운으로 태어난 사람들끼리의 만남이에요. 말 없이도 편하고, 긴장하지 않아도 자연스럽게 맞아들어갑니다.`;
+              if (rel.type === "충") return `출발점과 배경이 정반대로 부딪히는 구조예요. 처음엔 낯설고 긴장감이 돌 수 있지만, 그 자극이 오히려 오래 기억에 남는 케미가 되기도 합니다.`;
+              return `뿌리 에너지에서 특별한 작용은 없지만, 다른 부위에서 케미가 발현됩니다.`;
+            }
+            if (pos === "월지") {
+              if (rel.type === "육합") return `밖에서 보이는 모습, 사람들 앞에서의 케미도 아주 강해요. 함께 있으면 주변에서도 알아볼 만큼 자연스럽게 붙어 있고, 사회적으로 잘 어울리는 궁합입니다.`;
+              if (rel.type === "삼합") return `일상에서 에너지 방향이 맞아 함께할수록 더 활발해지는 두 사람이에요. 같이 있으면 더 빛나는 타입입니다.`;
+              if (rel.type === "방합") return `생활 패턴이 잘 맞아요. 밥 먹는 시간, 자는 시간, 활동하는 에너지까지 비슷하게 흘러서 함께 있으면 피곤함이 덜합니다.`;
+              if (rel.type === "충") return `사회적 에너지가 충돌해요. 취향이나 생활 방식이 달라 마찰이 생길 수 있지만, 그 마찰이 서로를 자극하고 무뎌지지 않게 해주는 역할도 합니다.`;
+              return `사회적 활동 에너지에서 특별한 충돌이나 합은 없어요. 다른 부위의 케미로 관계가 형성됩니다.`;
+            }
+            if (pos === "일지") {
+              if (rel.type === "육합") return `배우자궁에서 육합이 형성됩니다. 뗄레야 뗄 수가 없어요. 몸정이 들고, 화나다가도 마주치면 침대로 가게 되는 조합입니다. 서로의 몸이 서로를 기억하는 케미예요.`;
+              if (rel.type === "삼합") return `배우자궁에서 삼합 에너지가 형성됩니다. 자리를 함께할수록 서로에게 깊이 스며드는 구조예요. 처음엔 평범해 보여도 같이 있는 시간이 쌓일수록 더 강하게 연결됩니다.`;
+              if (rel.type === "방합") return `배우자궁이 같은 계절의 기운을 공유해요. 신체 리듬이 비슷해서 서로의 속도에 자연스럽게 맞춰지는 편안한 궁합입니다.`;
+              if (rel.type === "충") return `배우자궁이 정면으로 충돌합니다. 몸의 리듬이 달라 잠자리에서 불만이 쌓일 수 있어요. 하지만 충의 에너지가 강한 자극이 되어 오히려 더 끌리게 되는 역설적인 케미도 있습니다.`;
+              return `배우자궁에서 직접적인 합이나 충은 없어요. 천간 쪽의 케미가 더 강하게 작용합니다.`;
+            }
+            if (pos === "시지") {
+              if (rel.type === "육합") return `가장 깊은 내면, 아무에게도 보여주지 않는 욕구의 궁에서 육합이 형성됩니다. 말로는 표현 못해도 몸이 먼저 알고 반응하는, 둘만 아는 온도가 있는 관계입니다.`;
+              if (rel.type === "삼합") return `내면의 욕구 방향이 같아요. 깊은 곳에서 원하는 것이 통하기 때문에 시간이 지날수록 더 자연스럽고 편안하게 엮이는 구조입니다.`;
+              if (rel.type === "방합") return `내면의 욕구 리듬이 비슷해요. 말하지 않아도 서로가 원하는 타이밍이 맞아들어가는 편입니다.`;
+              if (rel.type === "충") return `내면 깊은 곳의 욕구가 충돌합니다. 원하는 것이 다르고 속도가 달라서 답답함이 쌓일 수 있어요. 솔직한 대화가 이 조합에서는 특히 중요합니다.`;
+              return `내면 욕구에서 특별한 충돌은 없어요. 다른 기둥에서 케미가 발현됩니다.`;
+            }
+            return rel.desc;
+          }
           const rows = [
-            { rowLabel: "년지 — 뿌리·환경 에너지", a: yj1, b: yj2 },
-            { rowLabel: "월지 — 사회·활동 에너지", a: mj1, b: mj2 },
-            { rowLabel: "일지 — 배우자·본인 에너지", a: ij1, b: ij2 },
-            ...(hj1 && hj2 ? [{ rowLabel: "시지 — 내면·욕구 에너지", a: hj1, b: hj2 }] : []),
+            { rowLabel: "년지 — 뿌리·환경 에너지", pos: "년지", a: yj1, b: yj2 },
+            { rowLabel: "월지 — 사회·활동 에너지", pos: "월지", a: mj1, b: mj2 },
+            { rowLabel: "일지 — 배우자·본인 에너지", pos: "일지", a: ij1, b: ij2 },
+            ...(hj1 && hj2 ? [{ rowLabel: "시지 — 내면·욕구 에너지", pos: "시지", a: hj1, b: hj2 }] : []),
           ];
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-5">년지 · 월지 · 일지 · 시지 관계 다이어그램</p>
-              <div className="space-y-5">
-                {rows.map(({ rowLabel, a, b }) => {
+              <p className="text-xs font-bold tracking-widest uppercase mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>년지 · 월지 · 일지 · 시지 관계 다이어그램</p>
+              <div className="space-y-6">
+                {rows.map(({ rowLabel, pos, a, b }) => {
                   const rel = getJjRel(a, b);
+                  const narrative = getRowNarrative(pos, rel, a, b);
                   return (
                     <div key={rowLabel}>
-                      <p className="text-[10px] text-gray-600 font-bold tracking-widest mb-3">{rowLabel}</p>
-                      <div className="flex items-center gap-3">
+                      <p className="text-[10px] font-bold tracking-widest mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>{rowLabel}</p>
+                      <div className="flex items-center gap-3 mb-2.5">
                         <div className="flex-1 flex flex-col items-center gap-1">
                           <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-rose-400/50" style={{ background: "rgba(244,63,94,0.1)" }}>{a}</div>
-                          <span className="text-[10px] text-gray-500">나</span>
+                          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>나</span>
                         </div>
                         <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                           <span className="text-xs font-black px-2.5 py-1 rounded-lg" style={{ color: rel.color, background: rel.bg }}>{rel.type}</span>
                           <div className="w-14 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, rgba(244,63,94,0.5), ${rel.color}, rgba(129,140,248,0.5))` }} />
-                          <span className="text-[9px] text-gray-600 text-center leading-tight max-w-[80px]">{rel.desc}</span>
                         </div>
                         <div className="flex-1 flex flex-col items-center gap-1">
                           <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border-2 border-indigo-400/50" style={{ background: "rgba(99,102,241,0.1)" }}>{b}</div>
-                          <span className="text-[10px] text-gray-500">상대</span>
+                          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>상대</span>
                         </div>
                       </div>
+                      <p className="text-[13px] leading-relaxed" style={{ color: "rgba(255,255,255,0.82)" }}>{narrative}</p>
                     </div>
                   );
                 })}
@@ -755,7 +784,7 @@ function HotCompatContent() {
 
           return (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">예상 만족도 (10점 만점)</p>
+              <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>예상 만족도 (10점 만점)</p>
               <div className="flex justify-between mb-1.5">
                 <span className="text-sm font-bold text-pink-300">{label1} {female}점</span>
                 <span className="text-sm font-bold text-sky-300">{label2} {male}점</span>
@@ -764,7 +793,7 @@ function HotCompatContent() {
                 <div className="h-full" style={{ width: `${(female / (female + male)) * 100}%`, background: "linear-gradient(90deg, #ec4899, #f472b6)" }} />
                 <div className="h-full" style={{ width: `${(male / (female + male)) * 100}%`, background: "linear-gradient(90deg, #6366f1, #38bdf8)" }} />
               </div>
-              <p className="text-xs text-gray-500 mt-3 leading-relaxed">
+              <p className="text-xs mt-3 leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
                 {female > male
                   ? `이 궁합은 ${label1} 쪽이 더 큰 만족을 느끼는 케미예요.`
                   : female < male
@@ -783,8 +812,8 @@ function HotCompatContent() {
             {/* 배우자궁 생극 + 음양 + 섹스리스 — 줄글 */}
             {(saengGuk || yangYinMatch || sexlessRisk) && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">두 사람의 잠자리 궁합</p>
-                <p className="text-sm text-gray-300 leading-relaxed">
+                <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>두 사람의 잠자리 궁합</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.88)" }}>
                   {saengGuk && `${saengGuk.desc} ${saengGuk.satisfactionNote} `}
                   {yangYinMatch && "양기가 강한 남성이 음기가 강한 여성에게 환장하는 조합이라, 서로의 에너지가 자연스럽게 보완되면서 강한 끌림이 생기는 구조예요. 음양의 밸런스가 맞아떨어지면 성적 케미가 배가됩니다. "}
                   {sexlessRisk}
@@ -794,14 +823,14 @@ function HotCompatContent() {
 
             {/* 개인 음양/수기운/성욕 분석 — 줄글 */}
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-              <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">서로가 서로에게 느끼는 점</p>
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>서로가 서로에게 느끼는 점</p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.88)" }}>
                 {label1}이 {label2}에게 느끼는 점은, {libido1.libidomsg} {libido1.gwanSalWarning ?? ""}
                 {libido1.yinyang === "양기 강함" && " 양기가 강해서 먼저 다가가고 리드하려는 욕구가 큰 편이에요."}
                 {libido1.yinyang === "음기 강함" && " 음기가 강해서 자극에 섬세하게 반응하고, 분위기와 감정 교감을 먼저 원하는 편이에요."}
                 {libido1.waterStrong && " 수(水) 기운이 받쳐줘서 끌리는 마음을 숨기지 못하고 자연스럽게 드러내는 타입이기도 해요."}
               </p>
-              <p className="text-sm text-gray-300 leading-relaxed mt-3">
+              <p className="text-sm leading-relaxed mt-3" style={{ color: "rgba(255,255,255,0.88)" }}>
                 반대로 {label2}이 {label1}에게 느끼는 점은, {libido2.libidomsg} {libido2.gwanSalWarning ?? ""}
                 {libido2.yinyang === "양기 강함" && " 양기가 강해서 먼저 다가가고 리드하려는 욕구가 큰 편이에요."}
                 {libido2.yinyang === "음기 강함" && " 음기가 강해서 자극에 섬세하게 반응하고, 분위기와 감정 교감을 먼저 원하는 편이에요."}
@@ -817,8 +846,8 @@ function HotCompatContent() {
               const targets = (lacking.length > 0 ? lacking : elements.slice(0, 2)).slice(0, 2);
               return (
                 <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-                  <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">속궁합을 더 끌어올리는 보강법</p>
-                  <p className="text-xs text-gray-600 mb-4 leading-relaxed">두 사람의 사주에서 부족한 오행을 보강하면 케미가 더 살아납니다.</p>
+                  <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>속궁합을 더 끌어올리는 보강법</p>
+                  <p className="text-xs mb-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>두 사람의 사주에서 부족한 오행을 보강하면 케미가 더 살아납니다.</p>
                   <div className="space-y-3">
                     {targets.map(el => {
                       const t = BOOST_TIP[el];
@@ -828,7 +857,7 @@ function HotCompatContent() {
                           <span className="text-xl shrink-0">{t.icon}</span>
                           <div>
                             <p className="text-sm font-bold mb-0.5" style={{ color: t.color }}>{el}(五行) 기운 보강</p>
-                            <p className="text-xs text-gray-400 leading-relaxed">{t.tip}</p>
+                            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.78)" }}>{t.tip}</p>
                           </div>
                         </div>
                       );
@@ -840,7 +869,7 @@ function HotCompatContent() {
 
             {chem.highlights.length > 0 ? (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-4">발견된 성적 케미 요소</p>
+                <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>발견된 성적 케미 요소</p>
                 <div className="space-y-3">
                   {chem.highlights.map((h, i) => (
                     <div key={i} className="flex items-start gap-3 rounded-xl px-4 py-3 border"
@@ -848,7 +877,7 @@ function HotCompatContent() {
                       <span className="font-black text-xs shrink-0 mt-0.5" style={{ color: h.color }}>#{i + 1}</span>
                       <div>
                         <p className="text-sm font-bold mb-0.5" style={{ color: h.color }}>{h.title}</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">{h.desc}</p>
+                        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.78)" }}>{h.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -856,8 +885,8 @@ function HotCompatContent() {
               </div>
             ) : (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-                <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">분석 결과</p>
-                <p className="text-sm text-gray-400 leading-relaxed">두 사람의 사주에서 강한 성적 케미 요소가 발견되지 않았습니다. 개인의 노력과 감성적 교감이 더 중요한 관계입니다.</p>
+                <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>분석 결과</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.78)" }}>두 사람의 사주에서 강한 성적 케미 요소가 발견되지 않았습니다. 개인의 노력과 감성적 교감이 더 중요한 관계입니다.</p>
               </div>
             )}
 
@@ -865,9 +894,9 @@ function HotCompatContent() {
             <div className="grid grid-cols-2 gap-3 mt-4">
               {[{ r: r1, label: label1 }, { r: r2, label: label2 }].map(({ r, label }) => (
                 <div key={label} className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
-                  <p className="text-xs text-gray-500 mb-1">{label}</p>
+                  <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</p>
                   <p className="text-lg font-black">{r.pillarsDetail.day.cg}{r.pillarsDetail.day.jj}일주</p>
-                  <p className="text-xs text-gray-600">{r.pillarsDetail.day.uunseong}</p>
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>{r.pillarsDetail.day.uunseong}</p>
                   {(() => {
                     const dohwaNames = r.sinsalList
                       .filter(s => ["도화살","홍염살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name))
