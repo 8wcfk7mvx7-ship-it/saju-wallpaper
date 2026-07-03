@@ -1033,7 +1033,7 @@ export default function TodayFortunePage() {
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
           <p className="text-sm font-bold text-violet-300 mb-1">🌗 오늘 만나는 기운 — {dayPillar.cg}{ILGAN_PERSONALITY[dayPillar.cg] ? `(${ILGAN_PERSONALITY[dayPillar.cg].keyword})` : ""}</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            오늘 일진의 천간 {dayPillar.cg}은 평소 {ilgan}일간인 {form.name || "나"}님에게 {ILGAN_PERSONALITY[dayPillar.cg]?.detail || ""}
+            오늘 일진의 천간 {dayPillar.cg}{(dayPillar.cg.charCodeAt(0) - 0xAC00) % 28 === 0 ? "는" : "은"} 평소 {ilgan}일간인 {form.name || "나"}님에게 {ILGAN_PERSONALITY[dayPillar.cg]?.detail || ""}
           </p>
           {hasTodayHap && (
             <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 이 기운이 나와 자연스럽게 맞아떨어져, {ILGAN_PERSONALITY[dayPillar.cg]?.keyword || "오늘의 기운"}이 평소보다 부드럽게 나에게 녹아드는 날이에요.</p>
