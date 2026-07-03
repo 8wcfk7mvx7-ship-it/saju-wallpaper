@@ -112,6 +112,7 @@ export default function FirstImpressionPage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -125,10 +126,11 @@ export default function FirstImpressionPage() {
         if (sol?.year) { y = sol.year; m = sol.month; d = sol.day; }
       } catch {}
     }
+    nameRef.current = form.name.trim() || "당신";
     resultRef.current = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
-      name: "나", gender: form.gender,
+      name: nameRef.current, gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
     setStep("loading");
@@ -245,6 +247,8 @@ export default function FirstImpressionPage() {
   const r = resultRef.current;
   if (!r) return null;
   const pd = r.pillarsDetail;
+  const userName = nameRef.current || "당신";
+  const N = userName === "당신" ? "당신" : `${userName}님`;
 
   // 편관 감지: 천간/지지 십성 중 하나라도 편관이면
   const fiAllSipseong = [pd.year, pd.month, pd.day, pd.hour].filter(Boolean).flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
@@ -270,7 +274,7 @@ export default function FirstImpressionPage() {
         <div className="text-center mb-8">
           <p className="text-amber-400 text-xs font-bold tracking-widest mb-2">FIRST IMPRESSION</p>
           <h1 className="text-2xl font-black leading-snug">
-            당신의 첫인상은
+            {N}의 첫인상은
           </h1>
         </div>
 
@@ -278,20 +282,20 @@ export default function FirstImpressionPage() {
         <div className="bg-gradient-to-br from-amber-950/40 to-orange-950/10 border border-amber-700/30 rounded-2xl p-5 mb-5">
           <h2 className="text-xl font-black text-white mb-3">&quot;{main.keyword}&quot;</h2>
           <p className="text-sm text-gray-300 leading-relaxed">
-            {main.desc} {main.merit} {main.risk}
-            {fiHasPyeongwan && " 여기에 강한 카리스마가 더해져서 말 한마디 안 해도 포스가 느껴지는 압도적인 첫인상을 줍니다. 함부로 대할 수 없는 분위기 때문에 처음 만난 사람도 자연스럽게 긴장하게 되고, 강렬하면서도 섹시한 인상을 남기는 타입입니다."}
+            {N}은 {main.desc} {main.merit} {main.risk}
+            {fiHasPyeongwan && ` 여기에 강한 카리스마가 더해져서 ${N}은 말 한마디 안 해도 포스가 느껴지는 압도적인 첫인상을 줍니다. 함부로 대할 수 없는 분위기 때문에 처음 만난 사람도 자연스럽게 긴장하게 되고, 강렬하면서도 섹시한 인상을 남기는 타입입니다.`}
           </p>
         </div>
 
         {/* 개선법 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-amber-300 mb-2">💡 맞춤 인상 개선법</p>
+          <p className="text-sm font-bold text-amber-300 mb-2">💡 {N} 맞춤 인상 개선법</p>
           <p className="text-sm text-gray-300 leading-relaxed">{main.tip}</p>
         </div>
 
         {/* 4기둥 종합 */}
         <div className="mb-2">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3 px-1">연·월·일·시, 단계별 인상</p>
+          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3 px-1">{N} — 연·월·일·시, 단계별 인상</p>
         </div>
         <div className="space-y-3 mb-8">
           {PILLAR_ROLE.map(({ key, label }) => {
@@ -310,11 +314,11 @@ export default function FirstImpressionPage() {
 
         {/* 이용방법 안내 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-          <p className="text-sm font-bold text-sky-300 mb-2">📖 이렇게 활용해보세요</p>
+          <p className="text-sm font-bold text-sky-300 mb-2">📖 {N}, 이렇게 활용해보세요</p>
           <ul className="text-xs text-gray-400 leading-relaxed space-y-1.5 list-disc list-inside">
-            <li>맨 위 결과는 회사·모임 등 사회생활에서 첫 만남에 가장 크게 작용합니다. 면접, 미팅, 소개팅 등 첫 만남 전에 참고해보세요.</li>
-            <li>친해진 뒤 드러나는 본모습은 따로 정리되어 있으니, &apos;첫인상과 실제 성격이 다르다&apos;는 말을 듣는다면 이 차이에서 오는 경우가 많습니다.</li>
-            <li>&apos;오해받기 쉬운 부분&apos;은 단점이 아니라, 같은 기운이 다르게 보이는 것뿐입니다. 개선법을 하루 한 가지씩만 의식적으로 적용해보세요.</li>
+            <li>맨 위 결과는 {N}이 회사·모임 등 사회생활에서 첫 만남 때 가장 강하게 전달하는 분위기입니다. 면접, 미팅, 소개팅 전에 참고해보세요.</li>
+            <li>친해진 뒤 드러나는 {N}의 본모습은 따로 정리되어 있으니, &apos;첫인상과 실제 성격이 다르다&apos;는 말을 듣는다면 이 차이에서 오는 경우가 많습니다.</li>
+            <li>&apos;오해받기 쉬운 부분&apos;은 {N}의 단점이 아니라, 같은 기운이 다르게 보이는 것뿐입니다. 개선법을 하루 한 가지씩만 의식적으로 적용해보세요.</li>
           </ul>
         </div>
 
