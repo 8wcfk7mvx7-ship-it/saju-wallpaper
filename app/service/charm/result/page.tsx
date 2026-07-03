@@ -117,6 +117,17 @@ function CharmResultContent() {
   const ilji = result.pillarsDetail.day.jj;
   const idata = ILGAN_CHARM_DB[ilgan];
   const jijiData = JIJI_CHARM_DB[ilji];
+
+  // 첫인상 특급 조합 (년지 + 일주)
+  const FIRSTIMPRESSION_SPECIAL: Record<string, string> = {
+    "진:신해": "첫인상부터 분위기가 남달라 말을 걸지 않아도 자연스럽게 시선을 끌고 번호를 먼저 물어보는 사람이 생기기 쉬운 편입니다.",
+    "오:병오": "환한 미소와 자신감이 먼저 눈에 들어오는 타입이라 어디서나 존재감이 커 자연스럽게 이성의 관심을 받습니다.",
+    "묘:정묘": "청순하면서도 묘한 분위기가 있어 처음엔 조용해 보여도 가까이 있을수록 더 매력적으로 느껴지는 타입입니다.",
+    "신:임신": "유머 감각과 센스가 뛰어나 처음 만난 자리에서도 자연스럽게 분위기를 주도하고 호감을 얻는 편입니다.",
+    "유:계유": "세련된 스타일과 깔끔한 이미지가 첫인상에서 강하게 작용해 자기관리 잘 하는 사람으로 기억됩니다.",
+  };
+  const firstImpKey = `${result.pillarsDetail.year.jj}:${ilgan}${ilji}`;
+  const firstImpSpecial = FIRSTIMPRESSION_SPECIAL[firstImpKey] ?? null;
   const dominantEl = result.dominant[0] || "토";
   const gagukPatterns = detectGagukPatterns(result);
   const olook = OHAENG_LOOK[dominantEl];
@@ -255,7 +266,7 @@ function CharmResultContent() {
             </p>
             <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5 mb-3">
               <p className="text-xs text-gray-500 mb-1">👁 처음 만난 사람 눈에</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{idata.firstImpression}</p>
+              <p className="text-sm text-gray-200 leading-relaxed">{idata.firstImpression}{firstImpSpecial ? ` ${firstImpSpecial}` : ""}</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {idata.keywords.map((k, i) => (
