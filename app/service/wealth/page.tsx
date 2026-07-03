@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import BackButton from "@/components/BackButton";
-import { analyzeSaju, getSipseong, type SajuResult, type Element } from "@/lib/saju";
+import { analyzeSaju, getSipseong, calcDaewoon, type SajuResult, type Element, type DaewoonResult } from "@/lib/saju";
 import { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, OVERSEAS_WEALTH_ILGAN, SPEND_TO_EARN_ILGAN, detectExcessPatterns } from "@/lib/saju2";
 import AnalysisLoading from "@/components/AnalysisLoading";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -33,6 +33,7 @@ export default function WealthPage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const daewoonRef = useRef<DaewoonResult | null>(null);
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
@@ -46,12 +47,14 @@ export default function WealthPage() {
         if (sol?.year) { y = sol.year; m = sol.month; d = sol.day; }
       } catch {}
     }
-    resultRef.current = analyzeSaju({
+    const saju = analyzeSaju({
       birthYear: y, birthMonth: m, birthDay: d,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
       name: "나", gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
+    resultRef.current = saju;
+    daewoonRef.current = calcDaewoon(y, m, d, form.gender, saju.pillarsDetail.day.cg, saju.pillarsDetail.month);
     setStep("loading");
   }
 
@@ -155,8 +158,39 @@ export default function WealthPage() {
 
   // ── 결과 ──
   const r = resultRef.current;
-  if (!r) return null;
+  const dw = daewoonRef.current;
+  if (!r || !dw) return null;
   const ilgan = r.pillarsDetail.day.cg;
+
+  // 대운별 재물운 등급
+  function daewoonWealthGrade(sipseongCg: string, sipseongJj: string): { grade: "좋음" | "보통" | "주의"; color: string; label: string; reason: string } {
+    const jaeSeong = ["정재", "편재"];
+    const sikSang = ["식신", "상관"];
+    const guan = ["정관", "편관"];
+    const bigeop = ["비견", "겁재"];
+    const inseong = ["정인", "편인"];
+    const dominant = [sipseongCg, sipseongJj];
+    const hasJae = dominant.some(s => jaeSeong.includes(s));
+    const hasSik = dominant.some(s => sikSang.includes(s));
+    const hasGuan = dominant.some(s => guan.includes(s));
+    const hasBigeop = dominant.some(s => bigeop.includes(s));
+    if (hasJae && hasSik) return { grade: "좋음", color: "#f59e0b", label: "재물 전성기", reason: "재물 기운과 생산 기운이 동시에 들어와 수입이 늘어나는 시기입니다." };
+    if (hasJae) return { grade: "좋음", color: "#fbbf24", label: "재물 활성화", reason: "재물 기운이 직접 들어오는 시기로 수입·투자 기회가 열립니다." };
+    if (hasSik && !hasBigeop) return { grade: "좋음", color: "#a3e635", label: "수익 창출 활성화", reason: "창의력·생산력이 수익으로 연결되는 시기입니다." };
+    if (hasGuan) return { grade: "보통", color: "#38bdf8", label: "직업·안정 수입", reason: "재물보다 직업·직위를 통한 안정적 수입이 중심인 시기입니다." };
+    if (hasBigeop && hasJae) return { grade: "보통", color: "#94a3b8", label: "경쟁 속 재물", reason: "재물 기운이 있지만 경쟁·지출도 함께 늘어나는 시기입니다." };
+    if (hasBigeop) return { grade: "주의", color: "#f87171", label: "재물 분산 주의", reason: "동료·경쟁 기운이 강해 재물이 흩어지거나 지출이 늘어나기 쉽습니다." };
+    if (dominant.some(s => inseong.includes(s))) return { grade: "보통", color: "#a78bfa", label: "준비·내실의 시기", reason: "직접적 재물보다 실력·자격을 쌓아두는 것이 유리한 시기입니다." };
+    return { grade: "보통", color: "#94a3b8", label: "일반 흐름", reason: "특별히 두드러진 재물운 변화는 없는 평이한 시기입니다." };
+  }
+
+  const currentYear = new Date().getFullYear();
+  const daewoonWithGrade = dw.pillars.map((p, idx) => ({
+    ...p,
+    idx,
+    isCurrent: idx === dw.currentIdx,
+    grade: daewoonWealthGrade(p.sipseongCg, p.sipseongJj),
+  }));
 
   // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
@@ -365,6 +399,54 @@ export default function WealthPage() {
             </div>
           </div>
         )}
+
+        {/* ── 대운별 재물운 타임라인 ── */}
+        <div className="bg-white/[0.03] border border-amber-700/20 rounded-2xl p-5 mb-5">
+          <p className="text-sm font-bold text-amber-300 mb-1">대운 흐름으로 본 재물운 타임라인</p>
+          <p className="text-xs text-gray-500 mb-4">{dw.direction} · 첫 대운 시작 {dw.startAge}세</p>
+          <div className="space-y-2.5">
+            {daewoonWithGrade.map((p) => (
+              <div key={p.idx}
+                className={`flex items-start gap-3 rounded-xl px-3.5 py-3 border transition-all ${p.isCurrent ? "border-amber-500/50 bg-amber-950/40" : "border-white/[0.06] bg-white/[0.02]"}`}>
+                <div className="shrink-0 text-center min-w-[48px]">
+                  <p className="text-[11px] font-black" style={{ color: p.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>
+                    {p.age}세
+                  </p>
+                  <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    {p.yearStart}~
+                  </p>
+                </div>
+                <div className="shrink-0 text-center">
+                  <p className="text-base font-black" style={{ color: p.isCurrent ? "#fbbf24" : "rgba(255,255,255,0.7)" }}>
+                    {p.cg}{p.jj}
+                  </p>
+                  <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    {p.sipseongCg}
+                  </p>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ background: `${p.grade.color}22`, color: p.grade.color, border: `1px solid ${p.grade.color}44` }}>
+                      {p.grade.label}
+                    </span>
+                    {p.isCurrent && (
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">현재</span>
+                    )}
+                  </div>
+                  <p className="text-[12px] leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    {p.grade.reason}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {dw.currentIdx >= 0 && (
+            <p className="text-[11px] text-gray-600 mt-3 text-center">
+              * 대운은 10년 단위로 흐르는 큰 흐름입니다. 매년 세운(歲運)과 함께 봐야 정확합니다.
+            </p>
+          )}
+        </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
           <p className="text-sm font-bold mb-1" style={{ color: ELEMENT_BOOST[yongshinEl].color }}>보조 처방 — 내 사주 핵심 오행 &apos;{yongshinEl}&apos; 보강 아이템</p>
