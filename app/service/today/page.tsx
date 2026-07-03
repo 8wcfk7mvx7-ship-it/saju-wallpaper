@@ -675,7 +675,33 @@ export default function TodayFortunePage() {
         result.push(rel.type === "삼합" ? { ...rel, type: "반합" } : rel);
       }
     });
-    return result;
+
+    // 중복 제거: 같은 (type, jj쌍) 관계가 여러 번 나타날 경우 가장 넓은 span만 남기고 나머지는 제거.
+    // (예: 해해해해 + 사 → 사해충 4줄 → 1줄)
+    const JIJI_ORDER_12 = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+    const seen = new Map<string, number>(); // key → result index (가장 넓은 span)
+    const toRemove = new Set<number>();
+    result.forEach((rel, idx) => {
+      if (rel.mergedGroup) return; // 3체 merge는 이미 단일 — 중복 없음
+      const sorted = [rel.jjA, rel.jjB].sort((a, b) => JIJI_ORDER_12.indexOf(a) - JIJI_ORDER_12.indexOf(b));
+      const key = `${rel.type}:${sorted[0]}:${sorted[1]}`;
+      if (seen.has(key)) {
+        const prevIdx = seen.get(key)!;
+        const prev = result[prevIdx];
+        const prevSpan = Math.abs(prev.b - prev.a);
+        const curSpan = Math.abs(rel.b - rel.a);
+        if (curSpan > prevSpan) {
+          toRemove.add(prevIdx);
+          seen.set(key, idx);
+        } else {
+          toRemove.add(idx);
+        }
+      } else {
+        seen.set(key, idx);
+      }
+    });
+
+    return result.filter((_, idx) => !toRemove.has(idx));
   })();
 
   // 천라지망(天羅地網): 원국·대운·세운·오늘 전체 지지 중 술+해(天羅) 또는 진+사(地網) 조합이 있는지 검사
@@ -925,8 +951,9 @@ export default function TodayFortunePage() {
             cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
             jjLines={relations.map(rel => {
               const mr = rel as MergedRel;
-              const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
               const mg = mr.mergedGroup;
+              const JIJI_ORD = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+              const [ja, jb] = [rel.jjA, rel.jjB].sort((a, b) => JIJI_ORD.indexOf(a) - JIJI_ORD.indexOf(b));
               const label = mg
                 ? `${mg[0]}·${mg[1]}·${mg[2]}${mr.mergeType ?? "삼합"}`
                 : `${ja}${jb}${rel.type}`;
