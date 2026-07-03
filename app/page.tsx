@@ -43,7 +43,7 @@ const UI: Record<Lang, {
     navBadge: "AI 사주",
     nav: ["사주", "가이드", "일진달력", "문의하기"],
     mypage: "마이페이지",
-    badgeTags: ["오행 균형 진단", "신살 발견", "경도 보정", "완전 무료"],
+    badgeTags: ["오행 균형 진단", "신살 발견", "경도 보정"],
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -58,7 +58,7 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Guide", "Daily Calendar", "Contact"],
     mypage: "My Page",
-    badgeTags: ["Chart & Element Analysis", "Sign Discovery", "Longitude Correction", "Free"],
+    badgeTags: ["Chart & Element Analysis", "Sign Discovery", "Longitude Correction"],
   },
   id: {
     h1: ["Wallpaper Anda saat ini", "mungkin menghalangi", "energi Anda"],
@@ -73,7 +73,7 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Panduan", "Kalender Harian", "Kontak"],
     mypage: "Halaman Saya",
-    badgeTags: ["Analisis Bagan & Elemen", "Penemuan Tanda", "Koreksi Bujur", "Gratis"],
+    badgeTags: ["Analisis Bagan & Elemen", "Penemuan Tanda", "Koreksi Bujur"],
   },
   ta: {
     h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
@@ -88,7 +88,7 @@ const UI: Record<Lang, {
     navBadge: "AI சாஜு",
     nav: ["சாஜு", "வழிகாட்டி", "தினசரி நாட்காட்டி", "தொடர்பு"],
     mypage: "என் பக்கம்",
-    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "அடையாள கண்டுபிடிப்பு", "தீர்க்கரேகை திருத்தம்", "இலவசம்"],
+    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "அடையாள கண்டுபிடிப்பு", "தீர்க்கரேகை திருத்தம்"],
   },
 };
 
@@ -1033,6 +1033,7 @@ export default function MainPage() {
   // 언어
   const [lang, setLang] = useState<Lang>("ko");
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
   // 별조각 잔액
@@ -1111,6 +1112,47 @@ export default function MainPage() {
         <div className="absolute inset-0 opacity-[0.025]"
           style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
       </div>
+
+      {/* ── 모바일 상단 헤더 ── */}
+      <header className="sm:hidden sticky top-0 z-50 border-b backdrop-blur-xl flex items-center justify-between px-4 h-12"
+        style={{ background: "rgba(7,0,26,0.92)", borderColor: "rgba(59,130,246,0.15)" }}>
+        <button onClick={() => router.push("/")} className="flex items-center gap-2">
+          <span className="text-base" style={{ color: "#3b82f6" }}>☯</span>
+          <span className="font-black text-sm text-white">Summer Palace</span>
+        </button>
+        <button onClick={() => setShowMobileMenu(v => !v)}
+          className="flex flex-col gap-[5px] p-2 rounded-lg"
+          style={{ color: "rgba(255,255,255,0.6)" }}>
+          <span className="block w-5 h-[2px] rounded-full bg-current" />
+          <span className="block w-5 h-[2px] rounded-full bg-current" />
+          <span className="block w-5 h-[2px] rounded-full bg-current" />
+        </button>
+        {showMobileMenu && (
+          <div className="absolute top-12 left-0 right-0 z-50 border-b"
+            style={{ background: "rgba(7,0,26,0.98)", borderColor: "rgba(59,130,246,0.15)" }}
+            onClick={() => setShowMobileMenu(false)}>
+            {[
+              { label: "홈", onClick: () => router.push("/") },
+              { label: "전체 서비스", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
+              { label: "만세력", onClick: () => router.push("/service/manseryeok") },
+              { label: "AI 채팅", onClick: () => router.push("/chat") },
+              { label: "오늘의 운세", onClick: () => router.push("/service/today") },
+              { label: "일진달력", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: "사주 가이드", onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: "마이페이지", onClick: () => router.push("/mypage") },
+            ].map(item => (
+              <button key={item.label} onClick={item.onClick}
+                className="w-full text-left px-5 py-3.5 text-sm font-semibold border-b transition-colors hover:bg-white/5"
+                style={{ color: "rgba(255,255,255,0.75)", borderColor: "rgba(255,255,255,0.05)" }}>
+                {item.label}
+              </button>
+            ))}
+            <div className="px-5 py-3">
+              <KakaoLoginButton redirectTo="/" />
+            </div>
+          </div>
+        )}
+      </header>
 
       {/* ── 상단 네비게이션 (모바일 숨김) ── */}
       <nav className="hidden sm:block sticky top-0 z-50 border-b backdrop-blur-xl"
@@ -1270,13 +1312,10 @@ export default function MainPage() {
               <span style={{ color: "#f472b6" }}>{t.h1[1]}</span><br />
               {t.h1[2]}
             </h1>
-            <p className="text-base font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
-              {t.heroSub}
-            </p>
           </div>
 
           {/* 피처 태그 */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
+          <div className="flex flex-nowrap justify-center gap-2 mb-8 px-4 overflow-x-auto">
             {t.badgeTags.map((tag, i) => {
               const colors = [
                 { bg: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", color: "#f9a8d4", dot: "#f472b6" },
@@ -1480,20 +1519,15 @@ export default function MainPage() {
               border: "1px solid rgba(201,168,76,0.45)",
               boxShadow: "0 0 24px rgba(201,168,76,0.15)",
             }}>
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              <div className="relative shrink-0 w-[72px] h-[83px] flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full" style={{
-                  background: "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 18%, rgba(255,247,220,0.95) 32%, rgba(255,255,255,0.55) 55%, rgba(201,168,76,0.15) 72%, rgba(255,255,255,0) 85%)",
-                  filter: "blur(7px)",
-                  transform: "scale(1.45)",
-                }} />
-                <Image src="/mascot-guide.png" alt="사주 마스코트" width={72} height={83}
-                  className="relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
+            <div className="flex items-center gap-6 flex-1 min-w-0">
+              <div className="shrink-0">
+                <Image src="/mascot-guide.png" alt="사주 마스코트" width={68} height={79}
+                  className="drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-black mb-1.5 uppercase tracking-widest" style={{ color: "#e0c168" }}>사주 명리학 가이드</p>
-                <p className="text-lg font-black text-white mb-1.5">사주가 처음이신가요?</p>
-                <p className="text-sm font-bold leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+                <p className="text-[10px] font-black mb-1 uppercase tracking-widest" style={{ color: "#e0c168" }}>사주 명리학 가이드</p>
+                <p className="text-base font-black text-white mb-1">사주가 처음이신가요?</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
                   오행·천간지지·신살·대운 등 기초를 단계별로 설명합니다.
                 </p>
               </div>
@@ -1524,9 +1558,8 @@ export default function MainPage() {
             <span className="absolute bottom-6 right-[8%] text-xl star-3" style={{ color: "#f5c518", opacity: 0.6 }}>★</span>
 
             <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(59,130,246,0.7)" }}>✦ Before & After ✦</p>
-            <h3 className="text-2xl sm:text-4xl font-black text-white mb-5 leading-snug">
-              &ldquo;몰랐던 내 사주의 진실을 알고 나서<br />
-              <span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
+            <h3 className="text-lg sm:text-3xl font-black text-white mb-5 leading-snug">
+              &ldquo;몰랐던 내 사주의 진실을 알고 나서 <span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
             </h3>
             <p className="text-sm sm:text-base max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
               사주는 운명을 바꾸는 도구가 아닙니다.<br />
@@ -1586,17 +1619,6 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* ── 하단 CTA ── */}
-        <section className="text-center py-10">
-          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.25)" }}>
-            더 많은 AI 서비스가 준비 중입니다
-          </p>
-          <div className="flex justify-center gap-2 mb-8">
-            {[0,1,2].map(i => (
-              <span key={i} className="w-1 h-1 rounded-full" style={{ background: "rgba(201,168,76,0.3)" }} />
-            ))}
-          </div>
-        </section>
 
       </div>
 
@@ -1624,14 +1646,6 @@ export default function MainPage() {
             <button onClick={() => router.push("/refund")} className="hover:text-amber-400/70 transition-colors">환불규정</button>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
             <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400/70 transition-colors">고객센터(카카오 채널)</a>
-          </div>
-
-          <div className="text-center mb-5">
-            <a href="http://pf.kakao.com/_cuksX" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-colors"
-              style={{ background: "rgba(253,224,71,0.1)", border: "1px solid rgba(253,224,71,0.25)", color: "#fde68a" }}>
-              💬 전화·이메일보다 카카오톡 문의가 가장 빠릅니다
-            </a>
           </div>
 
           <div className="text-center space-y-1.5 mb-4" style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>
@@ -1666,7 +1680,7 @@ export default function MainPage() {
         <div className="flex items-stretch h-[4.5rem]">
           {[
             { icon: "🏠", label: "홈", href: "/" },
-            { icon: "🔮", label: "사주", href: "/service/saju" },
+            { icon: "✨", label: "서비스", href: "/#services-section" },
             { icon: "📦", label: "보관함", href: "/mypage" },
             { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
