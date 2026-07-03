@@ -44,6 +44,10 @@ export default function MyPage() {
   const [blueberries, setBlueberries] = useState(0);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editModalIndex, setEditModalIndex] = useState<number | null>(null);
+  const [editModalName, setEditModalName] = useState("");
+  const [editModalForm, setEditModalForm] = useState<BirthFormData>(defaultBirthData());
   const [showAddModal, setShowAddModal] = useState(false);
   const [addForm, setAddForm] = useState<BirthFormData>(defaultBirthData());
   const [addName, setAddName] = useState("");
@@ -122,6 +126,44 @@ export default function MyPage() {
     setSavedSajus(next);
     localStorage.setItem(SAJU_STORAGE_KEY, JSON.stringify(next));
     setEditIndex(null);
+  }
+
+  function openEditModal(index: number) {
+    const s = savedSajus[index];
+    setEditModalIndex(index);
+    setEditModalName(s.label || s.name);
+    setEditModalForm({
+      ...defaultBirthData(s.gender as "male" | "female"),
+      name: s.name,
+      birthYear: s.birthYear,
+      birthMonth: s.birthMonth,
+      birthDay: s.birthDay,
+      birthHour: s.birthHourUnknown ? null : s.birthHour,
+      gender: s.gender as "male" | "female",
+    });
+    setShowEditModal(true);
+  }
+
+  function saveEditModal() {
+    if (editModalIndex === null) return;
+    const f = editModalForm;
+    if (!f.birthYear || !f.birthMonth || !f.birthDay) return;
+    const updated: SavedSaju = {
+      ...savedSajus[editModalIndex],
+      name: editModalForm.name || savedSajus[editModalIndex].name,
+      label: editModalName.trim() || undefined,
+      birthYear: Number(f.birthYear),
+      birthMonth: Number(f.birthMonth),
+      birthDay: Number(f.birthDay),
+      birthHour: f.birthHour ?? 0,
+      birthHourUnknown: f.birthHour === null,
+      gender: f.gender,
+    };
+    const next = savedSajus.map((s, i) => i === editModalIndex ? updated : s);
+    setSavedSajus(next);
+    localStorage.setItem(SAJU_STORAGE_KEY, JSON.stringify(next));
+    setShowEditModal(false);
+    setEditModalIndex(null);
   }
 
   function formatBirth(s: SavedSaju) {
@@ -229,7 +271,7 @@ export default function MyPage() {
         <div className="flex gap-2 mb-5">
           {([
             { key: "saju", label: "저장된 생년월일" },
-            { key: "reports", label: "저장된 보고서 (2종)" },
+            { key: "reports", label: `저장된 보고서${reports.length > 0 ? ` (${reports.length}종)` : ""}` },
           ] as const).map(({ key, label }) => (
             <button key={key} onClick={() => setTab(key)}
               className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
@@ -265,31 +307,15 @@ export default function MyPage() {
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      {editIndex === i ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            value={editLabel}
-                            onChange={e => setEditLabel(e.target.value)}
-                            className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                            placeholder="별명 입력 (예: 나, 엄마)"
-                            autoFocus
-                          />
-                          <button onClick={() => saveLabel(i)}
-                            className="text-xs px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300">저장</button>
-                          <button onClick={() => setEditIndex(null)}
-                            className="text-xs px-2 py-1 rounded-lg bg-white/5 text-gray-400">취소</button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <p className="font-black text-white">{saju.label || saju.name}</p>
-                          {saju.label && <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>({saju.name})</p>}
-                          <button onClick={() => { setEditIndex(i); setEditLabel(saju.label || ""); }}
-                            className="text-[10px] px-1.5 py-0.5 rounded"
-                            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>
-                            수정
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-white">{saju.label || saju.name}</p>
+                        {saju.label && <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>({saju.name})</p>}
+                        <button onClick={() => openEditModal(i)}
+                          className="text-[10px] px-1.5 py-0.5 rounded"
+                          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>
+                          수정
+                        </button>
+                      </div>
                       <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
                         {formatBirth(saju)} · {GENDER_LABEL[saju.gender] || saju.gender}
                       </p>
@@ -368,6 +394,50 @@ export default function MyPage() {
           </div>
         )}
       </div>
+
+      {/* 생년월일 수정 모달 */}
+      {showEditModal && editModalIndex !== null && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowEditModal(false); }}>
+          <div className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl overflow-y-auto"
+            style={{ background: "#0e0e1a", border: "1px solid rgba(255,255,255,0.1)", maxHeight: "90vh" }}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b"
+              style={{ background: "#0e0e1a", borderColor: "rgba(255,255,255,0.08)" }}>
+              <h2 className="font-black text-white text-base">생년월일 수정</h2>
+              <button onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-white transition text-xl leading-none">✕</button>
+            </div>
+            <div className="px-5 pt-4 pb-2">
+              <label className="block text-xs font-bold mb-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>이름 또는 별명</label>
+              <input
+                value={editModalName}
+                onChange={e => setEditModalName(e.target.value)}
+                placeholder="예: 나, 엄마, 친구"
+                className="w-full px-4 py-3 rounded-xl text-sm text-white focus:outline-none mb-4"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+              />
+            </div>
+            <div className="px-5 pb-4">
+              <BirthInputForm
+                value={editModalForm}
+                onChange={setEditModalForm}
+                accent="#c9a84c"
+              />
+            </div>
+            <div className="sticky bottom-0 px-5 pb-6 pt-3 border-t"
+              style={{ background: "#0e0e1a", borderColor: "rgba(255,255,255,0.08)" }}>
+              <button
+                onClick={saveEditModal}
+                disabled={!editModalForm.birthYear || !editModalForm.birthMonth || !editModalForm.birthDay}
+                className="w-full py-3.5 rounded-2xl font-black text-sm transition-all disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #c9a84c, #e8c97a)", color: "#06060e" }}>
+                수정 저장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 새 생년월일 입력 모달 */}
       {showAddModal && (
