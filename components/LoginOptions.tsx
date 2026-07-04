@@ -1,77 +1,41 @@
 "use client";
-import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-
-const GOOGLE_CLIENT_ID = "890801754093-edh505ocbhojnbr2fmfkj4rum2p3recr.apps.googleusercontent.com";
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: { client_id: string; callback: (resp: { credential: string }) => void }) => void;
-          renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
-        };
-      };
-    };
-  }
-}
+import { supabaseBrowser } from "@/lib/supabaseClient";
 
 export default function LoginOptions({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const redirect = pathname || "/";
-  const googleBtnRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    async function handleCredential(resp: { credential: string }) {
-      try {
-        const res = await fetch("/api/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ credential: resp.credential, redirect }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          onClose?.();
-          window.dispatchEvent(new Event("sp-auth-changed"));
-          router.push(data.redirect || "/");
-          router.refresh();
-        }
-      } catch {}
-    }
-
-    function init() {
-      if (!window.google || !googleBtnRef.current) return;
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredential });
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: "filled_black",
-        size: "large",
-        shape: "pill",
-        width: 320,
-        text: "continue_with",
-        locale: "ko",
-      });
-    }
-
-    if (window.google) {
-      init();
-    } else {
-      const timer = setInterval(() => {
-        if (window.google) {
-          clearInterval(timer);
-          init();
-        }
-      }, 200);
-      return () => clearInterval(timer);
-    }
-  }, [redirect, router, onClose]);
+  async function handleGoogleLogin() {
+    if (!supabaseBrowser) return;
+    await supabaseBrowser.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://summerpalace.ai.kr/auth/callback",
+      },
+    });
+  }
 
   return (
     <div className="w-full space-y-3">
-      <div ref={googleBtnRef} className="w-full flex justify-center" />
+      {/* Google 로그인 */}
+      <button
+        onClick={handleGoogleLogin}
+        className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
+        style={{ background: "#fff", color: "#1f1f1f", border: "1px solid rgba(0,0,0,0.12)" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Google로 로그인
+      </button>
+
+      {/* Apple 로그인 */}
       <a
-        href={`/api/auth/apple?redirect=${encodeURIComponent(redirect)}`}
+        href={`/api/auth/apple?redirect=${encodeURIComponent(pathname || "/")}`}
         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
         style={{ background: "#000", color: "#fff", border: "1px solid rgba(255,255,255,0.15)" }}
       >
@@ -80,6 +44,7 @@ export default function LoginOptions({ onClose }: { onClose?: () => void }) {
         </svg>
         Apple로 로그인
       </a>
+
       {onClose && (
         <button onClick={onClose}
           className="w-full py-3 rounded-2xl font-bold text-sm text-gray-400 hover:text-gray-200 transition-all">

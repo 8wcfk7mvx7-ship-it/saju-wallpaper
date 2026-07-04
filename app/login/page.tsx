@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser, isAuthConfigured } from "@/lib/supabaseClient";
+import LoginOptions from "@/components/LoginOptions";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,6 +68,14 @@ export default function LoginPage() {
             {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-600">또는</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        <LoginOptions />
 
         <p className="text-center text-xs text-gray-500 mt-6">
           아직 계정이 없으신가요?{" "}
