@@ -38,6 +38,7 @@ import {
   isHourCheonulIntactGoodFlow,
   getSipseongStrength,
   classifySinStrength,
+  getDisplaySinsalList,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
@@ -455,6 +456,7 @@ function ResultView({
   ];
 
   const ilgan = pd.day.cg;
+  const displaySinsalList = getDisplaySinsalList(result.sinsalList || []);
 
   useEffect(() => {
     trackTraits([
@@ -741,7 +743,7 @@ function ResultView({
                 {
                   row: "신살", get: (d: typeof pd.year, label: string) => {
                     const pl = label === "년주" ? "연" : label === "월주" ? "월" : label === "일주" ? "일" : "시";
-                    const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
+                    const names = displaySinsalList.filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
                     if (!names.length) return "—";
                     return (
                       <div className="flex flex-col items-center gap-0.5">
@@ -799,10 +801,10 @@ function ResultView({
       })()}
 
       {/* 신살 — 사주 바로 아래 */}
-      {result.sinsalList.length > 0 && (
-        <Section title={`신살(神殺) · 총 ${result.sinsalList.length}개 발견`} accent="#c084fc">
+      {displaySinsalList.length > 0 && (
+        <Section title={`신살(神殺) · 총 ${displaySinsalList.length}개 발견`} accent="#c084fc">
           <div className="space-y-2.5">
-            {result.sinsalList.map(s => (
+            {displaySinsalList.map(s => (
               <div key={s.name} className="rounded-xl px-4 py-3" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.05)" : s.category === "unlucky" ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.03)", border: s.category === "lucky" ? "1px solid rgba(52,211,153,0.15)" : s.category === "unlucky" ? "1px solid rgba(239,68,68,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-bold text-sm text-white">{s.name}</span>
@@ -817,8 +819,8 @@ function ResultView({
           </div>
           {/* 도화살 위치별 의미 + 발현 시기 */}
           {(() => {
-            const dohwaItems = result.sinsalList.filter(s =>
-              ["도화살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name)
+            const dohwaItems = displaySinsalList.filter(s =>
+              ["진도화","가도화","편야도화","나체도화","곤랑도화","녹방도화"].includes(s.name)
             );
             if (dohwaItems.length === 0) return null;
             const dohwaPillars = [...new Set(dohwaItems.flatMap(s => s.pillars))];

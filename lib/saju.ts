@@ -244,15 +244,10 @@ export interface SajuResult {
   yongshin: YongsinResult;
 }
 
-// 신살 목록을 화면에 나열할 때 쓰는 필터 — 도화살은 가도화/편야도화/진도화/나체도화/곤랑도화/녹방도화의
-// 상위 기본 카테고리일 뿐이라 항상 숨기고, 더 구체적인 도화 세부 유형이 함께 있으면
-// 약한 신호인 가도화도 중복으로 보이지 않게 같이 숨긴다. (점수 계산 등 내부 로직에는 영향 없음)
-const SPECIFIC_DOHWA_NAMES = new Set(["진도화", "나체도화", "곤랑도화", "녹방도화", "편야도화"]);
+// 신살 목록을 화면에 나열할 때 쓰는 필터
+// 도화살은 상위 카테고리이므로 항상 숨김 (가도화/진도화 등 세부로 표시)
 export function getDisplaySinsalList(sinsalList: SinsalItem[]): SinsalItem[] {
-  const hasSpecificDohwa = sinsalList.some(s => SPECIFIC_DOHWA_NAMES.has(s.name));
-  return sinsalList.filter(s =>
-    s.name !== "도화살" && !(s.name === "가도화" && hasSpecificDohwa)
-  );
+  return sinsalList.filter(s => s.name !== "도화살");
 }
 
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"];
@@ -1727,14 +1722,22 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   for (const ss of ['역마살','장성살','화개살','반안살','겁살','재살','망신살','지살','천살','월살','년살','육해살']) {
     addSinsal(ss, detailArr.filter(p => p.d.sinsal === ss).map(p => p.label));
   }
-  // 도화살 (연지 삼합그룹 기준 도화 지지) — 기존 호환을 위해 플래그는 유지하되,
-  // 매력 점수 산정을 위해 자리한 위치 개수에 따라 가도화(1~2자리)/편야도화(3자리 이상)로 세분화한다.
-  const dohwaPillars = detailArr.filter(p => p.d.jj === getDohwaJj(yeonji)).map(p => p.label);
+  // 도화살 (연지 삼합그룹 기준 도화 지지)
+  // 진도화: 연지 기준 도화지지가 일지에 있을 때 (가장 강한 도화)
+  // 가도화: 연지 기준 도화지지가 일지 외 기둥에 있을 때
+  // 편야도화: 일지 외 기둥에 3개 이상
+  const dohwaJjYeon = getDohwaJj(yeonji);
+  const dohwaPillars = detailArr.filter(p => p.d.jj === dohwaJjYeon).map(p => p.label);
   addSinsal('도화살', dohwaPillars);
-  if (dohwaPillars.length >= 3) {
-    addSinsal('편야도화', dohwaPillars);
-  } else if (dohwaPillars.length > 0) {
-    addSinsal('가도화', dohwaPillars);
+  const hasIlDohwa = dohwaPillars.includes('일');
+  const nonIlDohwaPillars = dohwaPillars.filter(p => p !== '일');
+  if (hasIlDohwa) {
+    addSinsal('진도화', ['일']);
+  }
+  if (nonIlDohwaPillars.length >= 3) {
+    addSinsal('편야도화', nonIlDohwaPillars);
+  } else if (nonIlDohwaPillars.length > 0) {
+    addSinsal('가도화', nonIlDohwaPillars);
   }
   // 천을귀인
   const cheonulJjs = CHEONUL_JJ[ilgan] || [];
@@ -1813,12 +1816,6 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   addSinsal('암록', detailArr.filter(p => p.d.jj === AMROK_JJ[ilgan]).map(p => p.label));
   // 천주귀인
   addSinsal('천주귀인', detailArr.filter(p => p.d.jj === CHEONJU_JJ[ilgan]).map(p => p.label));
-  // 진도화: 일지의 도화 지지가 연주 or 월주 지지에 존재할 때
-  const iljiDohwa = getDohwaJj(dayPillar.jj);
-  const jinDohwaLabels = detailArr.filter(p =>
-    (p.label === '연' || p.label === '월') && p.d.jj === iljiDohwa
-  ).map(p => p.label);
-  addSinsal('진도화', jinDohwaLabels);
   // 백호살: 사주의 어느 기둥이든 천간+지지 조합이 일치하면 성립
   {
     const baekhoLabels = detailArr.filter(p => BAEHO_ILJU.has(p.d.cg + p.d.jj)).map(p => p.label);
