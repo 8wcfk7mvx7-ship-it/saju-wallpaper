@@ -785,13 +785,6 @@ export default function ReportPage() {
               <p style={{margin:0,fontSize:13,lineHeight:1.8,color:"#cbd5e1"}}>
                 {aiContent.personality || profile.personality}
               </p>
-              {aiContent.personality&&(
-                <div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
-                  <p style={{margin:0,fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}>
-                    <span>✨</span> Claude AI 개인 맞춤 분석
-                  </p>
-                </div>
-              )}
             </div>
 
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}}>
@@ -818,7 +811,6 @@ export default function ReportPage() {
               <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fde68a"}}>
                 {aiContent.career || profile.jobs}
               </p>
-              {aiContent.career&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>}
             </div>
 
             <div style={{background:"rgba(248,113,113,0.06)",border:"1px solid rgba(248,113,113,0.15)",borderRadius:12,padding:"14px 18px"}}>
@@ -826,7 +818,6 @@ export default function ReportPage() {
               <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>
                 {aiContent.health || profile.health}
               </p>
-              {aiContent.health&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>}
             </div>
           </>
         ) : (
@@ -996,7 +987,6 @@ export default function ReportPage() {
             <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#c7d2fe"}}>
               {aiContent.career || (profile ? `${profile.jobs}${yong ? ` / 용신 기반: ${ELEMENT_BOOST[yong.yongshin]?.jobs}` : ""}` : "")}
             </p>
-            {aiContent.career&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 재물 */}
           <div style={{background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:12,padding:"14px 16px"}}>
@@ -1011,7 +1001,6 @@ export default function ReportPage() {
                 return "재물운은 꾸준한 노력으로 쌓아가는 스타일입니다. 안정적 투자가 맞습니다.";
               })()}
             </p>
-            {aiContent.money&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 건강 */}
           <div style={{background:"rgba(248,113,113,0.08)",border:"1px solid rgba(248,113,113,0.2)",borderRadius:12,padding:"14px 16px"}}>
@@ -1034,7 +1023,6 @@ export default function ReportPage() {
                 </div>
               );
             })()}
-            {aiContent.health&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 인간관계 */}
           <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"14px 16px"}}>
@@ -1050,7 +1038,6 @@ export default function ReportPage() {
                 return "균형 잡힌 십성 구성으로 다양한 인간관계를 유연하게 이끌어갑니다.";
               })()}
             </p>
-            {aiContent.relationships&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
         </div>
 
@@ -1059,7 +1046,6 @@ export default function ReportPage() {
           <div style={{marginTop:14,background:"rgba(236,72,153,0.08)",border:"1px solid rgba(236,72,153,0.2)",borderRadius:12,padding:"14px 18px"}}>
             <div style={{fontWeight:600,color:"#f472b6",marginBottom:8,fontSize:13}}>💕 연애·결혼운 심층 분석</div>
             <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#fbcfe8"}}>{aiContent.love}</p>
-            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
           </div>
         )}
 
@@ -1079,7 +1065,6 @@ export default function ReportPage() {
             </p>
             {aiContent.thisYear&&(
               <p style={{margin:"8px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}>
-                <span>✨</span> Claude AI 개인 맞춤 분석
               </p>
             )}
           </div>
@@ -1106,7 +1091,6 @@ export default function ReportPage() {
             </p>
             {aiContent.overall&&(
               <p style={{margin:"8px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}>
-                <span>✨</span> Claude AI 개인 맞춤 분석
               </p>
             )}
           </div>
@@ -1146,7 +1130,6 @@ export default function ReportPage() {
           <div style={{background:"rgba(20,184,166,0.08)",border:"1px solid rgba(20,184,166,0.25)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
             <div style={{fontWeight:600,color:"#5eead4",marginBottom:8,fontSize:13}}>✨ 기운 보완 & 일상 활용법</div>
             <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#a5f3fc"}}>{aiContent.yongshin}</p>
-            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
           </div>
         ) : (
           <div style={{background:"rgba(99,102,241,0.06)",border:"1px solid rgba(99,102,241,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
@@ -1164,7 +1147,6 @@ export default function ReportPage() {
             border:"1px solid rgba(99,102,241,0.25)",borderRadius:12,padding:"16px 18px",marginBottom:14}}>
             <div style={{fontWeight:700,color:"#a5b4fc",marginBottom:10,fontSize:14}}>🌟 인생 핵심 조언</div>
             <p style={{margin:0,fontSize:13,lineHeight:1.9,color:"#c7d2fe"}}>{aiContent.advice}</p>
-            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
           </div>
         )}
 
@@ -1175,7 +1157,6 @@ export default function ReportPage() {
           {aiContent.special ? (
             <>
               <p style={{margin:"0 0 12px",fontSize:13,lineHeight:1.9,color:"#e2e8f0",textAlign:"left"}}>{aiContent.special}</p>
-              <p style={{margin:0,fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><span>✨</span> {name}님께만 전하는 Claude AI의 특별 메시지</p>
             </>
           ) : (
             <p style={{margin:0,fontSize:13,lineHeight:1.9,color:"#e2e8f0"}}>
