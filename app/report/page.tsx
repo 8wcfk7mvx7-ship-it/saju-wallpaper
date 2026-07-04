@@ -814,13 +814,19 @@ export default function ReportPage() {
             </div>
 
             <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
-              <div style={{fontWeight:600,color:"#f59e0b",marginBottom:8,fontSize:13}}>💼 추천 직업군</div>
-              <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fde68a"}}>{profile.jobs}</p>
+              <div style={{fontWeight:600,color:"#f59e0b",marginBottom:8,fontSize:13}}>💼 직업·적성·재물 전략</div>
+              <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fde68a"}}>
+                {aiContent.career || profile.jobs}
+              </p>
+              {aiContent.career&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>}
             </div>
 
             <div style={{background:"rgba(248,113,113,0.06)",border:"1px solid rgba(248,113,113,0.15)",borderRadius:12,padding:"14px 18px"}}>
-              <div style={{fontWeight:600,color:"#f87171",marginBottom:6,fontSize:13}}>🏥 건강 주의 부위</div>
-              <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>{profile.health}</p>
+              <div style={{fontWeight:600,color:"#f87171",marginBottom:6,fontSize:13}}>🏥 건강 심층 분석</div>
+              <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>
+                {aiContent.health || profile.health}
+              </p>
+              {aiContent.health&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>}
             </div>
           </>
         ) : (
@@ -987,34 +993,33 @@ export default function ReportPage() {
           {/* 직업 */}
           <div style={{background:"rgba(99,102,241,0.08)",border:"1px solid rgba(99,102,241,0.2)",borderRadius:12,padding:"14px 16px"}}>
             <div style={{fontWeight:700,color:"#a5b4fc",marginBottom:10,fontSize:13}}>💼 직업·적성</div>
-            {profile&&<p style={{margin:"0 0 8px",fontSize:12,lineHeight:1.7,color:"#c7d2fe"}}>
-              <strong>일간 기반:</strong> {profile.jobs}
-            </p>}
-            {yong&&<p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#c7d2fe"}}>
-              <strong>용신 기반:</strong> {ELEMENT_BOOST[yong.yongshin]?.jobs}
-            </p>}
+            <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#c7d2fe"}}>
+              {aiContent.career || (profile ? `${profile.jobs}${yong ? ` / 용신 기반: ${ELEMENT_BOOST[yong.yongshin]?.jobs}` : ""}` : "")}
+            </p>
+            {aiContent.career&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 재물 */}
           <div style={{background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:12,padding:"14px 16px"}}>
             <div style={{fontWeight:700,color:"#10b981",marginBottom:10,fontSize:13}}>💰 재물운</div>
             <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#a7f3d0"}}>
-              {(()=>{
+              {aiContent.money || (()=>{
                 const jaeCnt=allSS.filter(s=>s==="정재"||s==="편재").length;
                 const biCnt=allSS.filter(s=>s==="비견"||s==="겁재").length;
-                if(jaeCnt>=2) return "재성(재물성)이 2개 이상으로 재물 복이 풍부합니다. 사업이나 투자에 유리한 구성입니다.";
-                if(biCnt>=2&&jaeCnt>=1) return "비겁이 많아 재물이 분산되기 쉽습니다. 동업·공동투자는 신중히 하세요. 혼자 관리하는 재물이 더 안전합니다.";
+                if(jaeCnt>=2) return "재성이 2개 이상으로 재물 복이 풍부합니다. 사업이나 투자에 유리한 구성입니다.";
+                if(biCnt>=2&&jaeCnt>=1) return "비겁이 많아 재물이 분산되기 쉽습니다. 동업·공동투자는 신중히 하세요.";
                 if(biCnt>=3) return "비겁이 강해 재물이 손에 쥐어지기 어렵습니다. 절약과 저축 습관이 중요합니다.";
-                return "재물운은 꾸준한 노력으로 쌓아가는 스타일입니다. 성실한 저축과 안정적 투자가 맞습니다.";
+                return "재물운은 꾸준한 노력으로 쌓아가는 스타일입니다. 안정적 투자가 맞습니다.";
               })()}
             </p>
+            {aiContent.money&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 건강 */}
           <div style={{background:"rgba(248,113,113,0.08)",border:"1px solid rgba(248,113,113,0.2)",borderRadius:12,padding:"14px 16px"}}>
             <div style={{fontWeight:700,color:"#f87171",marginBottom:10,fontSize:13}}>🏥 건강 주의사항</div>
             <p style={{margin:"0 0 6px",fontSize:12,lineHeight:1.7,color:"#fca5a5"}}>
-              {profile&&<><strong>일간 관련:</strong> {profile.health}</>}
+              {aiContent.health || (profile ? profile.health : "")}
             </p>
-            {lacking[0] && (() => {
+            {!aiContent.health && lacking[0] && (() => {
               const h = OHAENG_HEALTH[lacking[0] as "목"|"화"|"토"|"금"|"수"];
               if (!h) return null;
               return (
@@ -1029,23 +1034,34 @@ export default function ReportPage() {
                 </div>
               );
             })()}
+            {aiContent.health&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
           {/* 인간관계 */}
           <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"14px 16px"}}>
             <div style={{fontWeight:700,color:"#f59e0b",marginBottom:10,fontSize:13}}>🤝 인간관계·연애</div>
             <p style={{margin:0,fontSize:12,lineHeight:1.7,color:"#fde68a"}}>
-              {(()=>{
+              {aiContent.relationships || (()=>{
                 const guanCnt=allSS.filter(s=>s==="정관"||s==="편관").length;
-                const inCnt=allSS.filter(s=>s==="정인"||s==="편인").length;
                 const sikCnt=allSS.filter(s=>s==="식신"||s==="상관").length;
+                const inCnt=allSS.filter(s=>s==="정인"||s==="편인").length;
                 if(guanCnt>=2) return "관성이 강해 사회적 규범을 중시하고 책임감이 높습니다. 리더 역할을 자연스럽게 맡게 됩니다.";
                 if(sikCnt>=2) return "식상이 강해 표현력이 풍부하고 주변을 즐겁게 합니다. 인기운이 좋고 이성에게 매력적입니다.";
                 if(inCnt>=2) return "인성이 강해 학문과 지식을 추구하며, 주변 사람들에게 지혜로운 조언을 잘 해줍니다.";
-                return "균형 잡힌 십성 구성으로 다양한 인간관계를 유연하게 이끌어갑니다. 특정 유형에 치우치지 않는 중화된 관계패턴을 보입니다.";
+                return "균형 잡힌 십성 구성으로 다양한 인간관계를 유연하게 이끌어갑니다.";
               })()}
             </p>
+            {aiContent.relationships&&<p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI</p>}
           </div>
         </div>
+
+        {/* 연애·결혼운 AI 섹션 (aiContent.love 있을 때만) */}
+        {aiContent.love&&(
+          <div style={{marginTop:14,background:"rgba(236,72,153,0.08)",border:"1px solid rgba(236,72,153,0.2)",borderRadius:12,padding:"14px 18px"}}>
+            <div style={{fontWeight:600,color:"#f472b6",marginBottom:8,fontSize:13}}>💕 연애·결혼운 심층 분석</div>
+            <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#fbcfe8"}}>{aiContent.love}</p>
+            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
+          </div>
+        )}
 
         {/* 세운 조언 */}
         {yong&&(
@@ -1125,23 +1141,49 @@ export default function ReportPage() {
           </div>
         )}
 
-        <div style={{background:"rgba(99,102,241,0.06)",border:"1px solid rgba(99,102,241,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
-          <div style={{fontWeight:600,color:"#a5b4fc",marginBottom:8,fontSize:13}}>📱 배경화면 활용법</div>
-          <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#c7d2fe"}}>
-            하루 평균 150번 이상 스마트폰을 봅니다. 용신({yong?.yongshin||"—"})과 부족 오행의 색상이 담긴 배경화면을 매일 눈에 담으면,
-            잠재의식을 통해 그 오행의 에너지를 자연스럽게 보충할 수 있습니다.
-            SajuWallpaper에서 제공하는 맞춤 배경화면을 활용해 매일 운의 기운을 충전하세요.
-          </p>
-        </div>
+        {/* 용신 활용법 AI */}
+        {aiContent.yongshin ? (
+          <div style={{background:"rgba(20,184,166,0.08)",border:"1px solid rgba(20,184,166,0.25)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
+            <div style={{fontWeight:600,color:"#5eead4",marginBottom:8,fontSize:13}}>✨ 기운 보완 & 일상 활용법</div>
+            <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#a5f3fc"}}>{aiContent.yongshin}</p>
+            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
+          </div>
+        ) : (
+          <div style={{background:"rgba(99,102,241,0.06)",border:"1px solid rgba(99,102,241,0.15)",borderRadius:12,padding:"14px 18px",marginBottom:14}}>
+            <div style={{fontWeight:600,color:"#a5b4fc",marginBottom:8,fontSize:13}}>📱 배경화면 활용법</div>
+            <p style={{margin:0,fontSize:12,lineHeight:1.8,color:"#c7d2fe"}}>
+              하루 평균 150번 이상 스마트폰을 봅니다. 용신({yong?.yongshin||"—"})과 부족 오행의 색상이 담긴 배경화면을 매일 눈에 담으면,
+              잠재의식을 통해 그 오행의 에너지를 자연스럽게 보충할 수 있습니다.
+            </p>
+          </div>
+        )}
 
+        {/* 핵심 조언 AI */}
+        {aiContent.advice&&(
+          <div style={{background:"linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.12))",
+            border:"1px solid rgba(99,102,241,0.25)",borderRadius:12,padding:"16px 18px",marginBottom:14}}>
+            <div style={{fontWeight:700,color:"#a5b4fc",marginBottom:10,fontSize:14}}>🌟 인생 핵심 조언</div>
+            <p style={{margin:0,fontSize:13,lineHeight:1.9,color:"#c7d2fe"}}>{aiContent.advice}</p>
+            <p style={{margin:"6px 0 0",fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",gap:4}}><span>✨</span> Claude AI 개인 맞춤 분석</p>
+          </div>
+        )}
+
+        {/* 특별 메시지 AI */}
         <div style={{background:"linear-gradient(135deg,rgba(99,102,241,0.15),rgba(236,72,153,0.15))",
           border:"1px solid rgba(99,102,241,0.3)",borderRadius:16,padding:"18px 20px",textAlign:"center"}}>
           <div style={{fontSize:24,marginBottom:8}}>✨</div>
-          <p style={{margin:0,fontSize:13,lineHeight:1.9,color:"#e2e8f0"}}>
-            사주는 타고난 에너지의 지도입니다.<br/>
-            이 보고서가 {name}님만의 길을 찾는 데 작은 나침반이 되길 바랍니다.<br/>
-            <span style={{color:"#a5b4fc",fontWeight:600}}>— SajuWallpaper</span>
-          </p>
+          {aiContent.special ? (
+            <>
+              <p style={{margin:"0 0 12px",fontSize:13,lineHeight:1.9,color:"#e2e8f0",textAlign:"left"}}>{aiContent.special}</p>
+              <p style={{margin:0,fontSize:11,color:"#4b5563",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}><span>✨</span> {name}님께만 전하는 Claude AI의 특별 메시지</p>
+            </>
+          ) : (
+            <p style={{margin:0,fontSize:13,lineHeight:1.9,color:"#e2e8f0"}}>
+              사주는 타고난 에너지의 지도입니다.<br/>
+              이 보고서가 {name}님만의 길을 찾는 데 작은 나침반이 되길 바랍니다.<br/>
+              <span style={{color:"#a5b4fc",fontWeight:600}}>— SajuWallpaper</span>
+            </p>
+          )}
         </div>
       </Page>
     </>
