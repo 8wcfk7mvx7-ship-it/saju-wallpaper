@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSaju, getJijiRelations, getDohwaJj, CHEONUL_JJ, calcDaewoon } from "@/lib/saju";
-import { GANYEOJIDONG_PAIRS } from "@/lib/saju2";
+import { GANYEOJIDONG_PAIRS, getGaewunRanking } from "@/lib/saju2";
 import ResultFooterActions from "@/components/ResultFooterActions";
 
 export const dynamic = "force-dynamic";
@@ -382,6 +382,7 @@ function SuccessContent() {
   const [dayJj, setDayJj] = useState("");
   const [trashFindings, setTrashFindings] = useState<{ icon: string; title: string; desc: string }[]>([]);
   const [daewoonInsights, setDaewoonInsights] = useState<DaewoonInsight[]>([]);
+  const [gaewunRanking, setGaewunRanking] = useState<ReturnType<typeof getGaewunRanking>>([]);
 
   useEffect(() => {
     try {
@@ -404,6 +405,7 @@ function SuccessContent() {
       setDayJj(r.pillarsDetail.day.jj);
       setTrashFindings(computeTrashFindings(r, form.gender || "female"));
       setDaewoonInsights(computeDaewoonInsights(r, { year: form.year, month: form.month, day: form.day, gender: form.gender || "female" }));
+      setGaewunRanking(getGaewunRanking(r));
       setStage("done");
     } catch {
       setErrorMsg("분석 정보가 올바르지 않습니다.");
@@ -598,6 +600,25 @@ function SuccessContent() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* 개운법 */}
+        {gaewunRanking.length > 0 && (
+          <div className="rounded-2xl p-5" style={{ background: "rgba(251,191,36,0.05)", border: "1px solid rgba(251,191,36,0.15)" }}>
+            <p className="text-sm font-black text-white mb-1">나에게 맞는 색·방향·음식·숫자</p>
+            <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>오행 기운을 기준으로 좋은 오행 3가지를 우선 활용해보세요</p>
+            <div className="space-y-2.5">
+              {gaewunRanking.map(g => (
+                <div key={g.element} className="rounded-xl px-4 py-3" style={{ background: g.isGood ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${g.isGood ? "rgba(251,191,36,0.25)" : "rgba(255,255,255,0.08)"}` }}>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: g.isGood ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.08)", color: g.isGood ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>{g.rank}순위</span>
+                    <span className="text-sm font-black" style={{ color: g.colorHex }}>{g.color}</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>방향 {g.direction} · 음식 {g.food} · 맛 {g.taste} · 운동 {g.exercise} · 아이템 {g.items} · 숫자 {g.numbers}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
