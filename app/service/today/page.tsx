@@ -859,15 +859,42 @@ export default function TodayFortunePage() {
 
           <RelationDiagram
             cols={cols}
-            cgLines={cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }))}
-            jjLines={relations.map(rel => {
-              const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
-              const mg = (rel as MergedRel).mergedGroup;
-              const label = mg
-                ? `${mg[0]}·${mg[1]}·${mg[2]}삼합`
-                : `${ja}${jb}${rel.type}`;
-              return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
-            })}
+            cgLines={(() => {
+              const raw = cgRelations.map(rel => ({ aIdx: rel.aIdx, bIdx: rel.bIdx, label: `${rel.a}${rel.b}${rel.type}`, color: cgRelColor(rel.type, rel.a, rel.b), desc: cgRelDesc(rel.type) }));
+              const map = new Map<string, typeof raw[0] & { count: number }>();
+              for (const r of raw) {
+                const existing = map.get(r.label);
+                if (existing) {
+                  existing.count++;
+                  existing.aIdx = Math.min(existing.aIdx, r.aIdx);
+                  existing.bIdx = Math.max(existing.bIdx, r.bIdx);
+                } else {
+                  map.set(r.label, { ...r, count: 1 });
+                }
+              }
+              return Array.from(map.values()).map(r => ({ ...r, label: r.count > 1 ? `${r.label}×${r.count}` : r.label }));
+            })()}
+            jjLines={(() => {
+              const raw = relations.map(rel => {
+                const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
+                const mg = (rel as MergedRel).mergedGroup;
+                const isJahyeong = rel.jjA === rel.jjB && rel.type === "형";
+                const label = mg ? `${mg[0]}·${mg[1]}·${mg[2]}삼합` : isJahyeong ? `${ja}${jb}자형` : `${ja}${jb}${rel.type}`;
+                return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
+              });
+              const map = new Map<string, typeof raw[0] & { count: number }>();
+              for (const r of raw) {
+                const existing = map.get(r.label);
+                if (existing) {
+                  existing.count++;
+                  existing.aIdx = Math.min(existing.aIdx, r.aIdx);
+                  existing.bIdx = Math.max(existing.bIdx, r.bIdx);
+                } else {
+                  map.set(r.label, { ...r, count: 1 });
+                }
+              }
+              return Array.from(map.values()).map(r => ({ ...r, label: r.count > 1 ? `${r.label}×${r.count}` : r.label }));
+            })()}
           />
           {relations.length === 0 && cgRelations.length === 0 && (
             <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">원국·대운·세운·오늘 사이에 두드러진 합충 관계는 보이지 않아요. 큰 동요 없이 평이하게 흘러가는 흐름입니다.</p>

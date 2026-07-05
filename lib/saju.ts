@@ -210,7 +210,7 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
 // 위치(기둥) 기반의 jjA/jjB 순서와는 별개로, 이름을 부를 때만 canonical 순서를 따른다.
 const YUKHAP_CANON: [string, string][] = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
 const CHUNG_CANON: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
-const PA_CANON: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
+const PA_CANON: [string, string][] = [["자","유"],["묘","오"],["인","해"],["사","신"],["진","축"],["술","미"]];
 const HAE_CANON: [string, string][] = [["자","미"],["축","오"],["인","사"],["묘","진"],["신","해"],["유","술"]];
 const HYEONG_CANON: [string, string][] = [["자","묘"],["인","사"],["사","신"],["신","인"],["축","술"],["술","미"],["미","축"]];
 const SAMHAP_GROUPS_CANON: string[][] = [["인","오","술"],["사","유","축"],["신","자","진"],["해","묘","미"]];
