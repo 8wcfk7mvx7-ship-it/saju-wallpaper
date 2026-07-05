@@ -360,6 +360,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   나체도화: {hanja:"裸體桃花", category:"neutral",  desc:"매력이 직관적으로 드러나 숨길 수 없어요. 어디서든 시선을 끌고 이성이 자연스럽게 모이는 기운이에요. 그만큼 구설수·치정·스캔들에 휘말리기 쉽고 감정 기복으로 스스로 피곤해지는 경향이 있어요"},
   곤랑도화: {hanja:"滾浪桃花", category:"unlucky",  desc:"천간끼리는 끈끈하게 합을 이루는데 지지끼리는 서로 부딪히는 형(刑)의 구조예요. 겉으로는 깊이 끌리고 가까워지지만 속으로는 갈등과 구설이 쌓이기 쉬운 애정운이에요. 치정 시비나 관재구설로 번지지 않도록 거리 조절이 중요해요"},
   녹방도화: {hanja:"祿傍桃花", category:"lucky",  desc:"이성에게 어필하는 매력이 재물운과 사회적 인정을 부르는 기운과 함께 자리한 귀한 구조예요. 끼를 부리지 않아도 기품 있는 분위기로 사람을 끌고, 그 매력이 곧 사회적 인정과 좋은 인연으로 이어지는 흐름이에요"},
+  함지살:   {hanja:"咸池煞", category:"lucky",  desc:"삼명통회(三命通會)에 기록된 매력살로, 도화보다 한 차원 깊은 음기(陰氣)와 풍류 에너지를 품은 기운이에요. 애교·교태·감각적 매력이 자연스럽게 흘러나오고 예술적 재능과 연결되기도 해요"},
   낙정관살: {hanja:"落井關殺", category:"unlucky",  desc:"수난사고·추락·함몰 관련 사고에 취약해요. 폰 보며 걷다 맨홀·싱크홀에 빠지는 유형의 부주의가 실제 사고로 이어지기 쉬워요. 곡각살과 겹치면 물리적 충격이 더욱 강해지니 이동 중 항상 주변을 살피세요"},
   음인:     {hanja:"陰刃",   category:"unlucky",  desc:"겉으로는 온화하고 만만해 보이나 속에 독한 기운을 품고 있어요. 양인이 정면충돌형 강함이라면 음인은 끈질기고 은밀한 저항력이에요. 위기 상황에서 생존력이 극대화되며, 감정을 오래 쌓아두다 폭발하는 패턴을 주의하세요"},
   고신살:   {hanja:"孤神殺", category:"unlucky",  desc:"고독하고 의지할 곳이 없는 기운이에요. 이별수가 있어요"},
@@ -1785,6 +1786,26 @@ export function analyzeSaju(input: SajuInput): SajuResult {
       .map(p => p.label);
     addSinsal('녹방도화', nokbangPillars);
   }
+  // 함지살(咸池煞): 년지 또는 일지 삼합그룹 기준 특정 간지(干支) 조합이 기둥에 있어야 성립
+  // 해묘미→임자, 인오술→정묘, 사유축→갑오, 신자진→을유
+  {
+    const HAMJI_MAP: Record<string, string> = {
+      해:"임자", 묘:"임자", 미:"임자",
+      인:"정묘", 오:"정묘", 술:"정묘",
+      사:"갑오", 유:"갑오", 축:"갑오",
+      신:"을유", 자:"을유", 진:"을유",
+    };
+    const HAMJI_PAIRS: Record<string, {cg:string; jj:string}> = {
+      "임자":{cg:"임",jj:"자"}, "정묘":{cg:"정",jj:"묘"}, "갑오":{cg:"갑",jj:"오"}, "을유":{cg:"을",jj:"유"},
+    };
+    const hamjiKey = HAMJI_MAP[yeonji] ?? HAMJI_MAP[pillarsDetail.day.jj];
+    if (hamjiKey) {
+      const { cg: hcg, jj: hjj } = HAMJI_PAIRS[hamjiKey];
+      const hamjiPillars = detailArr.filter(p => p.d.cg === hcg && p.d.jj === hjj).map(p => p.label);
+      addSinsal('함지살', hamjiPillars);
+    }
+  }
+
   // 낙정관살: 연지 그룹 기준 지지가 사주에 존재
   const nakjeongTarget = NAKJEONG_MAP[yeonji];
   if (nakjeongTarget) {

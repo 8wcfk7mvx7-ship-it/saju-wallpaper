@@ -147,6 +147,8 @@ function CharmResultContent() {
   const 편관Trait = CHARM_TRAITS.find(t => t.id === "편관")!;
 
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
+  const has함지살 = result.sinsalList.some(s => s.name === "함지살");
+  const 함지살기둥 = result.sinsalList.find(s => s.name === "함지살")?.pillars ?? [];
 
   const jipchaknamNarrative = getJipchaknamNarrative(result, gender);
   const charmExtraNarrative = [
@@ -337,6 +339,18 @@ function CharmResultContent() {
         {/* ═══ 신살 매력 서열 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-4">신살 매력 서열</p>
+          {has함지살 && (
+            <div className="flex items-start gap-3 p-3 rounded-xl border mb-2.5" style={{ background: "rgba(245,158,11,0.07)", borderColor: "rgba(245,158,11,0.3)" }}>
+              <span className="text-lg shrink-0">✨</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-amber-200">함지살(咸池煞)</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">도화 상위 매력살</span>
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">삼명통회(三命通會) 기준 도화보다 차원 깊은 음기(陰氣) 매력살. 애교·교태·감각적 매력이 자연스럽게 흘러나옵니다. ({함지살기둥.join("·")}주)</p>
+              </div>
+            </div>
+          )}
           {mySalsPresent.length > 0 ? (
             <div className="space-y-2.5 mb-4">
               {mySalsPresent.map((s) => (

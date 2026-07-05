@@ -1,15 +1,11 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
 
-import { analyzeSaju, getSexlifeInsights, type SajuResult } from "@/lib/saju";
-import { getSexEnergyAnalysis, getAppearanceAnalysis } from "@/lib/saju2";
+import { analyzeSaju } from "@/lib/saju";
 import AnalysisLoading from "@/components/AnalysisLoading";
-import SipseongInsight from "@/components/SipseongInsight";
-import DohwaFormulaList from "@/components/DohwaFormulaList";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
-import ResultFooterActions from "@/components/ResultFooterActions";
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [v, setV] = useState(false);
@@ -319,9 +315,8 @@ function getGrade(score: number) { return GRADES.find(g => score >= g.min) ?? GR
 // ── 메인 ─────────────────────────────────────────────────────────────────────
 function ErosContent() {
   const router = useRouter();
-  const [step, setStep]     = useState<"entry" | "form" | "loading" | "result">("entry");
-  const [form, setForm]     = useState<BirthFormData>(defaultBirthData("female"));
-  const resultRef = useRef<SajuResult | null>(null);
+  const [step, setStep] = useState<"entry" | "form" | "loading">("entry");
+  const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
 
   async function handleAnalyze() {
     const yr = typeof form.birthYear === "number" ? form.birthYear : 0;
@@ -341,12 +336,18 @@ function ErosContent() {
       } catch {}
     }
 
-    resultRef.current = analyzeSaju({
+    const result = analyzeSaju({
       birthYear: fy, birthMonth: fm, birthDay: fd,
       birthHour: form.birthHour, birthMinute: form.birthMinute ?? 0,
       name: "나", gender: form.gender,
       birthPlace: form.city || "서울", style: "auto", productType: "report", useJajasi: form.useJajasi,
     });
+    try {
+      sessionStorage.setItem("erosData", JSON.stringify({
+        form: { ...form, birthYear: fy, birthMonth: fm, birthDay: fd },
+        result,
+      }));
+    } catch {}
     setStep("loading");
   }
 
@@ -434,366 +435,12 @@ function ErosContent() {
 
   // ── 로딩 ────────────────────────────────────────────────────────────────
   if (step === "loading") {
-    return <AnalysisLoading subject="나의 성적 매력" duration={2800} onDone={() => setStep("result")} />;
+    const orderId = `eros-${Date.now()}`;
+    return <AnalysisLoading subject="나의 성적 매력" duration={2800} onDone={() => router.push(`/service/eros/pay?orderId=${orderId}&amount=4900`)} />;
   }
 
-  // ── 결과 ────────────────────────────────────────────────────────────────
-  const result = resultRef.current;
-  if (!result) return null;
-
-  const hasSinsal = (n: string) => result.sinsalList.some(s => s.name === n);
-  const getSinsalPillars = (n: string) => result.sinsalList.find(s => s.name === n)?.pillars ?? [];
-  const has도화   = hasSinsal("도화살");
-  const has홍염   = hasSinsal("홍염살");
-  const has진도화  = hasSinsal("진도화");
-  const has역마   = hasSinsal("역마살");
-  const has편야도화 = hasSinsal("편야도화");
-  const has나체도화 = hasSinsal("나체도화");
-  const has곤랑도화 = hasSinsal("곤랑도화");
-  const has녹방도화 = hasSinsal("녹방도화");
-  const _rpd = result.pillarsDetail;
-  const hasMokYok = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).some(p => p?.uunseong === "목욕");
-  const mokYokStrong = _rpd.day?.uunseong === "목욕" || _rpd.hour?.uunseong === "목욕";
-  const erosAllSipseong = [_rpd.year, _rpd.month, _rpd.day, _rpd.hour].filter(Boolean).flatMap(p => [p?.sipseongCg, p?.sipseongJj]).filter(Boolean);
-  const hasPyeongwan = erosAllSipseong.includes("편관");
-  const haHwa     = result.dominant.includes("화");
-
-  // 음간(을·정·기·신·계)=음기, 양간(갑·병·무·경·임)=양기 — 매력 보너스를 성별과 무관하게 대칭으로 계산
-  const 음간목록 = ["을","정","기","신","계"];
-  const 양간목록 = ["갑","병","무","경","임"];
-  const ilganForScore = result.pillarsDetail.day.cg;
-  const is음간 = 음간목록.includes(ilganForScore);
-  const is양간 = 양간목록.includes(ilganForScore);
-  const 수기운천간 = ["임","계"];
-  const 수기운지지 = ["자","해","축"];
-  const 화목기운천간 = ["갑","을","병","정"];
-  const 화목기운지지 = ["인","묘","사","오"];
-  const pd = result.pillarsDetail;
-  const 수기운기둥수 = [pd.year, pd.month, pd.day, pd.hour].filter(p => p && (
-    수기운천간.includes(p.cg) || 수기운지지.includes(p.jj))
-  ).length;
-  const 화목기운기둥수 = [pd.year, pd.month, pd.day, pd.hour].filter(p => p && (
-    화목기운천간.includes(p.cg) || 화목기운지지.includes(p.jj))
-  ).length;
-  const has수기운강 = 수기운기둥수 >= 2 || result.dominant.includes("수");
-  const has화목기운강 = 화목기운기둥수 >= 2 || result.dominant.includes("화") || result.dominant.includes("목");
-
-  // ── 매력 점수 산출 ───────────────────────────────────────────────────────
-  // 신호 하나당 위치(연/월=약, 일/시=강) 가중치를 매기고, 신호가 여러 개 겹치면
-  // 단순 합산이 아니라 시너지 보너스가 추가로 붙는 구조. 점수 구성은 화면에 그대로 노출된다.
-  type ScoreFactor = { label: string; points: number; reason: string };
-  const factors: ScoreFactor[] = [];
-  let coreSignalCount = 0;
-
-  // 도화 계열은 "다수에게 풍기는 매력"이라 1대1 색기 신호인 홍염보다 기본적으로 더 강하게 잡는다.
-  // 편야도화/가도화는 위치 개수에 따른 상호배타적 등급, 진도화·나체도화·녹방도화·곤랑도화는 각각 독립적으로 추가된다.
-  if (has편야도화) {
-    factors.push({ label: "도화 기운 (전방위형)", points: 24, reason: "사주 곳곳에 퍼진 압도적인 인기 신호" });
-    coreSignalCount++;
-  } else if (has도화) {
-    const dohwaPillars = getSinsalPillars("도화살");
-    const strong = dohwaPillars.includes("일") || dohwaPillars.includes("시");
-    factors.push({ label: `도화 기운 (${dohwaPillars.join("·")}주)`, points: strong ? 14 : 9, reason: strong ? "본인의 매력으로 직접 드러나는 신호" : "분위기·환경에서 묻어나는 신호" });
-    coreSignalCount++;
-  }
-
-  if (has홍염) { factors.push({ label: "홍염 기운", points: 21, reason: "한 사람에게 강하게 꽂히는 1대1 색기 신호" }); coreSignalCount++; }
-
-  if (has진도화)  { factors.push({ label: "도화 기운 (진성)",     points: 30, reason: "타고난 진짜 인기 신호 — 다수에게 풍기는 매력의 정점" }); coreSignalCount++; }
-  if (has나체도화) { factors.push({ label: "본능형 일주 구조",     points: 30, reason: "솔직하고 직관적인 매력의 일주" }); coreSignalCount++; }
-  if (has녹방도화) { factors.push({ label: "격있는 도화 기운",     points: 30, reason: "품격과 함께 자리한 매력" }); coreSignalCount++; }
-  if (has곤랑도화) { factors.push({ label: "합·형 색기 구조",      points: 15, reason: "흔치 않지만 결이 다른 색기 구조" }); coreSignalCount++; }
-
-  if (hasMokYok) {
-    factors.push({ label: "관능 기운", points: mokYokStrong ? 22 : 13, reason: mokYokStrong ? "본인 매력·관능이 가장 강하게 드러나는 자리" : "관능적 감각을 타고난 기운" });
-    coreSignalCount++;
-  }
-
-  if (has역마) factors.push({ label: "활동적인 매력", points: 8, reason: "자유롭고 역동적인 인상" });
-  if (haHwa)   factors.push({ label: "화(火) 기운 우세", points: 10, reason: "열정적이고 표현력 있는 매력" });
-
-  if (form.gender === "female") {
-    if (has수기운강) factors.push({ label: "깊은 음기·물 기운", points: 15, reason: "깊고 농밀한 흡인력" });
-    if (is음간)      factors.push({ label: "음간 일간", points: 10, reason: "은근하고 깊은 음기의 매력" });
-  } else {
-    if (has화목기운강) factors.push({ label: "뜨거운 양기·화목 기운", points: 15, reason: "적극적이고 강한 흡인력" });
-    if (is양간)        factors.push({ label: "양간 일간", points: 10, reason: "강하고 적극적인 양기의 매력" });
-  }
-
-  let comboBonus = 0;
-  if (coreSignalCount >= 4) comboBonus = 36;
-  else if (coreSignalCount >= 3) comboBonus = 22;
-  else if (coreSignalCount >= 2) comboBonus = 10;
-  if (comboBonus > 0) {
-    factors.push({ label: "매력 신호 동시 발현", points: comboBonus, reason: `${coreSignalCount}가지 매력 신호가 겹쳐 서로를 증폭시킴` });
-  }
-
-  // 일주 밤 매력 순위 가점
-  const _iljuKey = pd.day.cg + pd.day.jj;
-  const _nightRank = ILJU_NIGHT_RANK[_iljuKey];
-  if (_nightRank !== undefined) {
-    const rankPts = _nightRank <= 20 ? 3 : _nightRank <= 54 ? 2 : 1;
-    const rankReason = _nightRank <= 20 ? "밤의 분위기를 압도하는 일주" : _nightRank <= 54 ? "은근히 스며드는 밤의 매력" : "잔잔하지만 오래 남는 밤의 여운";
-    factors.push({ label: "일주 밤 매력", points: rankPts, reason: rankReason });
-  }
-
-  const rawScore = factors.reduce((sum, f) => sum + f.points, 0);
-  const score = Math.min(rawScore, 100);
-
-  const grade  = getGrade(score);
-  const ilgan  = result.pillarsDetail.day.cg;
-  const ilji   = result.pillarsDetail.day.jj;
-  const wolggan = result.pillarsDetail.month.cg;
-  const app    = ILGAN_APPEARANCE[ilgan] ?? ILGAN_APPEARANCE["무"];
-  const sex    = ILGAN_SEX[ilgan] ?? ILGAN_SEX["무"];
-  const sexData = form.gender === "female" ? sex.female : sex.male;
-  const hidden = ILJI_HIDDEN_CHARM[ilji] ?? { charm: "알면 알수록 빠져드는 매력", weapon: "깊은 내면의 에너지" };
-  const tips   = SEDUCTION_TIPS[ilgan] ?? SEDUCTION_TIPS["무"];
-  const tipList = form.gender === "female" ? tips.male : tips.female;
-  const outerImage = WOLGGAN_OUTER[wolggan] ?? "사회적으로 안정적이고 신뢰감 있는 이미지.";
-
-  const firstImpKey = `${pd.year.jj}:${ilgan}${ilji}`;
-  const firstImpSpecial = FIRSTIMPRESSION_SPECIAL[firstImpKey] ?? null;
-
-  const charmSinsals: { name: string; desc: string }[] = [];
-  if (has진도화) charmSinsals.push({ name: "진도화(眞桃花)", desc: "이성이 먼저 다가오는 강한 끌림의 기운을 가지고 있습니다." });
-  if (has홍염)   charmSinsals.push({ name: "홍염살(紅艶殺)", desc: "색정적 매력이 강해, 이성이 본능적으로 끌리는 기운입니다." });
-  if (has도화)   charmSinsals.push({ name: "도화살(桃花殺)", desc: "자연스럽게 이성을 끌어당기는 에너지를 타고났습니다." });
-
-  const targetGender = form.gender === "female" ? "남자" : "여자";
-
-  // ── 암합·지지합·충 분석 ──────────────────────────────────────────────────
-  const cgList = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean);
-  const jjList = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean);
-
-  const found천간합: typeof 천간합목록 = [];
-  for (let i = 0; i < cgList.length; i++) {
-    for (let j = i + 1; j < cgList.length; j++) {
-      const match = 천간합목록.find(h =>
-        (h.a === cgList[i] && h.b === cgList[j]) ||
-        (h.a === cgList[j] && h.b === cgList[i])
-      );
-      if (match && !found천간합.includes(match)) found천간합.push(match);
-    }
-  }
-  const found지지합: typeof 지지합목록 = [];
-  for (let i = 0; i < jjList.length; i++) {
-    for (let j = i + 1; j < jjList.length; j++) {
-      const match = 지지합목록.find(h =>
-        (h.a === jjList[i] && h.b === jjList[j]) ||
-        (h.a === jjList[j] && h.b === jjList[i])
-      );
-      if (match && !found지지합.includes(match)) found지지합.push(match);
-    }
-  }
-  const found충: typeof 충목록 = [];
-  for (let i = 0; i < jjList.length; i++) {
-    for (let j = i + 1; j < jjList.length; j++) {
-      const match = 충목록.find(h =>
-        (h.a === jjList[i] && h.b === jjList[j]) ||
-        (h.a === jjList[j] && h.b === jjList[i])
-      );
-      if (match && !found충.includes(match)) found충.push(match);
-    }
-  }
-
-  // ── 요망력 (끌어당김 · 색기 · 밀당) ─────────────────────────────────────────
-  const 끌림력 = Math.min(100, 40 + (has도화 ? 25 : 0) + (has진도화 ? 25 : 0) + (has역마 ? 10 : 0));
-  const 색기력 = Math.min(100, 30 + (has홍염 ? 35 : 0) + (hasMokYok ? 25 : 0) + (haHwa ? 10 : 0));
-  const 밀당력 = Math.min(100, 35 + found충.length * 25 + (found천간합.length + found지지합.length) * 15);
-  const 신체매력 = Math.min(100, 45 + (hasMokYok ? 20 : 0) + (haHwa ? 15 : 0) + (has도화 ? 10 : 0) + (has홍염 ? 10 : 0));
-  const 요망력 = Math.round((끌림력 + 색기력 + 밀당력) / 3);
-
-  // 오행 조합 매력 코드 (설명 없이 결과 라벨만)
-  const dom = result.dominant;
-  const charmCodes: string[] = [];
-  if (dom.includes("금") && dom.includes("수")) charmCodes.push("금수쌍청 · 차가운 미녀상");
-  if (dom.includes("목") && dom.includes("화")) charmCodes.push("목화통명 · 밝고 따뜻한 인상");
-  if (dom.length === 1 && dom[0] === "수") charmCodes.push("수다자 · 물 같은 분위기");
-  const 요망등급 =
-    요망력 >= 85 ? "치명적 요망형 — 마주치면 위험" :
-    요망력 >= 70 ? "고급 요망형 — 은근하지만 강력" :
-    요망력 >= 50 ? "잠재 요망형 — 가까워질수록 발현" :
-    "순둥 매력형 — 요망기는 약하지만 진정성으로 어필";
-
-  // 배우자궁 십성 & 조후
-  const iljiSipseong = pd.day.sipseongJj ?? "";
-  const iljiSipseongDesc = ILJI_SIPSEONG[iljiSipseong] ?? null;
-  const woljiJohu = 월지_조후[pd.month.jj] ?? null;
-
-  return (
-    <main className="min-h-screen bg-[#08010f] text-white">
-      <BackButton />
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[140px]" style={{ backgroundColor: grade.color + "18" }} />
-        <div className="absolute bottom-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full bg-purple-950/20 blur-[120px]" />
-      </div>
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-24" id="eros-result">
-
-
-        {/* 헤더 */}
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-black mb-1">나의 성적 매력</h2>
-          <p className="text-gray-400 text-xs">{result.fourPillars}</p>
-        </div>
-
-        {/* ① 성적 매력 등급 */}
-        <div className="rounded-2xl p-5 mb-4 border" style={{ backgroundColor: grade.bg, borderColor: grade.border }}>
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <span className="text-xs font-bold tracking-widest mb-1 block" style={{ color: grade.color }}>성적 매력 등급</span>
-              <span className="text-4xl font-black" style={{ color: grade.color }}>{grade.grade}등급</span>
-              <span className="text-lg font-bold ml-2" style={{ color: grade.color }}>{grade.label}</span>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-black" style={{ color: grade.color }}>{score}점</p>
-              <p className="text-xs text-gray-300">/ 100</p>
-            </div>
-          </div>
-          <div className="w-full bg-white/10 rounded-full h-2.5 mb-3">
-            <div className="h-full rounded-full" style={{ width: `${score}%`, background: `linear-gradient(90deg, ${grade.color}, #a855f7)` }} />
-          </div>
-          <p className="text-sm text-gray-300 leading-relaxed">{grade.desc}</p>
-          <p className="text-sm font-bold mt-2" style={{ color: grade.color }}>→ {grade.oneliner}</p>
-
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-2.5">점수 구성</p>
-            <div className="space-y-2">
-              {factors.map((f, i) => (
-                <div key={i} className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-200">{f.label}</p>
-                    <p className="text-[11px] text-gray-500">{f.reason}</p>
-                  </div>
-                  <span className="text-sm font-bold shrink-0" style={{ color: grade.color }}>+{f.points}</span>
-                </div>
-              ))}
-            </div>
-            {rawScore > 100 && (
-              <p className="text-[11px] text-gray-500 mt-2.5 pt-2.5 border-t border-white/5">
-                합산 {rawScore}점 → 100점 만점 기준 {score}점으로 환산
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* ①-2 요망력 */}
-        <div className="bg-white/[0.03] border border-pink-700/20 rounded-2xl p-5 mb-4">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-pink-400 font-bold tracking-widest uppercase">요망력 지수</p>
-            <p className="text-2xl font-black text-pink-300">{요망력}<span className="text-sm text-gray-500">/100</span></p>
-          </div>
-          <p className="text-sm font-bold text-pink-200 mb-3">{요망등급}</p>
-          <div className="space-y-2.5">
-            {[
-              { label: "끌림력", desc: "가만히 있어도 시선을 끌어당기는 힘", value: 끌림력, color: "#f472b6" },
-              { label: "색기력", desc: "분위기·말투에서 흘러나오는 관능적 에너지", value: 색기력, color: "#fb7185" },
-              { label: "밀당력", desc: "다가왔다 멀어지며 상대를 더 끌리게 만드는 긴장감", value: 밀당력, color: "#c084fc" },
-              { label: "신체매력", desc: "체형·실루엣에서 드러나는 본능적인 매력", value: 신체매력, color: "#fbbf24" },
-            ].map(item => (
-              <div key={item.label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-gray-300">{item.label}</span>
-                  <span className="text-xs font-bold" style={{ color: item.color }}>{item.value}</span>
-                </div>
-                <div className="w-full bg-white/10 rounded-full h-1.5 mb-1">
-                  <div className="h-full rounded-full" style={{ width: `${item.value}%`, background: item.color }} />
-                </div>
-                <p className="text-[11px] text-gray-500">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          {charmCodes.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {charmCodes.map(c => (
-                <span key={c} className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-pink-500/15 text-pink-300 border border-pink-500/25">
-                  {c}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ② 나의 외모 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 외모</p>
-          <p className="text-sm text-gray-200 leading-relaxed">
-            {app.face} {app.body} {app.vibe} 비슷한 분위기로는 <span className="font-semibold" style={{ color: grade.color }}>{app.celeb}</span> 같은 이미지가 있습니다.
-            {" "}{getAppearanceAnalysis(result).points.join(" ")}
-          </p>
-        </div>
-
-        {/* ③ 나의 성적 능력·에너지 + 성향 인사이트 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">나의 성적 에너지</p>
-          <p className="text-sm text-gray-200 leading-relaxed">
-            {sexData.power} {sexData.energy} {sexData.style} {ILGAN_DAYNIGHT[ilgan]?.[form.gender === "female" ? "female" : "male"] ?? "낮과 밤의 모습이 비슷한 타입입니다."}
-            {hasMokYok && ` 게다가 감각과 관능이 가장 강한 위치를 타고나, ${form.gender === "female" ? "음기가 극도로 풍부하며 이성이 본능적으로 끌리고," : "양기가 강하고 이성을 끌어당기는 에너지가 있으며,"} 패션 감각도 타고나 약간의 노출도 고급스럽게 소화하고 어딜 가나 스타일로 시선을 끄는 것이 자연스럽게 성관계 매력으로 연결됩니다.`}
-            {hasPyeongwan && " 강한 카리스마가 있어 매력적이면서도 강렬한 인상을 남기는데, 말 한마디 없이도 포스가 느껴지고 압도적인 분위기 자체가 이성을 끌어당기며 가끔 부드러운 면을 보여주는 반전 매력까지 더해지면 치명적입니다."}
-            {form.gender === "female" && has수기운강 && " 수(水) 기운도 강해 흡인·수용·생식의 에너지가 풍부한데, 이 기운이 강한 여성은 상대를 깊이 끌어당기는 자기장 같은 매력이 있어 몸의 에너지가 농밀하고 관계에서 상대가 벗어나기 어렵습니다."}
-            {form.gender === "female" && is음간 && has수기운강 && " 받아들이고 흡수하는 기운까지 겹쳐, 겉으로는 조용해 보여도 내면에 강한 음기가 모여있어 관계에서 상대가 의존하게 되는 흡인력이 자연스럽게 발산됩니다."}
-            {" "}{getSexlifeInsights(result).map(ins => ins.desc).join(" ")}
-            {" "}{getSexEnergyAnalysis(result).points.join(" ")}
-          </p>
-        </div>
-
-        {/* ④ 암합·지지합·충 분석 */}
-        {(found천간합.length > 0 || found지지합.length > 0 || found충.length > 0) && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">사주 기둥 사이에 숨겨진 합(合)·충(沖)의 에너지</p>
-            <p className="text-sm text-gray-200 leading-relaxed">
-              {found천간합.map(h => `${h.a}${h.b}합으로 합화 ${h.합화}을 이루어 ${h.desc}`).join(" ")}
-              {found천간합.some(h => h.a === "정" || h.b === "정") && " 특히 정임합이 사주에 숨어있으면 겉으로 드러나지 않는 \"숨겨진 성적 매력\"이 있어, 가까워지면 폭발하는 타입입니다."}
-              {found지지합.length > 0 && " " + found지지합.map(h => `${h.a}${h.b}합으로 합화 ${h.합화}을 이루어 ${h.desc}`).join(" ") + " 음양이 맞아 자연스럽게 끌리는 기운입니다."}
-              {found충.length > 0 && ` 한편 ${found충.map(c => `${c.a}${c.b}충`).join(", ")}이 있어 긴장감과 자극이 강한 편입니다. ` + found충.map(c => c.desc).join(" ") + " 정적인 관계보다 역동적이고 자극적인 관계에서 에너지가 살아납니다."}
-            </p>
-          </div>
-        )}
-
-        {/* ⑥ 배우자궁·조후 분석 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">배우자궁 분석</p>
-          <p className="text-sm text-gray-200 leading-relaxed">
-            {ILJI_HIDDEN_CHARM[ilji]?.charm ?? "알면 알수록 빠져드는 매력입니다."}
-            {iljiSipseongDesc && ` ${iljiSipseongDesc}`}
-            {woljiJohu && ` ${woljiJohu}`}
-          </p>
-        </div>
-
-        {/* ⑧ 은근한 매력 (일지) + 월주 분석 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">은근한 매력</p>
-          <p className="text-sm text-gray-200 leading-relaxed">
-            {hidden.charm} 나의 은밀한 무기는 <span className="font-semibold" style={{ color: grade.color }}>{hidden.weapon}</span>입니다. 사회적으로 드러나는 외부 이미지로는, {outerImage}{ILJU_NIGHT_CHARM[ilgan + ilji] ? ` ${ILJU_NIGHT_CHARM[ilgan + ilji]}` : ""}{firstImpSpecial ? ` ${firstImpSpecial}` : ""}
-          </p>
-        </div>
-
-        {/* ⑩ 도화 신살 */}
-        {charmSinsals.length > 0 && (
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">타고난 매력 신호</p>
-            <p className="text-sm text-gray-200 leading-relaxed">
-              {charmSinsals.map(({ name, desc }) => `${name} — ${desc}`).join(" ")}
-            </p>
-          </div>
-        )}
-        {/* ⑪ 꼬시는 팁 */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-gray-500 font-bold tracking-widest uppercase mb-3">{targetGender}를 꼬시는 법</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{tipList.join(" ")}</p>
-        </div>
-
-        <DohwaFormulaList result={result} />
-        <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
-
-        <button onClick={() => { setForm(defaultBirthData("female")); setStep("form"); }}
-          className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
-          다시 분석하기
-        </button>
-        <ResultFooterActions targetId="eros-result" fileName="매력살" shareTitle="내 사주 분석 결과" shareText="Summer Palace에서 내 사주를 분석했어요" />
-      </div>
-    </main>
-  );
+  // ── 결과는 success 페이지에서 처리 ──────────────────────────────────────
+  return null;
 }
 
 export default function ErosPage() {
