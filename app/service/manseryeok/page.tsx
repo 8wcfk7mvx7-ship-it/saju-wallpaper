@@ -295,15 +295,15 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
 
 // ─── 오행 스타일 ───────────────────────────────────────────────────────────────
 const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge: string }> = {
-  목: { bg: "rgba(34,197,94,0.10)",  text: "#4ade80", border: "rgba(34,197,94,0.25)",  badge: "rgba(34,197,94,0.15)" },
-  화: { bg: "rgba(239,68,68,0.10)",  text: "#f87171", border: "rgba(239,68,68,0.25)",  badge: "rgba(239,68,68,0.15)" },
-  토: { bg: "rgba(245,158,11,0.10)", text: "#fbbf24", border: "rgba(245,158,11,0.25)", badge: "rgba(245,158,11,0.15)" },
-  금: { bg: "rgba(209,213,219,0.10)",text: "#d1d5db", border: "rgba(209,213,219,0.25)",badge: "rgba(209,213,219,0.15)" },
-  수: { bg: "rgba(59,130,246,0.10)", text: "#60a5fa", border: "rgba(59,130,246,0.25)",  badge: "rgba(59,130,246,0.15)" },
+  목: { bg: "rgba(30,40,30,0.7)",  text: "#86efac", border: "rgba(134,239,172,0.15)",  badge: "rgba(134,239,172,0.12)" },
+  화: { bg: "rgba(40,20,20,0.7)",  text: "#fca5a5", border: "rgba(252,165,165,0.15)",  badge: "rgba(252,165,165,0.12)" },
+  토: { bg: "rgba(40,32,10,0.7)",  text: "#fcd34d", border: "rgba(252,211,77,0.15)",   badge: "rgba(252,211,77,0.12)"  },
+  금: { bg: "rgba(20,20,36,0.7)",  text: "#c4b5fd", border: "rgba(196,181,253,0.15)",  badge: "rgba(196,181,253,0.12)" },
+  수: { bg: "rgba(10,22,38,0.7)",  text: "#93c5fd", border: "rgba(147,197,253,0.15)",  badge: "rgba(147,197,253,0.12)" },
 };
 // 오행 기반 십성 색상 체계 (일간 기준)
 const OHAENG_COLOR: Record<string, string> = {
-  목: "#22c55e", 화: "#ef4444", 토: "#f59e0b", 금: "#f8fafc", 수: "#94a3b8",
+  목: "#86efac", 화: "#fca5a5", 토: "#fcd34d", 금: "#c4b5fd", 수: "#93c5fd",
 };
 // 오행 생극 관계
 const OHAENG_GENERATES: Record<string, string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };

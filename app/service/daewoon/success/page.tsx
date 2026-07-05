@@ -8,11 +8,11 @@ import ResultFooterActions from "@/components/ResultFooterActions";
 export const dynamic = "force-dynamic";
 
 const ELEMENT_COLOR: Record<string, { bg: string; text: string; border: string }> = {
-  목: { bg: "#052e16", text: "#4ade80", border: "#14532d" },
-  화: { bg: "#450a0a", text: "#f87171", border: "#7f1d1d" },
-  토: { bg: "#2d1a00", text: "#fbbf24", border: "#78350f" },
-  금: { bg: "#0f0e2e", text: "#a5b4fc", border: "#1e1b4b" },
-  수: { bg: "#0a1f3a", text: "#60a5fa", border: "#0c2a4a" },
+  목: { bg: "rgba(30,40,30,0.7)",  text: "#86efac", border: "rgba(134,239,172,0.15)" },
+  화: { bg: "rgba(40,20,20,0.7)",  text: "#fca5a5", border: "rgba(252,165,165,0.15)" },
+  토: { bg: "rgba(40,32,10,0.7)",  text: "#fcd34d", border: "rgba(252,211,77,0.15)"  },
+  금: { bg: "rgba(20,20,36,0.7)",  text: "#c4b5fd", border: "rgba(196,181,253,0.15)" },
+  수: { bg: "rgba(10,22,38,0.7)",  text: "#93c5fd", border: "rgba(147,197,253,0.15)" },
 };
 
 const UUNSEONG_FORTUNE: Record<string, { score: number; color: string; desc: string; advice: string }> = {
