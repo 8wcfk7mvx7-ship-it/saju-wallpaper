@@ -34,6 +34,15 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Summer Palace",
   },
+  icons: {
+    icon: [
+      { url: "/mascot.png", sizes: "192x192", type: "image/png" },
+      { url: "/mascot.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/mascot.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport = {
