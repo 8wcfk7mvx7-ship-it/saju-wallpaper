@@ -118,22 +118,23 @@ interface Props {
   accent?: string;         // 테마 컬러
   showGender?: boolean;    // 성별 표시 여부 (기본 true)
   showName?: boolean;      // 이름 입력란 표시 여부 (기본 true) — 호출부에 별도 이름 입력란이 있으면 false로 중복 방지
+  hideProfileBtn?: boolean; // 여러 폼이 있을 때 중복 버튼 방지용
 }
 
 export default function BirthInputForm({
-  value, onChange, label, accent = "#7c3aed", showGender = true, showName = true,
+  value, onChange, label, accent = "#7c3aed", showGender = true, showName = true, hideProfileBtn = false,
 }: Props) {
   const set = (patch: Partial<BirthFormData>) => onChange({ ...value, ...patch });
-
-  // 첫 번째 BirthInputForm(label 없거나 "나")에만 바텀시트 표시
-  const showSheet = !label || label === "나";
 
   const isJajasiRange = value.birthHour !== null && (value.birthHour === 23 || value.birthHour === 0 || value.birthHour === 1);
 
   return (
     <>
-      {showSheet && (
-        <ProfileLoadSheet onLoad={(data) => onChange({ ...value, ...data })} />
+      {!hideProfileBtn && (
+        <ProfileLoadSheet
+          onLoad={(data) => onChange({ ...value, ...data })}
+          currentData={value}
+        />
       )}
     <div className="space-y-4">
       {label && (

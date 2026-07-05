@@ -63,7 +63,7 @@ export default function IljinCalendar() {
             일진달력
           </h2>
           <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>日辰曆 · 매일의 하늘과 땅의 기운</p>
-          <p className="text-[13px] mt-1 font-medium tracking-wide" style={{ color: "rgba(255,215,100,0.75)" }}>
+          <p className="text-[12px] mt-1 font-medium tracking-wide whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: "rgba(255,215,100,0.75)" }}>
             오늘 · {todayPillarLine}
           </p>
         </div>

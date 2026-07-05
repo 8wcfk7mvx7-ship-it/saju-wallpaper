@@ -9,8 +9,9 @@ declare global {
     google?: {
       accounts: {
         id: {
-          initialize: (config: { client_id: string; callback: (resp: { credential: string }) => void }) => void;
-          renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+          initialize: (cfg: object) => void;
+          renderButton: (el: HTMLElement, cfg: object) => void;
+          prompt: () => void;
         };
       };
     };
@@ -20,58 +21,50 @@ declare global {
 export default function LoginOptions({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const redirect = pathname || "/";
-  const googleBtnRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    async function handleCredential(resp: { credential: string }) {
-      try {
-        const res = await fetch("/api/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ credential: resp.credential, redirect }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          onClose?.();
-          window.dispatchEvent(new Event("sp-auth-changed"));
-          router.push(data.redirect || "/");
-          router.refresh();
-        }
-      } catch {}
-    }
-
     function init() {
-      if (!window.google || !googleBtnRef.current) return;
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredential });
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: "filled_black",
+      if (!window.google?.accounts?.id || !btnRef.current) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: async (resp: { credential: string }) => {
+          const res = await fetch("/api/auth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credential: resp.credential, redirect: pathname || "/" }),
+          });
+          const data = await res.json();
+          if (data.ok) router.push(data.redirect || "/");
+        },
+      });
+      window.google.accounts.id.renderButton(btnRef.current, {
+        theme: "outline",
         size: "large",
-        shape: "pill",
-        width: 320,
-        text: "continue_with",
+        width: btnRef.current.offsetWidth || 320,
+        text: "signin_with",
         locale: "ko",
       });
     }
 
-    if (window.google) {
+    if (window.google?.accounts?.id) {
       init();
     } else {
-      const timer = setInterval(() => {
-        if (window.google) {
-          clearInterval(timer);
-          init();
-        }
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) { clearInterval(interval); init(); }
       }, 200);
-      return () => clearInterval(timer);
+      return () => clearInterval(interval);
     }
-  }, [redirect, router, onClose]);
+  }, [pathname, router]);
 
   return (
     <div className="w-full space-y-3">
-      <div ref={googleBtnRef} className="w-full flex justify-center" />
+      {/* Google 로그인 */}
+      <div ref={btnRef} className="w-full overflow-hidden rounded-2xl" style={{ minHeight: 44 }} />
+
+      {/* Apple 로그인 */}
       <a
-        href={`/api/auth/apple?redirect=${encodeURIComponent(redirect)}`}
+        href={`/api/auth/apple?redirect=${encodeURIComponent(pathname || "/")}`}
         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
         style={{ background: "#000", color: "#fff", border: "1px solid rgba(255,255,255,0.15)" }}
       >
@@ -80,6 +73,7 @@ export default function LoginOptions({ onClose }: { onClose?: () => void }) {
         </svg>
         Apple로 로그인
       </a>
+
       {onClose && (
         <button onClick={onClose}
           className="w-full py-3 rounded-2xl font-bold text-sm text-gray-400 hover:text-gray-200 transition-all">

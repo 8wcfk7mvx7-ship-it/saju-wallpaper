@@ -45,9 +45,11 @@ export default function SoloPage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
+    nameRef.current = form.name?.trim() || "당신";
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
     if (form.calendarType === "lunar") {
       try {
@@ -173,6 +175,8 @@ export default function SoloPage() {
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
   const isFemale = form.gender === "female";
+  const userName = nameRef.current;
+  const N = userName === "당신" ? "당신" : `${userName}님`;
 
   // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
@@ -286,7 +290,7 @@ export default function SoloPage() {
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MARRIAGE OR SOLO</p>
           <h1 className="text-2xl font-black leading-snug">
-            {ilgan}{r.pillarsDetail.day.jj}일주 {form.name || "나"}님의<br />결혼 vs 비혼 적합도
+            {ilgan}{r.pillarsDetail.day.jj}일주 {N}의<br />결혼 vs 비혼 적합도
           </h1>
         </div>
 
@@ -308,7 +312,7 @@ export default function SoloPage() {
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-1">비혼일 때 더 성공할까?</p>
+          <p className="text-sm font-bold text-emerald-300 mb-1">{N}, 비혼일 때 더 성공할까?</p>
           <p className="text-sm text-gray-300 leading-relaxed">
             {bigeopCount >= 2 || hasMuGwan
               ? "사주 구조상 독립성과 자기 주도성이 강한 편입니다. 누군가에게 맞춰야 하는 환경보다, 본인의 결정으로 시간과 자원을 온전히 운용할 수 있는 환경에서 성과가 훨씬 크게 나타나는 타입입니다. 결혼 후 가정에 들어가는 에너지가 줄어들수록, 그 에너지가 일·자기계발 쪽으로 옮겨가며 성공 가능성이 오히려 높아질 수 있습니다. 이 구조에서는 결혼을 해도 어느 정도 자신만의 시간과 공간이 확보되지 않으면 답답함을 크게 느끼게 되므로, 파트너를 선택할 때 '서로의 독립성을 존중하는 사람'을 기준으로 삼는 것이 중요합니다."
@@ -390,7 +394,7 @@ export default function SoloPage() {
         )}
 
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-amber-300 mb-1">비혼으로 살 때 특히 신경 써야 할 부분</p>
+          <p className="text-sm font-bold text-amber-300 mb-1">{N}, 비혼으로 살 때 신경 써야 할 부분</p>
           <p className="text-sm text-gray-300 leading-relaxed">
             {hasMuJae
               ? "재물을 의미하는 기운이 약한 구조라, 혼자 경제를 책임져야 하는 비혼 생활에서는 재물 관리가 가장 중요한 변수가 됩니다. 고정 수입을 자동으로 분리·저축하는 시스템을 일찍 만들어두는 것이 노후 안정성에 큰 차이를 만듭니다. 이 구조에서는 월급처럼 고정된 수입원을 반드시 하나 이상 유지하고, 그 위에 부수적인 수입원을 천천히 쌓아가는 방식이 가장 안전합니다. 재테크보다 지출 관리가 먼저입니다."

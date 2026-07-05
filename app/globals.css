@@ -167,3 +167,8 @@ html.native-app header.sticky.top-0 {
 
 /* ── 浮動 ── */
 .float-anim { animation: float 5s ease-in-out infinite; }
+
+/* ── 어두운 배경 기준 회색 글자 밝기 보정 ── */
+.text-gray-400 { color: #b0bbc9 !important; }
+.text-gray-500 { color: #9aa8b8 !important; }
+.text-gray-600 { color: #8494a8 !important; }

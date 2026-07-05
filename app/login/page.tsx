@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser, isAuthConfigured } from "@/lib/supabaseClient";
+import { supabaseBrowser } from "@/lib/supabaseClient";
+import LoginOptions from "@/components/LoginOptions";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,14 +35,6 @@ export default function LoginPage() {
     router.push("/");
   }
 
-  if (!isAuthConfigured()) {
-    return (
-      <main className="min-h-screen bg-[#06060e] text-white flex items-center justify-center px-5">
-        <p className="text-sm text-gray-500">로그인 기능을 준비 중입니다.</p>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-[#06060e] text-white flex flex-col items-center justify-center px-5">
       <div className="w-full max-w-2xl">
@@ -67,6 +60,14 @@ export default function LoginPage() {
             {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-600">또는</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        <LoginOptions />
 
         <p className="text-center text-xs text-gray-500 mt-6">
           아직 계정이 없으신가요?{" "}
