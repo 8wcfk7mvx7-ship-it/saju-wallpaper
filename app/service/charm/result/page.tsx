@@ -9,6 +9,7 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getOhaengPlaceNarrative, getGongmangNarrative, getGwanseongSiksangYeonaeNarrative,
+  ILGAN_PERSONALITY,
 } from "@/lib/saju";
 import {
   ILGAN_CHARM_DB,
@@ -275,6 +276,21 @@ function CharmResultContent() {
             </div>
           </div>
         )}
+
+        {/* ═══ 일간 × 성별 특성 ═══ */}
+        {(() => {
+          const gd = ILGAN_PERSONALITY[ilgan]?.genderDetail;
+          const desc = gd ? (gender === "male" ? gd.male : gd.female) : null;
+          if (!desc) return null;
+          return (
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {gender === "male" ? "♂ 남성" : "♀ 여성"} · 실제 관찰
+              </p>
+              <p className="text-sm text-gray-300 leading-relaxed">{desc}</p>
+            </div>
+          );
+        })()}
 
         {/* ═══ 오행 외모 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
