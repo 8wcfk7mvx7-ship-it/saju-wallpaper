@@ -401,8 +401,21 @@ function getGenderDetail(sipseong: string): GenderDomain[] | null {
   return g ? SIPSEONG_GENDER_DETAIL[g] : null;
 }
 
-// ── 운 지수 계산 (평균 50점 기준 0~100점) ───────────────────────────────────────
+// ── 운 지수 계산 ──────────────────────────────────────────────────────────────
 type LuckIdx = { label: string; score: number; color: string };
+
+function calcLuckScore(sipseongCg: string, sipseongJj: string, uunseong: string): number {
+  const uf = UUNSEONG_FORTUNE[uunseong];
+  const base = uf ? uf.score * 10 : 50;
+  const GOOD_SS = new Set(["정관","정재","정인","식신","건록","제왕"]);
+  const BAD_SS  = new Set(["편관","겁재","상관"]);
+  let bonus = 0;
+  if (GOOD_SS.has(sipseongCg)) bonus += 8;
+  if (GOOD_SS.has(sipseongJj)) bonus += 8;
+  if (BAD_SS.has(sipseongCg))  bonus -= 8;
+  if (BAD_SS.has(sipseongJj))  bonus -= 8;
+  return Math.max(4, Math.min(96, Math.round(base + bonus)));
+}
 
 function calcLuckIndices(sipseongCg: string, sipseongJj: string, uunseong: string, gender: "male" | "female"): LuckIdx[] {
   const SIPSEONG_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
@@ -414,10 +427,9 @@ function calcLuckIndices(sipseongCg: string, sipseongJj: string, uunseong: strin
     const g = SIPSEONG_GROUP[s];
     if (g) groups[g] += 22;
   }
-
   const uf = UUNSEONG_FORTUNE[uunseong];
-  const uScore = uf ? uf.score : 5; // 0~10
-  const uDelta = (uScore - 5) * 5; // 약 -25 ~ +25
+  const uScore = uf ? uf.score : 5;
+  const uDelta = (uScore - 5) * 5;
 
   let marriage = 50 + uDelta * 0.6;
   if (gender === "female" && (sipseongCg === "정관" || sipseongJj === "정관")) marriage += 18;
@@ -430,39 +442,82 @@ function calcLuckIndices(sipseongCg: string, sipseongJj: string, uunseong: strin
   if (["장생", "관대", "제왕", "태"].includes(uunseong)) birth += 8;
   if (["묘", "절", "사"].includes(uunseong)) birth -= 12;
 
-  let change = 50 - uDelta * 0.4;
-  if (["겁재", "상관", "편관"].includes(sipseongCg) || ["겁재", "상관", "편관"].includes(sipseongJj)) change += 14;
-  if (["정인", "정관"].includes(sipseongCg) && ["정인", "정관"].includes(sipseongJj)) change -= 12;
-  if (["목욕", "병", "묘", "절", "태"].includes(uunseong)) change += 8;
-  if (["관대", "건록", "제왕"].includes(uunseong)) change -= 6;
-
   const clamp = (n: number) => Math.max(4, Math.min(96, Math.round(n)));
   return [
-    { label: "자립·경쟁운", score: clamp(groups.비겁), color: "#4ade80" },
-    { label: "표현·창작운", score: clamp(groups.식상), color: "#60a5fa" },
-    { label: "재물운", score: clamp(groups.재성), color: "#fbbf24" },
-    { label: "직장·책임운", score: clamp(groups.관성), color: "#c084fc" },
-    { label: "학업·도움운", score: clamp(groups.인성), color: "#e2e8f0" },
-    { label: "결혼 확률", score: clamp(marriage), color: "#f472b6" },
-    { label: "출생·자녀 확률", score: clamp(birth), color: "#34d399" },
-    { label: "변화 지수", score: clamp(change), color: "#fb7185" },
+    { label: "재물운", score: clamp(groups.재성 + uDelta * 0.4), color: "#fbbf24" },
+    { label: "직장·책임운", score: clamp(groups.관성 + uDelta * 0.3), color: "#c084fc" },
+    { label: "애정운", score: clamp(marriage), color: "#f472b6" },
+    { label: "건강운", score: clamp(50 + uDelta * 0.5), color: "#4ade80" },
+    { label: "창작·표현운", score: clamp(groups.식상), color: "#60a5fa" },
+    { label: "자녀운", score: clamp(birth), color: "#34d399" },
   ];
 }
 
-function LuckBars({ items, compact }: { items: LuckIdx[]; compact?: boolean }) {
+// 단일 길흉 게이지 + 세부 지표
+function LuckGauge({ score, items }: { score: number; items: LuckIdx[] }) {
+  const isGood = score >= 60;
+  const isBad  = score <= 38;
+  const gaugeColor = isGood ? "#4ade80" : isBad ? "#f87171" : "#94a3b8";
+  const label = score >= 75 ? "대길" : score >= 60 ? "길운" : score >= 45 ? "평운" : score >= 30 ? "흉운" : "대흉";
+  const labelColor = score >= 75 ? "#4ade80" : score >= 60 ? "#34d399" : score >= 45 ? "#94a3b8" : score >= 30 ? "#f87171" : "#ef4444";
+
   return (
-    <div className={compact ? "space-y-1" : "space-y-1.5"}>
-      {items.map(it => (
-        <div key={it.label} className="flex items-center gap-2">
-          <span className="text-[10px] shrink-0" style={{ width: 78, color: "rgba(255,255,255,0.45)" }}>{it.label}</span>
-          <div className="flex-1 h-2 rounded-full relative overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <div className="absolute left-1/2 top-0 bottom-0 w-px z-10" style={{ background: "rgba(255,255,255,0.2)" }} />
-            <div className="h-2 rounded-full transition-all" style={{ width: `${it.score}%`, background: it.color }} />
-          </div>
-          <span className="text-[10px] w-7 text-right font-black" style={{ color: it.color }}>{it.score}</span>
+    <div>
+      {/* 단일 길흉 게이지 */}
+      <div className="mb-3">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>흉운 ←</span>
+          <span className="text-xs font-black" style={{ color: labelColor }}>{label} {score}점</span>
+          <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>→ 길운</span>
         </div>
-      ))}
-      {!compact && <p className="text-[9px] text-right mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>※ 평균(50점)을 기준으로 한 상대 지수예요</p>}
+        <div className="h-3 rounded-full overflow-hidden relative" style={{ background: "linear-gradient(to right, #ef4444 0%, #f87171 25%, #94a3b8 45%, #94a3b8 55%, #4ade80 75%, #22c55e 100%)" }}>
+          <div className="absolute top-0 bottom-0 rounded-full" style={{ right: 0, width: `${100 - score}%`, background: "rgba(6,6,14,0.7)" }} />
+          <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-lg" style={{ left: `calc(${score}% - 6px)`, background: gaugeColor }} />
+        </div>
+      </div>
+      {/* 세부 지표 2열 */}
+      <div className="grid grid-cols-3 gap-1.5">
+        {items.map(it => (
+          <div key={it.label} className="rounded-lg px-2 py-1.5 text-center" style={{ background: "rgba(0,0,0,0.25)" }}>
+            <div className="h-1 rounded-full mb-1 overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <div className="h-1 rounded-full" style={{ width: `${it.score}%`, background: it.color }} />
+            </div>
+            <p className="text-[8px]" style={{ color: "rgba(255,255,255,0.4)" }}>{it.label}</p>
+            <p className="text-[9px] font-black" style={{ color: it.color }}>{it.score}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-[9px] text-right mt-1" style={{ color: "rgba(255,255,255,0.2)" }}>※ 50점 기준 상대 지수</p>
+    </div>
+  );
+}
+
+// 인생 전체 길흉 파노라마 차트
+function LifeFortuneChart({ pillars, currentIdx, gender }: { pillars: { sipseongCg: string; sipseongJj: string; uunseong: string; age: number; cg: string; jj: string }[]; currentIdx: number; gender: "male" | "female" }) {
+  const scores = pillars.map(p => calcLuckScore(p.sipseongCg, p.sipseongJj, p.uunseong));
+  const maxH = 48;
+  return (
+    <div className="rounded-2xl p-4 mb-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+      <p className="text-[10px] font-black mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>인생 전체 운기 흐름 — 길운(↑) · 흉운(↓)</p>
+      <div className="flex items-end gap-1" style={{ height: maxH + 20 }}>
+        {scores.map((score, i) => {
+          const h = Math.max(6, Math.round((score / 100) * maxH));
+          const isCur = i === currentIdx;
+          const col = score >= 65 ? "#4ade80" : score >= 50 ? "#a3e635" : score >= 38 ? "#94a3b8" : "#f87171";
+          return (
+            <div key={i} className="flex flex-col items-center flex-1 gap-0.5">
+              {isCur && <div className="w-1 h-1 rounded-full" style={{ background: "#fbbf24" }} />}
+              <div className="w-full rounded-t-sm transition-all" style={{ height: h, background: isCur ? "#fbbf24" : col, opacity: isCur ? 1 : 0.7 }} />
+              <span className="text-[6px]" style={{ color: isCur ? "#fbbf24" : "rgba(255,255,255,0.25)" }}>{pillars[i].age}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between mt-1">
+        <span className="text-[8px]" style={{ color: "rgba(255,255,255,0.25)" }}>← 흉운</span>
+        <span className="text-[8px] font-black" style={{ color: "#fbbf24" }}>● 현재</span>
+        <span className="text-[8px]" style={{ color: "rgba(255,255,255,0.25)" }}>길운 →</span>
+      </div>
     </div>
   );
 }
@@ -772,101 +827,8 @@ export default function DaewoonPage() {
             <span className="text-xs text-gray-600 mb-0.5">10년 단위</span>
           </div>
 
-          {/* 현재 대운 심층 분석 카드 */}
-          {daewoon.currentIdx >= 0 && (() => {
-            const cur = daewoon.pillars[daewoon.currentIdx];
-            const elStyle = ELEMENT_COLOR[cur.element] || ELEMENT_COLOR["토"];
-            const uunsF = UUNSEONG_FORTUNE[cur.uunseong];
-            const sipCg = SIPSEONG_DAEWOON[cur.sipseongCg];
-            const sipJj = SIPSEONG_DAEWOON[cur.sipseongJj];
-            return (
-              <div className="rounded-2xl p-5 mb-6 border-2" style={{ background: `${elStyle.bg}cc`, borderColor: "#ca8a04" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-yellow-500/25 text-yellow-400">현재 대운 심층 분석</span>
-                  <span className="text-[10px] text-gray-500">{cur.age}세 ~ {cur.age + 9}세 ({cur.yearStart}~{cur.yearStart + 9})</span>
-                </div>
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="text-center shrink-0">
-                    <p className="text-4xl font-black leading-none" style={{ color: elStyle.text }}>{cur.cg}</p>
-                    <p className="text-4xl font-black leading-none" style={{ color: elStyle.text }}>{cur.jj}</p>
-                    <p className="text-[10px] text-gray-500 mt-1">{cur.element}({cur.element})</p>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      <span className="text-xs px-2.5 py-1 rounded-full font-bold" style={{ background: `${SIPSEONG_COLOR[cur.sipseongCg] || "#fff"}22`, color: SIPSEONG_COLOR[cur.sipseongCg] || "#fff", border: `1px solid ${SIPSEONG_COLOR[cur.sipseongCg] || "#fff"}44` }}>{cur.sipseongCg} (천간)</span>
-                      <span className="text-xs px-2.5 py-1 rounded-full font-bold" style={{ background: `${SIPSEONG_COLOR[cur.sipseongJj] || "#fff"}22`, color: SIPSEONG_COLOR[cur.sipseongJj] || "#fff", border: `1px solid ${SIPSEONG_COLOR[cur.sipseongJj] || "#fff"}44` }}>{cur.sipseongJj} (지지)</span>
-                      {uunsF && <span className="text-xs px-2.5 py-1 rounded-full font-bold" style={{ background: `${uunsF.color}22`, color: uunsF.color }}>{uunsF.label}</span>}
-                    </div>
-                    {uunsF && <p className="text-sm font-semibold" style={{ color: uunsF.color }}>{uunsF.desc}</p>}
-                  </div>
-                </div>
-
-                {uunsF && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.3)" }}>
-                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {N}에게 미치는 영향</p>
-                    <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj)}`}</p>
-                  </div>
-                )}
-
-                {uunsF && (
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    {([
-                      { label: "💰 재물운", text: uunsF.finance, color: "#fbbf24" },
-                      { label: "💼 직업운", text: uunsF.career, color: "#60a5fa" },
-                      { label: "💑 애정운", text: uunsF.love, color: "#f472b6" },
-                      { label: "🏃 건강운", text: uunsF.health, color: "#4ade80" },
-                    ] as { label: string; text: string; color: string }[]).map(d => (
-                      <div key={d.label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.28)" }}>
-                        <p className="text-[10px] font-bold mb-1.5" style={{ color: d.color }}>{d.label}</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">{d.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {sipCg && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.25)" }}>
-                    <p className="text-xs font-bold mb-1" style={{ color: sipCg.color }}>{sipCg.title} — 천간의 기운</p>
-                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{sipCg.desc}</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">{sipCg.life}</p>
-                    <p className="text-xs mt-2 px-2 py-1.5 rounded-lg" style={{ background: "rgba(255,100,100,0.08)", color: "#f87171" }}>주의: {sipCg.caution}</p>
-                  </div>
-                )}
-
-                {sipJj && sipJj.title !== sipCg?.title && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.25)" }}>
-                    <p className="text-xs font-bold mb-1" style={{ color: sipJj.color }}>{sipJj.title} — 지지의 기운</p>
-                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{sipJj.desc}</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">{sipJj.life}</p>
-                  </div>
-                )}
-
-                {uunsF && (
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <div className="rounded-xl p-3" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
-                      <p className="text-[10px] font-bold text-emerald-400 mb-1">✅ 이 시기에 할 것</p>
-                      <p className="text-xs text-emerald-200/80 leading-relaxed">{uunsF.todo}</p>
-                    </div>
-                    <div className="rounded-xl p-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
-                      <p className="text-[10px] font-bold text-red-400 mb-1">🚫 하지 말 것</p>
-                      <p className="text-xs text-red-200/80 leading-relaxed">{uunsF.avoid}</p>
-                    </div>
-                  </div>
-                )}
-
-                {uunsF && (
-                  <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: "rgba(255,180,0,0.08)", border: "1px solid rgba(255,180,0,0.2)" }}>
-                    <span className="text-yellow-400 shrink-0 mt-0.5">!</span>
-                    <div>
-                      <p className="text-xs font-bold text-yellow-400 mb-0.5">이 시기 핵심 키워드</p>
-                      <p className="text-xs text-yellow-300">{uunsF.keyword}</p>
-                      <p className="text-xs text-yellow-200/60 mt-1">{uunsF.caution}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+          {/* 인생 전체 운기 파노라마 */}
+          <LifeFortuneChart pillars={daewoon.pillars} currentIdx={daewoon.currentIdx} gender={gender as "male" | "female"} />
 
           {/* 전체 대운 타임라인 */}
           <div className="space-y-3">
@@ -968,8 +930,8 @@ export default function DaewoonPage() {
 
                   {/* 운 지수 차트 */}
                   <div className="px-4 pb-4 pt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                    <p className="text-[10px] font-black mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>📊 이 시기의 운 지수</p>
-                    <LuckBars items={calcLuckIndices(p.sipseongCg, p.sipseongJj, p.uunseong, gender)} />
+                    <p className="text-[10px] font-black mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>📊 이 시기의 길흉 지수</p>
+                    <LuckGauge score={calcLuckScore(p.sipseongCg, p.sipseongJj, p.uunseong)} items={calcLuckIndices(p.sipseongCg, p.sipseongJj, p.uunseong, gender as "male" | "female")} />
                   </div>
 
                   {/* 성별 맞춤 상세 — 직업·재물·애정·자녀 */}
@@ -1037,8 +999,8 @@ export default function DaewoonPage() {
                     </div>
                     {isOpen && (
                       <div className="mt-1.5 rounded-xl p-2.5" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${elStyle.border}`, minWidth: 220 }}>
-                        <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>📊 {s.year}년 운 지수</p>
-                        <LuckBars compact items={calcLuckIndices(s.sipseongCg, s.sipseongJj, s.uunseong, gender)} />
+                        <p className="text-[9px] font-bold mb-1.5" style={{ color: elStyle.text }}>📊 {s.year}년 길흉 지수</p>
+                        <LuckGauge score={calcLuckScore(s.sipseongCg, s.sipseongJj, s.uunseong)} items={calcLuckIndices(s.sipseongCg, s.sipseongJj, s.uunseong, gender as "male" | "female")} />
 
                         {/* 원국과의 합충형파 한눈에 보기 */}
                         {(() => {
