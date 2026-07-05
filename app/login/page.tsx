@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser, isAuthConfigured } from "@/lib/supabaseClient";
+import { supabaseBrowser } from "@/lib/supabaseClient";
 import LoginOptions from "@/components/LoginOptions";
 
 export default function LoginPage() {
@@ -33,14 +33,6 @@ export default function LoginPage() {
       return;
     }
     router.push("/");
-  }
-
-  if (!isAuthConfigured()) {
-    return (
-      <main className="min-h-screen bg-[#06060e] text-white flex items-center justify-center px-5">
-        <p className="text-sm text-gray-500">로그인 기능을 준비 중입니다.</p>
-      </main>
-    );
   }
 
   return (
