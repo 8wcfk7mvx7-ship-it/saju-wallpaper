@@ -1202,11 +1202,13 @@ function getDeukllyeongFactor(ilgan: string, monthJj: string): number {
 // dayJj:   일지 (통근 보너스)
 function computeYongshin(
   ilgan: string, scores: ElementScore,
-  monthJj: string, dayJj: string
+  pillarsArr: Array<{cg: string; jj: string}>
 ): YongsinResult {
   const ilganEl = CHEONGAN_ELEMENT[ilgan] as Element;
   const GENERATED_BY: Record<string, Element> = {목:"수",화:"목",토:"화",금:"토",수:"금"};
   const CONTROLLED_BY: Record<string, Element> = {목:"금",화:"수",토:"목",금:"화",수:"토"};
+
+  const monthJj = pillarsArr[1]?.jj ?? pillarsArr[0].jj;
 
   const inseongEl  = GENERATED_BY[ilganEl];     // 인성: 나를 생하는
   const siksangEl  = OHAENG_GENERATES[ilganEl]; // 식상: 내가 생하는
@@ -1215,20 +1217,46 @@ function computeYongshin(
 
   const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
 
-  // ── 득령/실령 보정 ──────────────────────────────────────────────────────
-  // 득령 강도: 본기/중기/여기 구분으로 연속값 반환
+  // ── 1. 득령(得令)/실령(失令) ───────────────────────────────────────────────
+  // 월지 지장간 본기/중기/여기 기준 (본기 비겁·인성=1.35, 중기=1.10, 여기=0.92, 없음=0.75)
   const deuklFactor = getDeukllyeongFactor(ilgan, monthJj);
-  const isDG = deuklFactor >= 1.10; // 중기 이상이면 득령으로 간주 (desc용)
-  // 일지 통근 보정
-  const dayUU = getUunseong(ilgan, dayJj);
-  const WEAK_UU   = new Set(["사","묘","절","병"]);
-  const STRONG_UU = new Set(["장생","관대","건록","제왕"]);
+  const isDG = deuklFactor >= 1.10; // 중기 이상 → 득령
 
+  // ── 2. 득지(得地) — 4개 지지 전체 통근 ────────────────────────────────────
+  // 건록·제왕: 2점(강통근), 장생·관대·쇠·양: 1점(중통근), 나머지: 0점
+  const STRONG_ROOT_UU = new Set(["건록","제왕"]);
+  const MID_ROOT_UU    = new Set(["장생","관대","쇠","양"]);
+  let tonggeunScore = 0;
+  for (const { jj } of pillarsArr) {
+    const uu = getUunseong(ilgan, jj);
+    if (STRONG_ROOT_UU.has(uu)) tonggeunScore += 2;
+    else if (MID_ROOT_UU.has(uu)) tonggeunScore += 1;
+  }
+  // 득지 기준: 강통근 1개(2점) 이상 or 중통근 2개(2점) 이상 → 득지
+  const isDJ = tonggeunScore >= 2;
+  // 득지 보정 계수 (tonggeunScore 0~8 → factor 0.85~1.20)
+  // 기준(score=2): 1.0, +1점당 +0.035, 0점: 0.85
+  const tonggeunFactor = Math.max(0.85, Math.min(1.20, 0.93 + tonggeunScore * 0.035));
+
+  // ── 3. 득세(得勢) — 8자 비겁+인성 vs 식상+재성+관성 글자 수 ───────────────
+  let seCount = 0, oppCount = 0;
+  for (const { cg, jj } of pillarsArr) {
+    const cgEl = CHEONGAN_ELEMENT[cg] as Element | undefined;
+    if (cgEl === ilganEl || cgEl === inseongEl) seCount++;
+    else if (cgEl === siksangEl || cgEl === jaeseongEl || cgEl === gwanseongEl) oppCount++;
+    const bongiEl = CHEONGAN_ELEMENT[JIJI_BONGI[jj]] as Element | undefined;
+    if (bongiEl === ilganEl || bongiEl === inseongEl) seCount++;
+    else if (bongiEl === siksangEl || bongiEl === jaeseongEl || bongiEl === gwanseongEl) oppCount++;
+  }
+  // 득세: 비겁+인성 글자 수 > 식상+재성+관성 글자 수
+  const isDSe = seCount > oppCount;
+  const seFactor = isDSe ? 1.07 : 0.93;
+
+  // ── 신강/신약 지수 계산 ────────────────────────────────────────────────────
   // 인성은 나를 생하는 기운이지 내 자신이 아니므로 65% 반영 (인성 과다 신강 오판 방지)
   const jiwon = scores[ilganEl] * 1.0 + scores[inseongEl] * 0.65;
-  let jiwonAdj = jiwon * deuklFactor;
-  if (STRONG_UU.has(dayUU)) jiwonAdj *= 1.06;
-  else if (WEAK_UU.has(dayUU)) jiwonAdj *= 0.94;
+  // 득령 × 득지 × 득세 순서로 보정
+  let jiwonAdj = jiwon * deuklFactor * tonggeunFactor * seFactor;
 
   let strength: "신강" | "신약" | "중화";
   let yongshin: Element;
@@ -1237,25 +1265,37 @@ function computeYongshin(
 
   const rawPercent = (jiwonAdj / total) * 100;
   const sinLevel = classifySinStrength(rawPercent);
+  // 3조건 충족 현황 (desc 생성용)
+  const condMet = [isDG, isDJ, isDSe];
+  const metCount = condMet.filter(Boolean).length;
+  const condDesc = (() => {
+    const parts: string[] = [];
+    if (isDG)  parts.push("득령(得令)");
+    if (isDJ)  parts.push(`득지(得地·통근${tonggeunScore}점)`);
+    if (isDSe) parts.push(`득세(得勢·${seCount}:${oppCount})`);
+    if (!isDG) parts.push("실령(失令)");
+    if (!isDJ) parts.push("실지(失地)");
+    if (!isDSe) parts.push(`실세(失勢·${seCount}:${oppCount})`);
+    return parts.slice(0, 3).join(", ");
+  })();
+
   if (["신강","태왕","극왕"].includes(sinLevel)) {
     strength = "신강";
-    // 강한 일간 → 설기(식상) > 재성 > 관성 중 가장 부족한 것
     const cands: Element[] = [siksangEl, jaeseongEl, gwanseongEl];
     yongshin = cands.reduce((a, b) => scores[a] <= scores[b] ? a : b);
-    desc = `일간 ${ilgan}의 기운이 강합니다(신강·身强). ${isDG?"월지 득령(得令)으로 기운이 왕성해요. ":""}강한 에너지를 발산·활용하는 ${yongshin} 기운이 용신이에요. 표현·결과물을 만드는 기운과 돈·사회적 책임의 기운을 활용하는 삶이 유리해요.`;
+    desc = `일간 ${ilgan}의 기운이 강합니다(신강·身强). ${condDesc}. 강한 에너지를 발산·활용하는 ${yongshin} 기운이 용신이에요. 표현·결과물을 만드는 기운과 돈·사회적 책임의 기운을 활용하는 삶이 유리해요.`;
   } else if (["극약","태약","신약"].includes(sinLevel)) {
     strength = "신약";
-    // 신약은 일간을 직접 생조하는 인성(印星)을 우선 용신으로 본다.
-    // 단, 인성이 비겁의 절반에도 못 미칠 만큼 빈약하면 비겁(일간과 같은 오행)을 용신으로 삼는다.
     yongshin = scores[inseongEl] >= scores[ilganEl] * 0.5 ? inseongEl : ilganEl;
-    heeshin = yongshin === inseongEl ? ilganEl : inseongEl; // 희신: 인성·비겁 중 용신이 되지 못한 나머지
-    desc = `일간 ${ilgan}의 기운이 약합니다(신약·身弱). ${!isDG?"월지 실령(失令)으로 기운이 쇠약해요. ":""}나를 도와주는 ${yongshin} 기운이 용신이에요. 보호·학문의 기운과 독립심·자존심의 기운을 보강하는 환경이 유리해요.`;
+    heeshin = yongshin === inseongEl ? ilganEl : inseongEl;
+    desc = `일간 ${ilgan}의 기운이 약합니다(신약·身弱). ${condDesc}. 나를 도와주는 ${yongshin} 기운이 용신이에요. 보호·학문의 기운과 독립심·자존심의 기운을 보강하는 환경이 유리해요.`;
   } else {
     strength = "중화";
     const els: Element[] = ["목","화","토","금","수"];
     yongshin = els.reduce((a, b) => scores[a] <= scores[b] ? a : b);
-    desc = `일간의 기운이 중화(中和)에 가까워요. 가장 부족한 ${yongshin} 기운을 보충해 균형을 유지하는 게 좋아요.`;
+    desc = `일간의 기운이 중화(中和)에 가까워요(${condDesc}). 가장 부족한 ${yongshin} 기운을 보충해 균형을 유지하는 게 좋아요.`;
   }
+  void metCount; // 향후 활용 가능
 
   heeshin ??= GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
   const gishin  = CONTROLLED_BY[yongshin] as Element; // 용신을 극하는 → 기신
@@ -2007,7 +2047,7 @@ export function analyzeSaju(input: SajuInput): SajuResult {
     `${yearPillar.cg}${yearPillar.jj}`,
   ].join(" ");
 
-  const yongshin = computeYongshin(ilgan, scores, monthPillar.jj, dayPillar.jj);
+  const yongshin = computeYongshin(ilgan, scores, pillars);
 
   return {
     scores, rawScores, dominant, lacking,
