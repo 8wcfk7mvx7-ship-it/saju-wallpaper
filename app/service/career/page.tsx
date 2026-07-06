@@ -91,9 +91,11 @@ export default function CareerPage() {
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const [showDetail, setShowDetail] = useState(false);
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
+    nameRef.current = form.name?.trim() || "당신";
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
     if (form.calendarType === "lunar") {
       try {
@@ -223,6 +225,8 @@ export default function CareerPage() {
   const r = resultRef.current;
   if (!r) return null;
   const ilgan = r.pillarsDetail.day.cg;
+  const userName = nameRef.current;
+  const N = userName === "당신" ? "당신" : `${userName}님`;
 
   // 십성 그룹 카운트는 천간(원국 본기둥)에만 드러난 십성만 센다. 지장간은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
@@ -360,9 +364,9 @@ export default function CareerPage() {
         <div className="text-center mb-8">
           <p className="text-indigo-400 text-xs font-bold tracking-widest mb-2">MY APTITUDE</p>
           <h1 className="text-2xl font-black leading-snug mb-1">
-            {ilgan}{r.pillarsDetail.day.jj}일주 {form.name}님
+            {ilgan}{r.pillarsDetail.day.jj}일주 {N}
           </h1>
-          <p className="text-lg font-bold text-indigo-300">{form.name}님과 잘 맞는 직업은?</p>
+          <p className="text-lg font-bold text-indigo-300">{N}에게 잘 맞는 직업은?</p>
         </div>
 
         <div className="flex justify-center mb-5">
@@ -371,7 +375,7 @@ export default function CareerPage() {
 
         {/* 섹션 1 — 나와 잘 맞는 직업 */}
         <div className="bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-700/30 rounded-3xl p-6 mb-5">
-          <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">✦ 나와 잘 맞는 직업</p>
+          <p className="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-2">✦ {N}에게 잘 맞는 직업</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {jobList.map(job => (
               <span key={job} className="text-xs font-bold px-3 py-1.5 rounded-full bg-indigo-500/15 border border-indigo-400/30 text-indigo-200">
@@ -381,6 +385,73 @@ export default function CareerPage() {
           </div>
           <p className="text-sm text-gray-300 leading-relaxed">{careerInfo?.desc} {getJikjangSiseonNarrative(r)} {johu.desc}{iljuCareerAdjusted && ` 태어난 날의 기둥(일주) 자체로 보면, ${iljuCareerAdjusted}`} {getHakdangCareerNarrative(r)}</p>
         </div>
+
+        {/* 섹션 1-b — 일처리 능력 막대 */}
+        {(() => {
+          const clamp = (n: number) => Math.max(10, Math.min(95, Math.round(n)));
+          const ss = strengthByGroup;
+          const uS = (g: string) => { const s = ss[g]; return s ? (s.status === "강함" ? 80 : s.status === "보통" ? 58 : s.status === "약함" ? 38 : 22) : 22; };
+          const bars: { label: string; score: number }[] = [
+            { label: "기획·연구", score: clamp((uS("인성") + uS("식상")) / 2 + 5) },
+            { label: "끈기·정력", score: clamp(uS("비겁") + (r.yongshin.strength === "신강" ? 12 : 0)) },
+            { label: "실천·수단", score: clamp(uS("식상") + 8) },
+            { label: "완성·판매", score: clamp(uS("재성") + 10) },
+            { label: "관리·평가", score: clamp(uS("관성") + 8) },
+          ];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-xs font-bold mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>일처리 능력 — 단계별 비율</p>
+              <div className="space-y-2.5 mt-3">
+                {bars.map(b => (
+                  <div key={b.label} className="flex items-center gap-3">
+                    <span className="text-xs shrink-0 text-gray-400" style={{ width: 64 }}>{b.label}</span>
+                    <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div className="h-3 rounded-full" style={{ width: `${b.score}%`, background: b.score >= 50 ? "linear-gradient(to right,#dc2626,#ef4444)" : "linear-gradient(to right,#f97316,#fbbf24)" }} />
+                    </div>
+                    <span className="text-xs font-black shrink-0 w-8 text-right" style={{ color: b.score >= 50 ? "#f87171" : "#fbbf24" }}>{b.score}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* 섹션 1-c — 특징 그래프 10개 */}
+        {(() => {
+          const clamp = (n: number) => Math.max(10, Math.min(95, Math.round(n)));
+          const ss = strengthByGroup;
+          const uS = (g: string) => { const s = ss[g]; return s ? (s.status === "강함" ? 78 : s.status === "보통" ? 55 : s.status === "약함" ? 35 : 20) : 20; };
+          const has = (names: string[]) => names.some(n => (counts[n] || 0) >= 1);
+          const traits: { label: string; score: number }[] = [
+            { label: "비판력",   score: clamp(uS("관성") + (has(["편관"]) ? 12 : 0)) },
+            { label: "협동심",   score: clamp(uS("비겁") * 0.6 + 35) },
+            { label: "습득력",   score: clamp(uS("인성") + 8) },
+            { label: "창의력",   score: clamp(uS("식상") + (has(["상관"]) ? 14 : 0)) },
+            { label: "예술성",   score: clamp(uS("식상") * 0.8 + (has(["상관","식신"]) ? 10 : 0)) },
+            { label: "표현력",   score: clamp(uS("식상") + 5) },
+            { label: "활동력",   score: clamp(uS("비겁") + 10) },
+            { label: "모험심",   score: clamp(uS("재성") * 0.7 + (has(["겁재","편재"]) ? 15 : 0)) },
+            { label: "사업감각", score: clamp(uS("재성") + (has(["편재","겁재"]) ? 12 : 0)) },
+            { label: "신뢰성",   score: clamp(uS("관성") * 0.7 + uS("인성") * 0.3 + (has(["정관","정인"]) ? 12 : 0)) },
+          ];
+          return (
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <p className="text-xs font-bold mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>적성을 파악하는 특징 10개</p>
+              <p className="text-[10px] text-gray-600 mb-3">50% 미만 ▓ 주황 · 50% 이상 ▓ 붉은색</p>
+              <div className="space-y-2">
+                {traits.map(t => (
+                  <div key={t.label} className="flex items-center gap-3">
+                    <span className="text-xs shrink-0 text-gray-400" style={{ width: 56 }}>{t.label}</span>
+                    <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div className="h-2.5 rounded-full" style={{ width: `${t.score}%`, background: t.score >= 50 ? "linear-gradient(to right,#dc2626,#ef4444)" : "linear-gradient(to right,#f97316,#fbbf24)" }} />
+                    </div>
+                    <span className="text-[10px] font-black shrink-0 w-7 text-right" style={{ color: t.score >= 50 ? "#f87171" : "#fbbf24" }}>{t.score}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 섹션 2 — 나와 안 맞는 직업/환경 */}
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">

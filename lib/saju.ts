@@ -44,7 +44,7 @@ export interface SinsalItem {
 }
 
 // 신강/신약 8단계 세분류 (지수 0~100 기준)
-export const SIN_STRENGTH_LEVELS = ["극약", "태약", "신약", "중화신약", "중화신강", "신강", "태강", "극왕"] as const;
+export const SIN_STRENGTH_LEVELS = ["극약", "태약", "신약", "중화신약", "중화신강", "신강", "태왕", "극왕"] as const;
 export type SinStrengthLevel = typeof SIN_STRENGTH_LEVELS[number];
 
 // 각 단계의 상한선(%) — 마지막 극왕은 상한 없음
@@ -210,7 +210,7 @@ export function getJijiRelations(jjs: string[]): JijiRelation[] {
 // 위치(기둥) 기반의 jjA/jjB 순서와는 별개로, 이름을 부를 때만 canonical 순서를 따른다.
 const YUKHAP_CANON: [string, string][] = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
 const CHUNG_CANON: [string, string][] = [["자","오"],["축","미"],["인","신"],["묘","유"],["진","술"],["사","해"]];
-const PA_CANON: [string, string][] = [["자","유"],["오","묘"],["인","해"],["사","신"],["진","축"],["술","미"]];
+const PA_CANON: [string, string][] = [["자","유"],["묘","오"],["인","해"],["사","신"],["진","축"],["술","미"]];
 const HAE_CANON: [string, string][] = [["자","미"],["축","오"],["인","사"],["묘","진"],["신","해"],["유","술"]];
 const HYEONG_CANON: [string, string][] = [["자","묘"],["인","사"],["사","신"],["신","인"],["축","술"],["술","미"],["미","축"]];
 const SAMHAP_GROUPS_CANON: string[][] = [["인","오","술"],["사","유","축"],["신","자","진"],["해","묘","미"]];
@@ -244,15 +244,10 @@ export interface SajuResult {
   yongshin: YongsinResult;
 }
 
-// 신살 목록을 화면에 나열할 때 쓰는 필터 — 도화살은 가도화/편야도화/진도화/나체도화/곤랑도화/녹방도화의
-// 상위 기본 카테고리일 뿐이라 항상 숨기고, 더 구체적인 도화 세부 유형이 함께 있으면
-// 약한 신호인 가도화도 중복으로 보이지 않게 같이 숨긴다. (점수 계산 등 내부 로직에는 영향 없음)
-const SPECIFIC_DOHWA_NAMES = new Set(["진도화", "나체도화", "곤랑도화", "녹방도화", "편야도화"]);
+// 신살 목록을 화면에 나열할 때 쓰는 필터
+// 도화살은 상위 카테고리이므로 항상 숨김 (가도화/진도화 등 세부로 표시)
 export function getDisplaySinsalList(sinsalList: SinsalItem[]): SinsalItem[] {
-  const hasSpecificDohwa = sinsalList.some(s => SPECIFIC_DOHWA_NAMES.has(s.name));
-  return sinsalList.filter(s =>
-    s.name !== "도화살" && !(s.name === "가도화" && hasSpecificDohwa)
-  );
+  return sinsalList.filter(s => s.name !== "도화살");
 }
 
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"];
@@ -365,6 +360,7 @@ const SINSAL_INFO: Record<string, {hanja:string; category:'lucky'|'unlucky'|'neu
   나체도화: {hanja:"裸體桃花", category:"neutral",  desc:"매력이 직관적으로 드러나 숨길 수 없어요. 어디서든 시선을 끌고 이성이 자연스럽게 모이는 기운이에요. 그만큼 구설수·치정·스캔들에 휘말리기 쉽고 감정 기복으로 스스로 피곤해지는 경향이 있어요"},
   곤랑도화: {hanja:"滾浪桃花", category:"unlucky",  desc:"천간끼리는 끈끈하게 합을 이루는데 지지끼리는 서로 부딪히는 형(刑)의 구조예요. 겉으로는 깊이 끌리고 가까워지지만 속으로는 갈등과 구설이 쌓이기 쉬운 애정운이에요. 치정 시비나 관재구설로 번지지 않도록 거리 조절이 중요해요"},
   녹방도화: {hanja:"祿傍桃花", category:"lucky",  desc:"이성에게 어필하는 매력이 재물운과 사회적 인정을 부르는 기운과 함께 자리한 귀한 구조예요. 끼를 부리지 않아도 기품 있는 분위기로 사람을 끌고, 그 매력이 곧 사회적 인정과 좋은 인연으로 이어지는 흐름이에요"},
+  함지살:   {hanja:"咸池煞", category:"lucky",  desc:"삼명통회(三命通會)에 기록된 매력살로, 도화보다 한 차원 깊은 음기(陰氣)와 풍류 에너지를 품은 기운이에요. 애교·교태·감각적 매력이 자연스럽게 흘러나오고 예술적 재능과 연결되기도 해요"},
   낙정관살: {hanja:"落井關殺", category:"unlucky",  desc:"수난사고·추락·함몰 관련 사고에 취약해요. 폰 보며 걷다 맨홀·싱크홀에 빠지는 유형의 부주의가 실제 사고로 이어지기 쉬워요. 곡각살과 겹치면 물리적 충격이 더욱 강해지니 이동 중 항상 주변을 살피세요"},
   음인:     {hanja:"陰刃",   category:"unlucky",  desc:"겉으로는 온화하고 만만해 보이나 속에 독한 기운을 품고 있어요. 양인이 정면충돌형 강함이라면 음인은 끈질기고 은밀한 저항력이에요. 위기 상황에서 생존력이 극대화되며, 감정을 오래 쌓아두다 폭발하는 패턴을 주의하세요"},
   고신살:   {hanja:"孤神殺", category:"unlucky",  desc:"고독하고 의지할 곳이 없는 기운이에요. 이별수가 있어요"},
@@ -1173,11 +1169,28 @@ function getHourPillar(dayCgIdx: number, hour: number, minute: number): {cg: str
 // ── 득령(得令) 판단 ────────────────────────────────────────────────────────
 // 일간이 월지(月支) 지장간에서 비겁(같은 오행) 또는 인성(나를 생하는 오행)을 만나면 득령
 // 득령이면 신강 방향, 실령이면 신약 방향의 제1 기준
-function isDeukllyeong(ilgan: string, monthJj: string): boolean {
+// 월지 득령 강도: 본기(정기)/중기/여기 구분
+// 본기에 비겁·인성 있으면 완전 득령(1.35), 중기에만 있으면 약득령(1.10),
+// 여기에만 있으면 거의 실령(0.92), 없으면 완전 실령(0.75)
+function getDeukllyeongFactor(ilgan: string, monthJj: string): number {
   const ilEl = CHEONGAN_ELEMENT[ilgan] as Element;
   const GENERATED_BY: Record<string, Element> = {목:"수",화:"목",토:"화",금:"토",수:"금"};
-  const inEl = GENERATED_BY[ilEl]; // 인성 오행
-  return (JIJANGAN[monthJj] || []).some(j => j.element === ilEl || j.element === inEl);
+  const inEl = GENERATED_BY[ilEl];
+  const jijangStr = JIJANGAN_STR[monthJj] || "";
+  // JIJANGAN_STR 순서: 여기-중기-본기 (길이 2면 중기-본기, 길이 1이면 본기만)
+  const stems = jijangStr.split("");
+  const bongi = stems[stems.length - 1];
+  const junggi = stems.length >= 2 ? stems[stems.length - 2] : null;
+  const yeogi = stems.length >= 3 ? stems[stems.length - 3] : null;
+  const relevant = (s: string | null) => {
+    if (!s) return false;
+    const el = CHEONGAN_ELEMENT[s] as Element;
+    return el === ilEl || el === inEl;
+  };
+  if (relevant(bongi)) return 1.35;
+  if (relevant(junggi)) return 1.10;
+  if (relevant(yeogi)) return 0.92;
+  return 0.75;
 }
 
 // ── 용신 계산 ──────────────────────────────────────────────────────────────
@@ -1201,28 +1214,19 @@ function computeYongshin(
   const gwanseongEl= CONTROLLED_BY[ilganEl];    // 관성: 나를 극하는
 
   const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
-  const jiwon = scores[ilganEl] + scores[inseongEl]; // 일간을 직·간접 지원하는 기운
 
   // ── 득령/실령 보정 ──────────────────────────────────────────────────────
-  // 1단계: 월지 득령 여부
-  const isDG = isDeukllyeong(ilgan, monthJj);
-  // 2단계: 월지·일지 12운성으로 추가 보정
-  const monthUU = getUunseong(ilgan, monthJj);
-  const dayUU   = getUunseong(ilgan, dayJj);
-  // 기운이 매우 약해지는 운성
+  // 득령 강도: 본기/중기/여기 구분으로 연속값 반환
+  const deuklFactor = getDeukllyeongFactor(ilgan, monthJj);
+  const isDG = deuklFactor >= 1.10; // 중기 이상이면 득령으로 간주 (desc용)
+  // 일지 통근 보정
+  const dayUU = getUunseong(ilgan, dayJj);
   const WEAK_UU   = new Set(["사","묘","절","병"]);
-  // 기운이 강해지는 운성
   const STRONG_UU = new Set(["장생","관대","건록","제왕"]);
 
-  let jiwonAdj = jiwon;
-  if (isDG) {
-    jiwonAdj *= 1.35; // 득령 → 신강 방향 강화
-    if (STRONG_UU.has(monthUU)) jiwonAdj *= 1.10; // 장생·건록·제왕월 추가 보강
-  } else {
-    jiwonAdj *= 0.75; // 실령 → 신약 방향
-    if (WEAK_UU.has(monthUU)) jiwonAdj *= 0.82; // 사·묘·절·병지 추가 패널티
-  }
-  // 일지 통근 보정 (일지 강·약도 반영, 절반만)
+  // 인성은 나를 생하는 기운이지 내 자신이 아니므로 65% 반영 (인성 과다 신강 오판 방지)
+  const jiwon = scores[ilganEl] * 1.0 + scores[inseongEl] * 0.65;
+  let jiwonAdj = jiwon * deuklFactor;
   if (STRONG_UU.has(dayUU)) jiwonAdj *= 1.06;
   else if (WEAK_UU.has(dayUU)) jiwonAdj *= 0.94;
 
@@ -1231,13 +1235,15 @@ function computeYongshin(
   let heeshin: Element | undefined;
   let desc: string;
 
-  if (jiwonAdj > total * 0.55) {
+  const rawPercent = (jiwonAdj / total) * 100;
+  const sinLevel = classifySinStrength(rawPercent);
+  if (["신강","태왕","극왕"].includes(sinLevel)) {
     strength = "신강";
     // 강한 일간 → 설기(식상) > 재성 > 관성 중 가장 부족한 것
     const cands: Element[] = [siksangEl, jaeseongEl, gwanseongEl];
     yongshin = cands.reduce((a, b) => scores[a] <= scores[b] ? a : b);
     desc = `일간 ${ilgan}의 기운이 강합니다(신강·身强). ${isDG?"월지 득령(得令)으로 기운이 왕성해요. ":""}강한 에너지를 발산·활용하는 ${yongshin} 기운이 용신이에요. 표현·결과물을 만드는 기운과 돈·사회적 책임의 기운을 활용하는 삶이 유리해요.`;
-  } else if (jiwonAdj < total * 0.40) {
+  } else if (["극약","태약","신약"].includes(sinLevel)) {
     strength = "신약";
     // 신약은 일간을 직접 생조하는 인성(印星)을 우선 용신으로 본다.
     // 단, 인성이 비겁의 절반에도 못 미칠 만큼 빈약하면 비겁(일간과 같은 오행)을 용신으로 삼는다.
@@ -1254,7 +1260,7 @@ function computeYongshin(
   heeshin ??= GENERATED_BY[yongshin] as Element;  // 용신을 생해주는 → 희신
   const gishin  = CONTROLLED_BY[yongshin] as Element; // 용신을 극하는 → 기신
 
-  const percent = Math.max(0, Math.min(100, (jiwonAdj / total) * 100));
+  const percent = Math.max(0, Math.min(100, rawPercent));
 
   return { strength, percent, yongshin, heeshin, gishin, desc };
 }
@@ -1717,14 +1723,22 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   for (const ss of ['역마살','장성살','화개살','반안살','겁살','재살','망신살','지살','천살','월살','년살','육해살']) {
     addSinsal(ss, detailArr.filter(p => p.d.sinsal === ss).map(p => p.label));
   }
-  // 도화살 (연지 삼합그룹 기준 도화 지지) — 기존 호환을 위해 플래그는 유지하되,
-  // 매력 점수 산정을 위해 자리한 위치 개수에 따라 가도화(1~2자리)/편야도화(3자리 이상)로 세분화한다.
-  const dohwaPillars = detailArr.filter(p => p.d.jj === getDohwaJj(yeonji)).map(p => p.label);
+  // 도화살 (연지 삼합그룹 기준 도화 지지)
+  // 진도화: 연지 기준 도화지지가 일지에 있을 때 (가장 강한 도화)
+  // 가도화: 연지 기준 도화지지가 일지 외 기둥에 있을 때
+  // 편야도화: 일지 외 기둥에 3개 이상
+  const dohwaJjYeon = getDohwaJj(yeonji);
+  const dohwaPillars = detailArr.filter(p => p.d.jj === dohwaJjYeon).map(p => p.label);
   addSinsal('도화살', dohwaPillars);
-  if (dohwaPillars.length >= 3) {
-    addSinsal('편야도화', dohwaPillars);
-  } else if (dohwaPillars.length > 0) {
-    addSinsal('가도화', dohwaPillars);
+  const hasIlDohwa = dohwaPillars.includes('일');
+  const nonIlDohwaPillars = dohwaPillars.filter(p => p !== '일');
+  if (hasIlDohwa) {
+    addSinsal('진도화', ['일']);
+  }
+  if (nonIlDohwaPillars.length >= 3) {
+    addSinsal('편야도화', nonIlDohwaPillars);
+  } else if (nonIlDohwaPillars.length > 0) {
+    addSinsal('가도화', nonIlDohwaPillars);
   }
   // 천을귀인
   const cheonulJjs = CHEONUL_JJ[ilgan] || [];
@@ -1772,6 +1786,26 @@ export function analyzeSaju(input: SajuInput): SajuResult {
       .map(p => p.label);
     addSinsal('녹방도화', nokbangPillars);
   }
+  // 함지살(咸池煞): 년지 또는 일지 삼합그룹 기준 특정 간지(干支) 조합이 기둥에 있어야 성립
+  // 해묘미→임자, 인오술→정묘, 사유축→갑오, 신자진→을유
+  {
+    const HAMJI_MAP: Record<string, string> = {
+      해:"임자", 묘:"임자", 미:"임자",
+      인:"정묘", 오:"정묘", 술:"정묘",
+      사:"갑오", 유:"갑오", 축:"갑오",
+      신:"을유", 자:"을유", 진:"을유",
+    };
+    const HAMJI_PAIRS: Record<string, {cg:string; jj:string}> = {
+      "임자":{cg:"임",jj:"자"}, "정묘":{cg:"정",jj:"묘"}, "갑오":{cg:"갑",jj:"오"}, "을유":{cg:"을",jj:"유"},
+    };
+    const hamjiKey = HAMJI_MAP[yeonji] ?? HAMJI_MAP[pillarsDetail.day.jj];
+    if (hamjiKey) {
+      const { cg: hcg, jj: hjj } = HAMJI_PAIRS[hamjiKey];
+      const hamjiPillars = detailArr.filter(p => p.d.cg === hcg && p.d.jj === hjj).map(p => p.label);
+      addSinsal('함지살', hamjiPillars);
+    }
+  }
+
   // 낙정관살: 연지 그룹 기준 지지가 사주에 존재
   const nakjeongTarget = NAKJEONG_MAP[yeonji];
   if (nakjeongTarget) {
@@ -1803,12 +1837,6 @@ export function analyzeSaju(input: SajuInput): SajuResult {
   addSinsal('암록', detailArr.filter(p => p.d.jj === AMROK_JJ[ilgan]).map(p => p.label));
   // 천주귀인
   addSinsal('천주귀인', detailArr.filter(p => p.d.jj === CHEONJU_JJ[ilgan]).map(p => p.label));
-  // 진도화: 일지의 도화 지지가 연주 or 월주 지지에 존재할 때
-  const iljiDohwa = getDohwaJj(dayPillar.jj);
-  const jinDohwaLabels = detailArr.filter(p =>
-    (p.label === '연' || p.label === '월') && p.d.jj === iljiDohwa
-  ).map(p => p.label);
-  addSinsal('진도화', jinDohwaLabels);
   // 백호살: 사주의 어느 기둥이든 천간+지지 조합이 일치하면 성립
   {
     const baekhoLabels = detailArr.filter(p => BAEHO_ILJU.has(p.d.cg + p.d.jj)).map(p => p.label);
@@ -1994,7 +2022,7 @@ export function analyzeSaju(input: SajuInput): SajuResult {
 }
 
 // 일간(日干)별 성격 핵심 요약
-export const ILGAN_PERSONALITY: Record<string, { short: string; detail: string; keyword: string }> = {
+export const ILGAN_PERSONALITY: Record<string, { short: string; detail: string; keyword: string; genderDetail?: { male: string; female: string } }> = {
   갑: {
     short: "갑목(甲木) — 곧게 뻗는 큰 나무",
     keyword: "추진력·목표지향·리더십",
@@ -2018,7 +2046,7 @@ export const ILGAN_PERSONALITY: Record<string, { short: string; detail: string; 
   무: {
     short: "무토(戊土) — 광활한 황무지·큰 산",
     keyword: "맷집·합리화·안과밖 온도차",
-    detail: "상남자 기질 투탑 중 하나이에요. '상관없어'라고 하면 진짜 상관없어요. 무서워하는 것이 없어요. 목극토(木克土)여서 갑목이 극해도 황무지가 너무 광대해 나무가 덮어봐야 마사지 수준이에요. 충조차 안 맞어요. 내 사람에게는 절대적 의리를 보이지만, 그 논리는 외부에 통하지 않어요. 안과 밖의 평가가 극명하게 다르고 예기치 못한 상황에서 폭발적인 말과 행동이 나올 수 있어요. 내부 결속이 강한 만큼 외부에는 배타적으로 보이에요.",
+    detail: "강함과 담대함의 대명사 중 하나예요. '상관없어'라고 하면 진짜 상관없어요. 무서워하는 것이 없어요. 목극토(木克土)여서 갑목이 극해도 황무지가 너무 광대해 나무가 덮어봐야 마사지 수준이에요. 충조차 안 맞아요. 내 사람에게는 절대적 의리를 보이지만, 그 논리는 외부에 통하지 않아요. 안과 밖의 평가가 극명하게 다르고 예기치 못한 상황에서 폭발적인 말과 행동이 나올 수 있어요. 내부 결속이 강한 만큼 외부에는 배타적으로 보여요.",
   },
   기: {
     short: "기토(己土) — 비옥한 정원·논밭",
@@ -2028,22 +2056,38 @@ export const ILGAN_PERSONALITY: Record<string, { short: string; detail: string; 
   경: {
     short: "경금(庚金) — 도끼·원석 바위",
     keyword: "결단력·직선성·실행력",
-    detail: "상남자 기질 투탑 중 하나이에요. 강렬하고 단호하며 직선적이에요. 결단하면 곧바로 실행해요. 감정 표현은 서툴지만 진심이 두텁어요. 글로벌 표준을 만드는 힘이 있어요. 겉으로는 단단한 돌덩이처럼 보이지만 속은 의외로 여리고 진실한 편이에요. 맡은 일을 남에게 떠넘기거나 회피하지 않고 끝까지 책임지려 해서 자연스럽게 리더 역할을 맡게 되는 경우가 많아요. 다만 애교나 화려한 말로 마음을 표현하는 데는 서툴러서, 위로가 필요한 순간에도 위로보다 실질적인 해결책을 먼저 내놓다가 '공감을 못 해준다'는 오해를 사기 쉬워요. 본인은 최선을 다해 마음을 보여주고 있는데, 그 방식이 상대가 원하는 표현과 달라서 다툼이 생기는 경우가 종종 있어요. 대신 한번 마음을 주면 계산하지 않고 직진하는 스타일이에요. 화려한 언변보다 행동과 실천으로 신뢰를 쌓아가고, 통수를 맞아도 다시 마음을 여는 용기를 가진 편이에요. 헤어진 뒤에는 겉으로 미련 없어 보이지만 속마음은 다른 경우가 많아요.",
+    detail: "강함과 결단력의 대명사 중 하나예요. 강렬하고 단호하며 직선적이에요. 결단하면 곧바로 실행해요. 감정 표현은 서툴지만 진심이 두터워요. 글로벌 표준을 만드는 힘이 있어요. 겉으로는 단단한 돌덩이처럼 보이지만 속은 의외로 여리고 진실한 편이에요. 맡은 일을 남에게 떠넘기거나 회피하지 않고 끝까지 책임지려 해서 자연스럽게 리더 역할을 맡게 되는 경우가 많아요. 다만 애교나 화려한 말로 마음을 표현하는 데는 서툴러서, 위로가 필요한 순간에도 위로보다 실질적인 해결책을 먼저 내놓다가 '공감을 못 해준다'는 오해를 사기 쉬워요. 본인은 최선을 다해 마음을 보여주고 있는데, 그 방식이 상대가 원하는 표현과 달라서 다툼이 생기는 경우가 종종 있어요. 대신 한번 마음을 주면 계산하지 않고 직진하는 스타일이에요. 화려한 언변보다 행동과 실천으로 신뢰를 쌓아가고, 통수를 맞아도 다시 마음을 여는 용기를 가진 편이에요. 헤어진 뒤에는 겉으로 미련 없어 보이지만 속마음은 다른 경우가 많아요.",
+    genderDetail: {
+      male: "남자답고 강인한 첫인상이에요. 결단력이 뚜렷해서 아니다 싶으면 미련 없이 접는 편이에요. 의외로 쩨쩨한 구석이 있고, 자기 관리를 철저하게 챙기는 타입은 아니에요. 기분이 안 좋을 때 신경질이 나오기도 해요.",
+      female: "흐트러지지 않으려는 포스와 묵직함이 있어요. 함부로 건드리기 어려운 압도적인 아우라가 있어요. 위기 상황에서 오히려 더 강해지고, 재정 능력이 좋은 경우가 많아요.",
+    },
   },
   신: {
     short: "신금(辛金) — 세공된 보석·날카로운 칼날",
     keyword: "정밀함·예민함·완벽주의",
     detail: "정밀하고 예민하며 완벽을 추구해요. 작은 결점에도 민감하게 반응하고 상처를 오래 기억해요. 정교한 공학과 질서를 추구해요. 섬세하게 다듬어진 결과물을 만드는 능력이 탁월해요.",
+    genderDetail: {
+      male: "일상에서는 쉽게 보기 어려운 독특한 타입이에요. 연예인 중에 종종 보여도, 주변에서는 드문 편이에요.",
+      female: "예민하고 손재주가 좋으며 미적 감각이 뛰어나요. 머리는 분명히 좋은데 멘탈이 약한 편이에요.",
+    },
   },
   임: {
     short: "임수(壬水) — 광활한 바다·대하(大河)",
     keyword: "진지함·이과형·터프함",
     detail: "명리학적으로 '노인'의 기운이에요. 물상(物象)으로는 밤 — 일요일 저녁의 무드이에요. 바닷물처럼 광대하고 묵직해요. 진지함과 권위의식이 있으며 질서와 위계를 중시해요. 한심한 사람을 가장 싫어하는 일간으로, 타인에게 '이렇게 사는 게 사람이냐'고 꼭꼭 찍는 경향이 있어요. 이번 한번뿐이라는 진지한 마음으로 임하기에 실패하면 완전히 낙담해요. 과학적·이지적이며 논리와 데이터를 우선해요. 감성적 표현과 오글거리는 문구를 불편해해요. 직접적이고 터프한 소통을 선호해요. 연애에서는 섹시하고 성숙하며 깊은 매력을 지녔는데, 겉으로는 무뚝뚝해 보여도 친해지면 애교가 많아져요. 물상이 바다인 것처럼 실제로도 마음을 붙잡기 어려운 경우가 많고, 생각이 매우 많고 신중한 편이면서도 남을 먼저 배려하는 다정함이 있어요. 임수 남자는 자유롭고 매력적인 만큼 정착이 어려운 경우가 많고, 임수 여자는 귀여움과 야시시함이 공존하는 상반된 분위기를 지닌 경우가 많아요.",
+    genderDetail: {
+      male: "겉으로 헐렁해 보이는 여유 있는 매력이 있어요. 까칠한 사람도 잘 받아주는 수용력이 있어요. 사람을 만날 때 계산이 먼저 돌아가는 편이고, 속을 다 보여주지 않아요.",
+      female: "멀리서는 잘 눈에 안 띄는데, 가까이서 대화하면 매력이 가득해요. 다정한데 묘하게 섹시한 분위기가 있어요. 인간관계에서 약간 계산적인 면이 있어요.",
+    },
   },
   계: {
     short: "계수(癸水) — 빗물·이슬·안개",
     keyword: "계산적·공상적·실속형",
     detail: "명리학적으로 임수가 거대한 바다라면, 계수는 그 바닷물이 하늘로 올라가 응축된 빗물·이슬·안개예요. 형태가 없고 어디든 스며들기 때문에 겉으로는 여리고 순응적으로 보이지만, 실은 행동보다 계산이 먼저인 전략가 기질이에요. 옆에서 조용히 실속을 챙기고, 표현은 부드럽지만 내면에는 '결국 내 뜻대로 가야 한다'는 고집이 숨어 있어요. 공상적인 면과 지적 호기심이 강하고 머리가 좋아서, 남들이 못 보는 디테일과 빈틈을 잘 짚어내요. 냉철한 분석과 합리주의가 강점이지만, 동시에 안개처럼 변화무쌍한 감정선도 함께 가지고 있어 기분에 따라 사람을 대하는 태도가 묘하게 달라질 수 있어요. 물상이 작은 물방울인 만큼 혼자서는 약해 보여도, 모이고 모이면 바위도 뚫는 끈기와 침투력을 발휘해요. 인간관계에서는 한 번에 마음을 다 주지 않고 조금씩 간을 보며 신뢰를 쌓아가는 신중함이 있고, 신뢰가 쌓이면 누구보다 다정하고 헌신적으로 변해요. 연애에서는 계수 여자는 여리여리한 첫인상과 달리 속으로는 계획적이고 실속을 챙기는 면이 있어 의외로 '밀당'에 능하고, 계수 남자는 다정하고 섬세한 배려로 상대를 무장해제시키지만 자기 영역을 침범당하는 건 극도로 싫어해요. 직장에서는 큰소리치지 않으면서도 묵묵히 데이터와 근거를 쌓아 결국 원하는 결론으로 사람들을 이끄는 조용한 협상가 스타일이에요. 비가 땅에 스며들어 만물을 키우듯, 계수는 드러나지 않게 주변 사람을 성장시키는 역할을 자주 맡게 돼요.",
+    genderDetail: {
+      male: "말이 많고 수다스러운 면이 있어요. 부드럽고 다 받아주는 것처럼 보이지만 속에는 자기 의도가 있어요. 강한 사람도 능숙하게 다루는 능력이 있어요.",
+      female: "말이 많은 편인데 알맹이는 적어요. 열 마디 중 한 마디 정도만 귀담아들을 만해서, 잘 걸러가며 들어야 해요. 관계의 역학을 읽는 눈이 뛰어나게 현명해요.",
+    },
   },
 };
 
@@ -4058,7 +4102,7 @@ export function getStrengthTraitNarrative(r: SajuResult): string | null {
 // 22-4) 극신강/신왕(극왕·태강) 기질 — 비견·겁재가 일간을 떠받치고 인성이 그 힘을 다시 키워주는 구조 (용어 노출 없이 성향만 서술)
 export function getExtremeStrengthNarrative(r: SajuResult): string | null {
   const level = classifySinStrength(r.yongshin.percent);
-  if (level !== "극왕" && level !== "태강") return null;
+  if (level !== "극왕" && level !== "태왕") return null;
   return "사주 전체가 일간 본인을 떠받치는 기운으로 가득 차 있고, 그 위에 자신을 더 키워주는 기운까지 겹쳐 있어서 자기 확신과 추진력이 극단적으로 강한 구조예요. 본인의 판단을 의심하지 않고 주변의 통제나 제약을 잘 받아들이지 않으며, 자신과 비슷한 힘을 가진 존재와는 타협보다 경쟁을 택하는 경향이 강해요. 강한 자기 동력으로 조직을 만들고 사람을 끌어모으는 데는 탁월하지만, 본인보다 강한 권위나 규율 앞에서는 부딫히기 쉽고, 주변의 조언이나 견제를 무시한 채 독단적으로 밀고 나가다 고립되거나 갈등을 키우는 결과로 이어지는 경우가 많아요.";
 }
 

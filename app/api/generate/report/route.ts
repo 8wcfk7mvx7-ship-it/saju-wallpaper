@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getPrompt } from "@/lib/prompts";
 import { analyzeJaeseongPosition, SINGANG_TRAITS, JAESEONG_POSITION_INSIGHT } from "@/lib/saju";
 
+export const maxDuration = 300;
+
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // 오행 한자/이름 매핑
@@ -180,24 +182,29 @@ ${specialMsg}
 
 반드시 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 
+각 항목은 A4 1장 분량(600~800자)의 충분히 상세한 서술로 작성하세요.
+
 {
-  "overall": "종합 성격 및 인생 방향 분석 (200-300자)",
-  "personality": "성격의 강점과 특징, 내면의 동기와 행동 패턴 (200-300자)",
-  "career": "적성에 맞는 직업 분야, 재물을 다루는 방식, 성공 전략 (200-300자)",
-  "health": "건강에서 주의할 장기·부위, 생활 습관 조언, 음식·운동 제안 (200-300자)",
-  "relationships": "연애·결혼 스타일, 대인관계 특징, 좋은 인연을 만드는 법 (200-300자)",
-  "thisYear": "${new Date().getFullYear()}년~${new Date().getFullYear() + 1}년 운세 흐름, 특히 주의할 시기와 기회. 반드시 ${new Date().getFullYear()}년 하반기와 ${new Date().getFullYear() + 1}년을 기준으로 작성 (200-300자)",
-  "yongshin": "용신을 일상에서 활용하는 구체적인 방법 (색깔, 방향, 음식, 직업, 생활습관) (200-300자)",
-  "advice": "인생 전반에 걸친 핵심 조언, 이 사주가 가진 숨겨진 잠재력과 사명 (200-300자)",
-  "special": "${name}님에게만 전하는 특별한 메시지 (200-300자)"
+  "overall": "종합 성격 및 인생 방향 분석. 이 사주의 전체적인 구조와 에너지, 타고난 기질, 삶의 방향성, 핵심 과제를 포함한 심층 분석 (600-800자)",
+  "personality": "성격의 강점과 약점, 내면의 동기와 욕구, 행동 패턴, 감정 처리 방식, 대인관계에서 드러나는 특성, 스트레스 반응까지 세밀하게 분석 (600-800자)",
+  "career": "적성에 맞는 직업 분야와 그 이유, 재물 획득 방식과 재물운의 흐름, 성공을 위한 구체적 전략, 주의할 직업 환경, 사업 vs 직장 적합성 (600-800자)",
+  "health": "건강에서 주의할 장기·부위와 그 이유(오행 연관), 생활 습관 조언, 음식·운동 제안, 나이대별 건강 주의 시기, 정신 건강 관리법 (600-800자)",
+  "relationships": "연애·결혼 스타일, 이상형, 궁합 좋은 유형, 대인관계 특징, 친구·동료·상하관계 패턴, 좋은 인연을 만드는 구체적인 방법 (600-800자)",
+  "thisYear": "${new Date().getFullYear()}년~${new Date().getFullYear() + 1}년 운세 흐름. 반드시 ${new Date().getFullYear()}년 하반기와 ${new Date().getFullYear() + 1}년을 기준으로, 월별 흐름과 특히 주의할 시기, 기회의 시기, 행운 방향을 구체적으로 작성 (600-800자)",
+  "yongshin": "보완해야 할 기운과 그 이유, 일상에서 활용하는 구체적인 방법 (추천 색깔·방향·음식·직업·생활습관·아이템·숫자), 피해야 할 것들까지 포함 (600-800자)",
+  "love": "이성관계와 결혼운 심층 분석. 만남의 패턴, 연애할 때 드러나는 진짜 모습, 배우자와의 관계 역학, 결혼 시기와 조건, 결혼 후 생활 모습 (600-800자)",
+  "money": "재물운 심층 분석. 돈을 버는 방식, 돈을 쓰는 패턴, 투자 적성, 재물이 들어오는 루트, 재물운이 강해지는 시기와 조건, 돈 관련 주의사항 (600-800자)",
+  "advice": "인생 전반에 걸친 핵심 조언. 이 사주가 가진 숨겨진 잠재력과 사명, 인생 전반기·중반기·후반기 흐름, 꼭 피해야 할 선택, 인생을 바꿀 핵심 행동 (600-800자)",
+  "special": "${name}님에게만 전하는 특별한 메시지. 이 사주를 분석하며 느낀 이 사람만의 특별한 점, 삶의 본질적 과제, 그리고 진심 어린 응원의 말 (600-800자)"
 }`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 4000,
-      system: systemPrompt, // system role에도 주요 지시 넣어서 효과 강화
+    const message = await client.messages.stream({
+      model: "claude-opus-4-8",
+      max_tokens: 14000,
+      thinking: { type: "adaptive" },
+      system: systemPrompt,
       messages: [{ role: "user", content: prompt }],
-    });
+    }).finalMessage();
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
 

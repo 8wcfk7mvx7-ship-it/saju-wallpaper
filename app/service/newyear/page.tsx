@@ -285,6 +285,34 @@ export default function NewYearPage() {
           </p>
         </div>
 
+        {/* 길흉 통합 게이지 */}
+        {(() => {
+          const goodN = lines.filter(l => l.tone === "good").length;
+          const warnN = lines.filter(l => l.tone === "warn").length;
+          const total = goodN + warnN;
+          const goodPct = total === 0 ? 50 : Math.round((goodN / total) * 100);
+          const warnPct = 100 - goodPct;
+          const verdict = goodPct >= 70 ? "순풍" : goodPct >= 55 ? "소순풍" : goodPct >= 45 ? "평운" : goodPct >= 30 ? "소역풍" : "역풍";
+          const verdictColor = goodPct >= 65 ? "#4ade80" : goodPct >= 45 ? "#94a3b8" : "#f87171";
+          return (
+            <div className="rounded-2xl p-4 mb-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-black" style={{ color: "rgba(255,255,255,0.5)" }}>올해 길흉 흐름</p>
+                <span className="text-sm font-black" style={{ color: verdictColor }}>{verdict}</span>
+              </div>
+              {/* 단일 스택 바 */}
+              <div className="h-5 rounded-full overflow-hidden flex mb-2" style={{ background: "rgba(255,255,255,0.05)" }}>
+                <div className="h-full rounded-l-full transition-all" style={{ width: `${goodPct}%`, background: "linear-gradient(to right, #f97316, #fbbf24)" }} />
+                <div className="h-full rounded-r-full transition-all" style={{ width: `${warnPct}%`, background: "linear-gradient(to right, #dc2626, #ef4444)" }} />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs font-bold" style={{ color: "#fbbf24" }}>길운 {goodPct}%</span>
+                <span className="text-xs font-bold" style={{ color: "#f87171" }}>흉운 {warnPct}%</span>
+              </div>
+            </div>
+          );
+        })()}
+
         {lines.length === 0 ? (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
             <p className="text-sm text-gray-300 leading-relaxed">

@@ -389,6 +389,7 @@ export default function DohwasalPage() {
     ["도화살", "진도화", "나체도화", "곤랑도화", "녹방도화"].includes(s.name)
   );
   const hongyeom = r.sinsalList.find(s => s.name === "홍염살");
+  const hamji = r.sinsalList.find(s => s.name === "함지살");
 
   return (
     <main className="min-h-screen bg-[#150812] text-white">
@@ -476,6 +477,18 @@ export default function DohwasalPage() {
             <div className="bg-gradient-to-br from-fuchsia-950/50 to-rose-950/30 border border-fuchsia-700/30 rounded-2xl p-5 mb-5">
               <p className="text-sm font-bold text-fuchsia-300 mb-2">💋 다른 매력살: 홍염살(紅艶殺)이 있어요</p>
               <p className="text-sm text-gray-300 leading-relaxed">{getHongyeomDesc(hongyeom.pillars)}</p>
+            </div>
+          </FadeIn>
+        )}
+
+        {hamji && (
+          <FadeIn delay={380}>
+            <div className="border rounded-2xl p-5 mb-5" style={{ background: "rgba(245,158,11,0.07)", borderColor: "rgba(245,158,11,0.3)" }}>
+              <p className="text-sm font-bold text-amber-300 mb-1">✨ 함지살(咸池煞) — 도화보다 차원 깊은 매력살</p>
+              <p className="text-xs text-amber-500/70 mb-2">삼명통회(三命通會) 기준 · {hamji.pillars.join("·")}주</p>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                도화살과는 다른 개념으로, 매력살 서열에서는 도화보다 상위에 놓입니다. 애교·교태·감각적 매력이 자연스럽게 흘러나오고 예술적 재능과도 연결되는 기운입니다.
+              </p>
             </div>
           </FadeIn>
         )}

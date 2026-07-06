@@ -37,9 +37,11 @@ import {
   getHourCheonulIntactGoodFlowNarrative,
   isHourCheonulIntactGoodFlow,
   getSipseongStrength,
+  classifySinStrength,
+  getDisplaySinsalList,
   type SajuResult, type Element,
 } from "@/lib/saju";
-import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, getGaewunRanking, detectStayPutPattern } from "@/lib/saju2";
+import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, detectStayPutPattern } from "@/lib/saju2";
 import ResultFooterActions from "@/components/ResultFooterActions";
 import { trackTraits } from "@/lib/trackTrait";
 
@@ -253,15 +255,17 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
                               <div className="px-3 py-1.5 text-[9px] font-bold" style={{ background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.35)" }}>
                                 {sw.year}년 월별 운 (月運)
                               </div>
-                              <div className="grid grid-cols-3 gap-0 divide-y divide-x" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+                              <div className="grid grid-cols-3">
                                 {Array.from({length:12},(_,mi)=>mi+1).map(mon => {
                                   const mp = getMonthPillarForYear(sw.cg, mon);
                                   const mCgEl = CHEONGAN_ELEMENT[mp.cg] || "토";
                                   const mJjEl = jijiElement(mp.jj);
                                   const mCgStyle = EL_STYLE[mCgEl];
                                   const mJjStyle = EL_STYLE[mJjEl];
+                                  const col = (mon - 1) % 3;
+                                  const row = Math.floor((mon - 1) / 3);
                                   return (
-                                    <div key={mon} className="px-2 py-2 flex flex-col items-center gap-0.5" style={{ background: "rgba(255,255,255,0.01)" }}>
+                                    <div key={mon} className="px-2 py-2 flex flex-col items-center gap-0.5" style={{ background: "rgba(255,255,255,0.01)", borderBottom: row < 3 ? "1px solid rgba(255,255,255,0.06)" : "none", borderRight: col < 2 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
                                       <span className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{mon}월</span>
                                       <span className="text-xs font-black" style={{ color: mCgStyle.text }}>{mp.cg}</span>
                                       <span className="text-xs font-black" style={{ color: mJjStyle.text }}>{mp.jj}</span>
@@ -270,9 +274,9 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
                                   );
                                 })}
                               </div>
-                              <div className="px-3 py-1.5 text-[8px]" style={{ color: "rgba(255,255,255,0.2)" }}>
-                                일운 상세는 추후 지원 예정
-                              </div>
+                              <Link href="/service/today" className="flex items-center justify-center gap-1 px-3 py-2 text-[9px] transition-opacity hover:opacity-80" style={{ color: "rgba(139,92,246,0.7)", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                                일운(日運) 보기 →
+                              </Link>
                             </div>
                           )}
                         </div>
@@ -291,15 +295,15 @@ function DaewoonSewoonTable({ daewoon, ilgan, birthYear }: {
 
 // ─── 오행 스타일 ───────────────────────────────────────────────────────────────
 const EL_STYLE: Record<string, { bg: string; text: string; border: string; badge: string }> = {
-  목: { bg: "rgba(34,197,94,0.10)",  text: "#4ade80", border: "rgba(34,197,94,0.25)",  badge: "rgba(34,197,94,0.15)" },
-  화: { bg: "rgba(239,68,68,0.10)",  text: "#f87171", border: "rgba(239,68,68,0.25)",  badge: "rgba(239,68,68,0.15)" },
-  토: { bg: "rgba(245,158,11,0.10)", text: "#fbbf24", border: "rgba(245,158,11,0.25)", badge: "rgba(245,158,11,0.15)" },
-  금: { bg: "rgba(209,213,219,0.10)",text: "#d1d5db", border: "rgba(209,213,219,0.25)",badge: "rgba(209,213,219,0.15)" },
-  수: { bg: "rgba(59,130,246,0.10)", text: "#60a5fa", border: "rgba(59,130,246,0.25)",  badge: "rgba(59,130,246,0.15)" },
+  목: { bg: "rgba(30,40,30,0.7)",  text: "#86efac", border: "rgba(134,239,172,0.15)",  badge: "rgba(134,239,172,0.12)" },
+  화: { bg: "rgba(40,20,20,0.7)",  text: "#fca5a5", border: "rgba(252,165,165,0.15)",  badge: "rgba(252,165,165,0.12)" },
+  토: { bg: "rgba(40,32,10,0.7)",  text: "#fcd34d", border: "rgba(252,211,77,0.15)",   badge: "rgba(252,211,77,0.12)"  },
+  금: { bg: "rgba(20,20,36,0.7)",  text: "#c4b5fd", border: "rgba(196,181,253,0.15)",  badge: "rgba(196,181,253,0.12)" },
+  수: { bg: "rgba(10,22,38,0.7)",  text: "#93c5fd", border: "rgba(147,197,253,0.15)",  badge: "rgba(147,197,253,0.12)" },
 };
 // 오행 기반 십성 색상 체계 (일간 기준)
 const OHAENG_COLOR: Record<string, string> = {
-  목: "#22c55e", 화: "#ef4444", 토: "#f59e0b", 금: "#f8fafc", 수: "#94a3b8",
+  목: "#86efac", 화: "#fca5a5", 토: "#fcd34d", 금: "#c4b5fd", 수: "#93c5fd",
 };
 // 오행 생극 관계
 const OHAENG_GENERATES: Record<string, string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };
@@ -454,6 +458,18 @@ function ResultView({
   ];
 
   const ilgan = pd.day.cg;
+  const displaySinsalList = getDisplaySinsalList(result.sinsalList || []);
+
+  // 신살 카테고리별 분류 (섹션에 녹여넣기용)
+  const hasSinsal = (names: string[]) => displaySinsalList.filter(s => names.includes(s.name));
+  const sinsalDescs = (names: string[]) => hasSinsal(names).map(s => s.desc).filter(Boolean);
+
+  const moveDescs   = sinsalDescs(["역마살","지살","반안살","장성살"]);
+  const wealthDescs = sinsalDescs(["재살","암록","겁살"]);
+  const healthDescs = sinsalDescs(["천살","육해살","망신살","공망","귀문관살","화개살"]);
+  const luckyDescs  = sinsalDescs(["천을귀인","천덕귀인","월덕귀인","태극귀인","천주귀인","문창귀인","학당귀인"]);
+  const dohwaItems  = hasSinsal(["진도화","가도화","편야도화","나체도화","곤랑도화","녹방도화","년살"]);
+  const dohwaDescsForSection   = dohwaItems.map(s => s.desc).filter(Boolean);
 
   useEffect(() => {
     trackTraits([
@@ -740,7 +756,7 @@ function ResultView({
                 {
                   row: "신살", get: (d: typeof pd.year, label: string) => {
                     const pl = label === "년주" ? "연" : label === "월주" ? "월" : label === "일주" ? "일" : "시";
-                    const names = (result.sinsalList || []).filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
+                    const names = displaySinsalList.filter(s => s.pillars?.includes(pl) && s.name !== "나체도화").map(s => s.name);
                     if (!names.length) return "—";
                     return (
                       <div className="flex flex-col items-center gap-0.5">
@@ -797,70 +813,6 @@ function ResultView({
         );
       })()}
 
-      {/* 신살 — 사주 바로 아래 */}
-      {result.sinsalList.length > 0 && (
-        <Section title={`신살(神殺) · 총 ${result.sinsalList.length}개 발견`} accent="#c084fc">
-          <div className="space-y-2.5">
-            {result.sinsalList.map(s => (
-              <div key={s.name} className="rounded-xl px-4 py-3" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.05)" : s.category === "unlucky" ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.03)", border: s.category === "lucky" ? "1px solid rgba(52,211,153,0.15)" : s.category === "unlucky" ? "1px solid rgba(239,68,68,0.15)" : "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-sm text-white">{s.name}</span>
-                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.hanja}</span>
-                  <span className="text-[9px] px-1.5 rounded font-bold" style={{ background: s.category === "lucky" ? "rgba(52,211,153,0.12)" : s.category === "unlucky" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)", color: s.category === "lucky" ? "#34d399" : s.category === "unlucky" ? "#f87171" : "#9ca3af" }}>
-                    {s.category === "lucky" ? "길신" : s.category === "unlucky" ? "흉살" : "중립"}
-                  </span>
-                  <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>{s.pillars.join("·")}주</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* 도화살 위치별 의미 + 발현 시기 */}
-          {(() => {
-            const dohwaItems = result.sinsalList.filter(s =>
-              ["도화살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name)
-            );
-            if (dohwaItems.length === 0) return null;
-            const dohwaPillars = [...new Set(dohwaItems.flatMap(s => s.pillars))];
-            const posLabel: Record<string, string> = { 년: "연주", 월: "월주", 일: "일주", 시: "시주" };
-            const branchByLabel: Record<string, string> = {
-              년: pd.year.jj, 월: pd.month.jj, 일: pd.day.jj, 시: pd.hour?.jj ?? "",
-            };
-            const pillarOrder = ["년","월","일","시"];
-            const hasHapExtension = dohwaPillars.some(p => {
-              const idx = pillarOrder.indexOf(p);
-              if (idx < 0) return false;
-              const neighbors = [pillarOrder[idx-1], pillarOrder[idx+1]].filter(Boolean);
-              return neighbors.some(n => {
-                const jjA = branchByLabel[p];
-                const jjN = branchByLabel[n];
-                if (!jjA || !jjN) return false;
-                const rels = getJijiRelations([jjA, jjN]);
-                return rels.some(r => r.type === "육합" || r.type === "삼합" || r.type === "반합");
-              });
-            });
-            return (
-              <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "rgba(244,63,94,0.05)", border: "1px solid rgba(244,63,94,0.15)" }}>
-                <p className="text-xs font-bold mb-2" style={{ color: "#fb7185" }}>🌸 도화살 위치별 의미 · 발현 시기</p>
-                <div className="space-y-2">
-                  {dohwaPillars.map(p => {
-                    const info = DOHWA_POSITION_INFO[p];
-                    if (!info) return null;
-                    return (
-                      <div key={p}>
-                        <p className="text-[10px] font-bold mb-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>{posLabel[p] ?? `${p}주`} 도화</p>
-                        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{info.meaning} {info.timing}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-                {hasHapExtension && (
-                  <p className="text-[10px] mt-2 leading-relaxed" style={{ color: "rgba(251,113,133,0.7)" }}>{DOHWA_HAP_EXTENSION_NOTE}</p>
-                )}
-              </div>
-            );
-          })()}
-        </Section>
-      )}
 
       {/* ② 격국 · 용신 */}
       {(() => {
@@ -880,9 +832,51 @@ function ResultView({
           <Section title="사주 구조 · 필요 기운 · 계절 균형" accent="#a78bfa">
             {/* 필요 기운 그리드 */}
             <p className="text-[10px] font-bold mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>균형 필요 기운</p>
+            {/* 신강/신약 게이지 */}
+            {(() => {
+              const LEVELS = ["극약","태약","신약","중화신약","중화신강","신강","태왕","극왕"] as const;
+              const level = classifySinStrength(ys.percent);
+              const pct = Math.max(0, Math.min(100, ys.percent));
+              const barGradient = "linear-gradient(to right, #166534, #4ade80, #86efac, #fbbf24, #f97316, #ef4444, #7f1d1d)";
+              return (
+                <div className="mt-4 mb-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-gray-400">신강 · 신약</span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{
+                      background: pct >= 60 ? "rgba(239,68,68,0.15)" : pct <= 40 ? "rgba(96,165,250,0.15)" : "rgba(74,222,128,0.15)",
+                      color: pct >= 60 ? "#f87171" : pct <= 40 ? "#60a5fa" : "#4ade80",
+                      border: `1px solid ${pct >= 60 ? "rgba(239,68,68,0.3)" : pct <= 40 ? "rgba(96,165,250,0.3)" : "rgba(74,222,128,0.3)"}`,
+                    }}>{level}</span>
+                  </div>
+                  <div style={{ position: "relative", height: 8, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "visible" }}>
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 4, background: barGradient, opacity: 0.85 }} />
+                    {/* 중앙선 */}
+                    <div style={{ position: "absolute", left: "50%", top: -2, width: 1, height: 12, background: "rgba(255,255,255,0.3)" }} />
+                    {/* 바늘 */}
+                    <div style={{
+                      position: "absolute", top: "50%", left: `${pct}%`,
+                      transform: "translate(-50%, -50%)",
+                      width: 14, height: 14, borderRadius: "50%",
+                      background: "#fff", border: "2.5px solid #1a1a2e",
+                      boxShadow: "0 0 0 2px rgba(255,255,255,0.3)",
+                      zIndex: 2,
+                    }} />
+                  </div>
+                  {/* 8단계 레이블 */}
+                  <div className="flex justify-between mt-1.5">
+                    {LEVELS.map((l) => (
+                      <span key={l} style={{
+                        fontSize: 9, fontWeight: l === level ? 800 : 500,
+                        color: l === level ? "#fff" : "rgba(255,255,255,0.3)",
+                        textAlign: "center", flex: 1,
+                      }}>{l === "중화신약" ? "중화↙" : l === "중화신강" ? "중화↗" : l}</span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="grid grid-cols-2 gap-2 mb-2">
               {[
-                { label: "신강/신약", value: ys.strength, color: ys.strength === "신강" ? "#f87171" : ys.strength === "신약" ? "#60a5fa" : "#4ade80" },
                 { label: "필요 기운", value: ys.yongshin, color: EL_STYLE[ys.yongshin]?.text || "#fff" },
                 { label: "도움 기운", value: ys.heeshin, color: EL_STYLE[ys.heeshin]?.text || "#fff" },
                 { label: "꺼리는 기운", value: gishin, color: EL_STYLE[gishin]?.text || "#fff" },
@@ -1262,7 +1256,7 @@ function ResultView({
       })()}
 
       {/* ④-3 여성 이성운 — 좋은 인연을 부르는 구조 */}
-      {femaleLovePatterns.length > 0 && (
+      {(femaleLovePatterns.length > 0 || dohwaDescsForSection.length > 0) && (
         <Section title="좋은 인연을 부르는 사주 속 신호" accent="#f59e0b">
           <div className="space-y-4">
             {femaleLovePatterns.map((p, i) => (
@@ -1271,6 +1265,15 @@ function ResultView({
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{p.desc}</p>
               </div>
             ))}
+            {dohwaDescsForSection.length > 0 && (
+              <div className={femaleLovePatterns.length > 0 ? "pt-4 border-t border-white/[0.06] space-y-1.5" : "space-y-1.5"}>
+                {dohwaDescsForSection.map((d, i) => (
+                  <p key={i} className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ background: "rgba(251,191,36,0.04)", border: "1px solid rgba(251,191,36,0.1)", color: "rgba(255,255,255,0.55)" }}>
+                    {d}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </Section>
       )}
@@ -1432,6 +1435,15 @@ function ResultView({
               </div>
             </div>
           )}
+          {healthDescs.length > 0 && (
+            <div className="mt-3 space-y-1.5">
+              {healthDescs.map((d, i) => (
+                <p key={i} className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ background: "rgba(248,113,113,0.04)", border: "1px solid rgba(248,113,113,0.1)", color: "rgba(255,255,255,0.55)" }}>
+                  {d}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       </Section>
 
@@ -1454,22 +1466,6 @@ function ResultView({
         </div>
       </Section>
 
-      {/* 개운법 — 색상·방향·음식·운동·아이템·숫자 랭킹 */}
-      <Section title="개운법 — 나에게 맞는 색·방향·음식·숫자" accent="#fbbf24">
-        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>오행 기운을 기준으로 좋은 오행 3가지를 우선 활용해보세요</p>
-        <div className="space-y-2.5">
-          {getGaewunRanking(result).map(g => (
-            <div key={g.element} className="rounded-xl px-4 py-3" style={{ background: g.isGood ? "rgba(251,191,36,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${g.isGood ? "rgba(251,191,36,0.25)" : "rgba(255,255,255,0.08)"}` }}>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: g.isGood ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.08)", color: g.isGood ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>{g.rank}순위</span>
-                <span className="text-sm font-black" style={{ color: g.colorHex }}>{g.color}</span>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>방향 {g.direction} · 음식 {g.food} · 맛 {g.taste} · 운동 {g.exercise} · 아이템 {g.items} · 숫자 {g.numbers}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
       {/* ⑧ 직업 적성 */}
       <Section title="직업 적성 · 커리어 분석" accent="#34d399">
         <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>지배 오행({domEl}) · 일주 기준 적성 분석</p>
@@ -1488,6 +1484,24 @@ function ResultView({
           <p className="text-[10px] font-bold mb-1" style={{ color: "#f87171" }}>커리어 주의사항</p>
           <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{domCareer.caution}</p>
         </div>
+        {moveDescs.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            {moveDescs.map((d, i) => (
+              <p key={i} className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.1)", color: "rgba(255,255,255,0.55)" }}>
+                {d}
+              </p>
+            ))}
+          </div>
+        )}
+        {luckyDescs.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            {luckyDescs.map((d, i) => (
+              <p key={i} className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ background: "rgba(99,102,241,0.04)", border: "1px solid rgba(99,102,241,0.1)", color: "rgba(255,255,255,0.55)" }}>
+                {d}
+              </p>
+            ))}
+          </div>
+        )}
       </Section>
 
       {/* ⑨ 재성 위치 */}
@@ -1500,6 +1514,15 @@ function ResultView({
         <p className="text-xs px-4 py-2.5 rounded-xl" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", color: "rgba(255,255,255,0.55)" }}>
           재물 방식: {jaeseongInfo.wealth}
         </p>
+        {wealthDescs.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            {wealthDescs.map((d, i) => (
+              <p key={i} className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ background: "rgba(251,191,36,0.04)", border: "1px solid rgba(251,191,36,0.1)", color: "rgba(255,255,255,0.55)" }}>
+                {d}
+              </p>
+            ))}
+          </div>
+        )}
       </Section>
 
       {/* ⑩⑪ 대운표 + 세운표 */}

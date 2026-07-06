@@ -9,6 +9,7 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getOhaengPlaceNarrative, getGongmangNarrative, getGwanseongSiksangYeonaeNarrative,
+  ILGAN_PERSONALITY,
 } from "@/lib/saju";
 import {
   ILGAN_CHARM_DB,
@@ -117,6 +118,17 @@ function CharmResultContent() {
   const ilji = result.pillarsDetail.day.jj;
   const idata = ILGAN_CHARM_DB[ilgan];
   const jijiData = JIJI_CHARM_DB[ilji];
+
+  // 첫인상 특급 조합 (년지 + 일주)
+  const FIRSTIMPRESSION_SPECIAL: Record<string, string> = {
+    "진:신해": "첫인상부터 분위기가 남달라 말을 걸지 않아도 자연스럽게 시선을 끌고 번호를 먼저 물어보는 사람이 생기기 쉬운 편입니다.",
+    "오:병오": "환한 미소와 자신감이 먼저 눈에 들어오는 타입이라 어디서나 존재감이 커 자연스럽게 이성의 관심을 받습니다.",
+    "묘:정묘": "청순하면서도 묘한 분위기가 있어 처음엔 조용해 보여도 가까이 있을수록 더 매력적으로 느껴지는 타입입니다.",
+    "신:임신": "유머 감각과 센스가 뛰어나 처음 만난 자리에서도 자연스럽게 분위기를 주도하고 호감을 얻는 편입니다.",
+    "유:계유": "세련된 스타일과 깔끔한 이미지가 첫인상에서 강하게 작용해 자기관리 잘 하는 사람으로 기억됩니다.",
+  };
+  const firstImpKey = `${result.pillarsDetail.year.jj}:${ilgan}${ilji}`;
+  const firstImpSpecial = FIRSTIMPRESSION_SPECIAL[firstImpKey] ?? null;
   const dominantEl = result.dominant[0] || "토";
   const gagukPatterns = detectGagukPatterns(result);
   const olook = OHAENG_LOOK[dominantEl];
@@ -135,6 +147,8 @@ function CharmResultContent() {
   const 편관Trait = CHARM_TRAITS.find(t => t.id === "편관")!;
 
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
+  const has함지살 = result.sinsalList.some(s => s.name === "함지살");
+  const 함지살기둥 = result.sinsalList.find(s => s.name === "함지살")?.pillars ?? [];
 
   const jipchaknamNarrative = getJipchaknamNarrative(result, gender);
   const charmExtraNarrative = [
@@ -163,6 +177,8 @@ function CharmResultContent() {
     router.push(`/charm/pay?orderId=${orderId}&amount=${CHARM_PRICE}`);
   };
 
+  const N = name ? `${name}님` : "당신";
+
   return (
     <main className="min-h-screen bg-[#080810] text-white">
       <StarShower active={showering} />
@@ -182,7 +198,7 @@ function CharmResultContent() {
         <div className="text-center mb-6">
           <div className="text-4xl mb-3 drop-shadow-[0_0_30px_rgba(244,114,182,0.6)]">{grade.emoji}</div>
           <h1 className="text-2xl font-black mb-1 bg-gradient-to-r from-pink-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">
-            {name}님의 매력 분석
+            {N}의 매력 분석
           </h1>
           <p className="text-gray-500 text-sm">{result.fourPillars}</p>
         </div>
@@ -203,7 +219,7 @@ function CharmResultContent() {
           <div className="p-6 text-center">
             <div className="text-5xl mb-2">{grade.emoji}</div>
             <div className="text-xs font-bold tracking-[0.3em] mb-2" style={{ color: grade.color }}>
-              CHARM GRADE
+              {N}의 CHARM GRADE
             </div>
             <div className="text-6xl font-black mb-1" style={{ color: grade.color }}>
               {grade.grade}등급
@@ -253,7 +269,7 @@ function CharmResultContent() {
             </p>
             <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5 mb-3">
               <p className="text-xs text-gray-500 mb-1">👁 처음 만난 사람 눈에</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{idata.firstImpression}</p>
+              <p className="text-sm text-gray-200 leading-relaxed">{idata.firstImpression}{firstImpSpecial ? ` ${firstImpSpecial}` : ""}</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {idata.keywords.map((k, i) => (
@@ -262,6 +278,21 @@ function CharmResultContent() {
             </div>
           </div>
         )}
+
+        {/* ═══ 일간 × 성별 특성 ═══ */}
+        {(() => {
+          const gd = ILGAN_PERSONALITY[ilgan]?.genderDetail;
+          const desc = gd ? (gender === "male" ? gd.male : gd.female) : null;
+          if (!desc) return null;
+          return (
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
+              <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {gender === "male" ? "♂ 남성" : "♀ 여성"} · 실제 관찰
+              </p>
+              <p className="text-sm text-gray-300 leading-relaxed">{desc}</p>
+            </div>
+          );
+        })()}
 
         {/* ═══ 오행 외모 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
@@ -308,6 +339,18 @@ function CharmResultContent() {
         {/* ═══ 신살 매력 서열 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-4">신살 매력 서열</p>
+          {has함지살 && (
+            <div className="flex items-start gap-3 p-3 rounded-xl border mb-2.5" style={{ background: "rgba(245,158,11,0.07)", borderColor: "rgba(245,158,11,0.3)" }}>
+              <span className="text-lg shrink-0">✨</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-amber-200">함지살(咸池煞)</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">도화 상위 매력살</span>
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">삼명통회(三命通會) 기준 도화보다 차원 깊은 음기(陰氣) 매력살. 애교·교태·감각적 매력이 자연스럽게 흘러나옵니다. ({함지살기둥.join("·")}주)</p>
+              </div>
+            </div>
+          )}
           {mySalsPresent.length > 0 ? (
             <div className="space-y-2.5 mb-4">
               {mySalsPresent.map((s) => (

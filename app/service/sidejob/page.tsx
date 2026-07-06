@@ -27,9 +27,11 @@ export default function SidejobPage() {
   const [step, setStep] = useState<"entry" | "form" | "loading" | "result">("entry");
   const [form, setForm] = useState<BirthFormData>(defaultBirthData("female"));
   const resultRef = useRef<SajuResult | null>(null);
+  const nameRef = useRef<string>("");
 
   async function handleAnalyze() {
     if (!form.birthYear || !form.birthMonth || !form.birthDay) return;
+    nameRef.current = form.name?.trim() || "당신";
     let y = Number(form.birthYear), m = Number(form.birthMonth), d = Number(form.birthDay);
     if (form.calendarType === "lunar") {
       try {
@@ -162,6 +164,7 @@ export default function SidejobPage() {
   const ilgan = r.pillarsDetail.day.cg;
   const ilju = `${ilgan}${r.pillarsDetail.day.jj}`;
   const userName = form.name?.trim() || "회원";
+  const N = nameRef.current === "당신" ? "당신" : `${nameRef.current}님`;
 
   // 십성 그룹 카운트는 천간(사주 본기둥)에만 드러난 십성만 센다. 지장간(지지 속 숨은 십성)은 해석 참고용일 뿐 카운트에 포함하지 않는다.
   const sipseongList = [
@@ -233,7 +236,7 @@ export default function SidejobPage() {
         <div className="text-center mb-8">
           <p className="text-emerald-400 text-xs font-bold tracking-widest mb-2">SIDE HUSTLE POTENTIAL</p>
           <h1 className="text-2xl font-black leading-snug">
-            {userName}님, {ilju}일주의 투잡 가능성
+            {N}, {ilju}일주의 투잡 가능성
           </h1>
         </div>
 
