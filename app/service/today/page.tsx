@@ -73,6 +73,37 @@ const GROUP_TODAY: Record<string, { 총운: string; 재물: string; 애정: stri
   },
 };
 
+// 1~9 등급 계산 — 도메인별 십성그룹 + 12운성 복합 평가
+const UUNSEONG_BASE_SCORE: Record<string, number> = {
+  장생: 2, 건록: 1, 제왕: 2, 관대: 3, 양: 4, 목욕: 5, 태: 5, 쇠: 6, 병: 7, 묘: 8, 절: 8, 사: 9,
+};
+type DomainKey = "재물" | "애정" | "건강" | "공부문서";
+const GROUP_DOMAIN_MOD: Record<string, Record<DomainKey, number>> = {
+  비겁: { 재물: +1, 애정: +1, 건강: -1, 공부문서: +1 },
+  식상: { 재물: 0,  애정: -2, 건강: 0,  공부문서: 0  },
+  재성: { 재물: -2, 애정: -1, 건강: +1, 공부문서: +1 },
+  관성: { 재물: -1, 애정: 0,  건강: +1, 공부문서: -1 },
+  인성: { 재물: +1, 애정: -1, 건강: -1, 공부문서: -2 },
+};
+function calcDomainGrade(group: string, uunseong: string, domain: DomainKey, hapBonus: boolean, chungPenalty: boolean): number {
+  const base = UUNSEONG_BASE_SCORE[uunseong] ?? 5;
+  const mod = GROUP_DOMAIN_MOD[group]?.[domain] ?? 0;
+  const hap = hapBonus ? -1 : 0;
+  const chung = chungPenalty ? +1 : 0;
+  return Math.max(1, Math.min(9, base + mod + hap + chung));
+}
+const GRADE_LABEL: Record<number, { label: string; color: string }> = {
+  1: { label: "최상", color: "#22c55e" },
+  2: { label: "상",   color: "#4ade80" },
+  3: { label: "중상", color: "#86efac" },
+  4: { label: "중",   color: "#94a3b8" },
+  5: { label: "중",   color: "#94a3b8" },
+  6: { label: "중하", color: "#fb923c" },
+  7: { label: "하",   color: "#f87171" },
+  8: { label: "하",   color: "#ef4444" },
+  9: { label: "최하", color: "#dc2626" },
+};
+
 // 지지 합충 시각 다이어그램 컴포넌트
 // cols: 명식표 컬럼 배열 (시주→일주→월주→년주→대운→세운→오늘 순)
 // relations: sortJijiRelationsByStrength 처리된 관계 배열
@@ -1078,37 +1109,27 @@ export default function TodayFortunePage() {
         </div>
         </FadeIn>
 
-        {/* 재물운 */}
-        <FadeIn delay={240}>
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-amber-300 mb-1">💰 재물운</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{groupContent.재물}</p>
-        </div>
-        </FadeIn>
-
-        {/* 애정운 */}
-        <FadeIn delay={320}>
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-pink-300 mb-1">💞 애정·연애운</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{groupContent.애정}</p>
-        </div>
-        </FadeIn>
-
-        {/* 건강운 */}
-        <FadeIn delay={400}>
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-emerald-300 mb-1">🩺 건강운</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{groupContent.건강}</p>
-        </div>
-        </FadeIn>
-
-        {/* 공부/문서운 */}
-        <FadeIn delay={480}>
-        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
-          <p className="text-sm font-bold text-sky-300 mb-1">📄 공부·문서운</p>
-          <p className="text-sm text-gray-300 leading-relaxed">{groupContent.공부문서}</p>
-        </div>
-        </FadeIn>
+        {/* 도메인 운세 — 1~9등급 */}
+        {(["재물", "애정", "건강", "공부문서"] as DomainKey[]).map((domain, di) => {
+          const grade = calcDomainGrade(todayGroup, todayUunseong, domain, hasTodayHap, hasTodayChung);
+          const g = GRADE_LABEL[grade];
+          const domainLabel = domain === "공부문서" ? "공부·문서운" : `${domain}운`;
+          return (
+            <FadeIn key={domain} delay={240 + di * 80}>
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>{domainLabel}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${g.color}22`, color: g.color, border: `1px solid ${g.color}44` }}>{g.label}</span>
+                  <span className="text-3xl font-black tabular-nums" style={{ color: g.color, lineHeight: 1 }}>{grade}</span>
+                  <span className="text-xs text-gray-600 self-end mb-0.5">등급</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">{groupContent[domain]}</p>
+            </div>
+            </FadeIn>
+          );
+        })}
 
         <FadeIn delay={560}>
         <div className="grid grid-cols-2 gap-3">
