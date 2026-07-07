@@ -306,6 +306,16 @@ export default function ExamPage() {
     [r.pillarsDetail.year.jj, r.pillarsDetail.month.jj, r.pillarsDetail.hour?.jj].includes(jj)
   );
 
+  // 인성 강도 — 공직/시험은 관성보다 문서·학습 기운(인성)이 결정적
+  const allSipseong = [
+    r.pillarsDetail.year.sipseongCg, r.pillarsDetail.year.sipseongJj,
+    r.pillarsDetail.month.sipseongCg, r.pillarsDetail.month.sipseongJj,
+    r.pillarsDetail.day.sipseongJj,
+    r.pillarsDetail.hour?.sipseongCg, r.pillarsDetail.hour?.sipseongJj,
+  ].filter(Boolean) as string[];
+  const inseongCount = allSipseong.filter(s => s === "정인" || s === "편인").length;
+  const hasStrongInseong = inseongCount >= 2;
+
   // 오행 요약 뱃지
   const elColors: Record<Element, string> = { 목: "#22c55e", 화: "#ef4444", 토: "#eab308", 금: "#a3a3a3", 수: "#3b82f6" };
   const elBadge = elColors[ilganEl] ?? "#a78bfa";
@@ -412,6 +422,12 @@ export default function ExamPage() {
                 <div className="flex items-start gap-3 mb-3">
                   <span className="text-yellow-400 text-lg shrink-0">✦</span>
                   <p className="text-sm text-gray-300 leading-relaxed">천을귀인이 있어요. 막막하고 어려울 때 귀인이 나타나는 기운입니다. 독학보다는 좋은 스승이나 멘토와 함께할 때 실력이 극적으로 상승하는 구조를 가지고 있습니다.</p>
+                </div>
+              )}
+              {hasStrongInseong && (
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-yellow-400 text-lg shrink-0">✦</span>
+                  <p className="text-sm text-gray-300 leading-relaxed">학습·문서 기운이 사주에 두드러지게 강해요. 공직·자격시험 합격은 권력·지위 기운보다 이 학습·문서 기운이 실제 합격을 끌어당기는 경우가 많습니다. 대운이나 세운에서 학습·문서 기운이 들어오는 해에 특히 집중적으로 준비하면 좋은 결과로 이어질 가능성이 높아요.</p>
                 </div>
               )}
             </div>

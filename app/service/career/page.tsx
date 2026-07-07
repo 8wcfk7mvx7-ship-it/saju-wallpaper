@@ -285,6 +285,8 @@ export default function CareerPage() {
   const sikSangCount = totalCount("식신") + totalCount("상관");
   const gwanseongCount = totalCount("정관") + totalCount("편관");
   const hasSikSangSaengGwan = sikSangCount >= 1 && gwanseongCount >= 1;
+  // 관성 有 → 공직/조직에서 동기들보다 빠른 인정·승진
+  const hasGwanseong = gwanseongCount >= 1;
 
   const iljuInfo = ILJU_60[`${ilgan}${r.pillarsDetail.day.jj}`];
   const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCount) : "";
@@ -634,6 +636,13 @@ export default function CareerPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {hasGwanseong && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-sky-300 mb-2">조직·공직에서의 인정 기운</p>
+            <p className="text-sm text-gray-300 leading-relaxed">사주에 조직·책임의 기운이 있어요. 공공기관·공직·대기업처럼 위계와 직급이 있는 조직에서 같은 시기에 들어온 사람들보다 더 빠르게 인정받고 승진하는 흐름이 나타나는 경우가 많습니다. 규칙과 절차를 존중하는 구조 안에서 특히 두드러지는 유형이에요.</p>
           </div>
         )}
 
