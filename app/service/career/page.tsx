@@ -288,6 +288,10 @@ export default function CareerPage() {
   // 관성 有 → 공직/조직에서 동기들보다 빠른 인정·승진
   const hasGwanseong = gwanseongCount >= 1;
 
+  // 장성살 + 도화살 → 사회적 성공
+  const hasJangseongAndDohwa = r.sinsalList.some(s => s.name === "장성살") &&
+    r.sinsalList.some(s => ["도화살","진도화","나체도화","곤랑도화","녹방도화"].includes(s.name));
+
   const iljuInfo = ILJU_60[`${ilgan}${r.pillarsDetail.day.jj}`];
   const iljuCareerAdjusted = iljuInfo ? adjustCareerByExpression(iljuInfo.career, sikSangCount) : "";
 
@@ -643,6 +647,13 @@ export default function CareerPage() {
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
             <p className="text-sm font-bold text-sky-300 mb-2">조직·공직에서의 인정 기운</p>
             <p className="text-sm text-gray-300 leading-relaxed">사주에 조직·책임의 기운이 있어요. 공공기관·공직·대기업처럼 위계와 직급이 있는 조직에서 같은 시기에 들어온 사람들보다 더 빠르게 인정받고 승진하는 흐름이 나타나는 경우가 많습니다. 규칙과 절차를 존중하는 구조 안에서 특히 두드러지는 유형이에요.</p>
+          </div>
+        )}
+
+        {hasJangseongAndDohwa && (
+          <div className="bg-amber-950/20 border border-amber-500/25 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-amber-300 mb-2">장성살 + 도화살 — 사회적 성공 기운</p>
+            <p className="text-sm text-gray-300 leading-relaxed">통솔력과 카리스마를 상징하는 장성살, 그리고 대중적 인기와 매력을 뜻하는 도화살이 함께 있어요. 이 조합은 대중 앞에서 빛나고 조직을 이끄는 힘을 동시에 갖춘 구조예요. 리더십과 인기가 합쳐지면 사회적으로 두드러지는 성과를 만들어내는 경우가 많아요. 대중을 상대하는 직종, 리더십이 필요한 자리, 인지도가 영향력이 되는 분야에서 특히 빛을 발해요.</p>
           </div>
         )}
 

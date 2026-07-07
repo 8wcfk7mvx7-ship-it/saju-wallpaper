@@ -24,7 +24,7 @@ export default function SiteHeader() {
 
   function handleLoginClick() {
     if (typeof window !== "undefined" && window.innerWidth < 640) {
-      router.push("/login-select");
+      router.push(`/login-select?returnTo=${encodeURIComponent(pathname)}`);
     } else {
       setShowLoginModal(true);
     }
@@ -138,7 +138,7 @@ export default function SiteHeader() {
           >
             <h2 className="text-lg font-black text-center mb-1 text-white">로그인</h2>
             <p className="text-sm text-gray-500 text-center mb-6">간편하게 로그인하고 별조각을 안전하게 보관하세요.</p>
-            <LoginOptions onClose={() => setShowLoginModal(false)} />
+            <LoginOptions onClose={() => setShowLoginModal(false)} returnTo={pathname} />
           </div>
         </div>
       )}

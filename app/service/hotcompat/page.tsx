@@ -396,6 +396,31 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
       desc: GANYEO_JIDONG_LOVE.hapTrigger });
   }
 
+  // 일주 충 + 오행 상생 → 싸우고 섹스로 풀기
+  const JIJI_EL: Record<string,string> = { 자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수" };
+  const SAENG_MAP: Record<string,string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };
+  const iljiChung = JIJI_CHUNG_PAIRS.some(([a,b]) => (a===ij1&&b===ij2)||(a===ij2&&b===ij1));
+  if (iljiChung) {
+    const el1 = JIJI_EL[ij1];
+    const el2 = JIJI_EL[ij2];
+    const saengEachOther = (el1 && el2) && (SAENG_MAP[el1] === el2 || SAENG_MAP[el2] === el1);
+    if (saengEachOther) {
+      score += 12;
+      highlights.push({ rank: 8, title: "일주 충(沖) + 오행 상생 — 싸우고 풀기", color: "#f43f5e",
+        desc: "두 사람의 배우자궁이 서로 충돌하면서도 오행이 서로를 생해주는 구조예요. 티격태격 감정이 격해졌다가도 몸으로 푸는 패턴이 강하게 나타나는 조합이에요. 갈등이 오히려 더 강한 끌림과 화합의 계기가 되기도 해요." });
+    }
+  }
+
+  // 계미/신묘, 신미/계묘 특수 궁합
+  const specialPair =
+    ((ig1==="계"&&ij1==="미"&&ig2==="신"&&ij2==="묘")||(ig1==="신"&&ij1==="묘"&&ig2==="계"&&ij2==="미")) ||
+    ((ig1==="신"&&ij1==="미"&&ig2==="계"&&ij2==="묘")||(ig1==="계"&&ij1==="묘"&&ig2==="신"&&ij2==="미"));
+  if (specialPair) {
+    score += 20;
+    highlights.push({ rank: 1, title: "계미·신묘 / 신미·계묘 찰떡 조합", color: "#f43f5e",
+      desc: "사주학적으로 이 두 일주의 만남은 음기(陰氣)의 결이 맞아 떨어지는 조합으로 꼽혀요. 같은 결의 감수성과 섬세함을 공유해 몸과 마음이 자연스럽게 통하는 편이에요. 서로를 깊이 이해하면서 강한 끌림이 유지되는 구조예요." });
+  }
+
   // 원진
   const hj1 = r1.pillarsDetail.hour?.jj;
   const hj2 = r2.pillarsDetail.hour?.jj;

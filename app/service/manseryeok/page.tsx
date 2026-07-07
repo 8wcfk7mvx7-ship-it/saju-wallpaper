@@ -39,6 +39,7 @@ import {
   getSipseongStrength,
   classifySinStrength,
   getDisplaySinsalList,
+  getEumgiGadukMaleNarrative,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, detectStayPutPattern } from "@/lib/saju2";
@@ -605,6 +606,9 @@ function ResultView({
     + [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(jj => jj === "진" || jj === "술").length; // 진술 = 무토 통근
   const hasMuToExcess = muToCount >= 2 || result.scores["토"] / total > 0.32;
 
+  // ── 음기 가득한 남자 사주 ────────────────────────────────────────────────────
+  const eumgiGadukNote = getEumgiGadukMaleNarrative(result, form.gender);
+
   const samhapResults = detectSamhapBanghap(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
   const byeongjonPatterns = detectByeongjon(pd);
@@ -737,18 +741,42 @@ function ResultView({
             해:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
             원진: { color: "#c084fc", bg: "rgba(192,132,252,0.1)" },
           };
+          const YUKHAP_PAIRS_M = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
+          const hapJjsM = new Set(relations.filter(r => r.type === "육합").flatMap(r => [r.jjA, r.jjB]));
+          const haeRels = relations.filter(r => r.type === "해");
+          // 육합을 방해하는 해 조합 감지
+          const blockedYukhap = haeRels.filter(hr =>
+            YUKHAP_PAIRS_M.some(([a, b]) =>
+              (hr.jjA === a && hapJjsM.has(b)) || (hr.jjA === b && hapJjsM.has(a)) ||
+              (hr.jjB === a && hapJjsM.has(b)) || (hr.jjB === b && hapJjsM.has(a))
+            )
+          );
+          const hasSinhaehae = haeRels.some(r => (r.jjA === "신" && r.jjB === "해") || (r.jjA === "해" && r.jjB === "신"));
           return (
-            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-              {relations.map((r, i) => {
-                const st = REL_STYLE[r.type];
-                const [ja, jb] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
-                return (
-                  <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
-                    {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {ja}{jb} {r.type}
-                  </span>
-                );
-              })}
-            </div>
+            <>
+              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                {relations.map((r, i) => {
+                  const st = REL_STYLE[r.type];
+                  const [ja, jb] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
+                  return (
+                    <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
+                      {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {ja}{jb} {r.type}
+                    </span>
+                  );
+                })}
+              </div>
+              {/* 해(害) 특이사항 안내 */}
+              {hasSinhaehae && (
+                <div className="mt-2 rounded-xl px-3 py-2 text-[10px] leading-relaxed" style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)", color: "rgba(251,191,36,0.85)" }}>
+                  ⚠️ <strong>신(申)·해(亥) 해(害)</strong> — 도로·교통 상황이나 물 근처에서 부주의한 순간이 생기지 않도록 주의가 필요한 기운이 있어요. 호흡기·비뇨기 계통 건강도 꾸준히 챙기는 게 좋아요.
+                </div>
+              )}
+              {blockedYukhap.length > 0 && (
+                <div className="mt-2 rounded-xl px-3 py-2 text-[10px] leading-relaxed" style={{ background: "rgba(192,132,252,0.07)", border: "1px solid rgba(192,132,252,0.2)", color: "rgba(192,132,252,0.85)" }}>
+                  ✦ <strong>육합(六合)을 방해하는 해(害) 기운</strong> — 사주 내에서 잘 맞는 기운이 조화를 이루려 하지만, 그 흐름을 끊는 방해 기운도 함께 있어요. 좋은 인연·기회가 왔다 싶으면 뜻밖의 사람이나 상황이 끼어드는 패턴이 반복될 수 있어요. 억지로 잡으려 하기보다 타이밍을 기다리는 전략이 더 효과적이에요.
+                </div>
+              )}
+            </>
           );
         })()}
 
@@ -1399,21 +1427,8 @@ function ResultView({
 
       {/* 합·충 성격 구조 */}
       {hapChungChar && (
-        <Section title={`${hapChungChar.name} — 에너지 흐름 구조`} accent="#a78bfa">
-          <div className="space-y-2">
-            {[
-              { label: "핵심", val: hapChungChar.core },
-              { label: "강점", val: hapChungChar.strength },
-              { label: "약점", val: hapChungChar.weakness },
-              { label: "연애 스타일", val: hapChungChar.loveStyle },
-              { label: "궁합 방향", val: hapChungChar.compatible },
-            ].map(item => (
-              <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(167,139,250,0.05)", border: "1px solid rgba(167,139,250,0.12)" }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{item.label}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.val}</p>
-              </div>
-            ))}
-          </div>
+        <Section title={hapChungChar.title} accent="#a78bfa">
+          <p className="text-sm leading-[1.85]" style={{ color: "rgba(255,255,255,0.7)" }}>{hapChungChar.desc}</p>
         </Section>
       )}
 
@@ -1477,6 +1492,11 @@ function ResultView({
           {isMiSi && (
             <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(248,113,113,0.04)", border: "1px solid rgba(248,113,113,0.1)", color: "rgba(255,255,255,0.55)" }}>
               미(未)시 출생이에요. 미토(未土)는 토의 음기(陰氣)가 집약된 지지로, 이 시간대에 태어난 사람은 얼굴형이 둥글고 부드러운 인상인 경우가 많아요.
+            </p>
+          )}
+          {eumgiGadukNote && (
+            <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", color: "rgba(255,255,255,0.55)" }}>
+              {eumgiGadukNote}
             </p>
           )}
         </div>

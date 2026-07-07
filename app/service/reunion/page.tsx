@@ -7,6 +7,7 @@ import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import HapchungDiagram from "@/components/HapchungDiagram";
 import ResultFooterActions from "@/components/ResultFooterActions";
+import { calcDaewoon } from "@/lib/saju";
 import type { SajuResult } from "@/lib/saju";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,82 @@ const CONTACT_PATTERN_REUNION: Record<string, string> = {
   임: "가볍게 먼저 연락하다가 갑자기 사라지기도 합니다. 잠수 후 아무렇지 않게 돌아오는 것이 이 사람의 방식입니다. 자유로운 분위기 속에서 새로운 경험을 함께하는 것이 재회의 열쇠입니다.",
   계: "감정이 쌓이면 새벽에 갑자기 연락하거나 감성적인 콘텐츠를 공유합니다. 직접 고백보다 분위기로 감정을 전달하는 방식을 선호합니다. 재회를 원한다면 감성적 교감을 먼저 회복하세요.",
 };
+
+const CURRENT_YEAR_RN = 2026;
+
+interface TheirPersonalityTip {
+  title: string; desc: string; accent: string;
+}
+
+function computeTheirPersonalityTips(r: SajuResult, theirData: BirthFormData): TheirPersonalityTip[] {
+  const tips: TheirPersonalityTip[] = [];
+  const ilgan = r.pillarsDetail.day.cg;
+  const pd = r.pillarsDetail;
+
+  // 현재 대운 천간
+  let daewoonCg = "";
+  try {
+    const gender = (theirData.gender === "male" ? "male" : "female") as "male" | "female";
+    const dw = calcDaewoon(
+      Number(theirData.birthYear), Number(theirData.birthMonth), Number(theirData.birthDay),
+      gender, ilgan, { cg: pd.month.cg, jj: pd.month.jj }
+    );
+    const pillars = dw.pillars as { yearStart: number; cg: string }[];
+    const cur = pillars.find(p => p.yearStart <= CURRENT_YEAR_RN && CURRENT_YEAR_RN < p.yearStart + 10);
+    if (cur) daewoonCg = cur.cg;
+  } catch { /* ignore */ }
+
+  // ① 경금·신금 일간 or 대운 — 후각
+  const isGeumIlgan = ["경", "신"].includes(ilgan);
+  const isGeumDaewoon = !isGeumIlgan && ["경", "신"].includes(daewoonCg);
+  if (isGeumIlgan || isGeumDaewoon) {
+    tips.push({
+      accent: "#c4b5fd",
+      title: "향기에 무의식적으로 반응하는 사람이에요",
+      desc: (isGeumDaewoon ? "현재 대운이 금(金) 기운을 강하게 끌어올리고 있어요. " : "") +
+        "금(金) 기운은 오감 중 후각과 연결돼 있어요. 이 사람은 상대방의 냄새와 향에 본능적으로 반응해요. 만남 전에 향수·바디워시·섬유유연제를 신경 써서 활용하세요. 강하고 자극적인 향보다 깔끔하고 은은한 향이 훨씬 깊고 좋은 인상을 남겨요.",
+    });
+  }
+
+  // ② 토 용신 → 지지별 만남 시간대
+  if (r.yongshin?.yongshin === "토") {
+    const jjs = [pd.year.jj, pd.month.jj, pd.day.jj];
+    if (pd.hour) jjs.push(pd.hour.jj);
+    const hasMiSul = jjs.some(j => ["미", "술"].includes(j));
+    const hasChukJin = jjs.some(j => ["축", "진"].includes(j));
+
+    let desc = "";
+    if (hasMiSul && hasChukJin) {
+      desc = "낮(미토·술토 기운)과 저녁(축토·진토 기운) 모두 편안하게 만날 수 있는 유연한 구조예요. 어느 시간대든 잘 맞아요.";
+    } else if (hasMiSul) {
+      desc = "미토·술토 기운이 원국에 있어요. 낮 시간대 만남이 이 사람에게 더 자연스럽고 마음이 열려요. 점심이나 오후 카페 약속을 제안해 보세요.";
+    } else if (hasChukJin) {
+      desc = "축토·진토 기운이 원국에 있어요. 저녁 시간대 만남이 이 사람을 더 편안하게 만들어요. 저녁 식사나 야간 산책이 좋아요.";
+    } else {
+      desc = "토(土) 기운이 필요한 사람이에요. 안정적이고 여유 있는 낮 시간대, 특히 오전 10시~오후 4시 사이 만남이 자연스러운 대화를 끌어내요.";
+    }
+    tips.push({ accent: "#fbbf24", title: "이 시간대에 만나는 게 유리해요", desc });
+  }
+
+  // ③ 관성 2개 이상 — 체면·규칙
+  const allSipseong = [
+    pd.year.sipseongCg, pd.year.sipseongJj,
+    pd.month.sipseongCg, pd.month.sipseongJj,
+    pd.day.sipseongJj,
+  ];
+  if (pd.hour) allSipseong.push(pd.hour.sipseongCg, pd.hour.sipseongJj);
+  const gwansungCount = allSipseong.filter(s => s === "정관" || s === "편관").length;
+  if (gwansungCount >= 2) {
+    const daewoonNote = daewoonCg ? ` 현재 대운(${daewoonCg}) 시기에는 이 성향이 더 뚜렷하게 드러날 수 있어요.` : "";
+    tips.push({
+      accent: "#60a5fa",
+      title: "체면과 규칙을 지켜줘야 마음이 열려요",
+      desc: "관성이 강한 사람은 본인의 체면과 사회적 평판을 매우 중요하게 여겨요. 사람들 앞에서 망신을 주거나 자존심을 건드리는 행동은 절대 금물이에요. 상대가 정한 규칙과 선을 존중하고 잘 지켜주는 것이 재회에 결정적으로 유리하게 작용해요." + daewoonNote,
+    });
+  }
+
+  return tips;
+}
 
 const SESSION_KEY = "sp_reunion_session";
 const PAID_KEY = "sp_reunion_paid";
@@ -370,6 +447,25 @@ export default function ReunionPage() {
               <div className="rounded-2xl p-5" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.2)" }}>
                 <p className="text-xs font-bold mb-2" style={{ color: "#60a5fa" }}>📱 그 사람의 연락 패턴 — {ilgan}일간</p>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>{pattern}</p>
+              </div>
+            );
+          })()}
+
+          {/* 이성 원국 맞춤 재회 팁 */}
+          {theirSajuResult && (() => {
+            const tips = computeTheirPersonalityTips(theirSajuResult, theirData);
+            if (tips.length === 0) return null;
+            return (
+              <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-xs font-bold mb-3" style={{ color: "#fb923c" }}>🎯 그 사람 사주에 맞춘 재회 전략</p>
+                <div className="space-y-3">
+                  {tips.map((tip, i) => (
+                    <div key={i} className="rounded-xl p-4" style={{ background: `${tip.accent}0d`, border: `1px solid ${tip.accent}25` }}>
+                      <p className="text-xs font-bold mb-1.5" style={{ color: tip.accent }}>{tip.title}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>{tip.desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })()}

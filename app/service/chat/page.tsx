@@ -221,7 +221,7 @@ export default function SajuChatPage() {
     const hapCount = jijiRelations.filter(rel => rel.type === "육합" || rel.type === "삼합" || rel.type === "반합").length;
     const chungCount = jijiRelations.filter(rel => rel.type === "충").length;
     const hapChungChar = hapCount > chungCount ? HAP_CHUNG_CHARACTER.합 : chungCount > 0 ? HAP_CHUNG_CHARACTER.충 : null;
-    const hapChungNote = hapChungChar ? `${hapChungChar.name}: ${hapChungChar.core} ${hapChungChar.strength} ${hapChungChar.loveStyle}` : "";
+    const hapChungNote = hapChungChar ? `${hapChungChar.title}: ${hapChungChar.desc}` : "";
 
     // ── 신강/신약/중화 보충 (중화는 getStrengthTraitNarrative가 다루지 않는 영역) ──
     const junghwaNote = result.yongshin.strength === "중화"

@@ -585,7 +585,6 @@ function ErosSuccessContent() {
         </div>
 
         <DohwaFormulaList result={result} />
-        <SipseongInsight result={result} title="이성 매력의 뿌리 — 사주 속 핵심 기운" />
 
         <button onClick={() => router.push("/service/eros")}
           className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm border border-rose-700/40 text-rose-400 hover:bg-rose-950/30 transition-all">
