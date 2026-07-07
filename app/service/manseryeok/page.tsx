@@ -607,7 +607,7 @@ function ResultView({
   const hasMuToExcess = muToCount >= 2 || result.scores["토"] / total > 0.32;
 
   // ── 음기 가득한 남자 사주 ────────────────────────────────────────────────────
-  const eumgiGadukNote = getEumgiGadukMaleNarrative(result, form.gender);
+  const eumgiGadukNote = getEumgiGadukMaleNarrative(result, form.gender as "male" | "female" | undefined);
 
   const samhapResults = detectSamhapBanghap(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);

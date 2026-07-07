@@ -995,7 +995,7 @@ export default function TodayFortunePage() {
                 ⚠ {[hasCheonra && "술해천라", hasJimang && "진사지망"].filter(Boolean).join(" · ")} — {cheonraJimangLabels.join("·")}
               </p>
               <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                {hasCheonra && hasJimang ? "술·해(天羅)와 진·사(地網)가 모두 갖춰져" : hasCheonra ? "술·해(天羅) 조합이 갖춰져" : "진·사(地網) 조합이 갖춰져"} 오늘은 뜻하지 않은 구속·제약이 느껴지기 쉬운 날입니다. 외부로 일을 벌이기보다 내면에 집중하면 오히려 단단해지는 흐름이에요.
+                {hasCheonra && hasJimang ? "술·해(天羅)와 진·사(地網)가 모두 갖춰져" : hasCheonra ? "술·해(天羅) 조합이 갖춰져" : "진·사(地網) 조합이 갖춰져"} 오늘은 뜻하지 않은 구속·제약이 느껴지기 쉬운 날이에요. 외부로 일을 벌이기보다 내면에 집중하면 오히려 단단해지는 흐름이에요.
               </p>
             </div>
           )}

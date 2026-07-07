@@ -99,8 +99,9 @@ function ErosPayContent() {
             <p className="text-2xl font-black text-rose-400">{amount.toLocaleString()}원</p>
           </div>
           <PaymentMethodSelector
-            method={method}
-            onChange={setMethod}
+            selected={method}
+            onSelect={setMethod}
+            onConfirm={handlePayment}
             starBalance={starBalance}
             amount={amount}
           />
