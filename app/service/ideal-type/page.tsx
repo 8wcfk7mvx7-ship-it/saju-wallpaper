@@ -395,6 +395,9 @@ export default function IdealTypePage() {
   // 괴강살 여부
   const gwaegangWarning = isGwaegang(ilgan, dayJj) && gender === "male" ? GWAEGANG_MALE_WARNING : null;
 
+  // 화개살 → 화개살인 사람에게 끌림
+  const hasHwagaesal = r.sinsalList.some(s => s.name === "화개살");
+
   // 금수쌍청
   const allCgIdeal = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(Boolean) as string[];
   const allJjIdeal = [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(Boolean) as string[];
@@ -588,6 +591,14 @@ export default function IdealTypePage() {
                 </>
               )}
             </p>
+          </div>
+        )}
+
+        {/* 화개살 → 화개살인 사람에게 끌림 */}
+        {hasHwagaesal && (
+          <div className="bg-violet-950/30 border border-violet-500/25 rounded-2xl p-5 mb-5">
+            <p className="text-sm font-bold text-violet-300 mb-2">화개살(華蓋殺) — 끌리는 사람의 패턴</p>
+            <p className="text-sm text-gray-300 leading-relaxed">화개살이 있는 사람은 마찬가지로 화개살을 가진 사람에게 끌리는 경향이 있어요. 고독함 속에 깊이가 있고, 예술·철학·정신적인 면에 관심이 많은 사람에게 자연스럽게 공명하는 구조예요. 감각적으로 비슷한 결을 가진 사람과 있을 때 가장 편안함을 느껴요.</p>
           </div>
         )}
 

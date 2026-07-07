@@ -147,6 +147,12 @@ function CharmResultContent() {
   const 목욕Trait = CHARM_TRAITS.find(t => t.id === "목욕")!;
   const 편관Trait = CHARM_TRAITS.find(t => t.id === "편관")!;
 
+  // 괴강살 외모 특징
+  const hasGwaegangSal = result.sinsalList.some(s => s.name === "괴강살");
+  // 금 기운 많으면 동안
+  const totalScore = Object.values(result.scores).reduce((a, b) => a + b, 0) || 1;
+  const hasGeumDongan = result.scores["금"] / totalScore >= 0.35;
+
   const mySalsPresent = SAL_CHARM_DB.filter(s => result.sinsalList.some(sl => sl.name === s.key));
   const has함지살 = result.sinsalList.some(s => s.name === "함지살");
   const 함지살기둥 = result.sinsalList.find(s => s.name === "함지살")?.pillars ?? [];
@@ -299,7 +305,7 @@ function CharmResultContent() {
         {/* ═══ 오행 외모 ═══ */}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
           <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">오행({dominantEl}) · 외모 특징</p>
-          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""} {getAppearanceAnalysis(result).points.join(" ")}</p>
+          <p className="text-sm text-gray-300 leading-relaxed mb-2">{olook?.look}{charmExtraNarrative ? ` ${charmExtraNarrative}` : ""} {getAppearanceAnalysis(result).points.join(" ")}{hasGwaegangSal ? " 괴강(魁罡) 기운이 있는 사람은 외모에서 코가 높고 눈썹이 또렷한 편이며, 선이 여리고 섬세하기보다는 단정하고 선명한 인상을 가진 경우가 많아요." : ""}{hasGeumDongan ? " 금(金) 기운이 강하게 뒷받침되어 나이보다 어려 보이는 동안 외모인 경우가 많아요." : ""}</p>
           <p className="text-xs text-gray-600 mb-3">📺 비슷한 스타일: {olook?.celebs}</p>
           {olook?.skin && (
             <div className="border-t border-white/5 pt-3 mt-1">

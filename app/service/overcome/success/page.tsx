@@ -84,7 +84,7 @@ const ELEMENT_OVERCOME: Record<string, {
 }> = {
   목: { color:"#16a34a",icon:"🌿",overDesc:"고집이 끝이 없습니다. 분노가 자주 올라옵니다. 간 건강이 나빠집니다.",lackDesc:"의욕이 없습니다. 결단을 못 내립니다. 시작을 자꾸 미룹니다.",overFix:"흰색·은색 계열을 가까이 하세요. 서쪽 방향으로 앉으세요.",lackFix:"초록색을 인테리어에 넣으세요. 동쪽 방향으로 앉으세요.",chakColor:"초록색, 연두색",direction:"동쪽",numbers:"3, 8",objects:"관엽식물, 나무 소품",food:"신맛 — 귤, 레몬, 키위",healthTip:"간·담낭을 챙기세요. 절주 필수.",activity:"숲·공원 산책, 등산, 식물 가꾸기, 아침 스트레칭" },
   화: { color:"#dc2626",icon:"🔥",overDesc:"급합니다. 잠을 못 잡니다. 심장이 두근거립니다.",lackDesc:"표현을 못 합니다. 소극적으로 변합니다.",overFix:"파란색 계열을 들이세요. 수영, 차가운 음료.",lackFix:"붉은색을 인테리어에 넣으세요. 촛불 명상.",chakColor:"붉은색, 주황색",direction:"남쪽",numbers:"2, 7",objects:"촛불, 붉은 꽃",food:"쓴맛 — 커피, 녹차, 씀바귀",healthTip:"심장·혈압·눈을 챙기세요.",activity:"노래·춤·공연 관람, 사람들과 어울리는 모임, 햇볕 쬐기" },
-  토: { color:"#92400e",icon:"🏔️",overDesc:"고집이 세지고 완고해집니다. 소화가 잘 안 됩니다.",lackDesc:"믿음을 주지 못합니다. 불안정한 느낌이 강합니다.",overFix:"초록색·나무 소품을 들이세요. 신맛 음식.",lackFix:"황토 소재를 집에 넣으세요. 단맛 음식.",chakColor:"황토색, 노란색",direction:"중앙",numbers:"5, 10",objects:"황토 소품, 도자기",food:"단맛 — 고구마, 꿀, 대추",healthTip:"소화기·비장·위를 챙기세요.",activity:"명상, 요가, 텃밭·화분 가꾸기, 규칙적인 산책" },
+  토: { color:"#92400e",icon:"🏔️",overDesc:"고집이 세지고 완고해집니다. 소화가 잘 안 됩니다.",lackDesc:"믿음을 주지 못합니다. 불안정한 느낌이 강합니다.",overFix:"초록색·나무 소품을 들이세요. 신맛 음식.",lackFix:"황토 소재를 집에 넣으세요. 단맛 음식.",chakColor:"황토색, 노란색",direction:"중앙",numbers:"5, 10",objects:"황토 소품, 도자기, 악세서리·반지·귀걸이·팔찌",food:"단맛 — 고구마, 꿀, 대추",healthTip:"소화기·비장·위를 챙기세요.",activity:"명상, 요가, 텃밭·화분 가꾸기, 규칙적인 산책" },
   금: { color:"#7c3aed",icon:"⚔️",overDesc:"너무 냉정해집니다. 완벽주의로 주변이 힘들어합니다.",lackDesc:"의지력이 떨어집니다. 결단을 못 내립니다.",overFix:"붉은색을 가까이 하세요. 활동적인 취미.",lackFix:"흰색·실버 계열을 들이세요. 서쪽 방향을 활용하세요.",chakColor:"흰색, 은색",direction:"서쪽",numbers:"4, 9",objects:"금속 소품, 시계",food:"매운맛 — 마늘, 생강, 고추",healthTip:"폐·대장·피부를 챙기세요.",activity:"헬스·근력 운동, 정리정돈, 무술·격투 운동" },
   수: { color:"#0369a1",icon:"🌊",overDesc:"우울감이 옵니다. 신장이 무거워집니다.",lackDesc:"지혜가 흐려집니다. 건망증이 생깁니다.",overFix:"황토색을 들이세요. 단맛 음식.",lackFix:"파란색·검은색을 인테리어에 넣으세요. 북쪽을 활용하세요.",chakColor:"파란색, 검은색",direction:"북쪽",numbers:"1, 6",objects:"수족관, 파란 소품",food:"짠맛 — 해산물, 된장, 미역",healthTip:"신장·방광·뼈를 챙기세요.",activity:"독서, 수영, 글쓰기·일기, 충분한 수면" },
 };
@@ -333,14 +333,27 @@ function computeDaewoonInsights(r: any, form: { year: number; month: number; day
   }
 
   // 대운에서 형(刑) 들어올 때
+  let samhyeongWarned = false;
   for (const nj of natalJjs) {
     if (hyeongMatch(nj, dj)) {
-      insights.push({
-        type: "warn",
-        icon: "🔒",
-        title: `지금 대운에서 ${nj}과 형(刑) 기운이 들어와요`,
-        desc: `형은 겉으로는 비슷한 것 같은데 서로 억압하거나 옭아매는 기운이에요. 법적 문제·규칙과의 충돌·억압적인 환경에 놓일 수 있어요. 앞으로 ${remaining}년간은 계약서를 꼼꼼히 읽고, 규정을 어기는 행동은 최대한 자제하세요. 억울하게 엮이는 상황을 예방하는 게 최우선입니다.`,
-      });
+      // 삼형살(인사신 / 축술미)인지 확인
+      const isSamhyeong = ["인","사","신","축","술","미"].includes(nj) && ["인","사","신","축","술","미"].includes(dj);
+      if (isSamhyeong && !samhyeongWarned) {
+        samhyeongWarned = true;
+        insights.push({
+          type: "warn",
+          icon: "🌀",
+          title: `대운에서 삼형살(三刑殺) 기운이 완성돼요`,
+          desc: `지금 대운에서 삼형살이 형성되는 시기예요. 삼형살이 걸릴 때는 에너지를 아래로 내려보내는 방법이 효과적이에요. 노래방·주차장·찜질방·PC방 같은 지하 공간을 자주 활용하면 기운이 안정돼요. 맨발로 흙을 밟거나 화분에 식물을 심는 것, 등산도 좋은 방법이에요. 앞으로 ${remaining}년간은 의식적으로 지하·흙과 가까이하는 루틴을 만들어 보세요.`,
+        });
+      } else if (!isSamhyeong) {
+        insights.push({
+          type: "warn",
+          icon: "🔒",
+          title: `지금 대운에서 ${nj}과 형(刑) 기운이 들어와요`,
+          desc: `형은 겉으로는 비슷한 것 같은데 서로 억압하거나 옭아매는 기운이에요. 법적 문제·규칙과의 충돌·억압적인 환경에 놓일 수 있어요. 앞으로 ${remaining}년간은 계약서를 꼼꼼히 읽고, 규정을 어기는 행동은 최대한 자제하세요. 억울하게 엮이는 상황을 예방하는 게 최우선입니다.`,
+        });
+      }
     }
   }
 
@@ -617,6 +630,16 @@ function SuccessContent() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* 토 과다 악세서리 개운 tip */}
+        {dominant.includes("토") && (
+          <div className="rounded-2xl p-5 mb-6" style={{ background: "rgba(146,64,14,0.07)", border: "1px solid rgba(146,64,14,0.25)" }}>
+            <p className="text-sm font-black text-amber-300 mb-2">🪙 토(土) 기운 많은 사주 — 악세서리 개운법</p>
+            <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
+              토(土) 기운이 강한 사주는 몸에 악세서리를 착용하면 그 기운이 순환되어 뜻밖의 이득·재물·좋은 인연으로 돌아오는 경향이 있어요. 반지·귀걸이·팔찌·목걸이 등 금속 장신구가 특히 좋아요. 착용 습관을 들이면 기운이 안정되고 재물 흐름이 부드러워진답니다.
+            </p>
           </div>
         )}
 

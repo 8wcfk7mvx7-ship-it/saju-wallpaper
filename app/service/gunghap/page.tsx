@@ -347,6 +347,10 @@ const FEATURES=[
   {icon:"💀",title:"원진·충 경고",desc:"모르면 반복되는 갈등의 진짜 원인이 여기에 있습니다"},
 ];
 
+// 간여지동 일주 목록
+const GANYEOJIDONG_LIST = new Set(["갑인","을묘","병오","정사","무진","무술","기미","기축","경신","신유","임자","계해"]);
+function isGJD(cg:string,jj:string){ return GANYEOJIDONG_LIST.has(cg+jj); }
+
 export default function GunghapPage(){
   const [p1,setP1]=useState<PI>(empty());
   const [p2,setP2]=useState<PI>(empty());
@@ -356,6 +360,7 @@ export default function GunghapPage(){
     totalScore:number; grade:string; gradeColor:string; gradeEmoji:string;
     gradeTitle:string; gradeDesc:string;
     r1:ReturnType<typeof analyzeSaju>; r2:ReturnType<typeof analyzeSaju>;
+    specialNote: string | null;
   }>(null);
   const [showEntryBtn,setShowEntryBtn]=useState(false);
   const [step,setStep]=useState<'entry'|'form'|'loading'|'result'>('entry');
@@ -460,7 +465,22 @@ export default function GunghapPage(){
     else if(totalScore>=35){grade='주의';gradeColor='#feca57';gradeEmoji='⚠️';gradeTitle='모르고 있었다면 지금이라도';gradeDesc='서로 다른 방향을 바라보는 조합. 솔직한 대화가 필요합니다.';}
     else{grade='위험';gradeColor='#ee5a24';gradeEmoji='💀';gradeTitle='에너지를 갉아먹는 궁합';gradeDesc='상극 에너지가 강합니다. 의식적 노력 없이는 소모적인 관계가 됩니다.';}
 
-    setResult({johu,samhap,pillars,baram,yongsinDesc,ohaengDesc,totalScore,grade,gradeColor,gradeEmoji,gradeTitle,gradeDesc,r1,r2});
+    // 특수 궁합 노트
+    const ig1=pd1.day.cg, ij1=pd1.day.jj, ig2=pd2.day.cg, ij2=pd2.day.jj;
+    let specialNote: string | null = null;
+    // 계미/신묘, 신미/계묘
+    const isSpecialPair =
+      ((ig1==="계"&&ij1==="미"&&ig2==="신"&&ij2==="묘")||(ig1==="신"&&ij1==="묘"&&ig2==="계"&&ij2==="미")) ||
+      ((ig1==="신"&&ij1==="미"&&ig2==="계"&&ij2==="묘")||(ig1==="계"&&ij1==="묘"&&ig2==="신"&&ij2==="미"));
+    if (isSpecialPair) {
+      specialNote = "✨ 계미·신묘 / 신미·계묘 — 음기(陰氣)의 결이 맞아 떨어지는 특수 궁합이에요. 같은 감수성과 섬세함을 공유해 자연스럽게 교감하고 서로를 깊이 이해하는 조합으로 꼽혀요.";
+    }
+    // 간여지동 두 사람 모두
+    if (!specialNote && isGJD(ig1,ij1) && isGJD(ig2,ij2)) {
+      specialNote = "✨ 두 사람 모두 간여지동(干與支同) 일주예요. 위아래가 같은 기운으로 뭉친 사람끼리는 고집과 개성이 강하면서도 서로의 뚝심을 자연스럽게 이해하고 존중하는 조합이에요. 비슷한 결을 가진 두 사람이 만났을 때 오히려 편안하게 잘 맞는 경우가 많아요.";
+    }
+
+    setResult({johu,samhap,pillars,baram,yongsinDesc,ohaengDesc,totalScore,grade,gradeColor,gradeEmoji,gradeTitle,gradeDesc,r1,r2,specialNote});
     trackTraits([
       isWoljiSingleGyeopjae(r1) ? "woljiSingleGyeopjae" : null,
       isWoljiSingleGyeopjae(r2) ? "woljiSingleGyeopjae" : null,
@@ -668,6 +688,11 @@ export default function GunghapPage(){
               <div style={{fontSize:17,fontWeight:900,color:result.gradeColor,marginBottom:5}}>{result.grade}</div>
               <div style={{fontSize:14,fontWeight:800,marginBottom:5}}>{result.gradeTitle}</div>
               <div style={{fontSize:13,color:'rgba(255,255,255,0.75)',lineHeight:1.6}}>{result.gradeDesc}</div>
+              {result.specialNote && (
+                <div style={{marginTop:10,padding:'10px 12px',borderRadius:10,background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.22)',fontSize:12,color:'rgba(255,255,255,0.85)',lineHeight:1.6}}>
+                  {result.specialNote}
+                </div>
+              )}
               <SaveProfilePrompt
                 name={p1.name}
                 birthYear={Number(p1.birthData.birthYear) || 0}
