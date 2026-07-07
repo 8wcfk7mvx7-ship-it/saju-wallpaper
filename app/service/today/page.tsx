@@ -1047,15 +1047,20 @@ export default function TodayFortunePage() {
         {/* 오늘의 천간 — 일간과의 관계 */}
         <FadeIn delay={190}>
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-bold text-violet-300 mb-1">🌗 오늘 만나는 기운 — {dayPillar.cg}{ILGAN_PERSONALITY[dayPillar.cg] ? `(${ILGAN_PERSONALITY[dayPillar.cg].keyword})` : ""}</p>
+          <p className="text-sm font-bold text-violet-300 mb-1">🌗 오늘 만나는 기운 — {dayPillar.cg}</p>
           <p className="text-sm text-gray-300 leading-relaxed">
-            오늘 일진의 천간 {dayPillar.cg}{(dayPillar.cg.charCodeAt(0) - 0xAC00) % 28 === 0 ? "는" : "은"} 평소 {ilgan}일간인 {form.name || "나"}님에게 {ILGAN_PERSONALITY[dayPillar.cg]?.detail || ""}
+            오늘 일진의 천간 {dayPillar.cg}은(는) 나({ilgan}일간)에게 <span style={{ color: ["비견","겁재"].includes(todaySipseongCg) ? "#94a3b8" : ["식신","상관"].includes(todaySipseongCg) ? "#34d399" : ["편재","정재"].includes(todaySipseongCg) ? "#fbbf24" : ["편관","정관"].includes(todaySipseongCg) ? "#f87171" : "#a78bfa" }}>{todaySipseongCg}</span>으로 작용해요.
           </p>
           {hasTodayHap && (
-            <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 이 기운이 나와 자연스럽게 맞아떨어져, {ILGAN_PERSONALITY[dayPillar.cg]?.keyword || "오늘의 기운"}이 평소보다 부드럽게 나에게 녹아드는 날이에요.</p>
+            <p className="text-sm text-emerald-300 leading-relaxed mt-2">오늘은 이 기운이 나와 합(合)을 이뤄 자연스럽게 흘러들어와요. 막혔던 일이 풀리거나, 사람과의 관계가 부드럽게 맞아떨어지는 흐름이에요.</p>
           )}
           {hasTodayChung && (
-            <p className="text-sm text-rose-300 leading-relaxed mt-2">오늘은 이 기운이 평소의 나와 다소 부딪히면서, 평소와는 다른 낯선 자극이 들어오는 느낌을 받기 쉬워요. 좋고 나쁨보다는 '환기'의 의미로 받아들이면 도움이 됩니다.</p>
+            <p className="text-sm text-rose-300 leading-relaxed mt-2">오늘은 이 기운이 나와 충(沖)으로 맞부딪히는 날이에요. 자극이 강하게 들어오지만 좋고 나쁨보다는 '환기'로 받아들이면 오히려 새로운 돌파구가 생기기도 해요.</p>
+          )}
+          {!hasTodayHap && !hasTodayChung && todayRelations.length > 0 && (
+            <p className="text-sm text-amber-200/70 leading-relaxed mt-2">
+              오늘 일진과 {todayRelations.map(r => `${r.jjA}${r.jjB} ${r.type}`).join(", ")} 관계가 형성돼요. 직접적인 합충보다는 은근한 영향이 오가는 날이에요.
+            </p>
           )}
         </div>
         </FadeIn>
