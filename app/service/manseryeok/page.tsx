@@ -587,6 +587,24 @@ function ResultView({
 
 
   const total = Object.values(result.scores).reduce((a, b) => a + b, 0);
+
+  // ── 여성 비겁多 + 재성 약/무 → 부친 연 얕음 ────────────────────────────────
+  const femaleFatherWeakNote = (() => {
+    if (form.gender !== "female") return null;
+    const bigeobCnt = ssAllManse.filter(s => s === "비견" || s === "겁재").length;
+    const jaeCnt = ssAllManse.filter(s => s === "정재" || s === "편재").length;
+    if (bigeobCnt >= 3 && jaeCnt <= 1) return true;
+    return null;
+  })();
+
+  // ── 미(未)시 출생 → 얼굴이 둥근 편 ─────────────────────────────────────────
+  const isMiSi = pd.hour?.jj === "미";
+
+  // ── 무토(戊土) 다자 → 살집 있는 편 ──────────────────────────────────────────
+  const muToCount = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(cg => cg === "무").length
+    + [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(jj => jj === "진" || jj === "술").length; // 진술 = 무토 통근
+  const hasMuToExcess = muToCount >= 2 || result.scores["토"] / total > 0.32;
+
   const samhapResults = detectSamhapBanghap(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
   const byeongjonPatterns = detectByeongjon(pd);
@@ -1278,6 +1296,13 @@ function ResultView({
         </Section>
       )}
 
+      {/* ④-4 여성 부친 연 — 비겁多 재성약 */}
+      {femaleFatherWeakNote && (
+        <Section title="아버지와의 인연" accent="#94a3b8">
+          <p className="text-sm text-gray-300 leading-relaxed">독립심·자존심의 기운이 사주에 두드러지게 많고 살림·재물 기운이 상대적으로 적어요. 이런 구조에서는 아버지가 가정에서 충분한 역할을 하지 못하거나, 일찍부터 함께하는 시간이 적거나, 혹은 아버지와의 인연 자체가 얕고 짧게 이어지는 경우가 많아요. 어릴 때부터 스스로 해결하고 버텨온 경험이 내면의 단단함을 만들어주기도 합니다.</p>
+        </Section>
+      )}
+
       {/* ⑤ 월지 심리 */}
       {weolji && (
         <Section title="월지(月支) 심리 프로파일" accent="#06b6d4">
@@ -1443,6 +1468,16 @@ function ResultView({
                 </p>
               ))}
             </div>
+          )}
+          {hasMuToExcess && (
+            <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(234,179,8,0.06)", border: "1px solid rgba(234,179,8,0.15)", color: "rgba(255,255,255,0.55)" }}>
+              土 기운이 강하게 쌓여 있어요. 체형에서 살집이 자연스럽게 생기는 경향이 있고, 체중이 쉽게 늘어날 수 있는 구조예요. 살이 적당히 있을 때는 기운과 체력이 안정되지만, 지나치게 찌면 오히려 건강 균형이 흔들릴 수 있으니 꾸준한 활동 습관이 도움이 됩니다.
+            </p>
+          )}
+          {isMiSi && (
+            <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(248,113,113,0.04)", border: "1px solid rgba(248,113,113,0.1)", color: "rgba(255,255,255,0.55)" }}>
+              미(未)시 출생이에요. 미토(未土)는 토의 음기(陰氣)가 집약된 지지로, 이 시간대에 태어난 사람은 얼굴형이 둥글고 부드러운 인상인 경우가 많아요.
+            </p>
           )}
         </div>
       </Section>
