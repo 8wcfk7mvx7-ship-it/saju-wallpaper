@@ -1427,21 +1427,8 @@ function ResultView({
 
       {/* 합·충 성격 구조 */}
       {hapChungChar && (
-        <Section title={`${hapChungChar.name} — 에너지 흐름 구조`} accent="#a78bfa">
-          <div className="space-y-2">
-            {[
-              { label: "핵심", val: hapChungChar.core },
-              { label: "강점", val: hapChungChar.strength },
-              { label: "약점", val: hapChungChar.weakness },
-              { label: "연애 스타일", val: hapChungChar.loveStyle },
-              { label: "궁합 방향", val: hapChungChar.compatible },
-            ].map(item => (
-              <div key={item.label} className="rounded-xl px-4 py-3" style={{ background: "rgba(167,139,250,0.05)", border: "1px solid rgba(167,139,250,0.12)" }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: "#a78bfa" }}>{item.label}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{item.val}</p>
-              </div>
-            ))}
-          </div>
+        <Section title={hapChungChar.title} accent="#a78bfa">
+          <p className="text-sm leading-[1.85]" style={{ color: "rgba(255,255,255,0.7)" }}>{hapChungChar.desc}</p>
         </Section>
       )}
 
