@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const GOOGLE_CLIENT_ID = "890801754093-edh505ocbhojnbr2fmfkj4rum2p3recr.apps.googleusercontent.com";
+const LOGIN_PAGES = ["/login", "/login-select"];
 
 declare global {
   interface Window {
@@ -18,24 +19,42 @@ declare global {
   }
 }
 
-export default function LoginOptions({ onClose }: { onClose?: () => void }) {
+export default function LoginOptions({ onClose, returnTo }: { onClose?: () => void; returnTo?: string }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const btnRef = useRef<HTMLDivElement>(null);
+
+  // 로그인 완료 후 이동할 경로 결정
+  function getRedirect(): string {
+    // 명시적으로 전달된 returnTo 우선
+    if (returnTo && returnTo.startsWith("/") && !LOGIN_PAGES.includes(returnTo)) return returnTo;
+    // URL 쿼리 파라미터 ?returnTo=...
+    const qp = searchParams.get("returnTo");
+    if (qp && qp.startsWith("/") && !LOGIN_PAGES.includes(qp)) return qp;
+    // 현재 페이지가 로그인 페이지면 홈으로
+    if (LOGIN_PAGES.includes(pathname)) return "/";
+    return pathname || "/";
+  }
 
   useEffect(() => {
     function init() {
       if (!window.google?.accounts?.id || !btnRef.current) return;
+      const redirect = getRedirect();
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: async (resp: { credential: string }) => {
           const res = await fetch("/api/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ credential: resp.credential, redirect: pathname || "/" }),
+            body: JSON.stringify({ credential: resp.credential, redirect }),
           });
           const data = await res.json();
-          if (data.ok) router.push(data.redirect || "/");
+          if (data.ok) {
+            window.dispatchEvent(new Event("sp-auth-changed"));
+            onClose?.();
+            router.push(data.redirect || "/");
+          }
         },
       });
       window.google.accounts.id.renderButton(btnRef.current, {
@@ -55,7 +74,10 @@ export default function LoginOptions({ onClose }: { onClose?: () => void }) {
       }, 200);
       return () => clearInterval(interval);
     }
-  }, [pathname, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  const appleRedirect = getRedirect();
 
   return (
     <div className="w-full space-y-3">
@@ -64,7 +86,7 @@ export default function LoginOptions({ onClose }: { onClose?: () => void }) {
 
       {/* Apple 로그인 */}
       <a
-        href={`/api/auth/apple?redirect=${encodeURIComponent(pathname || "/")}`}
+        href={`/api/auth/apple?redirect=${encodeURIComponent(appleRedirect)}`}
         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
         style={{ background: "#000", color: "#fff", border: "1px solid rgba(255,255,255,0.15)" }}
       >
