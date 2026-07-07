@@ -447,30 +447,11 @@ function CharmResultContent() {
           </>
         )}
 
-        {/* ═══ 개운법 미리보기 + 잠금 ═══ */}
+        {/* ═══ 잠금 CTA ═══ */}
         {!isPaid ? (
           <div className="relative mb-4">
             <div className="rounded-2xl border border-white/10 overflow-hidden">
-              {/* 미리보기 (흐림) */}
               <div className="blur-md pointer-events-none select-none p-5">
-                {gaewun && (
-                  <div>
-                    <p className="text-xs text-gray-500 font-semibold tracking-widest uppercase mb-3">{gaewun.emoji} {gaewun.title}</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: "방향", value: gaewun.direction },
-                        { label: "최고의 시간", value: gaewun.time },
-                        { label: "행운 음식", value: gaewun.food.slice(0, 20) + "..." },
-                        { label: "향기", value: gaewun.scent.slice(0, 20) + "..." },
-                      ].map((item, i) => (
-                        <div key={i} className="bg-white/5 rounded-xl p-3">
-                          <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                          <p className="text-sm text-gray-200">{item.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 <div className="mt-4 p-4 bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 mb-2">AI 매력 인사이트</p>
                   <p className="text-sm text-gray-300">AI가 분석한 맞춤형 매력 향상 전략과 연애 전술 3가지...</p>
@@ -528,49 +509,10 @@ function CharmResultContent() {
             </div>
           </div>
         ) : (
-          <>
-            {/* 개운법 전체 공개 */}
-            {gaewun && (
-              <div className="rounded-2xl overflow-hidden mb-4" style={{ background: gaewun.colorBg, border: `1px solid ${gaewun.color}33` }}>
-                <div className="p-5">
-                  <p className="text-xs font-bold tracking-widest mb-3" style={{ color: gaewun.color }}>{gaewun.emoji} {gaewun.title}</p>
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    {[
-                      { label: "행운 방향", value: gaewun.direction },
-                      { label: "행운 계절", value: gaewun.season },
-                      { label: "행운 시간", value: gaewun.time },
-                      { label: "행운 음식", value: gaewun.food },
-                      { label: "행운 향기", value: gaewun.scent },
-                      { label: "행운 액세서리", value: gaewun.accessory },
-                    ].map((item, i) => (
-                      <div key={i} className="bg-black/20 rounded-xl p-3">
-                        <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                        <p className="text-sm text-gray-200">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div className="bg-black/20 rounded-xl p-3">
-                      <p className="text-xs text-gray-500 mb-1">🎯 추천 취미</p>
-                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.hobbies}</p>
-                    </div>
-                    <div className="bg-black/20 rounded-xl p-3">
-                      <p className="text-xs text-gray-500 mb-1">📍 행운의 장소</p>
-                      <p className="text-xs text-gray-300 leading-relaxed">{gaewun.places}</p>
-                    </div>
-                  </div>
-                  <div className="bg-black/20 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-2">💡 매력 개운 핵심 팁</p>
-                    <p className="text-sm text-gray-200 leading-relaxed">{gaewun.charm_tip}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+          <></>
         )}
 
         {result && <DohwaFormulaList result={result} />}
-        {result && <SipseongInsight result={result} title="매력 너머 — 사주 속 핵심 기운" />}
 
         {/* 결과 면책 */}
         <div className="text-center mt-6">

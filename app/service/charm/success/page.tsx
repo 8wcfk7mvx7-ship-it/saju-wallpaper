@@ -387,39 +387,6 @@ function CharmSuccessContent() {
           </div>
         )}
 
-        {/* 개운법 완전판 */}
-        {gaewun && (
-          <div className="rounded-2xl overflow-hidden mb-4" style={{ background: gaewun.colorBg, border: `1px solid ${gaewun.color}33` }}>
-            <div className="p-5">
-              <p className="text-xs font-bold tracking-widest mb-4" style={{ color: gaewun.color }}>{gaewun.emoji} {gaewun.title}</p>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {[
-                  { label: "행운 방향", value: gaewun.direction },
-                  { label: "행운 계절", value: gaewun.season },
-                  { label: "행운 시간", value: gaewun.time },
-                  { label: "행운 음식", value: gaewun.food },
-                  { label: "행운 향기", value: gaewun.scent },
-                  { label: "행운 액세서리", value: gaewun.accessory },
-                  { label: "인테리어 팁", value: gaewun.interior },
-                  { label: "매일 할 것", value: gaewun.action },
-                ].map((item, i) => (
-                  <div key={i} className="bg-black/20 rounded-xl p-3">
-                    <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                    <p className="text-xs text-gray-200">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="bg-black/20 rounded-xl p-4 mb-3">
-                <p className="text-xs text-gray-400 mb-2">💡 매력 개운 핵심 팁</p>
-                <p className="text-sm text-gray-200 leading-relaxed">{gaewun.charm_tip}</p>
-              </div>
-              <div className="bg-black/10 rounded-xl p-3">
-                <p className="text-xs text-gray-600 italic">{gaewun.viral}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* 극관계 */}
         {geukData && (
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 mb-4">
