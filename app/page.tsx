@@ -1314,25 +1314,6 @@ export default function MainPage() {
             </h1>
           </div>
 
-          {/* 피처 태그 */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
-            {t.badgeTags.map((tag, i) => {
-              const colors = [
-                { bg: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", color: "#f9a8d4", dot: "#f472b6" },
-                { bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.3)", color: "#c4b5fd", dot: "#a78bfa" },
-                { bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.3)",  color: "#93c5fd", dot: "#60a5fa" },
-                { bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.3)",  color: "#6ee7b7", dot: "#34d399" },
-              ];
-              const c = colors[i % colors.length];
-              return (
-                <span key={tag} className="inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-full font-semibold"
-                  style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>
-                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.dot, boxShadow: `0 0 6px ${c.dot}` }} />
-                  {tag}
-                </span>
-              );
-            })}
-          </div>
 
           {/* 신뢰 메시지 */}
           <div className="max-w-sm sm:max-w-xl mx-auto px-4 mb-6">
