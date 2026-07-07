@@ -177,7 +177,27 @@ function cgRelColor(type: "합" | "충", cgA: string, cgB: string): string | [st
   return survivor ? ELEMENT_COLOR[survivor] : [ELEMENT_COLOR[elA], ELEMENT_COLOR[elB]];
 }
 
-function jjRelDesc(type: JijiRelation["type"]): string {
+// 해(害) 쌍별 구체 설명
+const HAE_PAIR_DESC: Record<string, string> = {
+  "자미": "자(子)·미(未) 해 — 가까운 사람이 나도 모르게 발목을 잡는 느낌이 드는 날이에요. 뒤에서 방해를 받거나, 믿었던 사람에게 서운한 일이 생기기 쉬워요. 직접 부딪히기보다 은근히 피해를 보는 흐름이니 중요한 약속·계약은 좀 더 천천히 진행하는 편이 좋아요.",
+  "미자": "자(子)·미(未) 해 — 가까운 사람이 나도 모르게 발목을 잡는 느낌이 드는 날이에요. 뒤에서 방해를 받거나, 믿었던 사람에게 서운한 일이 생기기 쉬워요. 직접 부딪히기보다 은근히 피해를 보는 흐름이니 중요한 약속·계약은 좀 더 천천히 진행하는 편이 좋아요.",
+  "축오": "축(丑)·오(午) 해 — 잘 되어 가던 일에 뜻밖의 잡음이 끼는 느낌이에요. 주변에서 부정적인 말이 돌거나, 협력하려던 사람이 엉뚱한 방향으로 튀는 날일 수 있어요. 감정이 자극받기 쉬우니 말다툼이 커지지 않게 주의하세요.",
+  "오축": "축(丑)·오(午) 해 — 잘 되어 가던 일에 뜻밖의 잡음이 끼는 느낌이에요. 주변에서 부정적인 말이 돌거나, 협력하려던 사람이 엉뚱한 방향으로 튀는 날일 수 있어요. 감정이 자극받기 쉬우니 말다툼이 커지지 않게 주의하세요.",
+  "인사": "인(寅)·사(巳) 해 — 형제·친구·동료 사이에서 크고 작은 다툼이나 오해가 불거지기 쉬운 기운이에요. 직접적인 충돌은 아니지만 뒤에서 말이 돌거나 모략·배신 느낌의 상황이 생길 수 있어요. 가까운 사람일수록 오히려 거리를 두고 지켜보는 게 나아요.",
+  "사인": "인(寅)·사(巳) 해 — 형제·친구·동료 사이에서 크고 작은 다툼이나 오해가 불거지기 쉬운 기운이에요. 직접적인 충돌은 아니지만 뒤에서 말이 돌거나 모략·배신 느낌의 상황이 생길 수 있어요. 가까운 사람일수록 오히려 거리를 두고 지켜보는 게 나아요.",
+  "묘진": "묘(卯)·진(辰) 해 — 해야 할 일이 잘 맞물리지 않고 어긋나는 느낌이 드는 날이에요. 일정이 꼬이거나 사소한 방해가 반복되기 쉬워요. 큰 계획보다는 당장 처리할 것들을 하나씩 정리하는 게 맞는 흐름이에요.",
+  "진묘": "묘(卯)·진(辰) 해 — 해야 할 일이 잘 맞물리지 않고 어긋나는 느낌이 드는 날이에요. 일정이 꼬이거나 사소한 방해가 반복되기 쉬워요. 큰 계획보다는 당장 처리할 것들을 하나씩 정리하는 게 맞는 흐름이에요.",
+  "신해": "신(申)·해(亥) 해 — 안전사고에 각별히 신경 쓰는 날이에요. 도로·교통 상황이나 물 주변에서 부주의한 순간이 생기지 않도록 서두르지 말고, 무리한 야외 활동은 잠시 미루는 편이 좋아요. 호흡기·비뇨기 쪽 컨디션이 조금 예민해질 수 있으니 수분 섭취와 체온 관리에 신경 쓰세요.",
+  "해신": "신(申)·해(亥) 해 — 안전사고에 각별히 신경 쓰는 날이에요. 도로·교통 상황이나 물 주변에서 부주의한 순간이 생기지 않도록 서두르지 말고, 무리한 야외 활동은 잠시 미루는 편이 좋아요. 호흡기·비뇨기 쪽 컨디션이 조금 예민해질 수 있으니 수분 섭취와 체온 관리에 신경 쓰세요.",
+  "유술": "유(酉)·술(戌) 해 — 사소한 일로 주변 사람과 의견이 틀어지거나 불필요한 마찰이 생기기 쉬운 기운이에요. 잘 풀려가던 상황에 갑자기 제동이 걸리는 느낌이 들 수 있어요. 소통을 부드럽게 하고 감정 표현을 줄이는 하루로 보내는 게 좋아요.",
+  "술유": "유(酉)·술(戌) 해 — 사소한 일로 주변 사람과 의견이 틀어지거나 불필요한 마찰이 생기기 쉬운 기운이에요. 잘 풀려가던 상황에 갑자기 제동이 걸리는 느낌이 들 수 있어요. 소통을 부드럽게 하고 감정 표현을 줄이는 하루로 보내는 게 좋아요.",
+};
+
+function jjRelDesc(type: JijiRelation["type"], jjA?: string, jjB?: string): string {
+  if (type === "해" && jjA && jjB) {
+    const key = jjA + jjB;
+    return HAE_PAIR_DESC[key] ?? "은근히 신경 쓰이고 방해가 되는 기운이에요. 가까운 사람과 작은 마찰이 생기거나, 잘 풀리던 일에 뜻밖의 방해가 끼기 쉬운 흐름이에요.";
+  }
   switch (type) {
     case "육합": return "두 지지가 짝을 이뤄 서로 끌어당기고 화합하는 관계예요.";
     case "삼합": return "세 지지가 한 덩어리로 뭉쳐 강한 기운을 만드는 관계예요.";
@@ -185,7 +205,7 @@ function jjRelDesc(type: JijiRelation["type"]): string {
     case "충": return "두 기운이 정면으로 부딪혀 갑작스러운 변화나 긴장이 생기는 관계예요.";
     case "형": return "서로 부딪히며 다투거나 시비·구설이 생기기 쉬운 관계예요.";
     case "파": return "관계나 일이 깨지고 흩어지는 느낌을 주는 관계예요.";
-    case "해": return "은근히 신경 쓰이고 방해가 되는 관계예요.";
+    case "해": return "은근히 신경 쓰이고 방해가 되는 기운이에요. 가까운 사람과 작은 마찰이 생기거나, 잘 풀리던 일에 뜻밖의 방해가 끼기 쉬운 흐름이에요.";
     case "원진": return "이유 없이 꺼려지고 거리를 두게 되는 미묘한 관계예요.";
     default: return "";
   }
@@ -240,10 +260,11 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height, midDotX }
         {/* 3체 중간 지지 표시 점 */}
         {midDotX !== undefined && <circle cx={midDotX} cy={y} r={4} fill={cA} opacity={0.9} />}
       </svg>
-      {/* 중앙 레이블 배지 — title(PC 호버) + onClick(모바일 탭) 둘 다 지원 */}
+      {/* 중앙 레이블 배지 — PC: 호버 시 팝업 표시/숨김 / 모바일: 탭 토글 */}
       <div
-        title={desc}
-        onClick={() => setOpen(v => !v)}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen((v: boolean) => !v)}
         style={{
           position: "absolute", left: midX - badgeW / 2, top: y - 9, width: badgeW, height: 18,
           borderRadius: 9, background: badgeBg, border: badgeBorder,
@@ -255,6 +276,8 @@ function ConnectorLine({ xA, xB, y, color, label, desc, width, height, midDotX }
       </div>
       {open && (
         <div
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
           onClick={() => setOpen(false)}
           style={{
             position: "absolute", left: Math.max(0, Math.min(midX - 90, width - 180)), top: y + 12, width: 180, zIndex: 20,
@@ -889,12 +912,34 @@ export default function TodayFortunePage() {
               return Array.from(map.values()).map(r => ({ ...r, label: r.count > 1 ? `${r.label}×${r.count}` : r.label }));
             })()}
             jjLines={(() => {
+              // 육합 쌍 목록 — 해(害)와 겹치는지 확인용
+              const YUKHAP_PAIRS = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
+              const hapJjs = new Set(relations.filter(r => r.type === "육합").flatMap(r => [r.jjA, r.jjB]));
               const raw = relations.map(rel => {
                 const [ja, jb] = canonicalJijiPairOrder(rel.jjA, rel.jjB, rel.type);
                 const mg = (rel as MergedRel).mergedGroup;
                 const isJahyeong = rel.jjA === rel.jjB && rel.type === "형";
                 const label = mg ? `${mg[0]}·${mg[1]}·${mg[2]}삼합` : isJahyeong ? `${ja}${jb}자형` : `${ja}${jb}${rel.type}`;
-                return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc: jjRelDesc(rel.type) };
+                // 육합인데 그 짝이 해(害)로도 연결된 경우 → 설명에 방해 내용 추가
+                let desc = jjRelDesc(rel.type, rel.jjA, rel.jjB);
+                if (rel.type === "육합") {
+                  // 이 육합 쌍 중 하나가 다른 지지와 해(害) 관계인지 확인
+                  const haeRels = relations.filter(r => r.type === "해" && (r.jjA === rel.jjA || r.jjA === rel.jjB || r.jjB === rel.jjA || r.jjB === rel.jjB));
+                  if (haeRels.length > 0) {
+                    desc += " 단, 이 조화를 방해하는 해(害) 기운도 함께 있어서 — 잘 풀릴 것 같으면서도 중간에 누군가 발목을 잡는 느낌이 반복될 수 있어요. 기대만큼 결과가 나오지 않아도 너무 실망하지 마세요.";
+                  }
+                }
+                if (rel.type === "해") {
+                  // 이 해(害) 쌍 중 하나가 육합 쌍에 포함되는지 확인
+                  const isBlockingYukhap = YUKHAP_PAIRS.some(([a, b]) =>
+                    (rel.jjA === a && hapJjs.has(b)) || (rel.jjA === b && hapJjs.has(a)) ||
+                    (rel.jjB === a && hapJjs.has(b)) || (rel.jjB === b && hapJjs.has(a))
+                  );
+                  if (isBlockingYukhap) {
+                    desc += " 특히 이 기운은 오늘 맺어지려는 인연이나 합의를 조용히 방해하는 역할을 해요. 잘 맞는 것 같은데 어딘가 어긋나는 느낌이 든다면, 그 흐름을 억지로 잡으려 하지 말고 잠시 기다리는 쪽이 나아요.";
+                  }
+                }
+                return { aIdx: rel.a, bIdx: rel.b, label, color: relColor(rel.type, rel.jjA, rel.jjB), desc };
               });
               const map = new Map<string, typeof raw[0] & { count: number }>();
               for (const r of raw) {

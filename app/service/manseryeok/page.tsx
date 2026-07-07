@@ -741,18 +741,42 @@ function ResultView({
             해:   { color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
             원진: { color: "#c084fc", bg: "rgba(192,132,252,0.1)" },
           };
+          const YUKHAP_PAIRS_M = [["자","축"],["인","해"],["묘","술"],["진","유"],["사","신"],["오","미"]];
+          const hapJjsM = new Set(relations.filter(r => r.type === "육합").flatMap(r => [r.jjA, r.jjB]));
+          const haeRels = relations.filter(r => r.type === "해");
+          // 육합을 방해하는 해 조합 감지
+          const blockedYukhap = haeRels.filter(hr =>
+            YUKHAP_PAIRS_M.some(([a, b]) =>
+              (hr.jjA === a && hapJjsM.has(b)) || (hr.jjA === b && hapJjsM.has(a)) ||
+              (hr.jjB === a && hapJjsM.has(b)) || (hr.jjB === b && hapJjsM.has(a))
+            )
+          );
+          const hasSinhaehae = haeRels.some(r => (r.jjA === "신" && r.jjB === "해") || (r.jjA === "해" && r.jjB === "신"));
           return (
-            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-              {relations.map((r, i) => {
-                const st = REL_STYLE[r.type];
-                const [ja, jb] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
-                return (
-                  <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
-                    {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {ja}{jb} {r.type}
-                  </span>
-                );
-              })}
-            </div>
+            <>
+              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                {relations.map((r, i) => {
+                  const st = REL_STYLE[r.type];
+                  const [ja, jb] = canonicalJijiPairOrder(r.jjA, r.jjB, r.type);
+                  return (
+                    <span key={i} className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: st.color, background: st.bg, border: `1px solid ${st.color}30` }}>
+                      {pillars[r.a].label.slice(0,1)}지-{pillars[r.b].label.slice(0,1)}지 {ja}{jb} {r.type}
+                    </span>
+                  );
+                })}
+              </div>
+              {/* 해(害) 특이사항 안내 */}
+              {hasSinhaehae && (
+                <div className="mt-2 rounded-xl px-3 py-2 text-[10px] leading-relaxed" style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)", color: "rgba(251,191,36,0.85)" }}>
+                  ⚠️ <strong>신(申)·해(亥) 해(害)</strong> — 도로·교통 상황이나 물 근처에서 부주의한 순간이 생기지 않도록 주의가 필요한 기운이 있어요. 호흡기·비뇨기 계통 건강도 꾸준히 챙기는 게 좋아요.
+                </div>
+              )}
+              {blockedYukhap.length > 0 && (
+                <div className="mt-2 rounded-xl px-3 py-2 text-[10px] leading-relaxed" style={{ background: "rgba(192,132,252,0.07)", border: "1px solid rgba(192,132,252,0.2)", color: "rgba(192,132,252,0.85)" }}>
+                  ✦ <strong>육합(六合)을 방해하는 해(害) 기운</strong> — 사주 내에서 잘 맞는 기운이 조화를 이루려 하지만, 그 흐름을 끊는 방해 기운도 함께 있어요. 좋은 인연·기회가 왔다 싶으면 뜻밖의 사람이나 상황이 끼어드는 패턴이 반복될 수 있어요. 억지로 잡으려 하기보다 타이밍을 기다리는 전략이 더 효과적이에요.
+                </div>
+              )}
+            </>
           );
         })()}
 
