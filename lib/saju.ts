@@ -5033,3 +5033,28 @@ export function getGungseongCareerSummary(pd: SajuResult["pillarsDetail"]): Gung
 
   return items;
 }
+
+// 24) 음기 가득한 남자 사주 — 꾸밈·쇼핑·여사친 많음·게이 인기
+const EUM_CG_SET = new Set(["을","정","기","신","계"]);
+const EUM_JJ_SET = new Set(["자","축","묘","사","미","유","해"]);
+
+export function getEumgiGadukMaleNarrative(r: SajuResult, gender?: "male" | "female"): string | null {
+  if (gender !== "male") return null;
+  const pillars = allPillarsOf(r);
+  if (pillars.length < 4) return null;
+
+  let eumCount = 0;
+  for (const { cg, jj } of pillars) {
+    if (EUM_CG_SET.has(cg)) eumCount++;
+    if (EUM_JJ_SET.has(jj)) eumCount++;
+  }
+  // 8글자 중 6개 이상이 음기여야 해당
+  if (eumCount < 6) return null;
+
+  // 수·금 기운 합산 비율
+  const total = Object.values(r.scores).reduce((a, b) => a + b, 0) || 1;
+  const suGeum = (r.scores["수"] + r.scores["금"]) / total;
+  if (suGeum < 0.40) return null;
+
+  return "꾸미는 걸 좋아하고 패션·쇼핑에 관심이 많은 편이에요. 남자 친구보다 여자 친구가 많고, 여사친들과 자연스럽게 잘 어울리는 스타일이에요. 센스 있고 디테일에 신경 쓰는 모습 때문에 다양한 취향을 가진 사람들에게 인기가 있는 구조예요.";
+}

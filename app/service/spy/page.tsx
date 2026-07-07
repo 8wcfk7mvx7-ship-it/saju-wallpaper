@@ -22,6 +22,7 @@ import {
   getGwanseongSiksangYeonaeNarrative, getGeumMokGwadaNarrative, getIndaSingangMaleNarrative,
   getStrengthTraitNarrative, getExtremeStrengthNarrative, getWoljiSingleGyeopjaeNarrative, isWoljiSingleGyeopjae,
   getHourCheonulIntactGoodFlowNarrative, isHourCheonulIntactGoodFlow,
+  getEumgiGadukMaleNarrative,
 } from "@/lib/saju";
 import { trackTraits } from "@/lib/trackTrait";
 import AnalysisLoading from "@/components/AnalysisLoading";
@@ -441,6 +442,7 @@ function SpyContent() {
     getExtremeStrengthNarrative(result),
     getWoljiSingleGyeopjaeNarrative(result),
     getHourCheonulIntactGoodFlowNarrative(result),
+    getEumgiGadukMaleNarrative(result, theirGender),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ];
   const extraTraitNarrative = extraNarrativeFlags.filter((s): s is string => !!s).join(" ");

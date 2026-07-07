@@ -9,6 +9,7 @@ import {
   getJaeseongHonjapNarrative, getGwandanyeoNarrative, getSanggwanGyeongwanNarrative,
   getGwanseongGoripNarrative, getGwanbiAmhapNarrative, getDohwaPositionNarrative,
   getOhaengPlaceNarrative, getGongmangNarrative, getGwanseongSiksangYeonaeNarrative,
+  getEumgiGadukMaleNarrative,
   ILGAN_PERSONALITY,
 } from "@/lib/saju";
 import {
@@ -168,6 +169,7 @@ function CharmResultContent() {
     getDohwaPositionNarrative(result),
     getGongmangNarrative(result),
     getOhaengPlaceNarrative(result),
+    getEumgiGadukMaleNarrative(result, gender),
     !jipchaknamNarrative ? getHwabuJokNarrative(result) : null,
   ].filter((s): s is string => !!s).join(" ");
 

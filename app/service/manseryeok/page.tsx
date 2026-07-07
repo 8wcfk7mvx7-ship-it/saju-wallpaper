@@ -39,6 +39,7 @@ import {
   getSipseongStrength,
   classifySinStrength,
   getDisplaySinsalList,
+  getEumgiGadukMaleNarrative,
   type SajuResult, type Element,
 } from "@/lib/saju";
 import { ILGAN_SHADOW, ILGAN_PLACES, ILGAN_BOUNDARY, ILGAN_AFFECTION_STYLE, DOHWA_POSITION_INFO, DOHWA_HAP_EXTENSION_NOTE, OHAENG_ROLE_DB, BIGEOB_EXCESS_DESC, detectGumsuSangcheong, ILJI_DOHWA_FEMALE_DESC, GANYEO_ERA_SHIFT_NOTE, detectStayPutPattern } from "@/lib/saju2";
@@ -604,6 +605,9 @@ function ResultView({
   const muToCount = [pd.year.cg, pd.month.cg, pd.day.cg, pd.hour?.cg].filter(cg => cg === "무").length
     + [pd.year.jj, pd.month.jj, pd.day.jj, pd.hour?.jj].filter(jj => jj === "진" || jj === "술").length; // 진술 = 무토 통근
   const hasMuToExcess = muToCount >= 2 || result.scores["토"] / total > 0.32;
+
+  // ── 음기 가득한 남자 사주 ────────────────────────────────────────────────────
+  const eumgiGadukNote = getEumgiGadukMaleNarrative(result, form.gender);
 
   const samhapResults = detectSamhapBanghap(pd);
   const sipseongPatterns = analyzeSipseongPatterns(pd);
@@ -1477,6 +1481,11 @@ function ResultView({
           {isMiSi && (
             <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(248,113,113,0.04)", border: "1px solid rgba(248,113,113,0.1)", color: "rgba(255,255,255,0.55)" }}>
               미(未)시 출생이에요. 미토(未土)는 토의 음기(陰氣)가 집약된 지지로, 이 시간대에 태어난 사람은 얼굴형이 둥글고 부드러운 인상인 경우가 많아요.
+            </p>
+          )}
+          {eumgiGadukNote && (
+            <p className="text-xs leading-relaxed px-3 py-2 rounded-lg mt-3" style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", color: "rgba(255,255,255,0.55)" }}>
+              {eumgiGadukNote}
             </p>
           )}
         </div>
