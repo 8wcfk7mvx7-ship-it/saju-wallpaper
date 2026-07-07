@@ -815,7 +815,7 @@ export default function DaewoonPage() {
                   <span key={k} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>{k}</span>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{info.detail}</p>
+              <p className="text-xs text-gray-200 leading-relaxed line-clamp-3">{info.detail}</p>
             </div>
           );
         })()}
@@ -857,65 +857,65 @@ export default function DaewoonPage() {
                 </div>
 
                 {uunsF && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.3)" }}>
-                    <p className="text-xs font-bold mb-1.5 text-gray-300">이 대운이 {name}님에게 미치는 영향</p>
-                    <p className="text-sm text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj)}`}</p>
+                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <p className="text-xs font-bold mb-1.5 text-white">이 대운이 {name}님에게 미치는 영향</p>
+                    <p className="text-sm text-gray-100 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, cur.jj)}`}</p>
                   </div>
                 )}
 
                 {uunsF && (
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     {([
-                      { label: "💰 재물운", text: uunsF.finance, color: "#fbbf24" },
-                      { label: "💼 직업운", text: uunsF.career, color: "#60a5fa" },
-                      { label: "💑 애정운", text: uunsF.love, color: "#f472b6" },
-                      { label: "🏃 건강운", text: uunsF.health, color: "#4ade80" },
-                    ] as { label: string; text: string; color: string }[]).map(d => (
-                      <div key={d.label} className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.28)" }}>
-                        <p className="text-[10px] font-bold mb-1.5" style={{ color: d.color }}>{d.label}</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">{d.text}</p>
+                      { label: "💰 재물운", text: uunsF.finance },
+                      { label: "💼 직업운", text: uunsF.career },
+                      { label: "💑 애정운", text: uunsF.love },
+                      { label: "🏃 건강운", text: uunsF.health },
+                    ] as { label: string; text: string }[]).map(d => (
+                      <div key={d.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <p className="text-xs font-bold mb-1.5 text-white">{d.label}</p>
+                        <p className="text-xs text-gray-200 leading-relaxed">{d.text}</p>
                       </div>
                     ))}
                   </div>
                 )}
 
                 {sipCg && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.25)" }}>
-                    <p className="text-xs font-bold mb-1" style={{ color: sipCg.color }}>{sipCg.title} — 천간의 기운</p>
-                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{sipCg.desc}</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">{sipCg.life}</p>
-                    <p className="text-xs mt-2 px-2 py-1.5 rounded-lg" style={{ background: "rgba(255,100,100,0.08)", color: "#f87171" }}>주의: {sipCg.caution}</p>
+                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    <p className="text-xs font-bold mb-1 text-white">{sipCg.title} — 천간의 기운</p>
+                    <p className="text-sm text-gray-200 leading-relaxed mb-2">{sipCg.desc}</p>
+                    <p className="text-sm text-gray-100 leading-relaxed">{sipCg.life}</p>
+                    <p className="text-xs mt-2 px-2 py-1.5 rounded-lg text-gray-300" style={{ background: "rgba(255,255,255,0.05)" }}>주의: {sipCg.caution}</p>
                   </div>
                 )}
 
                 {sipJj && sipJj.title !== sipCg?.title && (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(0,0,0,0.25)" }}>
-                    <p className="text-xs font-bold mb-1" style={{ color: sipJj.color }}>{sipJj.title} — 지지의 기운</p>
-                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{sipJj.desc}</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">{sipJj.life}</p>
+                  <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    <p className="text-xs font-bold mb-1 text-white">{sipJj.title} — 지지의 기운</p>
+                    <p className="text-sm text-gray-200 leading-relaxed mb-2">{sipJj.desc}</p>
+                    <p className="text-sm text-gray-100 leading-relaxed">{sipJj.life}</p>
                   </div>
                 )}
 
                 {uunsF && (
                   <div className="grid grid-cols-2 gap-2 mb-3">
-                    <div className="rounded-xl p-3" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
-                      <p className="text-[10px] font-bold text-emerald-400 mb-1">✅ 이 시기에 할 것</p>
-                      <p className="text-xs text-emerald-200/80 leading-relaxed">{uunsF.todo}</p>
+                    <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <p className="text-xs font-bold text-white mb-1">✅ 이 시기에 할 것</p>
+                      <p className="text-xs text-gray-200 leading-relaxed">{uunsF.todo}</p>
                     </div>
-                    <div className="rounded-xl p-3" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
-                      <p className="text-[10px] font-bold text-red-400 mb-1">🚫 하지 말 것</p>
-                      <p className="text-xs text-red-200/80 leading-relaxed">{uunsF.avoid}</p>
+                    <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <p className="text-xs font-bold text-white mb-1">🚫 하지 말 것</p>
+                      <p className="text-xs text-gray-200 leading-relaxed">{uunsF.avoid}</p>
                     </div>
                   </div>
                 )}
 
                 {uunsF && (
-                  <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: "rgba(255,180,0,0.08)", border: "1px solid rgba(255,180,0,0.2)" }}>
-                    <span className="text-yellow-400 shrink-0 mt-0.5">!</span>
+                  <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <span className="text-white shrink-0 mt-0.5 font-bold">!</span>
                     <div>
-                      <p className="text-xs font-bold text-yellow-400 mb-0.5">이 시기 핵심 키워드</p>
-                      <p className="text-xs text-yellow-300">{uunsF.keyword}</p>
-                      <p className="text-xs text-yellow-200/60 mt-1">{uunsF.caution}</p>
+                      <p className="text-xs font-bold text-white mb-0.5">이 시기 핵심 키워드</p>
+                      <p className="text-sm text-gray-100">{uunsF.keyword}</p>
+                      <p className="text-xs text-gray-300 mt-1">{uunsF.caution}</p>
                     </div>
                   </div>
                 )}
@@ -975,7 +975,7 @@ export default function DaewoonPage() {
                   {uunsF && (
                     <div className="px-4 pb-3 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                       <p className="text-xs font-bold mt-3 mb-1.5" style={{ color: uunsF.color }}>{uunsF.label} — {p.uunseong}</p>
-                      <p className="text-xs text-gray-300 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj)}`}</p>
+                      <p className="text-xs text-gray-100 leading-relaxed">{uunsF.narrative}{natalPillars[2] && getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj) && ` ${getDaewoonIljiYukhapNote(natalPillars[2].jj, p.jj)}`}</p>
                       <p className="text-xs text-gray-500 leading-relaxed mt-2">{uunsF.caution}</p>
                       <div className="grid grid-cols-2 gap-2 mt-3">
                         {([
@@ -986,7 +986,7 @@ export default function DaewoonPage() {
                         ] as { label: string; text: string; color: string }[]).map(d => (
                           <div key={d.label} className="rounded-xl p-2.5" style={{ background: "rgba(0,0,0,0.28)" }}>
                             <p className="text-[9px] font-bold mb-1" style={{ color: d.color }}>{d.label}</p>
-                            <p className="text-[10px] text-gray-400 leading-relaxed">{d.text}</p>
+                            <p className="text-[10px] text-gray-200 leading-relaxed">{d.text}</p>
                           </div>
                         ))}
                       </div>
@@ -1009,13 +1009,13 @@ export default function DaewoonPage() {
                       {sipCg && (
                         <div className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.25)" }}>
                           <p className="text-[10px] font-bold mb-1" style={{ color: sipCg.color }}>{sipCg.title}</p>
-                          <p className="text-xs text-gray-400 leading-relaxed">{sipCg.life}</p>
+                          <p className="text-xs text-gray-200 leading-relaxed">{sipCg.life}</p>
                         </div>
                       )}
                       {sipJj && sipJj.title !== sipCg?.title && (
                         <div className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.2)" }}>
                           <p className="text-[10px] font-bold mb-1" style={{ color: sipJj.color }}>{sipJj.title}</p>
-                          <p className="text-xs text-gray-400 leading-relaxed">{sipJj.life}</p>
+                          <p className="text-xs text-gray-200 leading-relaxed">{sipJj.life}</p>
                         </div>
                       )}
                     </div>
@@ -1039,7 +1039,7 @@ export default function DaewoonPage() {
                         {detail.map(d => (
                           <div key={d.domain} className="rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.22)" }}>
                             <p className="text-[10px] font-bold mb-1" style={{ color: elStyle.text }}>{d.icon} {d.domain}</p>
-                            <p className="text-xs text-gray-400 leading-relaxed">{gender === "male" ? d.male : d.female}</p>
+                            <p className="text-xs text-gray-200 leading-relaxed">{gender === "male" ? d.male : d.female}</p>
                           </div>
                         ))}
                       </div>
@@ -1179,11 +1179,11 @@ export default function DaewoonPage() {
             return (
               <div className="mt-3 rounded-2xl p-4" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)" }}>
                 <p className="text-xs font-black text-yellow-400 mb-2">{cur.year}년 세운 분석 — {cur.cg}{cur.jj}</p>
-                {uunsF && <p className="text-xs text-gray-300 leading-relaxed mb-2">{uunsF.narrative}</p>}
+                {uunsF && <p className="text-xs text-gray-100 leading-relaxed mb-2">{uunsF.narrative}</p>}
                 {sipJj && (
                   <>
                     <p className="text-xs font-bold mb-1" style={{ color: sipJj.color }}>{sipJj.title}</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">{sipJj.life}</p>
+                    <p className="text-xs text-gray-200 leading-relaxed">{sipJj.life}</p>
                     <p className="text-xs text-gray-500 mt-1.5">{sipJj.caution}</p>
                   </>
                 )}

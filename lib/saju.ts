@@ -2272,13 +2272,20 @@ export function calcDaewoon(
     });
   }
 
-  // ④ 현재 해당 대운 인덱스
-  const nowYear = new Date().getFullYear();
-  const approxAge = nowYear - birthYear;
-  let currentIdx = pillars.findIndex((p, i) => {
-    const nextAge = i + 1 < pillars.length ? pillars[i + 1].age : 999;
-    return approxAge >= p.age && approxAge < nextAge;
-  });
+  // ④ 현재 해당 대운 인덱스 — dateStart 정확 날짜 기준
+  const today = new Date();
+  const todayJDN = toJDN(today.getFullYear(), today.getMonth() + 1, today.getDate());
+  let currentIdx = -1;
+  for (let i = 0; i < pillars.length; i++) {
+    const ds = pillars[i].dateStart;
+    const dsJDN = toJDN(ds.year, ds.month, ds.day);
+    const nextDs = i + 1 < pillars.length ? pillars[i + 1].dateStart : null;
+    const nextJDN = nextDs ? toJDN(nextDs.year, nextDs.month, nextDs.day) : Infinity;
+    if (todayJDN >= dsJDN && todayJDN < nextJDN) {
+      currentIdx = i;
+      break;
+    }
+  }
   if (currentIdx < 0) currentIdx = 0;
 
   return { startAge, direction: isForward ? "순행" : "역행", pillars, currentIdx };
