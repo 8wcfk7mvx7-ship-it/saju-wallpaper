@@ -28,7 +28,23 @@ const UI: Record<Lang, {
   navBadge: string;
   nav: [string, string, string, string];
   mypage: string;
-  badgeTags: string[];
+  trustHeadline: string;
+  trustBullets: [string, string, string];
+  ratingLabel: string;
+  counterLabel: string;
+  guideChip: string;
+  guideTitle: string;
+  guideDesc: string;
+  guideBtn: string;
+  bannerMain: string;
+  bannerHighlight: string;
+  bannerSub1: string;
+  bannerSub2: string;
+  emptyServices: string;
+  servicesCountUnit: string;
+  disclaimerShort: string;
+  mobileNav: [string, string, string, string];
+  mobileMenu: [string, string, string, string, string, string, string, string];
 }> = {
   ko: {
     h1: ["지금 이 순간", "당신에게 필요한", "한 가지"],
@@ -43,7 +59,27 @@ const UI: Record<Lang, {
     navBadge: "AI 사주",
     nav: ["사주", "가이드", "일진달력", "문의하기"],
     mypage: "마이페이지",
-    badgeTags: ["오행 균형 진단", "신살 발견", "경도 보정", "완전 무료"],
+    trustHeadline: "사주를 캡처해서 AI에 올려 묻는 것과는 분석 방식 자체가 다릅니다.",
+    trustBullets: [
+      "명리학 원전 이론과 사주 명식 계산 로직을 직접 구현한 <strong style=\"color:#fff\">전용 분석 엔진</strong>으로 풀이합니다",
+      "생년월일시로 산출한 <strong style=\"color:#fff\">사주 명식·십성·신살 데이터</strong>를 기준으로 항목별 풀이를 구성합니다",
+      "일반 대화형 AI가 즉석에서 답하는 방식이 아니라, <strong style=\"color:#fff\">정해진 명리학 규칙</strong>에 따라 일관되게 분석합니다",
+    ],
+    ratingLabel: "실제 후기",
+    counterLabel: "누적 분석 {n}건",
+    guideChip: "사주 명리학 가이드",
+    guideTitle: "사주가 처음이신가요?",
+    guideDesc: "오행·천간지지·신살·대운 등 기초를 단계별로 설명합니다.",
+    guideBtn: "가이드 보기 →",
+    bannerMain: "몰랐던 내 사주의 진실을 알고 나서 ",
+    bannerHighlight: "처음으로 방향이 보였습니다",
+    bannerSub1: "사주는 운명을 바꾸는 도구가 아닙니다.",
+    bannerSub2: "타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.",
+    emptyServices: "준비 중인 서비스입니다",
+    servicesCountUnit: "가지",
+    disclaimerShort: "본 서비스는 오락·참고 목적의 AI 콘텐츠입니다. 실제 의사결정의 근거로 사용하지 마세요.",
+    mobileNav: ["홈", "서비스", "보관함", "문의"],
+    mobileMenu: ["홈", "전체 서비스", "만세력", "AI 채팅", "오늘의 운세", "일진달력", "사주 가이드", "마이페이지"],
   },
   en: {
     h1: ["Your current wallpaper", "might be blocking", "your energy"],
@@ -58,7 +94,27 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Guide", "Daily Calendar", "Contact"],
     mypage: "My Page",
-    badgeTags: ["Chart & Element Analysis", "Sign Discovery", "Longitude Correction", "Free"],
+    trustHeadline: "This isn't the same as uploading your chart to a generic AI chatbot.",
+    trustBullets: [
+      "Built on classical theory with <strong style=\"color:#fff\">a dedicated analysis engine</strong> that directly implements saju calculation logic",
+      "Interprets results using <strong style=\"color:#fff\">your exact chart, ten gods, and sign data</strong> calculated from your birth info",
+      "Unlike conversational AI that answers on the fly — analyses follow <strong style=\"color:#fff\">consistent classical astrology rules</strong>",
+    ],
+    ratingLabel: "Real reviews",
+    counterLabel: "{n} analyses done",
+    guideChip: "Saju Astrology Guide",
+    guideTitle: "New to Saju?",
+    guideDesc: "Step-by-step intro to Five Elements, stems & branches, signs, and fortune cycles.",
+    guideBtn: "View Guide →",
+    bannerMain: "After finally understanding what my chart was really telling me, ",
+    bannerHighlight: "I saw my path clearly for the first time.",
+    bannerSub1: "Saju isn't a tool to change your fate.",
+    bannerSub2: "It's a compass — helping you understand your natural energy and live in alignment with it.",
+    emptyServices: "Coming soon",
+    servicesCountUnit: " services",
+    disclaimerShort: "This service provides AI-generated content for entertainment and reference only. Do not use it as a basis for real-life decisions.",
+    mobileNav: ["Home", "Services", "My Library", "Contact"],
+    mobileMenu: ["Home", "All Services", "Full Chart", "AI Chat", "Today's Fortune", "Daily Calendar", "Saju Guide", "My Page"],
   },
   id: {
     h1: ["Wallpaper Anda saat ini", "mungkin menghalangi", "energi Anda"],
@@ -73,7 +129,27 @@ const UI: Record<Lang, {
     navBadge: "AI Saju",
     nav: ["Saju", "Panduan", "Kalender Harian", "Kontak"],
     mypage: "Halaman Saya",
-    badgeTags: ["Analisis Bagan & Elemen", "Penemuan Tanda", "Koreksi Bujur", "Gratis"],
+    trustHeadline: "Ini berbeda dari sekadar mengunggah grafik Anda ke chatbot AI biasa.",
+    trustBullets: [
+      "Dibangun berdasarkan teori klasik dengan <strong style=\"color:#fff\">mesin analisis khusus</strong> yang langsung mengimplementasikan logika kalkulasi saju",
+      "Menginterpretasikan hasil menggunakan <strong style=\"color:#fff\">data bagan, sepuluh dewa, dan tanda Anda</strong> yang dihitung dari info kelahiran Anda",
+      "Berbeda dari AI percakapan yang menjawab spontan — analisis mengikuti <strong style=\"color:#fff\">aturan astrologi klasik yang konsisten</strong>",
+    ],
+    ratingLabel: "Ulasan nyata",
+    counterLabel: "{n} analisis selesai",
+    guideChip: "Panduan Astrologi Saju",
+    guideTitle: "Baru mengenal Saju?",
+    guideDesc: "Pengantar langkah demi langkah tentang Lima Elemen, batang & cabang, tanda, dan siklus nasib.",
+    guideBtn: "Lihat Panduan →",
+    bannerMain: "Setelah akhirnya memahami apa yang sebenarnya dikatakan grafik saya, ",
+    bannerHighlight: "saya melihat jalan saya dengan jelas untuk pertama kalinya.",
+    bannerSub1: "Saju bukanlah alat untuk mengubah takdir Anda.",
+    bannerSub2: "Ini adalah kompas — membantu Anda memahami energi alami dan hidup selaras dengannya.",
+    emptyServices: "Segera hadir",
+    servicesCountUnit: " layanan",
+    disclaimerShort: "Layanan ini menyediakan konten AI untuk hiburan dan referensi saja. Jangan gunakan sebagai dasar keputusan nyata.",
+    mobileNav: ["Beranda", "Layanan", "Pustaka", "Kontak"],
+    mobileMenu: ["Beranda", "Semua Layanan", "Grafik Lengkap", "Obrolan AI", "Keberuntungan Hari Ini", "Kalender Harian", "Panduan Saju", "Halaman Saya"],
   },
   ta: {
     h1: ["உங்கள் வால்பேப்பர்", "உங்கள் ஆற்றலை", "தடுக்கலாம்"],
@@ -88,7 +164,27 @@ const UI: Record<Lang, {
     navBadge: "AI சாஜு",
     nav: ["சாஜு", "வழிகாட்டி", "தினசரி நாட்காட்டி", "தொடர்பு"],
     mypage: "என் பக்கம்",
-    badgeTags: ["அட்டவணை·தத்துவ பகுப்பாய்வு", "அடையாள கண்டுபிடிப்பு", "தீர்க்கரேகை திருத்தம்", "இலவசம்"],
+    trustHeadline: "இது ஒரு பொதுவான AI சாட்போட்டில் உங்கள் ஜாதகத்தை பதிவேற்றுவதிலிருந்து வேறுபட்டது.",
+    trustBullets: [
+      "சாஜு கணக்கீட்டு தர்க்கத்தை நேரடியாக செயல்படுத்தும் <strong style=\"color:#fff\">அர்ப்பணிக்கப்பட்ட பகுப்பாய்வு என்ஜின்</strong> கொண்டு கட்டமைக்கப்பட்டது",
+      "உங்கள் பிறப்பு தகவலிலிருந்து கணக்கிடப்பட்ட <strong style=\"color:#fff\">விளக்கப்படம், பத்து கடவுளர்கள் மற்றும் அடையாள தரவு</strong> அடிப்படையில் பகுப்பாய்வு செய்கிறது",
+      "உரையாடல் AI போல் தானாகவே பதிலளிக்காமல் — <strong style=\"color:#fff\">நிலையான பழமையான ஜோதிட விதிகளை</strong> பின்பற்றி பகுப்பாய்வு செய்கிறது",
+    ],
+    ratingLabel: "உண்மையான மதிப்புரைகள்",
+    counterLabel: "{n} பகுப்பாய்வுகள் முடிந்தன",
+    guideChip: "சாஜு ஜோதிட வழிகாட்டி",
+    guideTitle: "சாஜு புதிதா?",
+    guideDesc: "ஐந்து தத்துவங்கள், தண்டு மற்றும் கிளைகள், அடையாளங்கள் மற்றும் விதி சுழற்சிகளுக்கான படிப்படியான அறிமுகம்.",
+    guideBtn: "வழிகாட்டியைப் பார்க்கவும் →",
+    bannerMain: "என் ஜாதகம் உண்மையில் என்ன சொல்கிறது என்று புரிந்த பிறகு, ",
+    bannerHighlight: "முதல் முறையாக என் பாதை தெளிவாக தெரிந்தது.",
+    bannerSub1: "சாஜு உங்கள் விதியை மாற்றும் கருவி அல்ல.",
+    bannerSub2: "இது ஒரு திசைகாட்டி — உங்கள் இயற்கை ஆற்றலை புரிந்துகொண்டு அதனோடு இணைந்து வாழ உதவுகிறது.",
+    emptyServices: "விரைவில் வரவிருக்கிறது",
+    servicesCountUnit: " சேவைகள்",
+    disclaimerShort: "இந்த சேவை பொழுதுபோக்கு மற்றும் குறிப்பு மட்டுமான AI உள்ளடக்கத்தை வழங்குகிறது. உண்மையான முடிவுகளுக்கு அடிப்படையாக பயன்படுத்த வேண்டாம்.",
+    mobileNav: ["முகப்பு", "சேவைகள்", "நூலகம்", "தொடர்பு"],
+    mobileMenu: ["முகப்பு", "அனைத்து சேவைகள்", "முழு விளக்கப்படம்", "AI அரட்டை", "இன்றைய அதிர்வு", "தினசரி நாட்காட்டி", "சாஜு வழிகாட்டி", "என் பக்கம்"],
   },
 };
 
@@ -268,7 +364,7 @@ const ACTIONS = [
   "낙정관살을 발견했습니다",
   "나체도화를 확인했습니다",
   "만세력을 조회했습니다",
-  "용신 분석을 완료했습니다",
+  "사주 핵심 기운 분석을 완료했습니다",
   "대운 흐름을 확인했습니다",
   "짝사랑 공략법을 받았습니다",
   "궁합 점수를 받았습니다",
@@ -294,7 +390,7 @@ const ACTIONS_TR: Record<Lang, string[]> = {
     "analyzed reunion chances", "checked the daily fortune calendar", "started a saju chat",
     "read a feng shui guide", "completed a one-sided love analysis", "received an improvement plan",
     "discovered a hidden hazard sign", "checked a romance-attraction sign", "looked up their full chart",
-    "completed an elemental balance analysis", "checked their decade-fortune flow", "received a one-sided love strategy",
+    "completed a core energy analysis", "checked their decade-fortune flow", "received a one-sided love strategy",
     "received a compatibility score", "unlocked a reunion strategy", "checked their annual fortune flow",
     "discovered a romance-attraction sign", "checked a hidden sign", "checked a travel-fortune sign",
     "checked their list of fortune signs", "checked a Five Elements balancing method", "checked a Zi Wei Dou Shu chart",
@@ -307,7 +403,7 @@ const ACTIONS_TR: Record<Lang, string[]> = {
     "menganalisis peluang rujuk kembali", "memeriksa kalender keberuntungan harian", "memulai obrolan saju",
     "membaca panduan feng shui", "menyelesaikan analisis cinta bertepuk sebelah tangan", "menerima rencana perbaikan diri",
     "menemukan tanda bahaya tersembunyi", "memeriksa tanda daya tarik asmara", "memeriksa chart saju lengkap",
-    "menyelesaikan analisis keseimbangan elemen", "memeriksa alur keberuntungan dekade", "menerima strategi cinta bertepuk sebelah tangan",
+    "menyelesaikan analisis energi inti", "memeriksa alur keberuntungan dekade", "menerima strategi cinta bertepuk sebelah tangan",
     "menerima skor kecocokan", "membuka strategi rujuk kembali", "memeriksa alur keberuntungan tahunan",
     "menemukan tanda daya tarik asmara", "memeriksa tanda tersembunyi", "memeriksa tanda keberuntungan perjalanan",
     "memeriksa daftar tanda keberuntungan", "memeriksa metode penyeimbang Lima Elemen", "memeriksa chart Zi Wei Dou Shu",
@@ -1132,14 +1228,14 @@ export default function MainPage() {
             style={{ background: "rgba(7,0,26,0.98)", borderColor: "rgba(59,130,246,0.15)" }}
             onClick={() => setShowMobileMenu(false)}>
             {[
-              { label: "홈", onClick: () => router.push("/") },
-              { label: "전체 서비스", onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
-              { label: "만세력", onClick: () => router.push("/service/manseryeok") },
-              { label: "AI 채팅", onClick: () => router.push("/chat") },
-              { label: "오늘의 운세", onClick: () => router.push("/service/today") },
-              { label: "일진달력", onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "사주 가이드", onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
-              { label: "마이페이지", onClick: () => router.push("/mypage") },
+              { label: t.mobileMenu[0], onClick: () => router.push("/") },
+              { label: t.mobileMenu[1], onClick: () => { router.push("/"); setTimeout(() => document.getElementById("services-section")?.scrollIntoView({ behavior: "smooth" }), 100); } },
+              { label: t.mobileMenu[2], onClick: () => router.push("/service/manseryeok") },
+              { label: t.mobileMenu[3], onClick: () => router.push("/chat") },
+              { label: t.mobileMenu[4], onClick: () => router.push("/service/today") },
+              { label: t.mobileMenu[5], onClick: () => document.getElementById("iljin-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.mobileMenu[6], onClick: () => document.getElementById("guide-section")?.scrollIntoView({ behavior: "smooth" }) },
+              { label: t.mobileMenu[7], onClick: () => router.push("/mypage") },
             ].map(item => (
               <button key={item.label} onClick={item.onClick}
                 className="w-full text-left px-5 py-3.5 text-sm font-semibold border-b transition-colors hover:bg-white/5"
@@ -1320,17 +1416,13 @@ export default function MainPage() {
             <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
-                사주를 캡처해서 AI에 올려 묻는 것과는 분석 방식 자체가 다릅니다.
+                {t.trustHeadline}
               </p>
               <ul className="space-y-2.5">
-                {[
-                  { text: <>명리학 원전 이론과 사주 명식 계산 로직을 직접 구현한 <strong style={{ color: "#fff" }}>전용 분석 엔진</strong>으로 풀이합니다</> },
-                  { text: <>생년월일시로 산출한 <strong style={{ color: "#fff" }}>사주 명식·십성·신살 데이터</strong>를 기준으로 항목별 풀이를 구성합니다</> },
-                  { text: <>일반 대화형 AI가 즉석에서 답하는 방식이 아니라, <strong style={{ color: "#fff" }}>정해진 명리학 규칙</strong>에 따라 일관되게 분석합니다</> },
-                ].map((item, i) => (
+                {t.trustBullets.map((bullet, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
                     <span className="shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>·</span>
-                    <span>{item.text}</span>
+                    <span dangerouslySetInnerHTML={{ __html: bullet }} />
                   </li>
                 ))}
               </ul>
@@ -1358,11 +1450,11 @@ export default function MainPage() {
               style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.18)", color: "rgba(255,255,255,0.55)" }}>
               <span style={{ color: "#f5c518" }}>★★★★★</span>
               <span className="font-bold" style={{ color: "#f5c518" }}>4.7</span>
-              <span>실제 후기</span>
+              <span>{t.ratingLabel}</span>
             </div>
             <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
-              <span>누적 분석 <strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>건</span>
+              <span>{t.counterLabel.split('{n}')[0]}<strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>{t.counterLabel.split('{n}')[1]}</span>
             </div>
           </div>
 
@@ -1408,7 +1500,7 @@ export default function MainPage() {
 
         {/* ── 면책 공지 ── */}
         <p className="text-center mb-6" style={{ color: "rgba(255,255,255,0.18)", fontSize: 10 }}>
-          본 서비스는 오락·참고 목적의 AI 콘텐츠입니다. 실제 의사결정의 근거로 사용하지 마세요.
+          {t.disclaimerShort}
         </p>
 
         {/* ── 서비스 섹션 ── */}
@@ -1420,7 +1512,7 @@ export default function MainPage() {
             </div>
             <span className="text-xs px-3 py-1 rounded-full font-bold"
               style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
-              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}가지
+              {SERVICES.filter(s => s.categories.includes(activeCategory)).length}{t.servicesCountUnit}
             </span>
           </div>
 
@@ -1487,7 +1579,7 @@ export default function MainPage() {
 
           {SERVICES.filter(s => s.categories.includes(activeCategory)).length === 0 && (
             <div className="text-center py-16 text-gray-600 text-sm">
-              준비 중인 서비스입니다
+              {t.emptyServices}
             </div>
           )}
         </section>
@@ -1506,10 +1598,10 @@ export default function MainPage() {
                   className="drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black mb-1 uppercase tracking-widest" style={{ color: "#e0c168" }}>사주 명리학 가이드</p>
-                <p className="text-base font-black text-white mb-1">사주가 처음이신가요?</p>
+                <p className="text-[10px] font-black mb-1 uppercase tracking-widest" style={{ color: "#e0c168" }}>{t.guideChip}</p>
+                <p className="text-base font-black text-white mb-1">{t.guideTitle}</p>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
-                  오행·천간지지·신살·대운 등 기초를 단계별로 설명합니다.
+                  {t.guideDesc}
                 </p>
               </div>
             </div>
@@ -1518,7 +1610,7 @@ export default function MainPage() {
               className="shrink-0 text-sm font-black px-5 py-2.5 rounded-xl transition-all"
               style={{ background: "#c9a84c", color: "#1a1305", border: "1px solid #c9a84c" }}
             >
-              가이드 보기 →
+              {t.guideBtn}
             </button>
           </div>
         </section>
@@ -1540,11 +1632,11 @@ export default function MainPage() {
 
             <p className="text-xs font-black mb-4 tracking-widest uppercase" style={{ color: "rgba(59,130,246,0.7)" }}>✦ Before & After ✦</p>
             <h3 className="text-lg sm:text-3xl font-black text-white mb-5 leading-snug">
-              &ldquo;몰랐던 내 사주의 진실을 알고 나서 <span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>처음으로 방향이 보였습니다&rdquo;</span>
+              &ldquo;{t.bannerMain}<span style={{ color: "#3b82f6", textShadow: "0 0 30px rgba(59,130,246,0.4)" }}>{t.bannerHighlight}&rdquo;</span>
             </h3>
             <p className="text-sm sm:text-base max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-              사주는 운명을 바꾸는 도구가 아닙니다.<br />
-              타고난 에너지를 이해하고, 그에 맞게 살아가는 나침반입니다.
+              {t.bannerSub1}<br />
+              {t.bannerSub2}
             </p>
           </div>
         </section>
@@ -1660,10 +1752,10 @@ export default function MainPage() {
         style={{ background: "rgba(7,0,26,0.97)", borderColor: "rgba(59,130,246,0.15)", backdropFilter: "blur(20px)" }}>
         <div className="flex items-stretch h-[4.5rem]">
           {[
-            { icon: "🏠", label: "홈", href: "/" },
-            { icon: "✨", label: "서비스", href: "/#services-section" },
-            { icon: "📦", label: "보관함", href: "/mypage" },
-            { icon: "💬", label: "문의", href: "http://pf.kakao.com/_cuksX", external: true },
+            { icon: "🏠", label: t.mobileNav[0], href: "/" },
+            { icon: "✨", label: t.mobileNav[1], href: "/#services-section" },
+            { icon: "📦", label: t.mobileNav[2], href: "/mypage" },
+            { icon: "💬", label: t.mobileNav[3], href: "http://pf.kakao.com/_cuksX", external: true },
           ].map((item) => (
             item.external ? (
               <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer"
