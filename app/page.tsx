@@ -1369,7 +1369,7 @@ export default function MainPage() {
             <div className="flex-1 min-w-0">
 
               {/* 실시간 활동 피드 */}
-              <div className="flex justify-center sm:justify-start mb-7">
+              <div className="flex justify-start mb-7">
                 <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
                   <span className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80" }} />
@@ -1380,9 +1380,9 @@ export default function MainPage() {
               </div>
 
               {/* 헤드라인 */}
-              <div className="text-center sm:text-left mb-6 pr-24 sm:pr-0">
-                <h1 className="font-black leading-[1.08] text-white"
-                  style={{ fontSize: "clamp(2.4rem, 6vw, 3.5rem)", letterSpacing: "-0.035em" }}>
+              <div className="text-left mb-6">
+                <h1 className="font-black leading-[1.1] text-white"
+                  style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", letterSpacing: "-0.03em" }}>
                   {t.h1[0]}<br />
                   <span style={{
                     background: "linear-gradient(110deg, #f472b6 0%, #c084fc 50%, #818cf8 100%)",
@@ -1394,9 +1394,9 @@ export default function MainPage() {
               </div>
 
               {/* 신뢰 포인트 */}
-              <ul className="space-y-2 mb-8 max-w-sm mx-auto sm:mx-0">
+              <ul className="space-y-2 mb-8 max-w-sm">
                 {t.trustBullets.map((bullet, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[13px] leading-relaxed text-center sm:text-left" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  <li key={i} className="flex items-start gap-2.5 text-[13px] leading-relaxed text-left" style={{ color: "rgba(255,255,255,0.5)" }}>
                     <span className="shrink-0 mt-[5px] w-1 h-1 rounded-full" style={{ background: "rgba(192,132,252,0.7)", minWidth: 4, minHeight: 4 }} />
                     <span dangerouslySetInnerHTML={{ __html: bullet }} />
                   </li>
@@ -1404,7 +1404,7 @@ export default function MainPage() {
               </ul>
 
               {/* CTA 버튼 */}
-              <div className="max-w-sm mx-auto sm:mx-0 mb-5">
+              <div className="max-w-sm mb-5">
                 <button
                   onClick={() => router.push("/service/manseryeok")}
                   className="cta-btn w-full font-black text-base py-4 rounded-2xl transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
@@ -1420,7 +1420,7 @@ export default function MainPage() {
               </div>
 
               {/* 신뢰 지표 */}
-              <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+              <div className="flex items-center gap-3 flex-wrap justify-start">
                 <div className="flex items-center gap-1 text-[11px]" style={{ color: "rgba(255,255,255,0.38)" }}>
                   <span style={{ color: "#f5c518", letterSpacing: 1 }}>★★★★★</span>
                   <span className="font-bold ml-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>4.7</span>
