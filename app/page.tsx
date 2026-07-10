@@ -1363,108 +1363,100 @@ export default function MainPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20" style={{ overflow: "visible" }}>
 
         {/* ── 히어로 섹션 ── */}
-        <section className="py-16 sm:py-24 text-center relative" style={{ overflow: "visible" }}>
-          {/* 마스코트 */}
-          <div className="absolute pointer-events-none select-none sm:hidden"
-            style={{ right: -10, top: -10, width: 110, padding: 8, overflow: "visible" }}>
-            <Image src="/mascot.png" alt="사주 마스코트" width={110} height={165} priority
-              style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 8px 32px rgba(147,51,234,0.4))" }} />
-          </div>
-          <div className="absolute pointer-events-none select-none hidden sm:block"
-            style={{ right: -20, bottom: -20, width: 260, padding: 24, overflow: "visible" }}>
-            <Image src="/mascot.png" alt="사주 마스코트" width={260} height={390} priority
-              style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 8px 32px rgba(147,51,234,0.4))" }} />
-          </div>
+        <section className="pt-12 pb-10 sm:pt-20 sm:pb-16 relative" style={{ overflow: "visible" }}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-16">
 
-          {/* 플로팅 장식 별 */}
-          <span className="absolute top-8 left-[8%] text-2xl star-1 pointer-events-none select-none" style={{ color: "#ec4899" }}>✦</span>
-          <span className="absolute top-20 right-[10%] text-lg star-2 pointer-events-none select-none" style={{ color: "#a78bfa" }}>✦</span>
-          <span className="absolute bottom-24 left-[15%] text-base star-3 pointer-events-none select-none" style={{ color: "#f472b6" }}>◆</span>
-          <span className="absolute bottom-16 right-[12%] text-xl star-4 pointer-events-none select-none" style={{ color: "#818cf8" }}>✦</span>
+            {/* ─ 텍스트 영역 ─ */}
+            <div className="flex-1 min-w-0">
 
-          {/* 스파클 아이콘 */}
-          <div className="flex justify-center mb-5">
-            <div className="relative">
-              <span className="text-4xl" style={{ filter: "drop-shadow(0 0 20px rgba(236,72,153,0.5))" }}>✦</span>
-              <span className="text-2xl absolute -top-2 -right-4" style={{ filter: "drop-shadow(0 0 12px rgba(167,139,250,0.6))" }}>✦</span>
-            </div>
-          </div>
+              {/* 실시간 활동 피드 */}
+              <div className="flex justify-center sm:justify-start mb-7">
+                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80" }} />
+                  <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
+                    {renderActivity(ACTIVITY_ENTRIES[activityIndex], lang)}
+                  </span>
+                </div>
+              </div>
 
-          {/* 실시간 카운터 */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
-              <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
-                {renderActivity(ACTIVITY_ENTRIES[activityIndex], lang)}
-              </span>
-            </div>
-          </div>
+              {/* 헤드라인 */}
+              <div className="text-center sm:text-left mb-6 pr-24 sm:pr-0">
+                <h1 className="font-black leading-[1.08] text-white"
+                  style={{ fontSize: "clamp(2.4rem, 6vw, 3.5rem)", letterSpacing: "-0.035em" }}>
+                  {t.h1[0]}<br />
+                  <span style={{
+                    background: "linear-gradient(110deg, #f472b6 0%, #c084fc 50%, #818cf8 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}>{t.h1[1]}</span><br />
+                  {t.h1[2]}
+                </h1>
+              </div>
 
-          {/* 메인 헤드라인 */}
-          <div className="mb-3 max-w-md mx-auto px-2">
-            <h1 className="text-4xl sm:text-5xl font-black leading-tight mb-4 text-white" style={{ letterSpacing: "-0.02em" }}>
-              {t.h1[0]}<br />
-              <span style={{ color: "#f472b6" }}>{t.h1[1]}</span><br />
-              {t.h1[2]}
-            </h1>
-          </div>
-
-
-          {/* 신뢰 메시지 */}
-          <div className="max-w-sm sm:max-w-xl mx-auto px-4 mb-6">
-            <div className="rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <p className="text-sm sm:text-base font-bold mb-4 text-center sm:text-left" style={{ color: "rgba(255,255,255,0.92)" }}>
-                {t.trustHeadline}
-              </p>
-              <ul className="space-y-2.5">
+              {/* 신뢰 포인트 */}
+              <ul className="space-y-2 mb-8 max-w-sm mx-auto sm:mx-0">
                 {t.trustBullets.map((bullet, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
-                    <span className="shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>·</span>
+                  <li key={i} className="flex items-start gap-2.5 text-[13px] leading-relaxed text-center sm:text-left" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <span className="shrink-0 mt-[5px] w-1 h-1 rounded-full" style={{ background: "rgba(192,132,252,0.7)", minWidth: 4, minHeight: 4 }} />
                     <span dangerouslySetInnerHTML={{ __html: bullet }} />
                   </li>
                 ))}
               </ul>
+
+              {/* CTA 버튼 */}
+              <div className="max-w-sm mx-auto sm:mx-0 mb-5">
+                <button
+                  onClick={() => router.push("/service/manseryeok")}
+                  className="cta-btn w-full font-black text-base py-4 rounded-2xl transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, #be185d 0%, #7c3aed 100%)",
+                    color: "#fff",
+                    letterSpacing: "-0.01em",
+                    boxShadow: "0 2px 32px rgba(190,24,93,0.25), 0 0 0 1px rgba(255,255,255,0.06) inset",
+                  }}
+                >
+                  {t.heroCta}
+                </button>
+              </div>
+
+              {/* 신뢰 지표 */}
+              <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+                <div className="flex items-center gap-1 text-[11px]" style={{ color: "rgba(255,255,255,0.38)" }}>
+                  <span style={{ color: "#f5c518", letterSpacing: 1 }}>★★★★★</span>
+                  <span className="font-bold ml-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>4.7</span>
+                  <span className="ml-0.5">{t.ratingLabel}</span>
+                </div>
+                <span style={{ color: "rgba(255,255,255,0.12)" }}>|</span>
+                <div className="text-[11px]" style={{ color: "rgba(255,255,255,0.38)" }}>
+                  {t.counterLabel.split('{n}')[0]}
+                  <strong style={{ color: "rgba(255,255,255,0.6)" }}>{counter.toLocaleString()}</strong>
+                  {t.counterLabel.split('{n}')[1]}
+                </div>
+              </div>
+            </div>
+
+            {/* ─ 마스코트 (데스크탑) ─ */}
+            <div className="hidden sm:flex shrink-0 items-end justify-center self-end"
+              style={{ width: 220 }}>
+              <Image src="/mascot.png" alt="" width={220} height={330} priority
+                style={{ width: "100%", height: "auto", filter: "drop-shadow(0 24px 64px rgba(124,58,237,0.45))" }} />
             </div>
           </div>
 
-          {/* CTA 버튼 — 전체 너비 핑크-퍼플 */}
-          <div className="max-w-sm mx-auto px-4 mb-4">
-            <button
-              onClick={() => router.push("/service/manseryeok")}
-              className="cta-btn w-full font-black text-lg py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
-              style={{
-                background: "linear-gradient(135deg, #db2777, #9333ea)",
-                color: "#fff",
-                boxShadow: "0 0 40px rgba(219,39,119,0.35), 0 0 80px rgba(147,51,234,0.2)",
-              }}
-            >
-              {t.heroCta}
-            </button>
+          {/* 마스코트 (모바일 — 우상단 absolute) */}
+          <div className="absolute pointer-events-none select-none sm:hidden"
+            style={{ right: -8, top: 4, width: 96, opacity: 0.9 }}>
+            <Image src="/mascot.png" alt="" width={96} height={144} priority
+              style={{ width: "100%", height: "auto", filter: "drop-shadow(0 8px 24px rgba(124,58,237,0.5))" }} />
           </div>
-
-          {/* 별점 + 누적 */}
-          <div className="flex items-center justify-center gap-4 flex-wrap mt-4">
-            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
-              style={{ background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.18)", color: "rgba(255,255,255,0.55)" }}>
-              <span style={{ color: "#f5c518" }}>★★★★★</span>
-              <span className="font-bold" style={{ color: "#f5c518" }}>4.7</span>
-              <span>{t.ratingLabel}</span>
-            </div>
-            <div className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>
-              <span>{t.counterLabel.split('{n}')[0]}<strong style={{ color: "rgba(255,255,255,0.8)" }}>{counter.toLocaleString()}</strong>{t.counterLabel.split('{n}')[1]}</span>
-            </div>
-          </div>
-
         </section>
 
         {/* ── 공지사항 (1줄 롤링) ── */}
-        <section className="mb-10">
+        <section className="mb-8">
           <div
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-[1.01]"
-            style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.15)" }}
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-opacity hover:opacity-80"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
             onClick={() => router.push("/notice")}
           >
             <span className="text-xs font-bold shrink-0" style={{ color: "#fbbf24" }}>📢</span>
@@ -1507,11 +1499,11 @@ export default function MainPage() {
         <section id="services-section" className="mb-16" style={{ scrollMarginTop: "72px" }}>
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-xs font-black mb-1.5 tracking-widest uppercase shimmer-text">✦ AI SERVICES</p>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.servicesHeading}</h2>
+              <p className="text-[10px] font-bold mb-1.5 tracking-[0.2em] uppercase" style={{ color: "rgba(139,92,246,0.7)" }}>AI SERVICES</p>
+              <h2 className="text-xl sm:text-2xl font-black text-white" style={{ letterSpacing: "-0.02em" }}>{t.servicesHeading}</h2>
             </div>
-            <span className="text-xs px-3 py-1 rounded-full font-bold"
-              style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#3b82f6" }}>
+            <span className="text-[11px] px-3 py-1 rounded-full font-semibold"
+              style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)", color: "rgba(139,92,246,0.8)" }}>
               {SERVICES.filter(s => s.categories.includes(activeCategory)).length}{t.servicesCountUnit}
             </span>
           </div>
