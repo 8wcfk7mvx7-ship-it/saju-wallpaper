@@ -189,7 +189,7 @@ export default function FirstImpressionPage() {
             </div>
 
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
               내 첫인상 확인하기
             </button>
           </FadeIn>

@@ -303,7 +303,7 @@ function SpyContent() {
 
           <FadeIn delay={400} className="w-full">
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-red-700 to-rose-600 hover:from-red-600 hover:to-rose-500 text-white shadow-lg shadow-red-900/50 transition-all active:scale-[0.98]">
               염탐 시작하기
             </button>
           </FadeIn>

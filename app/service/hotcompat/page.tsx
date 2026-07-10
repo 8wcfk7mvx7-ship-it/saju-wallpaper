@@ -572,7 +572,7 @@ function HotCompatContent() {
           </FadeIn>
           <FadeIn delay={300} className="w-full">
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
               성적 케미 분석하기
             </button>
           </FadeIn>

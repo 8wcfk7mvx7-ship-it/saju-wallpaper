@@ -121,7 +121,7 @@ export default function SoloPage() {
 
           <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
-            className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-indigo-700 to-violet-600 hover:from-indigo-600 hover:to-violet-500 text-white shadow-lg shadow-indigo-900/50 transition-all active:scale-[0.98]">
+            className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-indigo-700 to-violet-600 hover:from-indigo-600 hover:to-violet-500 text-white shadow-lg shadow-indigo-900/50 transition-all active:scale-[0.98]">
             내 결혼·비혼 적합도 확인하기
           </button>
           </FadeIn>

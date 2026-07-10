@@ -104,7 +104,7 @@ export default function SidejobPage() {
             </div>
 
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/50 transition-all active:scale-[0.98]">
               내 투잡 가능성 확인하기
             </button>
           </FadeIn>

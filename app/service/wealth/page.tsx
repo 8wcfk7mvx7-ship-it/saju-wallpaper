@@ -116,7 +116,7 @@ export default function WealthPage() {
 
           <FadeIn delay={560}>
           <button onClick={() => setStep("form")}
-            className="w-full px-6 py-4 rounded-2xl font-black text-base tracking-tight bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
+            className="w-full px-6 py-5 rounded-2xl font-black text-base tracking-tight bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-900/50 transition-all active:scale-[0.98]">
             내 재물운 확인하기
           </button>
           </FadeIn>

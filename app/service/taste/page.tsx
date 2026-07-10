@@ -418,7 +418,7 @@ export default function TastePage() {
             <BirthInputForm value={form} onChange={setForm} accent="#d97706" />
 
             <button onClick={handleAnalyze} disabled={!ready}
-              className={`w-full py-4 rounded-2xl font-black text-lg tracking-tight transition-all active:scale-[0.98] ${
+              className={`w-full py-5 rounded-2xl font-black text-lg tracking-tight transition-all active:scale-[0.98] ${
                 ready ? "text-[#1a0f00] shadow-lg" : "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"
               }`}
               style={ready ? { background: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)", boxShadow: "0 8px 32px -4px rgba(217,119,6,0.4)" } : {}}>

@@ -50,7 +50,7 @@ export default function AdultGatePage() {
           <FadeIn delay={300}>
             <button
               onClick={() => setConfirmed(true)}
-              className="w-full py-4 rounded-2xl font-black text-white text-base mb-3 transition-all active:scale-[0.98]"
+              className="w-full py-5 rounded-2xl font-black text-white text-lg mb-3 transition-all active:scale-[0.98]"
               style={{ background: "linear-gradient(135deg, #7c3aed, #dc2626)" }}
             >
               만 19세 이상입니다 — 입장하기
