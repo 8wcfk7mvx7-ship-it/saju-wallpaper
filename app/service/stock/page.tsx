@@ -509,7 +509,7 @@ export default function StockPage() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition" />
             </div>
             <button onClick={handleAnalyze}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-emerald-900/40">
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-5 rounded-2xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-emerald-900/40">
               📈 내 사주 투자 성향 분석하기
             </button>
           </div>

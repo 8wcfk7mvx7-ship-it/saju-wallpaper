@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseClient";
 import LoginOptions from "@/components/LoginOptions";
@@ -67,7 +67,9 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        <LoginOptions />
+        <Suspense>
+          <LoginOptions />
+        </Suspense>
 
         <p className="text-center text-xs text-gray-500 mt-6">
           아직 계정이 없으신가요?{" "}

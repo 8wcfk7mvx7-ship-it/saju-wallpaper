@@ -323,7 +323,7 @@ export default function DohwasalPage() {
             </div>
 
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
               내 도화살 확인하기
             </button>
           </FadeIn>

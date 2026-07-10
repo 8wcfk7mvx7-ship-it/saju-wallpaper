@@ -399,7 +399,7 @@ function calcChem(r1: SajuResult, r2: SajuResult): ChemResult {
   // 일주 충 + 오행 상생 → 싸우고 섹스로 풀기
   const JIJI_EL: Record<string,string> = { 자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수" };
   const SAENG_MAP: Record<string,string> = { 목:"화", 화:"토", 토:"금", 금:"수", 수:"목" };
-  const iljiChung = JIJI_CHUNG_PAIRS.some(([a,b]) => (a===ij1&&b===ij2)||(a===ij2&&b===ij1));
+  const iljiChung = JIJI_CHUNG_LIST.some(c => (c.a===ij1&&c.b===ij2)||(c.a===ij2&&c.b===ij1));
   if (iljiChung) {
     const el1 = JIJI_EL[ij1];
     const el2 = JIJI_EL[ij2];
@@ -572,7 +572,7 @@ function HotCompatContent() {
           </FadeIn>
           <FadeIn delay={300} className="w-full">
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-lg shadow-rose-900/50 transition-all active:scale-[0.98]">
               성적 케미 분석하기
             </button>
           </FadeIn>

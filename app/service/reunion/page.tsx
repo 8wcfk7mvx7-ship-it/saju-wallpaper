@@ -271,7 +271,7 @@ export default function ReunionPage() {
           <FadeIn delay={300}>
             <button
               onClick={() => setStep("my")}
-              className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
+              className="w-full py-5 rounded-2xl font-black text-lg transition-all active:scale-[0.98]"
               style={{ background: "linear-gradient(135deg, #ea580c, #f97316)", color: "#fff", boxShadow: "0 8px 32px rgba(234,88,12,0.45)" }}
             >
               재회 가능성 확인하기 →

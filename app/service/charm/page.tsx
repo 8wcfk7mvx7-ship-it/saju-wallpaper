@@ -312,7 +312,7 @@ export default function CharmPage() {
         <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 space-y-6 shadow-2xl shadow-black/40">
           <BirthInputForm value={birthData} onChange={setBirthData} accent="#a855f7" />
           <button onClick={handleAnalyze}
-            className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-pink-900/40">
+            className="w-full bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-bold py-5 rounded-2xl transition-all active:scale-[0.98] text-lg shadow-lg shadow-pink-900/40">
             ✨ 내 숨은 매력 분석하기
           </button>
         </div>

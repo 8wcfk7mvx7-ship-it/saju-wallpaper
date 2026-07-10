@@ -107,7 +107,7 @@ export default function ChildPage() {
 
           <FadeIn delay={300} className="w-full">
             <button onClick={() => setStep("form")}
-              className="w-full py-4 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-700 to-emerald-600 hover:from-cyan-600 hover:to-emerald-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
+              className="w-full py-5 rounded-2xl font-black text-lg tracking-tight bg-gradient-to-r from-cyan-700 to-emerald-600 hover:from-cyan-600 hover:to-emerald-500 text-white shadow-lg shadow-cyan-900/50 transition-all active:scale-[0.98]">
               내 자녀운 확인하기
             </button>
           </FadeIn>
