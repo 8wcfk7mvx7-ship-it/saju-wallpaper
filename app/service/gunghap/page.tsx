@@ -658,9 +658,9 @@ export default function GunghapPage(){
                   <BirthInputForm value={p2.birthData} onChange={v=>setP2({...p2,birthData:v})} accent="#818cf8" showName={false} />
                 </div>
                 <button onClick={calc} style={{
-                  width:'100%',marginTop:18,padding:'18px',borderRadius:16,border:'none',
+                  width:'100%',marginTop:18,padding:'20px',borderRadius:16,border:'none',
                   background:'linear-gradient(135deg,#7c3aed,#6366f1)',color:'#fff',
-                  fontSize:16,fontWeight:900,cursor:'pointer',
+                  fontSize:'1.125rem',fontWeight:900,cursor:'pointer',
                   boxShadow:'0 8px 28px rgba(124,58,237,0.45)'}}>
                   💑 사주 궁합 분석하기
                 </button>
