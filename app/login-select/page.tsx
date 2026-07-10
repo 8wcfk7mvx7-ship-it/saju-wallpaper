@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import LoginOptions from "@/components/LoginOptions";
 import BackButton from "@/components/BackButton";
 
@@ -10,7 +11,9 @@ export default function LoginSelectPage() {
         <div className="w-full max-w-2xl">
           <h1 className="text-xl font-black text-center mb-1">로그인</h1>
           <p className="text-sm text-gray-500 text-center mb-8">간편하게 로그인하고 별조각을 안전하게 보관하세요.</p>
-          <LoginOptions />
+          <Suspense>
+            <LoginOptions />
+          </Suspense>
         </div>
       </div>
     </main>
