@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AdBanner from "@/components/AdBanner";
 
 const LOADING_MESSAGES_KO = [
   "사주팔자를 계산하고 있어요...",
@@ -151,7 +150,6 @@ export default function LoadingPage() {
           />
         </div>
 
-        <AdBanner />
 
         {/* 사주 팁 */}
         <div className="bg-indigo-900/30 border border-indigo-500/20 rounded-2xl p-5">

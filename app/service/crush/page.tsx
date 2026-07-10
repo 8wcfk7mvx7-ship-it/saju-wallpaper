@@ -12,7 +12,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 import { useRouter } from "next/navigation";
-import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import {
   analyzeSaju, ILGAN_PERSONALITY, getDisplaySinsalList, type SajuResult,
@@ -477,7 +476,6 @@ export default function CrushPage() {
             style={{ animation: `bounce 1.2s ease ${i * 0.2}s infinite`, animationName: "pulse" }} />
         ))}
       </div>
-      <AdBanner className="max-w-sm" />
     </main>
   );
 

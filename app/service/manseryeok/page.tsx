@@ -11,7 +11,6 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
     </div>
   );
 }
-import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import BirthInputForm, { type BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
 import {
@@ -1686,7 +1685,6 @@ export default function ManseryeokPage() {
           <p className="text-white font-bold text-lg mb-2">사주 완전 분석 중...</p>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>사주 구조·필요 기운·일주론·신살·대운 계산 중</p>
         </div>
-        <AdBanner className="max-w-sm" />
       </div>
     );
   }

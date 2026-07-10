@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import AdBanner from "@/components/AdBanner";
 import BackButton from "@/components/BackButton";
 import StarShower from "@/components/StarShower";
 import BirthInputForm, { BirthFormData, defaultBirthData } from "@/components/BirthInputForm";
@@ -372,7 +371,6 @@ export default function ReunionPage() {
                 style={{ animationDelay: `${i * 0.15}s` }} />
             ))}
           </div>
-          <AdBanner className="max-w-sm mt-4" />
         </div>
       </main>
     );

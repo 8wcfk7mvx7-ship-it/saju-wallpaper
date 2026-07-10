@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import AdBanner from "@/components/AdBanner";
 
 // ─────────────────────────────────────────────
 // 타입
@@ -318,8 +317,6 @@ function GeneratingContent() {
       {!done && !error && (
         <div className="w-full max-w-2xl">
           <p className="text-xs text-gray-600 text-center mb-2">AI 생성에는 약 1-2분이 소요됩니다 ☕</p>
-          {/* 광고 1: 배너 */}
-          <AdBanner />
 
           {/* 사주 팁 카드 (광고 사이 컨텐츠) */}
           <div className="bg-white/3 border border-white/8 rounded-xl p-4 my-4 text-center">
@@ -328,9 +325,6 @@ function GeneratingContent() {
               사주팔자에서 일주(日柱)는 현재의 나를, 월주(月柱)는 환경과 부모를, 연주(年柱)는 조상과 초년 운을 나타냅니다.
             </p>
           </div>
-
-          {/* 광고 2 */}
-          <AdBanner />
         </div>
       )}
     </div>

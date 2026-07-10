@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import AdBanner from "@/components/AdBanner";
 
 const KakaoLoginButton = dynamic(() => import("@/components/KakaoLoginButton"), { ssr: false });
 const IljinCalendar = dynamic(() => import("@/components/IljinCalendar"), { ssr: false });
@@ -1484,11 +1483,6 @@ export default function MainPage() {
             <span className="text-gray-600 text-xs shrink-0">›</span>
           </div>
         </section>
-
-        {/* ── 광고 배너 ── */}
-        <div className="mb-6">
-          <AdBanner />
-        </div>
 
         {/* ── 면책 공지 ── */}
         <p className="text-center mb-6" style={{ color: "rgba(255,255,255,0.18)", fontSize: 10 }}>
