@@ -21,6 +21,7 @@ body {
   color: var(--foreground);
   word-break: keep-all;
   overflow-wrap: break-word;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* ── 배경 폭포 문양: 있는둥 없는둥, 아주 옅게 흐르는 세로 결 ── */

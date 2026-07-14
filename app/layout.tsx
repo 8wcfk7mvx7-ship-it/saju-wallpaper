@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import AutoLogout from "@/components/AutoLogout";
 import SiteHeader from "@/components/SiteHeader";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import NativeBridge from "@/components/NativeBridge";
 import PageViewTracker from "@/components/PageViewTracker";
-
-const chosun = localFont({
-  src: "./fonts/ChosunilboMyungjo.woff",
-  variable: "--font-chosun",
-  display: "swap",
-  preload: true,
-});
 
 export const metadata: Metadata = {
   title: { default: "여름궁전(Summer Palace) — AI 사주 명리 분석", template: "%s | Summer Palace" },
@@ -87,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`h-full antialiased ${chosun.variable}`} suppressHydrationWarning>
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -100,7 +92,7 @@ export default function RootLayout({
         />
         <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
-      <body className={`min-h-full flex flex-col ${chosun.className}`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <div className="bg-waterfall" aria-hidden="true" />
         <AutoLogout />
         <NativeBridge />
