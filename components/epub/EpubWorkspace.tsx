@@ -15,6 +15,7 @@ import { loadDraft, listProjects, loadProject, saveDraft, saveProject, type Proj
 import { saveEpubFile } from "@/lib/epub/download";
 import { countMatches, replaceAllInBook } from "@/lib/epub/findReplace";
 import { validateBook } from "@/lib/epub/validate";
+import { docxToChapters } from "@/lib/epub/docxImport";
 import BookMetaBar from "./BookMetaBar";
 import EditorPane from "./EditorPane";
 import PreviewPane from "./PreviewPane";
@@ -540,6 +541,18 @@ export default function EpubWorkspace() {
     resetHistory();
   }
 
+  /** Word(.docx) 파일을 읽어 새 챕터(들)로 만들어 현재 책 끝에 이어 붙인다(기존 내용은 건드리지 않는다). */
+  async function handleImportDocx(file: File) {
+    try {
+      const imported = await docxToChapters(file);
+      mutate(prev => ({ ...prev, chapters: [...prev.chapters, ...imported] }));
+      setActiveChapterId(imported[0].id);
+    } catch (err) {
+      console.error("Word 파일 가져오기 실패", err);
+      alert("이 파일을 읽지 못했어요. .docx 파일이 맞는지 확인해 주세요.");
+    }
+  }
+
   // ── 찾아 바꾸기 ──
   const findMatchCount = useMemo(() => countMatches(book, findQuery), [book, findQuery]);
 
@@ -620,6 +633,7 @@ export default function EpubWorkspace() {
         onSaveProject={handleSaveProject}
         onSaveAsProject={handleSaveAsProject}
         onOpenProject={handleOpenProject}
+        onImportDocx={handleImportDocx}
         onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
         onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
         onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}

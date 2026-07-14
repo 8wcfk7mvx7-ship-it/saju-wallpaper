@@ -33,6 +33,7 @@ interface Props {
   onSaveProject: () => void;
   onSaveAsProject: () => void;
   onOpenProject: (id: string) => void;
+  onImportDocx: (file: File) => void;
   onChangeTitle: (title: string) => void;
   onChangeSubtitle: (subtitle: string) => void;
   onChangeAuthor: (author: string) => void;
@@ -52,7 +53,7 @@ export default function BookMetaBar({
   title, subtitle, author, publisher, isbn, description, date, coverImage, publisherLogo, fontId, exporting, canUndo, canRedo, onUndo, onRedo,
   findReplaceOpen, onToggleFindReplace,
   focusMode, onToggleFocusMode, onToggleFullscreen,
-  projects, currentProjectId, onRefreshProjects, onNewProject, onSaveProject, onSaveAsProject, onOpenProject,
+  projects, currentProjectId, onRefreshProjects, onNewProject, onSaveProject, onSaveAsProject, onOpenProject, onImportDocx,
   onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangePublisher, onChangeIsbn, onChangeDescription, onChangeDate,
   onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
@@ -102,6 +103,7 @@ export default function BookMetaBar({
           onSave={onSaveProject}
           onSaveAs={onSaveAsProject}
           onOpenProject={onOpenProject}
+          onImportDocx={onImportDocx}
         />
 
         <div className="hidden sm:flex items-center gap-1 shrink-0">

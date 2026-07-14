@@ -10,6 +10,7 @@ interface Props {
   onSave: () => void;
   onSaveAs: () => void;
   onOpenProject: (id: string) => void;
+  onImportDocx: (file: File) => void;
 }
 
 function formatDate(ts: number): string {
@@ -17,9 +18,10 @@ function formatDate(ts: number): string {
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export default function FileMenu({ projects, currentProjectId, onOpenMenu, onNew, onSave, onSaveAs, onOpenProject }: Props) {
+export default function FileMenu({ projects, currentProjectId, onOpenMenu, onNew, onSave, onSaveAs, onOpenProject, onImportDocx }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const docxInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -44,6 +46,18 @@ export default function FileMenu({ projects, currentProjectId, onOpenMenu, onNew
       >
         파일 ▾
       </button>
+      {/* 드롭다운이 닫혀도(파일 선택창이 뜬 사이 메뉴가 닫히므로) input이 사라지면 안 되기 때문에 항상 마운트해 둔다. */}
+      <input
+        ref={docxInputRef}
+        type="file"
+        accept=".docx"
+        className="hidden"
+        onChange={e => {
+          const file = e.target.files?.[0];
+          if (file) onImportDocx(file);
+          e.target.value = "";
+        }}
+      />
       {open && (
         <div
           className="absolute left-0 top-full mt-1 z-[150] rounded-xl overflow-hidden py-1 min-w-[220px]"
@@ -69,6 +83,15 @@ export default function FileMenu({ projects, currentProjectId, onOpenMenu, onNew
             style={{ color: "#2a2417" }}
           >
             다른 이름으로 저장...
+          </button>
+          <div className="my-1 border-t" style={{ borderColor: "rgba(0,0,0,0.08)" }} />
+          <button
+            onClick={() => { setOpen(false); docxInputRef.current?.click(); }}
+            className="w-full text-left px-3.5 py-2 text-sm font-semibold hover:bg-black/5"
+            style={{ color: "#2a2417" }}
+            title="Word(.docx)로 내보낸 원고를 챕터로 가져와요. 애플 Pages도 '내보내기 > Word'로 만들 수 있어요."
+          >
+            가져오기 (Word .docx)...
           </button>
 
           {projects.length > 0 && (
