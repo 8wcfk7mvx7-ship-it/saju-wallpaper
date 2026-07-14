@@ -20,6 +20,7 @@ interface Props {
   onAddParagraph: () => void;
   onAddTextBox: () => void;
   onAddImages: (files: FileList | File[]) => void;
+  onAddCopyright: () => void;
   onAddNote: (note: Note) => void;
   onChangeNote: (noteId: string, text: string) => void;
   onDeleteNote: (noteId: string) => void;
@@ -28,7 +29,7 @@ interface Props {
 export default function EditorPane(props: Props) {
   const {
     chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter,
-    onChangeBlock, onDeleteBlock, onMoveBlock, onSplitAt, onAddParagraph, onAddTextBox, onAddImages,
+    onChangeBlock, onDeleteBlock, onMoveBlock, onSplitAt, onAddParagraph, onAddTextBox, onAddImages, onAddCopyright,
     onAddNote, onChangeNote, onDeleteNote,
   } = props;
   const [dragOver, setDragOver] = useState(false);
@@ -108,6 +109,13 @@ export default function EditorPane(props: Props) {
             style={{ background: "rgba(96,165,250,0.12)", color: "#93c5fd" }}
           >
             + 이미지
+          </button>
+          <button
+            onClick={onAddCopyright}
+            className="text-xs font-bold px-3 py-1.5 rounded-full"
+            style={{ background: "rgba(245,197,24,0.12)", color: "#e8c964" }}
+          >
+            + 저작권 페이지
           </button>
           <input
             ref={fileInputRef}

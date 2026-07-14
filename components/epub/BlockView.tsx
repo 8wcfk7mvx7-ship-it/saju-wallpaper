@@ -85,6 +85,65 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
         </div>
       )}
 
+      {block.type === "copyright" && (
+        <div
+          className="rounded-lg p-3 space-y-2"
+          style={{ background: "rgba(245,197,24,0.05)", border: "1px dashed rgba(245,197,24,0.3)" }}
+        >
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded inline-block" style={{ background: "rgba(245,197,24,0.2)", color: "#e8c964" }}>
+            저작권(판권) 페이지
+          </span>
+          <input
+            value={block.title}
+            onChange={e => onChange({ ...block, title: e.target.value })}
+            placeholder="책 제목"
+            className="w-full bg-transparent outline-none text-sm font-bold"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              value={block.author}
+              onChange={e => onChange({ ...block, author: e.target.value })}
+              placeholder="지은이"
+              className="w-full bg-transparent outline-none text-xs"
+              style={{ color: "rgba(255,255,255,0.75)" }}
+            />
+            <input
+              value={block.date}
+              onChange={e => onChange({ ...block, date: e.target.value })}
+              placeholder="발행일 (자유 형식)"
+              className="w-full bg-transparent outline-none text-xs"
+              style={{ color: "rgba(255,255,255,0.75)" }}
+            />
+          </div>
+          <input
+            value={block.publisher}
+            onChange={e => onChange({ ...block, publisher: e.target.value })}
+            placeholder="출판사(선택)"
+            className="w-full bg-transparent outline-none text-xs"
+            style={{ color: "rgba(255,255,255,0.75)" }}
+          />
+          <textarea
+            value={block.body}
+            onChange={e => onChange({ ...block, body: e.target.value })}
+            placeholder="저작권 문구 등 원하는 내용을 직접 입력하세요. (예: ⓒ 2026 홍길동. All rights reserved.)"
+            rows={Math.max(3, block.body.split("\n").length)}
+            className="w-full bg-transparent outline-none resize-none text-xs leading-[1.7]"
+            style={{ color: "rgba(255,255,255,0.75)" }}
+          />
+          <div className="flex items-center gap-4 pt-1">
+            <label className="flex items-center gap-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <input type="checkbox" checked={block.showCover} onChange={e => onChange({ ...block, showCover: e.target.checked })} />
+              표지 이미지 포함
+            </label>
+            <label className="flex items-center gap-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <input type="checkbox" checked={block.showPublisherLogo} onChange={e => onChange({ ...block, showPublisherLogo: e.target.checked })} />
+              출판사 로고 포함
+            </label>
+          </div>
+        </div>
+      )}
+
       {block.type === "image" && (
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import type { Block, Book, Chapter, Note } from "./types";
 import { computeNoteNumbers, referencedNoteIds, splitTextByNoteRefs } from "./notes";
+import { getEpubFont, type EpubFontOption } from "./fonts";
 
 function escapeXml(input: string): string {
   return input
@@ -82,12 +83,21 @@ interface ResolvedImage {
   bytes: ArrayBuffer;
 }
 
+function mimeFromDataUrl(dataUrl: string): string {
+  return /^data:([^;]+);/.exec(dataUrl)?.[1] ?? "image/png";
+}
+
 async function dataUrlToBytes(dataUrl: string): Promise<{ bytes: ArrayBuffer; mediaType: string }> {
-  const match = /^data:([^;]+);base64,/.exec(dataUrl);
-  const mediaType = match?.[1] ?? "image/png";
+  const mediaType = mimeFromDataUrl(dataUrl);
   const res = await fetch(dataUrl);
   const bytes = await res.arrayBuffer();
   return { bytes, mediaType };
+}
+
+/** 표지/출판사 로고처럼 책 전체에서 한 장씩만 쓰는 이미지. OEBPS 기준 상대경로("images/xxx")를 돌려준다. */
+interface BookAssets {
+  coverPath: string | null;
+  publisherLogoPath: string | null;
 }
 
 async function collectImages(book: Book): Promise<ResolvedImage[]> {
@@ -105,7 +115,12 @@ async function collectImages(book: Book): Promise<ResolvedImage[]> {
   return images;
 }
 
-function blockToXhtml(block: Block, imageByBlockId: Map<string, ResolvedImage>, ctx: NoteRenderContext): string {
+function blockToXhtml(
+  block: Block,
+  imageByBlockId: Map<string, ResolvedImage>,
+  ctx: NoteRenderContext,
+  assets: BookAssets
+): string {
   switch (block.type) {
     case "paragraph": {
       const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx);
@@ -124,6 +139,22 @@ function blockToXhtml(block: Block, imageByBlockId: Map<string, ResolvedImage>, 
       const caption = block.caption.trim();
       const figcaption = caption ? `<figcaption>${escapeXml(caption)}</figcaption>` : "";
       return `<figure class="epub-image"><img src="../images/${resolved.fileName}" alt="${escapeXml(block.alt)}"/>${figcaption}</figure>`;
+    }
+    case "copyright": {
+      const parts: string[] = [];
+      if (block.showCover && assets.coverPath) {
+        parts.push(`<div class="cr-cover"><img src="../${assets.coverPath}" alt="표지"/></div>`);
+      }
+      parts.push(`<h2 class="cr-title">${escapeXml(block.title)}</h2>`);
+      if (block.author.trim()) parts.push(`<p class="cr-line">${escapeXml(block.author)}</p>`);
+      if (block.publisher.trim()) parts.push(`<p class="cr-line">${escapeXml(block.publisher)}</p>`);
+      if (block.date.trim()) parts.push(`<p class="cr-line cr-date">${escapeXml(block.date)}</p>`);
+      if (block.showPublisherLogo && assets.publisherLogoPath) {
+        parts.push(`<div class="cr-logo"><img src="../${assets.publisherLogoPath}" alt="출판사 로고"/></div>`);
+      }
+      const body = plainParagraphs(block.body);
+      if (body) parts.push(`<div class="cr-body">${body}</div>`);
+      return `<section class="copyright-page" epub:type="colophon">\n${parts.join("\n")}\n</section>`;
     }
   }
 }
@@ -146,13 +177,18 @@ function endnotesSection(chapter: Chapter, ctx: NoteRenderContext): string {
   return `<section epub:type="endnotes" class="endnotes"><h2>미주</h2>\n${items}\n</section>`;
 }
 
-function chapterToXhtml(chapter: Chapter, book: Book, imageByBlockId: Map<string, ResolvedImage>): string {
+function chapterToXhtml(
+  chapter: Chapter,
+  book: Book,
+  imageByBlockId: Map<string, ResolvedImage>,
+  assets: BookAssets
+): string {
   const ctx: NoteRenderContext = {
     noteById: new Map(chapter.notes.map(n => [n.id, n])),
     noteNumbers: computeNoteNumbers(chapter),
     renderedFootnotes: new Set(),
   };
-  const body = chapter.blocks.map(b => blockToXhtml(b, imageByBlockId, ctx)).join("\n");
+  const body = chapter.blocks.map(b => blockToXhtml(b, imageByBlockId, ctx, assets)).join("\n");
   const endnotes = endnotesSection(chapter, ctx);
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
@@ -219,7 +255,7 @@ ${navPoints}
 </ncx>`;
 }
 
-function contentOpf(book: Book, images: ResolvedImage[]): string {
+function contentOpf(book: Book, images: ResolvedImage[], assets: BookAssets, font: EpubFontOption): string {
   const modified = new Date().toISOString().replace(/\.\d+Z$/, "Z");
   const manifestChapters = book.chapters
     .map((c, i) => `<item id="chap${i + 1}" href="text/chapter-${i + 1}.xhtml" media-type="application/xhtml+xml"/>`)
@@ -231,10 +267,19 @@ function contentOpf(book: Book, images: ResolvedImage[]): string {
 
   let coverManifest = "";
   let coverMeta = "";
-  if (book.coverImage) {
-    coverManifest = `<item id="cover-image" href="images/cover.${MIME_EXT[/^data:([^;]+);/.exec(book.coverImage)?.[1] ?? "image/png"] ?? "png"}" media-type="${/^data:([^;]+);/.exec(book.coverImage)?.[1] ?? "image/png"}" properties="cover-image"/>`;
+  if (assets.coverPath && book.coverImage) {
+    coverManifest = `<item id="cover-image" href="${assets.coverPath}" media-type="${mimeFromDataUrl(book.coverImage)}" properties="cover-image"/>`;
     coverMeta = `<meta name="cover" content="cover-image"/>`;
   }
+
+  const logoManifest =
+    assets.publisherLogoPath && book.publisherLogo
+      ? `<item id="publisher-logo" href="${assets.publisherLogoPath}" media-type="${mimeFromDataUrl(book.publisherLogo)}"/>`
+      : "";
+
+  const fontManifest = font.embed
+    ? `<item id="epub-font" href="fonts/${font.embed.fileName}" media-type="${font.embed.mimeType}"/>`
+    : "";
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id" xml:lang="${book.language}">
@@ -243,6 +288,7 @@ function contentOpf(book: Book, images: ResolvedImage[]): string {
 <dc:title>${escapeXml(book.title)}</dc:title>
 <dc:language>${book.language}</dc:language>
 ${book.author ? `<dc:creator>${escapeXml(book.author)}</dc:creator>` : ""}
+${book.date.trim() ? `<dc:date>${escapeXml(book.date.trim())}</dc:date>` : ""}
 <meta property="dcterms:modified">${modified}</meta>
 ${coverMeta}
 </metadata>
@@ -250,7 +296,9 @@ ${coverMeta}
 <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
 <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
 <item id="css" href="css/style.css" media-type="text/css"/>
+${fontManifest}
 ${coverManifest}
+${logoManifest}
 ${manifestChapters}
 ${manifestImages}
 </manifest>
@@ -260,13 +308,24 @@ ${spineChapters}
 </package>`;
 }
 
-const STYLE_CSS = `
+function buildStyleCss(font: EpubFontOption): string {
+  const fontFace = font.embed
+    ? `@font-face {
+  font-family: '${font.embed.fontFamilyName}';
+  src: url('fonts/${font.embed.fileName}') format('${font.embed.format}');
+  font-weight: 400;
+  font-style: normal;
+}`
+    : "";
+
+  return `
+${fontFace}
 html, body {
   margin: 0;
   padding: 0;
 }
 body {
-  font-family: serif;
+  font-family: ${font.epubFontFamily};
   line-height: 1.8;
   padding: 1.2em;
 }
@@ -336,7 +395,42 @@ aside.footnote p, aside.endnote p {
   font-size: 1.1em;
   margin: 0 0 1em;
 }
+.copyright-page {
+  page-break-before: always;
+  text-align: center;
+  padding-top: 3em;
+}
+.copyright-page .cr-cover img {
+  max-width: 55%;
+  margin: 0 auto 2em;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.copyright-page .cr-title {
+  font-size: 1.3em;
+  margin: 0 0 0.8em;
+  page-break-before: avoid;
+}
+.copyright-page .cr-line {
+  margin: 0 0 0.3em;
+  text-indent: 0;
+  font-size: 0.9em;
+  color: #444;
+}
+.copyright-page .cr-logo img {
+  max-width: 30%;
+  margin: 1.5em auto 0;
+}
+.copyright-page .cr-body {
+  margin-top: 2em;
+  text-align: left;
+  font-size: 0.85em;
+  color: #555;
+}
+.copyright-page .cr-body p {
+  text-indent: 0;
+}
 `;
+}
 
 /** 브라우저에서 Book 데이터를 실제 .epub(zip) 파일로 빌드한다. */
 export async function buildEpub(book: Book): Promise<Blob> {
@@ -357,27 +451,44 @@ export async function buildEpub(book: Book): Promise<Blob> {
   const oebps = zip.folder("OEBPS")!;
   const images = await collectImages(book);
   const imageByBlockId = new Map(images.map(img => [img.block.id, img]));
-
-  oebps.file("content.opf", contentOpf(book, images));
-  oebps.file("nav.xhtml", navXhtml(book));
-  oebps.file("toc.ncx", tocNcx(book));
-  oebps.folder("css")!.file("style.css", STYLE_CSS);
-
-  const textFolder = oebps.folder("text")!;
-  book.chapters.forEach((chapter, i) => {
-    textFolder.file(`chapter-${i + 1}.xhtml`, chapterToXhtml(chapter, book, imageByBlockId));
-  });
+  const font = getEpubFont(book.fontId);
 
   const imagesFolder = oebps.folder("images")!;
   for (const img of images) {
     imagesFolder.file(img.fileName, img.bytes);
   }
 
+  const assets: BookAssets = { coverPath: null, publisherLogoPath: null };
+
   if (book.coverImage) {
     const { bytes, mediaType } = await dataUrlToBytes(book.coverImage);
     const ext = MIME_EXT[mediaType] ?? "png";
+    assets.coverPath = `images/cover.${ext}`;
     imagesFolder.file(`cover.${ext}`, bytes);
   }
+
+  if (book.publisherLogo) {
+    const { bytes, mediaType } = await dataUrlToBytes(book.publisherLogo);
+    const ext = MIME_EXT[mediaType] ?? "png";
+    assets.publisherLogoPath = `images/publisher-logo.${ext}`;
+    imagesFolder.file(`publisher-logo.${ext}`, bytes);
+  }
+
+  if (font.embed) {
+    const res = await fetch(font.embed.publicPath);
+    const bytes = await res.arrayBuffer();
+    oebps.folder("fonts")!.file(font.embed.fileName, bytes);
+  }
+
+  oebps.file("content.opf", contentOpf(book, images, assets, font));
+  oebps.file("nav.xhtml", navXhtml(book));
+  oebps.file("toc.ncx", tocNcx(book));
+  oebps.folder("css")!.file("style.css", buildStyleCss(font));
+
+  const textFolder = oebps.folder("text")!;
+  book.chapters.forEach((chapter, i) => {
+    textFolder.file(`chapter-${i + 1}.xhtml`, chapterToXhtml(chapter, book, imageByBlockId, assets));
+  });
 
   return zip.generateAsync({
     type: "blob",

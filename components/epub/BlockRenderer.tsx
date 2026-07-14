@@ -45,7 +45,12 @@ function ParagraphText({ text, ctx }: { text: string; ctx: NoteContext }) {
   );
 }
 
-export default function BlockRenderer({ block, ctx }: { block: Block; ctx: NoteContext }) {
+export interface BookAssets {
+  coverImage: string | null;
+  publisherLogo: string | null;
+}
+
+export default function BlockRenderer({ block, ctx, assets }: { block: Block; ctx: NoteContext; assets: BookAssets }) {
   if (block.type === "paragraph") {
     return <ParagraphText text={block.text} ctx={ctx} />;
   }
@@ -65,13 +70,36 @@ export default function BlockRenderer({ block, ctx }: { block: Block; ctx: NoteC
       </aside>
     );
   }
+  if (block.type === "image") {
+    return (
+      <figure style={{ margin: "1.5em 0", textAlign: "center" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={block.src} alt={block.alt} style={{ maxWidth: "100%", borderRadius: 4 }} />
+        {block.caption.trim() && (
+          <figcaption style={{ fontSize: "0.85em", opacity: 0.6, marginTop: "0.5em" }}>{block.caption}</figcaption>
+        )}
+      </figure>
+    );
+  }
   return (
-    <figure style={{ margin: "1.5em 0", textAlign: "center" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={block.src} alt={block.alt} style={{ maxWidth: "100%", borderRadius: 4 }} />
-      {block.caption.trim() && (
-        <figcaption style={{ fontSize: "0.85em", opacity: 0.6, marginTop: "0.5em" }}>{block.caption}</figcaption>
+    <section style={{ textAlign: "center", padding: "3em 0 1em", borderTop: "1px dashed rgba(0,0,0,0.15)" }}>
+      {block.showCover && assets.coverImage && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={assets.coverImage} alt="표지" style={{ maxWidth: "45%", margin: "0 auto 1.5em", boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} />
       )}
-    </figure>
+      <p style={{ fontWeight: 800, fontSize: "1.1em", margin: "0 0 0.6em" }}>{block.title}</p>
+      {block.author.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.author}</p>}
+      {block.publisher.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.publisher}</p>}
+      {block.date.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.date}</p>}
+      {block.showPublisherLogo && assets.publisherLogo && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={assets.publisherLogo} alt="출판사 로고" style={{ maxWidth: "25%", margin: "1.2em auto 0" }} />
+      )}
+      {block.body.trim() && (
+        <div style={{ textAlign: "left", marginTop: "1.5em", fontSize: "0.8em", opacity: 0.7 }}>
+          <ParagraphText text={block.body} ctx={ctx} />
+        </div>
+      )}
+    </section>
   );
 }

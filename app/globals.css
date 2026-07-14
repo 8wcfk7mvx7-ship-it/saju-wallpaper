@@ -172,3 +172,19 @@ html.native-app header.sticky.top-0 {
 .text-gray-400 { color: #b0bbc9 !important; }
 .text-gray-500 { color: #9aa8b8 !important; }
 .text-gray-600 { color: #8494a8 !important; }
+
+/* ── EPUB 편집기 무료 폰트 (lib/epub/fonts.ts와 이름을 맞춘다) ── */
+@font-face {
+  font-family: 'EpubNanumMyeongjo';
+  src: url('/fonts/epub/nanum-myeongjo.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EpubNanumGothic';
+  src: url('/fonts/epub/nanum-gothic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

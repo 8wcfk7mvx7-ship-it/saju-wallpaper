@@ -2,13 +2,16 @@
 import { useMemo } from "react";
 import type { Chapter } from "@/lib/epub/types";
 import { computeNoteNumbers, referencedNoteIds } from "@/lib/epub/notes";
-import BlockRenderer from "./BlockRenderer";
+import { getEpubFont, type EpubFontId } from "@/lib/epub/fonts";
+import BlockRenderer, { type BookAssets } from "./BlockRenderer";
 
 interface Props {
   chapter: Chapter;
   chapterIndex: number;
   chapterCount: number;
   fontSize: number;
+  fontId: EpubFontId;
+  assets: BookAssets;
   onFontSizeChange: (size: number) => void;
   onPrevChapter: () => void;
   onNextChapter: () => void;
@@ -18,8 +21,9 @@ const MIN_FONT = 13;
 const MAX_FONT = 30;
 
 export default function PreviewPane({
-  chapter, chapterIndex, chapterCount, fontSize, onFontSizeChange, onPrevChapter, onNextChapter,
+  chapter, chapterIndex, chapterCount, fontSize, fontId, assets, onFontSizeChange, onPrevChapter, onNextChapter,
 }: Props) {
+  const previewFontFamily = getEpubFont(fontId).previewFontFamily;
   const noteById = useMemo(() => new Map(chapter.notes.map(n => [n.id, n])), [chapter.notes]);
   const noteNumbers = useMemo(() => computeNoteNumbers(chapter), [chapter]);
   const noteCtx = useMemo(() => ({ noteById, noteNumbers }), [noteById, noteNumbers]);
@@ -74,14 +78,14 @@ export default function PreviewPane({
               fontSize,
               lineHeight: 1.8,
               color: "#1c1a14",
-              fontFamily: "var(--font-chosun), serif",
+              fontFamily: previewFontFamily,
               padding: "2rem 1.6rem",
               minHeight: 320,
             }}
           >
             <h1 style={{ fontSize: "1.3em", fontWeight: 800, margin: "0 0 1em" }}>{chapter.title}</h1>
             {chapter.blocks.map(block => (
-              <BlockRenderer key={block.id} block={block} ctx={noteCtx} />
+              <BlockRenderer key={block.id} block={block} ctx={noteCtx} assets={assets} />
             ))}
 
             {footnotes.length > 0 && (

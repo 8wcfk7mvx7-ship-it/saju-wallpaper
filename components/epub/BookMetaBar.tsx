@@ -1,27 +1,35 @@
 "use client";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EPUB_FONTS, type EpubFontId } from "@/lib/epub/fonts";
 
 interface Props {
   title: string;
   author: string;
+  date: string;
   coverImage: string | null;
+  publisherLogo: string | null;
+  fontId: EpubFontId;
   exporting: boolean;
   onChangeTitle: (title: string) => void;
   onChangeAuthor: (author: string) => void;
+  onChangeDate: (date: string) => void;
   onChangeCover: (file: File | null) => void;
+  onChangePublisherLogo: (file: File | null) => void;
+  onChangeFont: (fontId: EpubFontId) => void;
   onExport: () => void;
   view: "editor" | "preview";
   onChangeView: (view: "editor" | "preview") => void;
 }
 
 export default function BookMetaBar({
-  title, author, coverImage, exporting,
-  onChangeTitle, onChangeAuthor, onChangeCover, onExport,
+  title, author, date, coverImage, publisherLogo, fontId, exporting,
+  onChangeTitle, onChangeAuthor, onChangeDate, onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
 }: Props) {
   const router = useRouter();
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [showMeta, setShowMeta] = useState(false);
 
   return (
@@ -75,24 +83,45 @@ export default function BookMetaBar({
 
       {showMeta && (
         <div className="px-3 sm:px-4 pb-3 flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={() => coverInputRef.current?.click()}
-            className="shrink-0 w-16 h-20 rounded-lg overflow-hidden flex items-center justify-center text-[10px] font-bold"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.4)" }}
-          >
-            {coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={coverImage} alt="표지" className="w-full h-full object-cover" />
-            ) : (
-              "표지 추가"
-            )}
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => coverInputRef.current?.click()}
+              className="w-16 h-20 rounded-lg overflow-hidden flex items-center justify-center text-[10px] font-bold text-center leading-tight"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.4)" }}
+            >
+              {coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={coverImage} alt="표지" className="w-full h-full object-cover" />
+              ) : (
+                "표지 추가"
+              )}
+            </button>
+            <button
+              onClick={() => logoInputRef.current?.click()}
+              className="w-16 h-20 rounded-lg overflow-hidden flex items-center justify-center text-[10px] font-bold text-center leading-tight p-1"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.4)" }}
+            >
+              {publisherLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={publisherLogo} alt="출판사 로고" className="w-full h-full object-contain" />
+              ) : (
+                "출판사 로고"
+              )}
+            </button>
+          </div>
           <input
             ref={coverInputRef}
             type="file"
             accept="image/*"
             className="hidden"
             onChange={e => onChangeCover(e.target.files?.[0] ?? null)}
+          />
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={e => onChangePublisherLogo(e.target.files?.[0] ?? null)}
           />
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <input
@@ -109,6 +138,25 @@ export default function BookMetaBar({
               className="w-full bg-transparent outline-none text-sm border-b pb-1"
               style={{ color: "rgba(255,255,255,0.8)", borderColor: "rgba(255,255,255,0.1)" }}
             />
+            <div className="flex gap-2">
+              <input
+                value={date}
+                onChange={e => onChangeDate(e.target.value)}
+                placeholder="발행일 (자유 형식)"
+                className="flex-1 min-w-0 bg-transparent outline-none text-xs border-b pb-1"
+                style={{ color: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.1)" }}
+              />
+              <select
+                value={fontId}
+                onChange={e => onChangeFont(e.target.value as EpubFontId)}
+                className="bg-transparent outline-none text-xs border-b pb-1"
+                style={{ color: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.1)" }}
+              >
+                {EPUB_FONTS.map(f => (
+                  <option key={f.id} value={f.id} style={{ color: "#000" }}>{f.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       )}

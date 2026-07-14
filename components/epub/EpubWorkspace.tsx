@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
-  createBook, createChapter, createParagraphBlock, createTextBoxBlock, normalizeBook,
+  createBook, createChapter, createCopyrightBlock, createParagraphBlock, createTextBoxBlock, normalizeBook,
   type Block, type Book, type Note,
 } from "@/lib/epub/types";
+import type { EpubFontId } from "@/lib/epub/fonts";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
 import { extractNoteRefIds, stripNoteToken } from "@/lib/epub/notes";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
@@ -123,6 +124,11 @@ export default function EpubWorkspace() {
     updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createTextBoxBlock("")] }));
   }
 
+  function handleAddCopyright() {
+    const block = createCopyrightBlock(book);
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, block] }));
+  }
+
   async function handleAddImages(files: FileList | File[]) {
     const blocks = await imageBlocksFromFiles(files);
     if (blocks.length === 0) return;
@@ -189,6 +195,16 @@ export default function EpubWorkspace() {
     setBook(prev => ({ ...prev, coverImage: dataUrl }));
   }
 
+  async function handleChangePublisherLogo(file: File | null) {
+    if (!file) return;
+    const dataUrl = await readFileAsDataUrl(file);
+    setBook(prev => ({ ...prev, publisherLogo: dataUrl }));
+  }
+
+  function handleChangeFont(fontId: EpubFontId) {
+    setBook(prev => ({ ...prev, fontId }));
+  }
+
   async function handleExport() {
     setExporting(true);
     try {
@@ -207,11 +223,17 @@ export default function EpubWorkspace() {
       <BookMetaBar
         title={book.title}
         author={book.author}
+        date={book.date}
         coverImage={book.coverImage}
+        publisherLogo={book.publisherLogo}
+        fontId={book.fontId}
         exporting={exporting}
         onChangeTitle={t => setBook(prev => ({ ...prev, title: t }))}
         onChangeAuthor={a => setBook(prev => ({ ...prev, author: a }))}
+        onChangeDate={d => setBook(prev => ({ ...prev, date: d }))}
         onChangeCover={handleChangeCover}
+        onChangePublisherLogo={handleChangePublisherLogo}
+        onChangeFont={handleChangeFont}
         onExport={handleExport}
         view={mobileView}
         onChangeView={setMobileView}
@@ -234,6 +256,7 @@ export default function EpubWorkspace() {
             onAddParagraph={handleAddParagraph}
             onAddTextBox={handleAddTextBox}
             onAddImages={handleAddImages}
+            onAddCopyright={handleAddCopyright}
             onAddNote={handleAddNote}
             onChangeNote={handleChangeNote}
             onDeleteNote={handleDeleteNote}
@@ -249,6 +272,8 @@ export default function EpubWorkspace() {
             chapterIndex={activeChapterIndex}
             chapterCount={book.chapters.length}
             fontSize={book.previewFontSize}
+            fontId={book.fontId}
+            assets={{ coverImage: book.coverImage, publisherLogo: book.publisherLogo }}
             onFontSizeChange={size => setBook(prev => ({ ...prev, previewFontSize: size }))}
             onPrevChapter={() => {
               const target = book.chapters[activeChapterIndex - 1];
