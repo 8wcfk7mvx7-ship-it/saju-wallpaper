@@ -281,11 +281,19 @@ function contentOpf(book: Book, images: ResolvedImage[], assets: BookAssets, fon
     ? `<item id="epub-font" href="fonts/${font.embed.fileName}" media-type="${font.embed.mimeType}"/>`
     : "";
 
+  // 부제가 있으면 EPUB3 title-type 확장으로 주제목/부제를 구분해서 넣는다.
+  const titleMeta = book.subtitle.trim()
+    ? `<dc:title id="main-title">${escapeXml(book.title)}</dc:title>
+<meta refines="#main-title" property="title-type">main</meta>
+<dc:title id="subtitle">${escapeXml(book.subtitle.trim())}</dc:title>
+<meta refines="#subtitle" property="title-type">subtitle</meta>`
+    : `<dc:title>${escapeXml(book.title)}</dc:title>`;
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id" xml:lang="${book.language}">
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 <dc:identifier id="book-id">urn:uuid:${book.id}</dc:identifier>
-<dc:title>${escapeXml(book.title)}</dc:title>
+${titleMeta}
 <dc:language>${book.language}</dc:language>
 ${book.author ? `<dc:creator>${escapeXml(book.author)}</dc:creator>` : ""}
 ${book.date.trim() ? `<dc:date>${escapeXml(book.date.trim())}</dc:date>` : ""}

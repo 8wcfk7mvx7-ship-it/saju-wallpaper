@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
-  createBook, createChapter, createCopyrightBlock, createParagraphBlock, createTextBoxBlock, normalizeBook,
-  type Block, type Book, type Note,
+  createBook, createChapter, createCopyrightBlock, createNote, createParagraphBlock, createTextBoxBlock, normalizeBook,
+  type Block, type Book, type Note, type NoteKind, type ParagraphBlock, type TextBoxBlock,
 } from "@/lib/epub/types";
 import type { EpubFontId } from "@/lib/epub/fonts";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
-import { extractNoteRefIds, stripNoteToken } from "@/lib/epub/notes";
+import { referencedNoteIdsInBlocks, replaceRangeWithNoteToken, stripNoteToken } from "@/lib/epub/notes";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
 import { loadDraft, saveDraft } from "@/lib/epub/storage";
 import { saveEpubFile } from "@/lib/epub/download";
@@ -21,6 +21,20 @@ function readFileAsDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+}
+
+/** 문단/텍스트박스 블록 목록에서 특정 블록의 text만 계산해서 바꿔치기한다. */
+function updateBlockText(blocks: Block[], blockId: string, compute: (text: string) => string): Block[] {
+  return blocks.map(b => {
+    if (b.id !== blockId || (b.type !== "paragraph" && b.type !== "textbox")) return b;
+    return { ...b, text: compute(b.text) };
+  });
+}
+
+/** 같은 타입(문단/텍스트박스)의 새 블록을 만들되 내용은 지정한 텍스트로 채운다. id는 새로 발급된다. */
+function cloneTextBlockWithText(block: ParagraphBlock | TextBoxBlock, text: string): ParagraphBlock | TextBoxBlock {
+  if (block.type === "textbox") return { ...createTextBoxBlock(text), label: block.label };
+  return createParagraphBlock(text);
 }
 
 export default function EpubWorkspace() {
@@ -146,16 +160,8 @@ export default function EpubWorkspace() {
       const moved = chapter.blocks.slice(blockIdx + 1);
 
       // 각주/미주는 실제로 참조되는 쪽 챕터를 따라간다. 양쪽에서 참조되면(드묾) 둘 다에 남긴다.
-      const referencedIn = (blocks: Block[]) => {
-        const ids = new Set<string>();
-        for (const b of blocks) {
-          if (b.type !== "paragraph" && b.type !== "textbox") continue;
-          for (const id of extractNoteRefIds(b.text)) ids.add(id);
-        }
-        return ids;
-      };
-      const keepIds = referencedIn(keep);
-      const movedIds = referencedIn(moved);
+      const keepIds = referencedNoteIdsInBlocks(keep);
+      const movedIds = referencedNoteIdsInBlocks(moved);
       const keepNotes = chapter.notes.filter(n => keepIds.has(n.id) || !movedIds.has(n.id));
       const movedNotes = chapter.notes.filter(n => movedIds.has(n.id));
 
@@ -166,6 +172,78 @@ export default function EpubWorkspace() {
       chapters.splice(chapterIdx + 1, 0, newChapter);
       return { ...prev, chapters };
     });
+  }
+
+  /** 우클릭 메뉴: 드래그로 고른 글자를 뽑아 책 제목으로 쓰고, 본문에서는 지운다. */
+  function handleSetBookTitle(blockId: string, start: number, end: number) {
+    const block = activeChapter.blocks.find(b => b.id === blockId);
+    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    const selected = block.text.slice(start, end).trim();
+    if (!selected) return;
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
+    setBook(prev => ({ ...prev, title: selected }));
+  }
+
+  /** 우클릭 메뉴: 드래그로 고른 글자를 뽑아 책 부제로 쓰고, 본문에서는 지운다. */
+  function handleSetBookSubtitle(blockId: string, start: number, end: number) {
+    const block = activeChapter.blocks.find(b => b.id === blockId);
+    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    const selected = block.text.slice(start, end).trim();
+    if (!selected) return;
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
+    setBook(prev => ({ ...prev, subtitle: selected }));
+  }
+
+  /** 우클릭 메뉴: 드래그로 고른 글자를 새 챕터의 제목으로 삼아, 그 지점에서 챕터를 나눈다. */
+  function handleSplitAsChapter(blockId: string, start: number, end: number) {
+    const targetBlock = activeChapter.blocks.find(b => b.id === blockId);
+    if (!targetBlock || (targetBlock.type !== "paragraph" && targetBlock.type !== "textbox")) return;
+    const newTitle = targetBlock.text.slice(start, end).trim();
+    if (!newTitle) return;
+    const newChapterTemplate = createChapter(newTitle);
+
+    setBook(prev => {
+      const chapterIdx = prev.chapters.findIndex(c => c.id === activeChapter.id);
+      const chapter = prev.chapters[chapterIdx];
+      const idx = chapter.blocks.findIndex(b => b.id === blockId);
+      const block = chapter.blocks[idx];
+      if (idx < 0 || !block || (block.type !== "paragraph" && block.type !== "textbox")) return prev;
+
+      const beforeText = block.text.slice(0, start);
+      const afterText = block.text.slice(end);
+      const blocksBefore = chapter.blocks.slice(0, idx);
+      const blocksAfter = chapter.blocks.slice(idx + 1);
+      const keptBlock = { ...block, text: beforeText };
+      const newFirstBlock = cloneTextBlockWithText(block, afterText);
+      const keepBlocks = [...blocksBefore, keptBlock];
+      const movedBlocks = [newFirstBlock, ...blocksAfter];
+
+      const keepIds = referencedNoteIdsInBlocks(keepBlocks);
+      const movedIds = referencedNoteIdsInBlocks(movedBlocks);
+      const keepNotes = chapter.notes.filter(n => keepIds.has(n.id) || !movedIds.has(n.id));
+      const movedNotes = chapter.notes.filter(n => movedIds.has(n.id));
+
+      const newChapter = { ...newChapterTemplate, blocks: movedBlocks, notes: movedNotes };
+      const chapters = [...prev.chapters];
+      chapters[chapterIdx] = { ...chapter, blocks: keepBlocks, notes: keepNotes };
+      chapters.splice(chapterIdx + 1, 0, newChapter);
+      return { ...prev, chapters };
+    });
+    setActiveChapterId(newChapterTemplate.id);
+  }
+
+  /** 우클릭 메뉴: 드래그로 고른 글자를 각주/미주 내용으로 옮기고, 본문 자리에는 참조 표시만 남긴다. */
+  function handleConvertSelectionToNote(blockId: string, start: number, end: number, kind: NoteKind) {
+    const block = activeChapter.blocks.find(b => b.id === blockId);
+    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    const selected = block.text.slice(start, end).trim();
+    if (!selected) return;
+    const note: Note = { ...createNote(kind), text: selected };
+    updateChapter(activeChapter.id, c => ({
+      ...c,
+      notes: [...c.notes, note],
+      blocks: updateBlockText(c.blocks, blockId, t => replaceRangeWithNoteToken(t, start, end, note.id)),
+    }));
   }
 
   function handleAddNote(note: Note) {
@@ -222,6 +300,7 @@ export default function EpubWorkspace() {
     <div className="flex flex-col" style={{ height: "100dvh" }}>
       <BookMetaBar
         title={book.title}
+        subtitle={book.subtitle}
         author={book.author}
         date={book.date}
         coverImage={book.coverImage}
@@ -229,6 +308,7 @@ export default function EpubWorkspace() {
         fontId={book.fontId}
         exporting={exporting}
         onChangeTitle={t => setBook(prev => ({ ...prev, title: t }))}
+        onChangeSubtitle={s => setBook(prev => ({ ...prev, subtitle: s }))}
         onChangeAuthor={a => setBook(prev => ({ ...prev, author: a }))}
         onChangeDate={d => setBook(prev => ({ ...prev, date: d }))}
         onChangeCover={handleChangeCover}
@@ -260,6 +340,10 @@ export default function EpubWorkspace() {
             onAddNote={handleAddNote}
             onChangeNote={handleChangeNote}
             onDeleteNote={handleDeleteNote}
+            onSetBookTitle={handleSetBookTitle}
+            onSetBookSubtitle={handleSetBookSubtitle}
+            onSplitAsChapter={handleSplitAsChapter}
+            onConvertSelectionToNote={handleConvertSelectionToNote}
           />
         </div>
 

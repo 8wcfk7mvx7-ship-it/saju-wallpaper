@@ -28,13 +28,18 @@ export function computeNoteNumbers(chapter: Chapter): Map<string, number> {
   return numbers;
 }
 
-/** 본문 어딘가에서 실제로 참조되고 있는 노트 id 집합. */
-export function referencedNoteIds(chapter: Chapter): Set<string> {
+/** 블록 목록 어딘가에서 실제로 참조되고 있는 노트 id 집합. */
+export function referencedNoteIdsInBlocks(blocks: Block[]): Set<string> {
   const ids = new Set<string>();
-  for (const block of chapter.blocks) {
+  for (const block of blocks) {
     for (const id of extractNoteRefIds(blockText(block))) ids.add(id);
   }
   return ids;
+}
+
+/** 본문 어딘가에서 실제로 참조되고 있는 노트 id 집합. */
+export function referencedNoteIds(chapter: Chapter): Set<string> {
+  return referencedNoteIdsInBlocks(chapter.blocks);
 }
 
 export function insertNoteToken(text: string, cursor: number, noteId: string): { text: string; cursor: number } {
@@ -47,6 +52,11 @@ export function insertNoteToken(text: string, cursor: number, noteId: string): {
 /** 노트가 삭제되었을 때 본문에 남은 참조 토큰을 제거한다. */
 export function stripNoteToken(text: string, noteId: string): string {
   return text.replace(new RegExp(`\\[\\^${noteId}\\]`, "g"), "");
+}
+
+/** 우클릭 메뉴로 선택 영역을 각주/미주로 바꿀 때: 선택된 글자를 참조 토큰으로 치환한다. */
+export function replaceRangeWithNoteToken(text: string, start: number, end: number, noteId: string): string {
+  return text.slice(0, start) + `[^${noteId}]` + text.slice(end);
 }
 
 export interface TextSegment {

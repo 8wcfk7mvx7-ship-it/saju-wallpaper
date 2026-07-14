@@ -62,6 +62,8 @@ export interface Book {
   /** dc:identifier에 쓰이는 고정 UUID. 재수출해도 바뀌지 않는다. */
   id: string;
   title: string;
+  /** 선택 사항. 우클릭 메뉴에서 "부제로 설정"으로 지정. */
+  subtitle: string;
   author: string;
   language: string;
   /** 발행일 등 자유 텍스트(형식 자유). */
@@ -138,6 +140,7 @@ export function createBook(): Book {
   return {
     id: makeUuid(),
     title: "제목 없는 책",
+    subtitle: "",
     author: "",
     language: "ko",
     date: todayString(),
@@ -153,6 +156,7 @@ export function createBook(): Book {
 export function normalizeBook(book: Book): Book {
   return {
     ...book,
+    subtitle: book.subtitle ?? "",
     date: book.date ?? todayString(),
     publisherLogo: book.publisherLogo ?? null,
     fontId: book.fontId ?? "chosunilbo",

@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createNote, type Block, type Note, type NoteKind } from "@/lib/epub/types";
 import { insertNoteToken } from "@/lib/epub/notes";
+import SelectionMenu from "./SelectionMenu";
 
 interface Props {
   block: Block;
@@ -12,6 +13,17 @@ interface Props {
   onMove: (direction: -1 | 1) => void;
   onSplitHere: () => void;
   onAddNote: (note: Note) => void;
+  onSetBookTitle: (blockId: string, start: number, end: number) => void;
+  onSetBookSubtitle: (blockId: string, start: number, end: number) => void;
+  onSplitAsChapter: (blockId: string, start: number, end: number) => void;
+  onConvertSelectionToNote: (blockId: string, start: number, end: number, kind: NoteKind) => void;
+}
+
+interface SelectionState {
+  x: number;
+  y: number;
+  start: number;
+  end: number;
 }
 
 const btnStyle: CSSProperties = {
@@ -19,9 +31,13 @@ const btnStyle: CSSProperties = {
   background: "rgba(255,255,255,0.05)",
 };
 
-export default function BlockView({ block, isFirst, isLast, onChange, onDelete, onMove, onSplitHere, onAddNote }: Props) {
+export default function BlockView({
+  block, isFirst, isLast, onChange, onDelete, onMove, onSplitHere, onAddNote,
+  onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote,
+}: Props) {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const pendingCursor = useRef<number | null>(null);
+  const [selection, setSelection] = useState<SelectionState | null>(null);
 
   useEffect(() => {
     if (pendingCursor.current !== null && textAreaRef.current) {
@@ -42,6 +58,14 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
     onChange({ ...block, text });
   }
 
+  function handleContextMenu(e: React.MouseEvent<HTMLTextAreaElement>) {
+    const el = e.currentTarget;
+    const { selectionStart, selectionEnd } = el;
+    if (selectionStart === selectionEnd) return; // 선택된 글자가 없으면 기본 메뉴 그대로 둔다
+    e.preventDefault();
+    setSelection({ x: e.clientX, y: e.clientY, start: selectionStart, end: selectionEnd });
+  }
+
   return (
     <div className="group relative rounded-xl px-3 py-2.5" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
       {block.type === "paragraph" && (
@@ -49,6 +73,7 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
           ref={textAreaRef}
           value={block.text}
           onChange={e => onChange({ ...block, text: e.target.value })}
+          onContextMenu={handleContextMenu}
           placeholder="이어서 써보세요..."
           rows={Math.max(3, block.text.split("\n").length)}
           className="w-full bg-transparent outline-none resize-none text-[15px] leading-[1.8]"
@@ -77,6 +102,7 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
             ref={textAreaRef}
             value={block.text}
             onChange={e => onChange({ ...block, text: e.target.value })}
+            onContextMenu={handleContextMenu}
             placeholder="박스 안에 들어갈 내용을 써보세요..."
             rows={Math.max(3, block.text.split("\n").length)}
             className="w-full bg-transparent outline-none resize-none text-sm leading-[1.7]"
@@ -197,6 +223,21 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
           </button>
         )}
       </div>
+
+      {selection && (block.type === "paragraph" || block.type === "textbox") && (
+        <SelectionMenu
+          x={selection.x}
+          y={selection.y}
+          onClose={() => setSelection(null)}
+          items={[
+            { label: "제목으로 설정 (책 제목)", onClick: () => onSetBookTitle(block.id, selection.start, selection.end) },
+            { label: "부제로 설정 (책 부제)", onClick: () => onSetBookSubtitle(block.id, selection.start, selection.end) },
+            { label: "챕터로 설정 (여기서 새 챕터 시작)", onClick: () => onSplitAsChapter(block.id, selection.start, selection.end) },
+            { label: "각주로 설정", onClick: () => onConvertSelectionToNote(block.id, selection.start, selection.end, "footnote") },
+            { label: "미주로 설정", onClick: () => onConvertSelectionToNote(block.id, selection.start, selection.end, "endnote") },
+          ]}
+        />
+      )}
     </div>
   );
 }

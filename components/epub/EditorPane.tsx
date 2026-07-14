@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import type { Block, Chapter, Note } from "@/lib/epub/types";
+import type { Block, Chapter, Note, NoteKind } from "@/lib/epub/types";
 import ChapterRail from "./ChapterRail";
 import BlockView from "./BlockView";
 import NotesPanel from "./NotesPanel";
@@ -24,6 +24,10 @@ interface Props {
   onAddNote: (note: Note) => void;
   onChangeNote: (noteId: string, text: string) => void;
   onDeleteNote: (noteId: string) => void;
+  onSetBookTitle: (blockId: string, start: number, end: number) => void;
+  onSetBookSubtitle: (blockId: string, start: number, end: number) => void;
+  onSplitAsChapter: (blockId: string, start: number, end: number) => void;
+  onConvertSelectionToNote: (blockId: string, start: number, end: number, kind: NoteKind) => void;
 }
 
 export default function EditorPane(props: Props) {
@@ -31,6 +35,7 @@ export default function EditorPane(props: Props) {
     chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter,
     onChangeBlock, onDeleteBlock, onMoveBlock, onSplitAt, onAddParagraph, onAddTextBox, onAddImages, onAddCopyright,
     onAddNote, onChangeNote, onDeleteNote,
+    onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote,
   } = props;
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,6 +84,10 @@ export default function EditorPane(props: Props) {
               onMove={dir => onMoveBlock(block.id, dir)}
               onSplitHere={() => onSplitAt(block.id)}
               onAddNote={onAddNote}
+              onSetBookTitle={onSetBookTitle}
+              onSetBookSubtitle={onSetBookSubtitle}
+              onSplitAsChapter={onSplitAsChapter}
+              onConvertSelectionToNote={onConvertSelectionToNote}
             />
           ))}
         </div>

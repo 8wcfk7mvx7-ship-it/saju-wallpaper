@@ -5,6 +5,7 @@ import { EPUB_FONTS, type EpubFontId } from "@/lib/epub/fonts";
 
 interface Props {
   title: string;
+  subtitle: string;
   author: string;
   date: string;
   coverImage: string | null;
@@ -12,6 +13,7 @@ interface Props {
   fontId: EpubFontId;
   exporting: boolean;
   onChangeTitle: (title: string) => void;
+  onChangeSubtitle: (subtitle: string) => void;
   onChangeAuthor: (author: string) => void;
   onChangeDate: (date: string) => void;
   onChangeCover: (file: File | null) => void;
@@ -23,8 +25,8 @@ interface Props {
 }
 
 export default function BookMetaBar({
-  title, author, date, coverImage, publisherLogo, fontId, exporting,
-  onChangeTitle, onChangeAuthor, onChangeDate, onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
+  title, subtitle, author, date, coverImage, publisherLogo, fontId, exporting,
+  onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangeDate, onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
 }: Props) {
   const router = useRouter();
@@ -50,7 +52,7 @@ export default function BookMetaBar({
         >
           <p className="text-sm font-black truncate text-white">{title || "제목 없는 책"}</p>
           <p className="text-[11px] truncate" style={{ color: "rgba(255,255,255,0.4)" }}>
-            {author ? author : "책 정보 편집"}
+            {subtitle || author || "책 정보 편집"}
           </p>
         </button>
 
@@ -130,6 +132,13 @@ export default function BookMetaBar({
               placeholder="책 제목"
               className="w-full bg-transparent outline-none text-sm font-bold border-b pb-1"
               style={{ color: "#fff", borderColor: "rgba(255,255,255,0.1)" }}
+            />
+            <input
+              value={subtitle}
+              onChange={e => onChangeSubtitle(e.target.value)}
+              placeholder="부제(선택)"
+              className="w-full bg-transparent outline-none text-xs border-b pb-1"
+              style={{ color: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.1)" }}
             />
             <input
               value={author}
