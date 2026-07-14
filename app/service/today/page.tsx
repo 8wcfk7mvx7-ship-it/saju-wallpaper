@@ -803,6 +803,36 @@ export default function TodayFortunePage() {
     });
   }
 
+  // ── 직관 위젯 데이터 ──
+  const hapBonus = hasTodayHap;
+  const chungPenalty = hasTodayChung;
+  const moneyGrade = calcDomainGrade(todayGroup, todayUunseong, "재물", hapBonus, chungPenalty);
+  const loveGrade = calcDomainGrade(todayGroup, todayUunseong, "애정", hapBonus, chungPenalty);
+  const healthGrade = calcDomainGrade(todayGroup, todayUunseong, "건강", hapBonus, chungPenalty);
+  const studyGrade = calcDomainGrade(todayGroup, todayUunseong, "공부문서", hapBonus, chungPenalty);
+  const avgGrade = (moneyGrade + loveGrade + healthGrade + studyGrade) / 4;
+  const letterGrade = avgGrade <= 2 ? "S" : avgGrade <= 3.5 ? "A" : avgGrade <= 5 ? "B" : avgGrade <= 6.5 ? "C" : "D";
+  const letterColor = letterGrade === "S" ? "#22c55e" : letterGrade === "A" ? "#4ade80" : letterGrade === "B" ? "#60a5fa" : letterGrade === "C" ? "#fb923c" : "#f87171";
+
+  const MONEY_KEYWORD: Record<number, string> = { 1:"수익 기대", 2:"재물 좋음", 3:"소소한 이득", 4:"평이", 5:"평이", 6:"지출 조심", 7:"낭비 주의", 8:"손실 경계", 9:"재물 위험" };
+  const LOVE_KEYWORD: Record<number, string>  = { 1:"설레는 하루", 2:"애정 좋음", 3:"긍정적", 4:"평이", 5:"평이", 6:"오해 주의", 7:"감정 기복", 8:"갈등 주의", 9:"애정 위험" };
+  const HEALTH_KEYWORD: Record<number, string>= { 1:"컨디션 최상", 2:"활력 넘침", 3:"양호", 4:"평이", 5:"평이", 6:"피로 조심", 7:"무리 금지", 8:"건강 주의", 9:"건강 경계" };
+  const CAUTION_KEYWORD: Record<string, string> = {
+    비겁:"자존심 충돌", 식상:"과소비·피로", 재성:"과로·분산", 관성:"긴장·스트레스", 인성:"우유부단"
+  };
+  const MISSION_LIST: Record<string, string[]> = {
+    비겁: ["오늘 한 가지 결단 내리기", "내가 먼저 연락해보기", "짧은 운동 10분"],
+    식상: ["아이디어 3가지 메모하기", "새로운 음식 먹어보기", "좋아하는 음악 틀기"],
+    재성: ["지출 내역 한 번 확인하기", "고마운 사람에게 연락하기", "물 2리터 마시기"],
+    관성: ["오늘 할 일 목록 작성하기", "중요한 서류 한 가지 처리하기", "스트레칭 5분"],
+    인성: ["책 10페이지 읽기", "조용히 혼자만의 시간 갖기", "일찍 잠자리 들기"],
+  };
+  const todayMission = (() => {
+    const list = MISSION_LIST[todayGroup] ?? MISSION_LIST["비겁"];
+    const d = new Date();
+    return list[(d.getDate()) % list.length];
+  })();
+
   return (
     <main className="min-h-screen bg-[#06060e] text-white">
       <BackButton />
@@ -810,7 +840,7 @@ export default function TodayFortunePage() {
         <div className="absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full bg-slate-800/30 blur-[160px]" />
       </div>
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-6 pb-16" id="today-result">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <p className="text-gray-400 text-xs font-bold tracking-widest mb-2">TODAY&apos;S FORTUNE</p>
           <h1 className="text-2xl font-black leading-snug">
             {ilgan}{r.pillarsDetail.day.jj}일주 {form.name || "나"}님,<br />
@@ -827,6 +857,79 @@ export default function TodayFortunePage() {
             />
           </div>
         </div>
+
+        {/* ── 직관 요약 위젯 ── */}
+        <FadeIn delay={0}>
+        <div className="rounded-2xl mb-5 overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+          {/* 등급 + 총운 요약 */}
+          <div className="flex items-center gap-5 px-5 pt-5 pb-4">
+            <div className="shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-4xl font-black"
+              style={{ background: `${letterColor}18`, border: `2px solid ${letterColor}55`, color: letterColor, letterSpacing: "-0.05em" }}>
+              {letterGrade}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-gray-500 font-bold mb-1">오늘의 총운</p>
+              <p className="text-sm font-bold text-white leading-snug">
+                {letterGrade === "S" || letterGrade === "A"
+                  ? "흐름이 좋은 날이에요. 중요한 일은 오늘 처리하세요."
+                  : letterGrade === "B"
+                  ? "무난하게 흘러가는 날이에요. 평소처럼 차분하게."
+                  : letterGrade === "C"
+                  ? "조심스럽게 움직이는 게 좋은 날이에요."
+                  : "오늘은 새로운 시도보다 지키는 데 집중하세요."}
+              </p>
+            </div>
+          </div>
+
+          {/* 영역별 키워드 3개 */}
+          <div className="grid grid-cols-3 border-t border-white/[0.07]">
+            {[
+              { label: "재물운", keyword: MONEY_KEYWORD[moneyGrade] ?? "평이", grade: moneyGrade },
+              { label: "주의", keyword: CAUTION_KEYWORD[todayGroup] ?? "평이", grade: 5 },
+              { label: "애정운", keyword: LOVE_KEYWORD[loveGrade] ?? "평이", grade: loveGrade },
+            ].map((item, i) => {
+              const col = item.grade <= 3 ? "#4ade80" : item.grade <= 5 ? "#94a3b8" : item.label === "주의" ? "#fb923c" : "#fb923c";
+              return (
+                <div key={i} className={`px-3 py-3 text-center ${i < 2 ? "border-r border-white/[0.07]" : ""}`}>
+                  <p className="text-[10px] text-gray-500 font-bold mb-1">{item.label}</p>
+                  <p className="text-sm font-black" style={{ color: col }}>{item.keyword}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 오늘의 미션 */}
+          <div className="border-t border-white/[0.07] px-5 py-3.5 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg"
+              style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)" }}>
+              ✦
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black tracking-widest" style={{ color: "#fbbf24" }}>오늘의 미션</p>
+              <p className="text-sm font-bold text-white mt-0.5">{todayMission}</p>
+            </div>
+            <div className="text-xs font-bold shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>
+              {today.getFullYear()}.{String(today.getMonth() + 1).padStart(2, "0")}.{String(today.getDate()).padStart(2, "0")}
+            </div>
+          </div>
+
+          {/* 건강운 · 공부문서 */}
+          <div className="grid grid-cols-2 border-t border-white/[0.07]">
+            {[
+              { label: "건강운", keyword: HEALTH_KEYWORD[healthGrade] ?? "평이", grade: healthGrade },
+              { label: "공부·문서", keyword: studyGrade <= 3 ? "집중 잘됨" : studyGrade <= 5 ? "평이" : studyGrade <= 7 ? "집중 어려움" : "실수 주의", grade: studyGrade },
+            ].map((item, i) => {
+              const col = item.grade <= 3 ? "#4ade80" : item.grade <= 5 ? "#94a3b8" : "#fb923c";
+              return (
+                <div key={i} className={`px-3 py-3 text-center ${i === 0 ? "border-r border-white/[0.07]" : ""}`}>
+                  <p className="text-[10px] text-gray-500 font-bold mb-1">{item.label}</p>
+                  <p className="text-sm font-black" style={{ color: col }}>{item.keyword}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        </FadeIn>
 
         {/* 명식표 */}
         <FadeIn delay={0}>
