@@ -44,7 +44,7 @@ function cloneTextBlockWithText(block: TextBearingBlock, text: string): TextBear
     case "poem":
       return { ...createPoemBlock(text), align: block.align };
     case "heading":
-      return createHeadingBlock(text, block.level);
+      return { ...createHeadingBlock(text, block.level), align: block.align };
     case "paragraph":
       return { ...createParagraphBlock(text), align: block.align };
   }
@@ -500,11 +500,22 @@ export default function EpubWorkspace() {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: "100dvh", background: "#f7f1e3", color: "#2a2417" }}>
+    <div
+      className="flex flex-col"
+      style={{
+        height: "100dvh",
+        background: "#f7f1e3",
+        color: "#2a2417",
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif',
+      }}
+    >
       <BookMetaBar
         title={book.title}
         subtitle={book.subtitle}
         author={book.author}
+        publisher={book.publisher}
+        isbn={book.isbn}
+        description={book.description}
         date={book.date}
         coverImage={book.coverImage}
         publisherLogo={book.publisherLogo}
@@ -527,6 +538,9 @@ export default function EpubWorkspace() {
         onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
         onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
         onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}
+        onChangePublisher={p => mutate(prev => ({ ...prev, publisher: p }))}
+        onChangeIsbn={i => mutate(prev => ({ ...prev, isbn: i }))}
+        onChangeDescription={d => mutate(prev => ({ ...prev, description: d }))}
         onChangeDate={d => mutate(prev => ({ ...prev, date: d }))}
         onChangeCover={handleChangeCover}
         onChangePublisherLogo={handleChangePublisherLogo}

@@ -86,7 +86,37 @@ export interface BookAssets {
   publisherLogo: string | null;
 }
 
+/** 뷰어 폰트 크기와 무관하게 percent 지점(위에서부터 %)에 내용이 오도록, 위아래 여백을 flex-grow 비율로 나눈다.
+ *  실제 내보내기(generator.ts)에서는 강제 페이지 나눔까지 걸리지만, 미리보기에서는 위치 감각만 보여준다. */
+function PagePositionPreview({ percent, children }: { percent: number; children: ReactNode }) {
+  const top = Math.max(0, Math.min(100, percent));
+  const bottom = 100 - top;
+  return (
+    <div style={{ position: "relative", height: "65vh", display: "flex", flexDirection: "column", margin: "1em 0" }}>
+      <span
+        style={{
+          position: "absolute", top: 2, left: 0, fontSize: "0.65em", fontWeight: 800,
+          opacity: 0.4, letterSpacing: "0.02em",
+        }}
+      >
+        📍 위치 고정 · {top}%
+      </span>
+      <div style={{ flexGrow: top, flexShrink: 0 }} />
+      <div>{children}</div>
+      <div style={{ flexGrow: bottom, flexShrink: 0 }} />
+    </div>
+  );
+}
+
 export default function BlockRenderer({ block, ctx, assets }: { block: Block; ctx: NoteContext; assets: BookAssets }) {
+  const content = renderBlockContent(block, ctx, assets);
+  if ("pagePosition" in block && block.pagePosition != null) {
+    return <PagePositionPreview percent={block.pagePosition}>{content}</PagePositionPreview>;
+  }
+  return content;
+}
+
+function renderBlockContent(block: Block, ctx: NoteContext, assets: BookAssets): ReactNode {
   switch (block.type) {
     case "paragraph":
       return <RichParagraphs text={block.text} ctx={ctx} align={block.align} />;
@@ -126,7 +156,11 @@ export default function BlockRenderer({ block, ctx, assets }: { block: Block; ct
 
     case "heading": {
       const Tag = block.level === 2 ? "h2" : "h3";
-      return <Tag style={{ fontSize: block.level === 2 ? "1.2em" : "1.05em", fontWeight: 800, margin: "1.2em 0 0.6em" }}><RichLine line={block.text} ctx={ctx} /></Tag>;
+      return (
+        <Tag style={{ fontSize: block.level === 2 ? "1.2em" : "1.05em", fontWeight: 800, margin: "1.2em 0 0.6em", textAlign: block.align }}>
+          <RichLine line={block.text} ctx={ctx} />
+        </Tag>
+      );
     }
 
     case "scenebreak":

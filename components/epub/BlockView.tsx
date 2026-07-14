@@ -35,29 +35,87 @@ const btnStyle: CSSProperties = {
   background: "rgba(0,0,0,0.04)",
 };
 
-const ALIGN_OPTIONS: { value: Align; label: string }[] = [
-  { value: "left", label: "왼쪽" },
-  { value: "center", label: "가운데" },
-  { value: "right", label: "오른쪽" },
-  { value: "justify", label: "양쪽" },
+const ALIGN_OPTIONS: { value: Align; label: string; icon: string }[] = [
+  { value: "left", label: "왼쪽 정렬", icon: "≡⁻" },
+  { value: "center", label: "가운데 정렬", icon: "⁻≡⁻" },
+  { value: "right", label: "오른쪽 정렬", icon: "⁻≡" },
+  { value: "justify", label: "양쪽 정렬", icon: "≡≡" },
 ];
 
+/** 왼쪽/가운데/오른쪽/양쪽 정렬을 고르는 정렬 버튼. 눈에 잘 띄도록 선택된 항목은 채워진 배경으로 표시한다. */
 function AlignButtons({ align, onChange }: { align: Align; onChange: (a: Align) => void }) {
   return (
-    <div className="flex items-center gap-1 mb-1.5">
+    <div
+      className="flex items-center gap-0.5 mb-1.5 p-0.5 rounded-lg w-fit"
+      style={{ background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.06)" }}
+    >
       {ALIGN_OPTIONS.map(opt => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+          title={opt.label}
+          aria-pressed={align === opt.value}
+          className="text-[11px] px-2.5 py-1 rounded-md font-bold tracking-tight"
           style={{
-            background: align === opt.value ? "rgba(37,99,235,0.15)" : "rgba(0,0,0,0.04)",
-            color: align === opt.value ? "#1d4ed8" : "rgba(42,36,23,0.4)",
+            background: align === opt.value ? "#1d4ed8" : "transparent",
+            color: align === opt.value ? "#fff" : "rgba(42,36,23,0.5)",
+            boxShadow: align === opt.value ? "0 1px 3px rgba(29,78,216,0.4)" : "none",
           }}
         >
-          {opt.label}
+          {opt.icon}
         </button>
       ))}
+    </div>
+  );
+}
+
+const PAGE_POSITION_PRESETS: { label: string; value: number }[] = [
+  { label: "최상단 고정", value: 0 },
+  { label: "1/3 지점 고정", value: 33 },
+  { label: "정중앙 고정", value: 50 },
+];
+
+/** 문구를 페이지의 특정 세로 위치(뷰어 폰트 크기와 무관)에 고정한다. 프리셋 버튼 또는 슬라이더로 직접 고를 수 있다. */
+function PagePositionControl({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  return (
+    <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+      <button
+        onClick={() => onChange(value === null ? 50 : null)}
+        className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+        style={{
+          background: value === null ? "rgba(0,0,0,0.045)" : "rgba(146,114,14,0.15)",
+          color: value === null ? "rgba(42,36,23,0.4)" : "#92720e",
+        }}
+      >
+        {value === null ? "일반 흐름" : "📍 페이지 위치 고정"}
+      </button>
+      {value !== null && (
+        <>
+          {PAGE_POSITION_PRESETS.map(p => (
+            <button
+              key={p.value}
+              onClick={() => onChange(p.value)}
+              className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+              style={{
+                background: value === p.value ? "rgba(146,114,14,0.2)" : "rgba(0,0,0,0.04)",
+                color: value === p.value ? "#92720e" : "rgba(42,36,23,0.4)",
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={value}
+            onChange={e => onChange(Number(e.target.value))}
+            className="flex-1 min-w-[70px] accent-amber-700"
+            title="직접 끌어서 위치 정하기"
+          />
+          <span className="text-[10px] w-8 text-right shrink-0" style={{ color: "rgba(42,36,23,0.45)" }}>{value}%</span>
+        </>
+      )}
     </div>
   );
 }
@@ -126,6 +184,7 @@ export default function BlockView({
       {block.type === "paragraph" && (
         <>
           <AlignButtons align={block.align} onChange={a => onChange({ ...block, align: a })} />
+          <PagePositionControl value={block.pagePosition} onChange={v => onChange({ ...block, pagePosition: v })} />
           <textarea
             ref={setTextAreaRef}
             value={block.text}
@@ -157,6 +216,7 @@ export default function BlockView({
             />
           </div>
           <AlignButtons align={block.align} onChange={a => onChange({ ...block, align: a })} />
+          <PagePositionControl value={block.pagePosition} onChange={v => onChange({ ...block, pagePosition: v })} />
           <textarea
             ref={setTextAreaRef}
             value={block.text}
@@ -176,6 +236,7 @@ export default function BlockView({
             인용구
           </span>
           <AlignButtons align={block.align} onChange={a => onChange({ ...block, align: a })} />
+          <PagePositionControl value={block.pagePosition} onChange={v => onChange({ ...block, pagePosition: v })} />
           <textarea
             ref={setTextAreaRef}
             value={block.text}
@@ -202,6 +263,7 @@ export default function BlockView({
             시 / 운문 (줄바꿈 그대로 유지)
           </span>
           <AlignButtons align={block.align} onChange={a => onChange({ ...block, align: a })} />
+          <PagePositionControl value={block.pagePosition} onChange={v => onChange({ ...block, pagePosition: v })} />
           <textarea
             ref={setTextAreaRef}
             value={block.text}
@@ -216,25 +278,29 @@ export default function BlockView({
       )}
 
       {block.type === "heading" && (
-        <div className="flex items-center gap-2">
-          <select
-            value={block.level}
-            onChange={e => onChange({ ...block, level: Number(e.target.value) as 2 | 3 })}
-            className="bg-transparent outline-none text-xs font-bold px-1.5 py-1 rounded"
-            style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.55)" }}
-          >
-            <option value={2}>소제목(큰)</option>
-            <option value={3}>소제목(작은)</option>
-          </select>
+        <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <select
+              value={block.level}
+              onChange={e => onChange({ ...block, level: Number(e.target.value) as 2 | 3 })}
+              className="bg-transparent outline-none text-xs font-bold px-1.5 py-1 rounded"
+              style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.55)" }}
+            >
+              <option value={2}>소제목(큰)</option>
+              <option value={3}>소제목(작은)</option>
+            </select>
+            <AlignButtons align={block.align} onChange={a => onChange({ ...block, align: a })} />
+          </div>
           <input
             ref={setTextAreaRef}
             value={block.text}
             onChange={e => onChange({ ...block, text: e.target.value })}
             onContextMenu={handleContextMenu}
             placeholder="소제목을 입력하세요"
-            className="flex-1 min-w-0 bg-transparent outline-none text-base font-black"
-            style={{ color: "#2a2417" }}
+            className="w-full bg-transparent outline-none text-base font-black"
+            style={{ color: "#2a2417", textAlign: block.align }}
           />
+          <PagePositionControl value={block.pagePosition} onChange={v => onChange({ ...block, pagePosition: v })} />
         </div>
       )}
 
@@ -443,15 +509,19 @@ export default function BlockView({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={block.src} alt={block.alt} className="max-w-full rounded-lg mb-2" style={{ maxHeight: 240 }} />
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-0.5 p-0.5 rounded-lg"
+              style={{ background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.06)" }}
+            >
               {(["left", "center", "right"] as const).map(a => (
                 <button
                   key={a}
                   onClick={() => onChange({ ...block, align: a })}
-                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                  aria-pressed={block.align === a}
+                  className="text-[11px] px-2.5 py-1 rounded-md font-bold"
                   style={{
-                    background: block.align === a ? "rgba(37,99,235,0.15)" : "rgba(0,0,0,0.04)",
-                    color: block.align === a ? "#1d4ed8" : "rgba(42,36,23,0.4)",
+                    background: block.align === a ? "#1d4ed8" : "transparent",
+                    color: block.align === a ? "#fff" : "rgba(42,36,23,0.5)",
                   }}
                 >
                   {a === "left" ? "왼쪽" : a === "center" ? "가운데" : "오른쪽"}

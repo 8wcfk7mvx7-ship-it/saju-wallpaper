@@ -45,6 +45,19 @@ function richNodesToXhtml(nodes: RichNode[]): string {
     .join("");
 }
 
+/** 문구를 뷰어 폰트 크기와 무관하게 페이지의 특정 세로 지점(위에서부터 %)에 고정한다.
+ *  앞뒤로 강제 페이지 나눔을 걸어 이 블록만 독립된 한 페이지를 차지하게 하고,
+ *  위아래 빈 공간을 flex-grow 비율로 나눠 percent 지점에 내용이 오도록 만든다. */
+function wrapPagePosition(html: string, percent: number): string {
+  const top = Math.max(0, Math.min(100, percent));
+  const bottom = 100 - top;
+  return `<div class="page-pin" style="page-break-before:always;break-before:page;page-break-after:always;break-after:page;height:100vh;display:flex;flex-direction:column;">
+<div style="flex:${top} 0 0;" aria-hidden="true"></div>
+<div class="page-pin-content">${html}</div>
+<div style="flex:${bottom} 0 0;" aria-hidden="true"></div>
+</div>`;
+}
+
 /** 정렬/들여쓰기가 반영된 <p> 여는 태그. */
 function paragraphOpenTag(align?: Align, indent = true): string {
   const styles: string[] = [];
@@ -182,31 +195,37 @@ function blockToXhtml(
   switch (block.type) {
     case "paragraph": {
       const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align });
-      return footnoteAsides ? `${html}\n${footnoteAsides}` : html;
+      const content = block.pagePosition != null ? wrapPagePosition(html, block.pagePosition) : html;
+      return footnoteAsides ? `${content}\n${footnoteAsides}` : content;
     }
     case "textbox": {
       const label = block.label.trim();
       const labelHtml = label ? `<p class="textbox-label">${escapeXml(label)}</p>` : "";
       const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align });
       const aside = `<aside class="textbox">${labelHtml}${html}</aside>`;
-      return footnoteAsides ? `${aside}\n${footnoteAsides}` : aside;
+      const content = block.pagePosition != null ? wrapPagePosition(aside, block.pagePosition) : aside;
+      return footnoteAsides ? `${content}\n${footnoteAsides}` : content;
     }
     case "quote": {
       const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align, indent: false });
       const citation = block.citation.trim() ? `<footer>— <cite>${escapeXml(block.citation)}</cite></footer>` : "";
       const bq = `<blockquote class="quote">${html}${citation}</blockquote>`;
-      return footnoteAsides ? `${bq}\n${footnoteAsides}` : bq;
+      const content = block.pagePosition != null ? wrapPagePosition(bq, block.pagePosition) : bq;
+      return footnoteAsides ? `${content}\n${footnoteAsides}` : content;
     }
     case "poem": {
       const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align, indent: false });
       const poem = `<div class="poem" epub:type="z3998:poem">${html}</div>`;
-      return footnoteAsides ? `${poem}\n${footnoteAsides}` : poem;
+      const content = block.pagePosition != null ? wrapPagePosition(poem, block.pagePosition) : poem;
+      return footnoteAsides ? `${content}\n${footnoteAsides}` : content;
     }
     case "heading": {
       const footnoteIdsInBlock: string[] = [];
       const inner = renderNoteAwareLine(block.text, ctx, footnoteIdsInBlock);
       const tag = block.level === 2 ? "h2" : "h3";
-      const heading = `<${tag} id="${block.id}">${inner}</${tag}>`;
+      const alignAttr = block.align && block.align !== "left" ? ` style="text-align:${block.align}"` : "";
+      const headingHtml = `<${tag} id="${block.id}"${alignAttr}>${inner}</${tag}>`;
+      const heading = block.pagePosition != null ? wrapPagePosition(headingHtml, block.pagePosition) : headingHtml;
       const footnoteAsides = buildFootnoteAsides(footnoteIdsInBlock, ctx);
       return footnoteAsides ? `${heading}\n${footnoteAsides}` : heading;
     }
@@ -426,6 +445,9 @@ function contentOpf(book: Book, images: ResolvedImage[], assets: BookAssets, fon
 ${titleMeta}
 <dc:language>${book.language}</dc:language>
 ${book.author ? `<dc:creator>${escapeXml(book.author)}</dc:creator>` : ""}
+${book.publisher.trim() ? `<dc:publisher>${escapeXml(book.publisher.trim())}</dc:publisher>` : ""}
+${book.description.trim() ? `<dc:description>${escapeXml(book.description.trim())}</dc:description>` : ""}
+${book.isbn.trim() ? `<dc:identifier id="isbn">${escapeXml(book.isbn.trim())}</dc:identifier>\n<meta refines="#isbn" property="identifier-type" scheme="onix:codelist5">15</meta>` : ""}
 ${book.date.trim() ? `<dc:date>${escapeXml(book.date.trim())}</dc:date>` : ""}
 <meta property="dcterms:modified">${modified}</meta>
 ${coverMeta}
@@ -568,6 +590,18 @@ p.scenebreak {
 }
 .pagebreak-marker {
   page-break-before: always;
+}
+.page-pin {
+  overflow: hidden;
+}
+.page-pin-content {
+  flex-shrink: 0;
+}
+.page-pin-content p:first-child,
+.page-pin-content blockquote:first-child,
+.page-pin-content aside:first-child,
+.page-pin-content div:first-child {
+  margin-top: 0;
 }
 ul, ol {
   margin: 0 0 1em;

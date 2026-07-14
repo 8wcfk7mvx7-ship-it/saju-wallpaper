@@ -9,6 +9,9 @@ interface Props {
   title: string;
   subtitle: string;
   author: string;
+  publisher: string;
+  isbn: string;
+  description: string;
   date: string;
   coverImage: string | null;
   publisherLogo: string | null;
@@ -31,6 +34,9 @@ interface Props {
   onChangeTitle: (title: string) => void;
   onChangeSubtitle: (subtitle: string) => void;
   onChangeAuthor: (author: string) => void;
+  onChangePublisher: (publisher: string) => void;
+  onChangeIsbn: (isbn: string) => void;
+  onChangeDescription: (description: string) => void;
   onChangeDate: (date: string) => void;
   onChangeCover: (file: File | null) => void;
   onChangePublisherLogo: (file: File | null) => void;
@@ -41,10 +47,11 @@ interface Props {
 }
 
 export default function BookMetaBar({
-  title, subtitle, author, date, coverImage, publisherLogo, fontId, exporting, canUndo, canRedo, onUndo, onRedo,
+  title, subtitle, author, publisher, isbn, description, date, coverImage, publisherLogo, fontId, exporting, canUndo, canRedo, onUndo, onRedo,
   focusMode, onToggleFocusMode, onToggleFullscreen,
   projects, currentProjectId, onRefreshProjects, onNewProject, onSaveProject, onSaveAsProject, onOpenProject,
-  onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangeDate, onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
+  onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangePublisher, onChangeIsbn, onChangeDescription, onChangeDate,
+  onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
 }: Props) {
   const router = useRouter();
@@ -211,18 +218,34 @@ export default function BookMetaBar({
               className="w-full bg-transparent outline-none text-xs border-b pb-1"
               style={{ color: "rgba(42,36,23,0.65)", borderColor: "rgba(0,0,0,0.12)" }}
             />
-            <input
-              value={author}
-              onChange={e => onChangeAuthor(e.target.value)}
-              placeholder="지은이"
-              className="w-full bg-transparent outline-none text-sm border-b pb-1"
-              style={{ color: "rgba(42,36,23,0.78)", borderColor: "rgba(0,0,0,0.12)" }}
-            />
+            <div className="flex gap-2">
+              <input
+                value={author}
+                onChange={e => onChangeAuthor(e.target.value)}
+                placeholder="지은이"
+                className="flex-1 min-w-0 bg-transparent outline-none text-sm border-b pb-1"
+                style={{ color: "rgba(42,36,23,0.78)", borderColor: "rgba(0,0,0,0.12)" }}
+              />
+              <input
+                value={publisher}
+                onChange={e => onChangePublisher(e.target.value)}
+                placeholder="출판사(선택)"
+                className="flex-1 min-w-0 bg-transparent outline-none text-sm border-b pb-1"
+                style={{ color: "rgba(42,36,23,0.78)", borderColor: "rgba(0,0,0,0.12)" }}
+              />
+            </div>
             <div className="flex gap-2">
               <input
                 value={date}
                 onChange={e => onChangeDate(e.target.value)}
                 placeholder="발행일 (자유 형식)"
+                className="flex-1 min-w-0 bg-transparent outline-none text-xs border-b pb-1"
+                style={{ color: "rgba(42,36,23,0.65)", borderColor: "rgba(0,0,0,0.12)" }}
+              />
+              <input
+                value={isbn}
+                onChange={e => onChangeIsbn(e.target.value)}
+                placeholder="ISBN(선택)"
                 className="flex-1 min-w-0 bg-transparent outline-none text-xs border-b pb-1"
                 style={{ color: "rgba(42,36,23,0.65)", borderColor: "rgba(0,0,0,0.12)" }}
               />
@@ -237,6 +260,14 @@ export default function BookMetaBar({
                 ))}
               </select>
             </div>
+            <textarea
+              value={description}
+              onChange={e => onChangeDescription(e.target.value)}
+              placeholder="책 소개(선택) — EPUB 파일 정보에 들어갑니다"
+              rows={2}
+              className="w-full bg-transparent outline-none resize-none text-xs border-b pb-1"
+              style={{ color: "rgba(42,36,23,0.65)", borderColor: "rgba(0,0,0,0.12)" }}
+            />
           </div>
         </div>
       )}

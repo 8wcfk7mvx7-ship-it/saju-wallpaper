@@ -17,11 +17,17 @@ export type BlockType =
   | "list"
   | "frontmatter";
 
+/** 뷰어 폰트 크기와 무관하게 페이지 안에서 고정된 세로 위치에 놓고 싶을 때 쓴다.
+ *  null이면 평소처럼 자연스럽게 흐른다. 0~100 값이면 그 지점(위에서부터 %)에 고정하고,
+ *  앞뒤로 강제 페이지 나눔이 걸려 이 블록만 독립된 한 페이지를 차지한다. */
+export type PagePosition = number | null;
+
 export interface ParagraphBlock {
   id: string;
   type: "paragraph";
   text: string;
   align: Align;
+  pagePosition: PagePosition;
 }
 
 export interface TextBoxBlock {
@@ -30,6 +36,7 @@ export interface TextBoxBlock {
   label: string;
   text: string;
   align: Align;
+  pagePosition: PagePosition;
 }
 
 export interface ImageBlock {
@@ -65,6 +72,7 @@ export interface QuoteBlock {
   text: string;
   citation: string;
   align: Align;
+  pagePosition: PagePosition;
 }
 
 /** 장면 전환을 나타내는 구분선(예: * * *). 내용이 없는 순수 구조용 블록. */
@@ -79,6 +87,7 @@ export interface PoemBlock {
   type: "poem";
   text: string;
   align: Align;
+  pagePosition: PagePosition;
 }
 
 /** 챕터 안의 소제목(h2/h3). */
@@ -87,6 +96,8 @@ export interface HeadingBlock {
   type: "heading";
   text: string;
   level: 2 | 3;
+  align: Align;
+  pagePosition: PagePosition;
 }
 
 /** 리더에 따라 다르지만 대부분 여기서 강제로 다음 페이지로 넘어간다. */
@@ -177,6 +188,12 @@ export interface Book {
   /** 선택 사항. 우클릭 메뉴에서 "부제로 설정"으로 지정. */
   subtitle: string;
   author: string;
+  /** 출판사명. EPUB 메타데이터(dc:publisher)로 그대로 내보내진다. */
+  publisher: string;
+  /** ISBN 등 식별자(선택). 있으면 dc:identifier로 추가된다. */
+  isbn: string;
+  /** 책 소개(선택). EPUB 메타데이터(dc:description)로 내보내진다. */
+  description: string;
   language: string;
   /** 발행일 등 자유 텍스트(형식 자유). */
   date: string;
@@ -202,25 +219,25 @@ export function makeId(prefix: string): string {
 }
 
 export function createParagraphBlock(text = ""): ParagraphBlock {
-  return { id: makeId("p"), type: "paragraph", text, align: "left" };
+  return { id: makeId("p"), type: "paragraph", text, align: "left", pagePosition: null };
 }
 
 export function createTextBoxBlock(text = ""): TextBoxBlock {
-  return { id: makeId("box"), type: "textbox", label: "메모", text, align: "left" };
+  return { id: makeId("box"), type: "textbox", label: "메모", text, align: "left", pagePosition: null };
 }
 
 export function createImageBlock(src: string, alt = ""): ImageBlock {
   return { id: makeId("img"), type: "image", src, alt, caption: "", align: "center", widthPercent: 100 };
 }
 
-/** book의 현재 제목/저자/발행일을 기본값으로 채우되, 이 블록 안에서 자유롭게 고쳐 쓸 수 있다. */
-export function createCopyrightBlock(book: Pick<Book, "title" | "author" | "date">): CopyrightBlock {
+/** book의 현재 제목/저자/발행일/출판사를 기본값으로 채우되, 이 블록 안에서 자유롭게 고쳐 쓸 수 있다. */
+export function createCopyrightBlock(book: Pick<Book, "title" | "author" | "date" | "publisher">): CopyrightBlock {
   return {
     id: makeId("cr"),
     type: "copyright",
     title: book.title,
     author: book.author,
-    publisher: "",
+    publisher: book.publisher,
     date: book.date,
     body: "",
     showCover: true,
@@ -229,7 +246,7 @@ export function createCopyrightBlock(book: Pick<Book, "title" | "author" | "date
 }
 
 export function createQuoteBlock(text = ""): QuoteBlock {
-  return { id: makeId("q"), type: "quote", text, citation: "", align: "left" };
+  return { id: makeId("q"), type: "quote", text, citation: "", align: "left", pagePosition: null };
 }
 
 export function createSceneBreakBlock(): SceneBreakBlock {
@@ -237,11 +254,11 @@ export function createSceneBreakBlock(): SceneBreakBlock {
 }
 
 export function createPoemBlock(text = ""): PoemBlock {
-  return { id: makeId("poem"), type: "poem", text, align: "left" };
+  return { id: makeId("poem"), type: "poem", text, align: "left", pagePosition: null };
 }
 
 export function createHeadingBlock(text = "", level: 2 | 3 = 2): HeadingBlock {
-  return { id: makeId("h"), type: "heading", text, level };
+  return { id: makeId("h"), type: "heading", text, level, align: "left", pagePosition: null };
 }
 
 export function createPageBreakBlock(): PageBreakBlock {
@@ -282,6 +299,9 @@ export function createBook(): Book {
     title: "제목 없는 책",
     subtitle: "",
     author: "",
+    publisher: "",
+    isbn: "",
+    description: "",
     language: "ko",
     date: todayString(),
     coverImage: null,
@@ -297,6 +317,9 @@ export function normalizeBook(book: Book): Book {
   return {
     ...book,
     subtitle: book.subtitle ?? "",
+    publisher: book.publisher ?? "",
+    isbn: book.isbn ?? "",
+    description: book.description ?? "",
     date: book.date ?? todayString(),
     publisherLogo: book.publisherLogo ?? null,
     fontId: book.fontId ?? "chosunilbo",
@@ -311,7 +334,10 @@ export function normalizeBook(book: Book): Book {
 
 function normalizeBlock(b: Block): Block {
   if (b.type === "paragraph" || b.type === "textbox" || b.type === "quote" || b.type === "poem") {
-    return { ...b, align: b.align ?? "left" };
+    return { ...b, align: b.align ?? "left", pagePosition: b.pagePosition ?? null };
+  }
+  if (b.type === "heading") {
+    return { ...b, align: b.align ?? "left", pagePosition: b.pagePosition ?? null };
   }
   if (b.type === "image") {
     return { ...b, align: b.align ?? "center", widthPercent: b.widthPercent ?? 100 };
