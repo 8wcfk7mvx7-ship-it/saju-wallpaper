@@ -6,6 +6,7 @@ import SiteHeader from "@/components/SiteHeader";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import NativeBridge from "@/components/NativeBridge";
 import PageViewTracker from "@/components/PageViewTracker";
+import PageContentFrame from "@/components/PageContentFrame";
 
 const chosun = localFont({
   src: "./fonts/ChosunilboMyungjo.woff",
@@ -106,9 +107,7 @@ export default function RootLayout({
         <NativeBridge />
         <PageViewTracker />
         <SiteHeader />
-        <div style={{ paddingBottom: "calc(56px + env(safe-area-inset-bottom))" }} className="sm:pb-0">
-          {children}
-        </div>
+        <PageContentFrame>{children}</PageContentFrame>
         <MobileBottomNav />
       </body>
     </html>
