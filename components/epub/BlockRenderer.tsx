@@ -1,6 +1,9 @@
 "use client";
-import type { Block, Note } from "@/lib/epub/types";
+import type { ReactNode } from "react";
+import type { Align, Block, Note } from "@/lib/epub/types";
+import { frontMatterLabel } from "@/lib/epub/types";
 import { splitTextByNoteRefs } from "@/lib/epub/notes";
+import { parseRichText, type RichNode } from "@/lib/epub/richtext";
 
 export interface NoteContext {
   noteById: Map<string, Note>;
@@ -21,21 +24,48 @@ function NoteMark({ noteId, ctx }: { noteId: string; ctx: NoteContext }) {
   );
 }
 
-function ParagraphText({ text, ctx }: { text: string; ctx: NoteContext }) {
+function renderRichNodes(nodes: RichNode[]): ReactNode {
+  return nodes.map((node, i) => {
+    if (node.type === "text") return <span key={i}>{node.value}</span>;
+    const children = renderRichNodes(node.children);
+    switch (node.style) {
+      case "bold":
+        return <strong key={i}>{children}</strong>;
+      case "italic":
+        return <em key={i}>{children}</em>;
+      case "underline":
+        return <span key={i} style={{ textDecoration: "underline" }}>{children}</span>;
+      case "strike":
+        return <s key={i}>{children}</s>;
+      case "highlight":
+        return <mark key={i} style={{ background: "#fde68a", color: "#1c1a14", padding: "0 2px", borderRadius: 2 }}>{children}</mark>;
+      case "sup":
+        return <sup key={i}>{children}</sup>;
+      case "sub":
+        return <sub key={i}>{children}</sub>;
+    }
+  });
+}
+
+function RichLine({ line, ctx }: { line: string; ctx: NoteContext }) {
+  return (
+    <>
+      {splitTextByNoteRefs(line).map((seg, k) =>
+        seg.type === "text" ? <span key={k}>{renderRichNodes(parseRichText(seg.value))}</span> : <NoteMark key={k} noteId={seg.noteId!} ctx={ctx} />
+      )}
+    </>
+  );
+}
+
+function RichParagraphs({ text, ctx, align, indent = true }: { text: string; ctx: NoteContext; align?: Align; indent?: boolean }) {
   const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
   return (
     <>
       {paragraphs.map((p, i) => (
-        <p key={i} style={{ margin: "0 0 1em", textIndent: "1em" }}>
+        <p key={i} style={{ margin: "0 0 1em", textIndent: indent && (align === "left" || align === "justify" || !align) ? "1em" : 0, textAlign: align }}>
           {p.split("\n").map((line, j, arr) => (
             <span key={j}>
-              {splitTextByNoteRefs(line).map((seg, k) =>
-                seg.type === "text" ? (
-                  <span key={k}>{seg.value}</span>
-                ) : (
-                  <NoteMark key={k} noteId={seg.noteId!} ctx={ctx} />
-                )
-              )}
+              <RichLine line={line} ctx={ctx} />
               {j < arr.length - 1 && <br />}
             </span>
           ))}
@@ -51,55 +81,121 @@ export interface BookAssets {
 }
 
 export default function BlockRenderer({ block, ctx, assets }: { block: Block; ctx: NoteContext; assets: BookAssets }) {
-  if (block.type === "paragraph") {
-    return <ParagraphText text={block.text} ctx={ctx} />;
-  }
-  if (block.type === "textbox") {
-    return (
-      <aside
-        style={{
-          margin: "1.5em 0",
-          padding: "1em 1.2em",
-          border: "1px solid rgba(153,153,153,0.5)",
-          borderRadius: 4,
-          background: "rgba(255,255,255,0.04)",
-        }}
-      >
-        {block.label.trim() && <p style={{ fontWeight: "bold", margin: "0 0 0.5em" }}>{block.label}</p>}
-        <ParagraphText text={block.text} ctx={ctx} />
-      </aside>
-    );
-  }
-  if (block.type === "image") {
-    return (
-      <figure style={{ margin: "1.5em 0", textAlign: "center" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={block.src} alt={block.alt} style={{ maxWidth: "100%", borderRadius: 4 }} />
-        {block.caption.trim() && (
-          <figcaption style={{ fontSize: "0.85em", opacity: 0.6, marginTop: "0.5em" }}>{block.caption}</figcaption>
-        )}
-      </figure>
-    );
-  }
-  return (
-    <section style={{ textAlign: "center", padding: "3em 0 1em", borderTop: "1px dashed rgba(0,0,0,0.15)" }}>
-      {block.showCover && assets.coverImage && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={assets.coverImage} alt="표지" style={{ maxWidth: "45%", margin: "0 auto 1.5em", boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} />
-      )}
-      <p style={{ fontWeight: 800, fontSize: "1.1em", margin: "0 0 0.6em" }}>{block.title}</p>
-      {block.author.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.author}</p>}
-      {block.publisher.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.publisher}</p>}
-      {block.date.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.date}</p>}
-      {block.showPublisherLogo && assets.publisherLogo && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={assets.publisherLogo} alt="출판사 로고" style={{ maxWidth: "25%", margin: "1.2em auto 0" }} />
-      )}
-      {block.body.trim() && (
-        <div style={{ textAlign: "left", marginTop: "1.5em", fontSize: "0.8em", opacity: 0.7 }}>
-          <ParagraphText text={block.body} ctx={ctx} />
+  switch (block.type) {
+    case "paragraph":
+      return <RichParagraphs text={block.text} ctx={ctx} align={block.align} />;
+
+    case "textbox":
+      return (
+        <aside
+          style={{
+            margin: "1.5em 0",
+            padding: "1em 1.2em",
+            border: "1px solid rgba(153,153,153,0.5)",
+            borderRadius: 4,
+            background: "rgba(255,255,255,0.04)",
+          }}
+        >
+          {block.label.trim() && <p style={{ fontWeight: "bold", margin: "0 0 0.5em" }}>{block.label}</p>}
+          <RichParagraphs text={block.text} ctx={ctx} align={block.align} />
+        </aside>
+      );
+
+    case "quote":
+      return (
+        <blockquote style={{ margin: "1.5em 0.5em", paddingLeft: "1em", borderLeft: "3px solid rgba(0,0,0,0.25)", fontStyle: "italic" }}>
+          <RichParagraphs text={block.text} ctx={ctx} align={block.align} indent={false} />
+          {block.citation.trim() && (
+            <footer style={{ fontStyle: "normal", fontSize: "0.85em", opacity: 0.65, marginTop: "0.5em" }}>{block.citation}</footer>
+          )}
+        </blockquote>
+      );
+
+    case "poem":
+      return (
+        <div style={{ margin: "1.5em 0", fontFamily: "serif" }}>
+          <RichParagraphs text={block.text} ctx={ctx} align={block.align} indent={false} />
         </div>
-      )}
-    </section>
-  );
+      );
+
+    case "heading": {
+      const Tag = block.level === 2 ? "h2" : "h3";
+      return <Tag style={{ fontSize: block.level === 2 ? "1.2em" : "1.05em", fontWeight: 800, margin: "1.2em 0 0.6em" }}><RichLine line={block.text} ctx={ctx} /></Tag>;
+    }
+
+    case "scenebreak":
+      return <div style={{ textAlign: "center", margin: "2em 0", letterSpacing: "0.4em", opacity: 0.5 }}>⁂</div>;
+
+    case "pagebreak":
+      return (
+        <div style={{ margin: "1em 0", textAlign: "center", fontSize: "0.7em", opacity: 0.3, borderTop: "1px dashed currentColor", paddingTop: "0.5em" }}>
+          — 페이지 나눔 —
+        </div>
+      );
+
+    case "list": {
+      const Tag = block.ordered ? "ol" : "ul";
+      return (
+        <Tag style={{ margin: "0 0 1em", paddingLeft: "1.6em" }}>
+          {block.items.filter(item => item.trim()).map((item, i) => (
+            <li key={i} style={{ margin: "0 0 0.4em" }}>
+              <RichLine line={item} ctx={ctx} />
+            </li>
+          ))}
+        </Tag>
+      );
+    }
+
+    case "frontmatter":
+      return (
+        <section style={{ textAlign: "center", padding: "3em 0 1em" }}>
+          <p style={{ fontSize: "0.75em", letterSpacing: "0.2em", opacity: 0.5, margin: "0 0 1em" }}>{frontMatterLabel(block.kind)}</p>
+          {block.title.trim() && <p style={{ fontWeight: 800, fontSize: "1.05em", margin: "0 0 1em" }}>{block.title}</p>}
+          {block.body.trim() && (
+            <div style={{ textAlign: block.kind === "foreword" || block.kind === "afterword" ? "left" : "center", fontStyle: block.kind === "epigraph" ? "italic" : "normal" }}>
+              <RichParagraphs text={block.body} ctx={ctx} indent={block.kind === "foreword" || block.kind === "afterword"} />
+            </div>
+          )}
+          {block.kind === "epigraph" && block.citation.trim() && (
+            <p style={{ fontSize: "0.85em", opacity: 0.6, marginTop: "0.8em" }}>{block.citation}</p>
+          )}
+        </section>
+      );
+
+    case "image": {
+      const justify = block.align === "left" ? "flex-start" : block.align === "right" ? "flex-end" : "center";
+      return (
+        <figure style={{ margin: "1.5em 0", display: "flex", flexDirection: "column", alignItems: justify }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={block.src} alt={block.alt} style={{ width: `${block.widthPercent}%`, maxWidth: "100%", borderRadius: 4 }} />
+          {block.caption.trim() && (
+            <figcaption style={{ fontSize: "0.85em", opacity: 0.6, marginTop: "0.5em" }}>{block.caption}</figcaption>
+          )}
+        </figure>
+      );
+    }
+
+    case "copyright":
+      return (
+        <section style={{ textAlign: "center", padding: "3em 0 1em", borderTop: "1px dashed rgba(0,0,0,0.15)" }}>
+          {block.showCover && assets.coverImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={assets.coverImage} alt="표지" style={{ maxWidth: "45%", margin: "0 auto 1.5em", boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} />
+          )}
+          <p style={{ fontWeight: 800, fontSize: "1.1em", margin: "0 0 0.6em" }}>{block.title}</p>
+          {block.author.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.author}</p>}
+          {block.publisher.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.publisher}</p>}
+          {block.date.trim() && <p style={{ fontSize: "0.85em", margin: "0 0 0.2em", opacity: 0.75 }}>{block.date}</p>}
+          {block.showPublisherLogo && assets.publisherLogo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={assets.publisherLogo} alt="출판사 로고" style={{ maxWidth: "25%", margin: "1.2em auto 0" }} />
+          )}
+          {block.body.trim() && (
+            <div style={{ textAlign: "left", marginTop: "1.5em", fontSize: "0.8em", opacity: 0.7 }}>
+              <RichParagraphs text={block.body} ctx={ctx} />
+            </div>
+          )}
+        </section>
+      );
+  }
 }

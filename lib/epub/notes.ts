@@ -1,10 +1,10 @@
-import type { Block, Chapter, NoteKind } from "./types";
+import { hasText, type Block, type Chapter, type NoteKind } from "./types";
 
 /** 본문 텍스트 안에서 각주/미주를 표시하는 인라인 토큰. 마크다운 각주 문법을 본떴다. */
 const NOTE_REF_RE = /\[\^([\w-]+)\]/g;
 
 function blockText(block: Block): string {
-  return block.type === "paragraph" || block.type === "textbox" ? block.text : "";
+  return hasText(block) ? block.text : "";
 }
 
 export function extractNoteRefIds(text: string): string[] {

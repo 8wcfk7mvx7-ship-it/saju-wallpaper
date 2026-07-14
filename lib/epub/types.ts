@@ -2,12 +2,26 @@
 // generator.ts가 그대로 읽어서 .epub 파일로 변환한다.
 import type { EpubFontId } from "./fonts";
 
-export type BlockType = "paragraph" | "textbox" | "image" | "copyright";
+export type Align = "left" | "center" | "right" | "justify";
+
+export type BlockType =
+  | "paragraph"
+  | "textbox"
+  | "image"
+  | "copyright"
+  | "quote"
+  | "scenebreak"
+  | "poem"
+  | "heading"
+  | "pagebreak"
+  | "list"
+  | "frontmatter";
 
 export interface ParagraphBlock {
   id: string;
   type: "paragraph";
   text: string;
+  align: Align;
 }
 
 export interface TextBoxBlock {
@@ -15,6 +29,7 @@ export interface TextBoxBlock {
   type: "textbox";
   label: string;
   text: string;
+  align: Align;
 }
 
 export interface ImageBlock {
@@ -24,6 +39,9 @@ export interface ImageBlock {
   src: string;
   alt: string;
   caption: string;
+  align: "left" | "center" | "right";
+  /** 원본 대비 표시 크기(%). 1~100. */
+  widthPercent: number;
 }
 
 /** 판권(Copyright) 페이지. 책 어디든(도입부/마지막 등) 원하는 위치에 넣을 수 있는 블록이다. */
@@ -40,7 +58,99 @@ export interface CopyrightBlock {
   showPublisherLogo: boolean;
 }
 
-export type Block = ParagraphBlock | TextBoxBlock | ImageBlock | CopyrightBlock;
+/** 인용구. 출처(citation)는 선택 사항. */
+export interface QuoteBlock {
+  id: string;
+  type: "quote";
+  text: string;
+  citation: string;
+  align: Align;
+}
+
+/** 장면 전환을 나타내는 구분선(예: * * *). 내용이 없는 순수 구조용 블록. */
+export interface SceneBreakBlock {
+  id: string;
+  type: "scenebreak";
+}
+
+/** 시/운문. 줄바꿈을 그대로 보존해서 보여준다(문단처럼 다시 흐르지 않음). */
+export interface PoemBlock {
+  id: string;
+  type: "poem";
+  text: string;
+  align: Align;
+}
+
+/** 챕터 안의 소제목(h2/h3). */
+export interface HeadingBlock {
+  id: string;
+  type: "heading";
+  text: string;
+  level: 2 | 3;
+}
+
+/** 리더에 따라 다르지만 대부분 여기서 강제로 다음 페이지로 넘어간다. */
+export interface PageBreakBlock {
+  id: string;
+  type: "pagebreak";
+}
+
+export interface ListBlock {
+  id: string;
+  type: "list";
+  ordered: boolean;
+  items: string[];
+}
+
+export type FrontMatterKind = "dedication" | "epigraph" | "foreword" | "afterword";
+
+const FRONT_MATTER_LABELS: Record<FrontMatterKind, string> = {
+  dedication: "헌사",
+  epigraph: "제사(에피그래프)",
+  foreword: "서문",
+  afterword: "후기",
+};
+
+export function frontMatterLabel(kind: FrontMatterKind): string {
+  return FRONT_MATTER_LABELS[kind];
+}
+
+/** 헌사/제사/서문/후기처럼 책의 구조적인 특수 페이지. epub:type 시맨틱으로 표시된다. */
+export interface FrontMatterBlock {
+  id: string;
+  type: "frontmatter";
+  kind: FrontMatterKind;
+  title: string;
+  body: string;
+  /** 제사(에피그래프)에서 주로 쓰는 출처 표시. */
+  citation: string;
+}
+
+export type Block =
+  | ParagraphBlock
+  | TextBoxBlock
+  | ImageBlock
+  | CopyrightBlock
+  | QuoteBlock
+  | SceneBreakBlock
+  | PoemBlock
+  | HeadingBlock
+  | PageBreakBlock
+  | ListBlock
+  | FrontMatterBlock;
+
+/** 우클릭 메뉴(굵게/기울임/각주 등)를 적용할 수 있는, 줄글을 담은 블록들. */
+export type TextBearingBlock = ParagraphBlock | TextBoxBlock | QuoteBlock | PoemBlock | HeadingBlock;
+
+export function hasText(block: Block): block is TextBearingBlock {
+  return (
+    block.type === "paragraph" ||
+    block.type === "textbox" ||
+    block.type === "quote" ||
+    block.type === "poem" ||
+    block.type === "heading"
+  );
+}
 
 /** 각주(footnote, 본문 근처 팝업)와 미주(endnote, 챕터 끝에 모아서). */
 export type NoteKind = "footnote" | "endnote";
@@ -56,6 +166,8 @@ export interface Chapter {
   title: string;
   blocks: Block[];
   notes: Note[];
+  /** 챕터 첫 글자를 크게 보여주는 전통적인 드롭캡 서식. */
+  dropCap: boolean;
 }
 
 export interface Book {
@@ -90,15 +202,15 @@ export function makeId(prefix: string): string {
 }
 
 export function createParagraphBlock(text = ""): ParagraphBlock {
-  return { id: makeId("p"), type: "paragraph", text };
+  return { id: makeId("p"), type: "paragraph", text, align: "left" };
 }
 
 export function createTextBoxBlock(text = ""): TextBoxBlock {
-  return { id: makeId("box"), type: "textbox", label: "메모", text };
+  return { id: makeId("box"), type: "textbox", label: "메모", text, align: "left" };
 }
 
 export function createImageBlock(src: string, alt = ""): ImageBlock {
-  return { id: makeId("img"), type: "image", src, alt, caption: "" };
+  return { id: makeId("img"), type: "image", src, alt, caption: "", align: "center", widthPercent: 100 };
 }
 
 /** book의 현재 제목/저자/발행일을 기본값으로 채우되, 이 블록 안에서 자유롭게 고쳐 쓸 수 있다. */
@@ -116,8 +228,36 @@ export function createCopyrightBlock(book: Pick<Book, "title" | "author" | "date
   };
 }
 
+export function createQuoteBlock(text = ""): QuoteBlock {
+  return { id: makeId("q"), type: "quote", text, citation: "", align: "left" };
+}
+
+export function createSceneBreakBlock(): SceneBreakBlock {
+  return { id: makeId("sb"), type: "scenebreak" };
+}
+
+export function createPoemBlock(text = ""): PoemBlock {
+  return { id: makeId("poem"), type: "poem", text, align: "left" };
+}
+
+export function createHeadingBlock(text = "", level: 2 | 3 = 2): HeadingBlock {
+  return { id: makeId("h"), type: "heading", text, level };
+}
+
+export function createPageBreakBlock(): PageBreakBlock {
+  return { id: makeId("pb"), type: "pagebreak" };
+}
+
+export function createListBlock(ordered = false): ListBlock {
+  return { id: makeId("list"), type: "list", ordered, items: [""] };
+}
+
+export function createFrontMatterBlock(kind: FrontMatterKind): FrontMatterBlock {
+  return { id: makeId("fm"), type: "frontmatter", kind, title: frontMatterLabel(kind), body: "", citation: "" };
+}
+
 export function createChapter(title = "새 챕터"): Chapter {
-  return { id: makeId("ch"), title, blocks: [createParagraphBlock("")], notes: [] };
+  return { id: makeId("ch"), title, blocks: [createParagraphBlock("")], notes: [], dropCap: false };
 }
 
 export function createNote(kind: NoteKind): Note {
@@ -160,6 +300,21 @@ export function normalizeBook(book: Book): Book {
     date: book.date ?? todayString(),
     publisherLogo: book.publisherLogo ?? null,
     fontId: book.fontId ?? "chosunilbo",
-    chapters: book.chapters.map(c => ({ ...c, notes: c.notes ?? [] })),
+    chapters: book.chapters.map(c => ({
+      ...c,
+      notes: c.notes ?? [],
+      dropCap: c.dropCap ?? false,
+      blocks: c.blocks.map(b => normalizeBlock(b)),
+    })),
   };
+}
+
+function normalizeBlock(b: Block): Block {
+  if (b.type === "paragraph" || b.type === "textbox" || b.type === "quote" || b.type === "poem") {
+    return { ...b, align: b.align ?? "left" };
+  }
+  if (b.type === "image") {
+    return { ...b, align: b.align ?? "center", widthPercent: b.widthPercent ?? 100 };
+  }
+  return b;
 }

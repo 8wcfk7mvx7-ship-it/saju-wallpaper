@@ -1,7 +1,8 @@
 import JSZip from "jszip";
-import type { Block, Book, Chapter, Note } from "./types";
+import type { Align, Block, Book, Chapter, Note } from "./types";
 import { computeNoteNumbers, referencedNoteIds, splitTextByNoteRefs } from "./notes";
 import { getEpubFont, type EpubFontOption } from "./fonts";
+import { parseRichText, type RichNode } from "./richtext";
 
 function escapeXml(input: string): string {
   return input
@@ -12,13 +13,48 @@ function escapeXml(input: string): string {
     .replace(/'/g, "&apos;");
 }
 
-/** 줄글 텍스트 -> 문단 태그들 (각주/미주 본문처럼 참조 토큰이 없는 일반 텍스트용). */
-function plainParagraphs(text: string): string {
+/** 굵게/기울임 등 인라인 서식 트리를 실제 XHTML 태그로 바꾼다. */
+function richNodesToXhtml(nodes: RichNode[]): string {
+  return nodes
+    .map(node => {
+      if (node.type === "text") return escapeXml(node.value);
+      const inner = richNodesToXhtml(node.children);
+      switch (node.style) {
+        case "bold":
+          return `<strong>${inner}</strong>`;
+        case "italic":
+          return `<em>${inner}</em>`;
+        case "underline":
+          return `<span class="u">${inner}</span>`;
+        case "strike":
+          return `<s>${inner}</s>`;
+        case "highlight":
+          return `<mark>${inner}</mark>`;
+        case "sup":
+          return `<sup>${inner}</sup>`;
+        case "sub":
+          return `<sub>${inner}</sub>`;
+      }
+    })
+    .join("");
+}
+
+/** 정렬/들여쓰기가 반영된 <p> 여는 태그. */
+function paragraphOpenTag(align?: Align, indent = true): string {
+  const styles: string[] = [];
+  if (align && align !== "left") styles.push(`text-align:${align}`);
+  if (!indent || (align && align !== "left" && align !== "justify")) styles.push("text-indent:0");
+  return styles.length ? `<p style="${styles.join(";")}">` : "<p>";
+}
+
+/** 줄글 텍스트 -> 문단 태그들 (각주/미주 본문처럼 참조 토큰이 없는 일반 텍스트용). 인라인 서식은 지원된다. */
+function plainParagraphs(text: string, align?: Align, indent = true): string {
+  const openTag = paragraphOpenTag(align, indent);
   const paragraphs = text.split(/\n{2,}/);
   return paragraphs
     .map(p => p.trim())
     .filter(p => p.length > 0)
-    .map(p => `<p>${escapeXml(p).replace(/\n/g, "<br/>")}</p>`)
+    .map(p => `${openTag}${p.split("\n").map(line => richNodesToXhtml(parseRichText(line))).join("<br/>")}</p>`)
     .join("\n");
 }
 
@@ -29,11 +65,11 @@ interface NoteRenderContext {
   renderedFootnotes: Set<string>;
 }
 
-/** 본문 한 줄을 렌더링하며 각주/미주 참조를 <sup><a epub:type="noteref"> 마커로 바꾼다. */
+/** 본문 한 줄을 렌더링하며 각주/미주 참조는 <sup><a epub:type="noteref">로, 굵게/기울임 등은 실제 태그로 바꾼다. */
 function renderNoteAwareLine(line: string, ctx: NoteRenderContext, footnoteIdsInBlock: string[]): string {
   return splitTextByNoteRefs(line)
     .map(seg => {
-      if (seg.type === "text") return escapeXml(seg.value);
+      if (seg.type === "text") return richNodesToXhtml(parseRichText(seg.value));
       const noteId = seg.noteId!;
       const note = ctx.noteById.get(noteId);
       const num = ctx.noteNumbers.get(noteId);
@@ -46,25 +82,34 @@ function renderNoteAwareLine(line: string, ctx: NoteRenderContext, footnoteIdsIn
     .join("");
 }
 
-/** 각주/미주 참조가 들어갈 수 있는 본문(문단, 텍스트 박스)을 렌더링한다. */
-function renderNoteAwareParagraphs(text: string, ctx: NoteRenderContext): { html: string; footnoteAsides: string } {
-  const footnoteIdsInBlock: string[] = [];
-  const paragraphs = text
-    .split(/\n{2,}/)
-    .map(p => p.trim())
-    .filter(p => p.length > 0)
-    .map(p => `<p>${p.split("\n").map(line => renderNoteAwareLine(line, ctx, footnoteIdsInBlock)).join("<br/>")}</p>`);
-
-  const footnoteAsides = footnoteIdsInBlock
+/** 이미 등장한 각주 id를 걸러내고 <aside epub:type="footnote"> 목록을 만든다. */
+function buildFootnoteAsides(footnoteIdsInBlock: string[], ctx: NoteRenderContext): string {
+  return footnoteIdsInBlock
     .filter(id => !ctx.renderedFootnotes.has(id))
     .map(id => {
       ctx.renderedFootnotes.add(id);
       const note = ctx.noteById.get(id)!;
       const num = ctx.noteNumbers.get(id)!;
       return `<aside epub:type="footnote" id="${id}" class="footnote"><p class="note-number"><a epub:type="noteref-back" href="#ref-${id}">${num}.</a></p>${plainParagraphs(note.text) || "<p></p>"}</aside>`;
-    });
+    })
+    .join("\n");
+}
 
-  return { html: paragraphs.join("\n"), footnoteAsides: footnoteAsides.join("\n") };
+/** 각주/미주 참조가 들어갈 수 있는 본문(문단, 텍스트 박스, 인용구, 시 등)을 렌더링한다. */
+function renderNoteAwareParagraphs(
+  text: string,
+  ctx: NoteRenderContext,
+  opts: { align?: Align; indent?: boolean } = {}
+): { html: string; footnoteAsides: string } {
+  const footnoteIdsInBlock: string[] = [];
+  const openTag = paragraphOpenTag(opts.align, opts.indent ?? true);
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
+    .map(p => `${openTag}${p.split("\n").map(line => renderNoteAwareLine(line, ctx, footnoteIdsInBlock)).join("<br/>")}</p>`);
+
+  return { html: paragraphs.join("\n"), footnoteAsides: buildFootnoteAsides(footnoteIdsInBlock, ctx) };
 }
 
 const MIME_EXT: Record<string, string> = {
@@ -115,6 +160,13 @@ async function collectImages(book: Book): Promise<ResolvedImage[]> {
   return images;
 }
 
+const FRONT_MATTER_EPUB_TYPE: Record<string, string> = {
+  dedication: "dedication",
+  epigraph: "epigraph",
+  foreword: "foreword",
+  afterword: "afterword",
+};
+
 function blockToXhtml(
   block: Block,
   imageByBlockId: Map<string, ResolvedImage>,
@@ -123,22 +175,68 @@ function blockToXhtml(
 ): string {
   switch (block.type) {
     case "paragraph": {
-      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx);
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align });
       return footnoteAsides ? `${html}\n${footnoteAsides}` : html;
     }
     case "textbox": {
       const label = block.label.trim();
       const labelHtml = label ? `<p class="textbox-label">${escapeXml(label)}</p>` : "";
-      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx);
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align });
       const aside = `<aside class="textbox">${labelHtml}${html}</aside>`;
       return footnoteAsides ? `${aside}\n${footnoteAsides}` : aside;
+    }
+    case "quote": {
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align, indent: false });
+      const citation = block.citation.trim() ? `<footer>— <cite>${escapeXml(block.citation)}</cite></footer>` : "";
+      const bq = `<blockquote class="quote">${html}${citation}</blockquote>`;
+      return footnoteAsides ? `${bq}\n${footnoteAsides}` : bq;
+    }
+    case "poem": {
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx, { align: block.align, indent: false });
+      const poem = `<div class="poem" epub:type="z3998:poem">${html}</div>`;
+      return footnoteAsides ? `${poem}\n${footnoteAsides}` : poem;
+    }
+    case "heading": {
+      const footnoteIdsInBlock: string[] = [];
+      const inner = renderNoteAwareLine(block.text, ctx, footnoteIdsInBlock);
+      const tag = block.level === 2 ? "h2" : "h3";
+      const heading = `<${tag} id="${block.id}">${inner}</${tag}>`;
+      const footnoteAsides = buildFootnoteAsides(footnoteIdsInBlock, ctx);
+      return footnoteAsides ? `${heading}\n${footnoteAsides}` : heading;
+    }
+    case "scenebreak":
+      return `<p class="scenebreak" role="separator" aria-label="장면 전환">⁂</p>`;
+    case "pagebreak":
+      return `<div class="pagebreak-marker"></div>`;
+    case "list": {
+      const footnoteIdsInBlock: string[] = [];
+      const tag = block.ordered ? "ol" : "ul";
+      const items = block.items
+        .filter(item => item.trim())
+        .map(item => `<li>${renderNoteAwareLine(item, ctx, footnoteIdsInBlock)}</li>`)
+        .join("\n");
+      const listHtml = `<${tag}>\n${items}\n</${tag}>`;
+      const footnoteAsides = buildFootnoteAsides(footnoteIdsInBlock, ctx);
+      return footnoteAsides ? `${listHtml}\n${footnoteAsides}` : listHtml;
+    }
+    case "frontmatter": {
+      const isProse = block.kind === "foreword" || block.kind === "afterword";
+      const parts: string[] = [];
+      if (block.title.trim()) parts.push(`<h2 class="fm-title">${escapeXml(block.title)}</h2>`);
+      const { html: bodyHtml, footnoteAsides } = renderNoteAwareParagraphs(block.body, ctx, { indent: isProse, align: isProse ? undefined : "center" });
+      if (bodyHtml) parts.push(`<div class="fm-body fm-${block.kind}">${bodyHtml}</div>`);
+      if (block.kind === "epigraph" && block.citation.trim()) {
+        parts.push(`<p class="fm-citation">${escapeXml(block.citation)}</p>`);
+      }
+      const section = `<section class="frontmatter fm-${block.kind}" epub:type="${FRONT_MATTER_EPUB_TYPE[block.kind]}">\n${parts.join("\n")}\n</section>`;
+      return footnoteAsides ? `${section}\n${footnoteAsides}` : section;
     }
     case "image": {
       const resolved = imageByBlockId.get(block.id);
       if (!resolved) return "";
       const caption = block.caption.trim();
       const figcaption = caption ? `<figcaption>${escapeXml(caption)}</figcaption>` : "";
-      return `<figure class="epub-image"><img src="../images/${resolved.fileName}" alt="${escapeXml(block.alt)}"/>${figcaption}</figure>`;
+      return `<figure class="epub-image epub-image-${block.align}"><img src="../images/${resolved.fileName}" alt="${escapeXml(block.alt)}" style="width:${block.widthPercent}%"/>${figcaption}</figure>`;
     }
     case "copyright": {
       const parts: string[] = [];
@@ -190,6 +288,7 @@ function chapterToXhtml(
   };
   const body = chapter.blocks.map(b => blockToXhtml(b, imageByBlockId, ctx, assets)).join("\n");
   const endnotes = endnotesSection(chapter, ctx);
+  const sectionClass = chapter.dropCap ? ` class="dropcap"` : "";
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${book.language}" xml:lang="${book.language}">
@@ -199,7 +298,7 @@ function chapterToXhtml(
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
 </head>
 <body>
-<section epub:type="chapter">
+<section epub:type="chapter"${sectionClass}>
 <h1>${escapeXml(chapter.title)}</h1>
 ${body}
 </section>
@@ -208,9 +307,20 @@ ${endnotes}
 </html>`;
 }
 
+function chapterHeadings(chapter: Chapter): Extract<Block, { type: "heading" }>[] {
+  return chapter.blocks.filter((b): b is Extract<Block, { type: "heading" }> => b.type === "heading" && b.text.trim().length > 0);
+}
+
 function navXhtml(book: Book): string {
   const items = book.chapters
-    .map((c, i) => `<li><a href="text/chapter-${i + 1}.xhtml">${escapeXml(c.title)}</a></li>`)
+    .map((c, i) => {
+      const headings = chapterHeadings(c);
+      const sub =
+        headings.length > 0
+          ? `<ol>\n${headings.map(h => `<li><a href="text/chapter-${i + 1}.xhtml#${h.id}">${escapeXml(h.text)}</a></li>`).join("\n")}\n</ol>`
+          : "";
+      return `<li><a href="text/chapter-${i + 1}.xhtml">${escapeXml(c.title)}</a>${sub}</li>`;
+    })
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
@@ -232,13 +342,27 @@ ${items}
 }
 
 function tocNcx(book: Book): string {
+  let playOrder = 0;
   const navPoints = book.chapters
-    .map(
-      (c, i) => `<navPoint id="navpoint-${i + 1}" playOrder="${i + 1}">
+    .map((c, i) => {
+      playOrder += 1;
+      const chapterPlayOrder = playOrder;
+      const headings = chapterHeadings(c);
+      const children = headings
+        .map(h => {
+          playOrder += 1;
+          return `<navPoint id="navpoint-${h.id}" playOrder="${playOrder}">
+<navLabel><text>${escapeXml(h.text)}</text></navLabel>
+<content src="text/chapter-${i + 1}.xhtml#${h.id}"/>
+</navPoint>`;
+        })
+        .join("\n");
+      return `<navPoint id="navpoint-${i + 1}" playOrder="${chapterPlayOrder}">
 <navLabel><text>${escapeXml(c.title)}</text></navLabel>
 <content src="text/chapter-${i + 1}.xhtml"/>
-</navPoint>`
-    )
+${children}
+</navPoint>`;
+    })
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
@@ -328,6 +452,9 @@ function buildStyleCss(font: EpubFontOption): string {
 
   return `
 ${fontFace}
+:root {
+  color-scheme: light dark;
+}
 html, body {
   margin: 0;
   padding: 0;
@@ -336,15 +463,50 @@ body {
   font-family: ${font.epubFontFamily};
   line-height: 1.8;
   padding: 1.2em;
+  background: #f6f1e6;
+  color: #1c1a14;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  -epub-hyphens: auto;
+  hyphens: auto;
 }
 h1 {
   font-size: 1.4em;
   margin: 0 0 1em;
   page-break-before: always;
 }
+h2 {
+  font-size: 1.15em;
+  margin: 1.4em 0 0.6em;
+}
+h3 {
+  font-size: 1.05em;
+  margin: 1.2em 0 0.5em;
+}
 p {
   margin: 0 0 1em;
   text-indent: 1em;
+}
+/* 소제목 바로 다음 문단은 들여쓰지 않는 것이 일반적인 조판 관행이다 */
+h1 + p, h2 + p, h3 + p {
+  text-indent: 0;
+}
+section.dropcap > p:first-of-type::first-letter {
+  font-size: 3em;
+  font-weight: 800;
+  float: left;
+  line-height: 0.8;
+  margin: 0.05em 0.08em 0 0;
+}
+mark {
+  background: #fde68a;
+  color: #1c1a14;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.u {
+  text-decoration: underline;
 }
 .textbox {
   display: block;
@@ -352,7 +514,7 @@ p {
   padding: 1em 1.2em;
   border: 1px solid #999;
   border-radius: 4px;
-  background: #f5f5f5;
+  background: rgba(0,0,0,0.04);
 }
 .textbox p {
   text-indent: 0;
@@ -361,12 +523,62 @@ p {
   font-weight: bold;
   margin-bottom: 0.5em;
 }
+blockquote.quote {
+  margin: 1.2em 1.5em;
+  padding-left: 1em;
+  border-left: 3px solid #999;
+  font-style: italic;
+}
+blockquote.quote p {
+  text-indent: 0;
+}
+blockquote.quote footer {
+  font-style: normal;
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 0.5em;
+}
+.poem {
+  margin: 1.5em 0;
+}
+.poem p {
+  text-indent: 0;
+}
+p.scenebreak {
+  text-align: center;
+  margin: 2em 0;
+  letter-spacing: 0.4em;
+  text-indent: 0;
+  opacity: 0.6;
+}
+.pagebreak-marker {
+  page-break-before: always;
+}
+ul, ol {
+  margin: 0 0 1em;
+  padding-left: 1.6em;
+}
+li {
+  margin: 0 0 0.4em;
+}
 .epub-image {
   margin: 1.5em 0;
-  text-align: center;
 }
 .epub-image img {
   max-width: 100%;
+  display: block;
+}
+.epub-image-center {
+  text-align: center;
+}
+.epub-image-center img {
+  margin: 0 auto;
+}
+.epub-image-left {
+  text-align: left;
+}
+.epub-image-right img {
+  margin-left: auto;
 }
 .epub-image figcaption {
   font-size: 0.85em;
@@ -383,7 +595,7 @@ aside.footnote, aside.endnote {
   margin: 0.6em 0 1.2em;
   padding: 0.6em 1em;
   border-top: 1px solid #ccc;
-  background: #f5f5f5;
+  background: rgba(0,0,0,0.04);
   color: #333;
 }
 aside.footnote p, aside.endnote p {
@@ -403,7 +615,7 @@ aside.footnote p, aside.endnote p {
   font-size: 1.1em;
   margin: 0 0 1em;
 }
-.copyright-page {
+.copyright-page, .frontmatter {
   page-break-before: always;
   text-align: center;
   padding-top: 3em;
@@ -436,6 +648,46 @@ aside.footnote p, aside.endnote p {
 }
 .copyright-page .cr-body p {
   text-indent: 0;
+}
+.frontmatter .fm-title {
+  font-size: 1.1em;
+  margin: 0 0 1em;
+}
+.frontmatter .fm-foreword, .frontmatter .fm-afterword {
+  text-align: left;
+  margin-top: 1em;
+}
+.frontmatter .fm-citation {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 0.8em;
+  text-indent: 0;
+}
+
+/* 리더가 다크 모드일 때 배경/글자색을 함께 바꾼다 (Apple Books 등에서 지원) */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1a1816;
+    color: #e8e3d8;
+  }
+  mark {
+    background: #7a6a1f;
+    color: #fff3d0;
+  }
+  .textbox, aside.footnote, aside.endnote {
+    background: rgba(255,255,255,0.06);
+    border-color: #555;
+    color: #d8d3c8;
+  }
+  blockquote.quote {
+    border-left-color: #777;
+  }
+  .copyright-page .cr-line, .copyright-page .cr-body, .epub-image figcaption {
+    color: #c9c3b6;
+  }
+  .endnotes, p.scenebreak {
+    border-color: #555;
+  }
 }
 `;
 }

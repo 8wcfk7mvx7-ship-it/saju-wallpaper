@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
-  createBook, createChapter, createCopyrightBlock, createNote, createParagraphBlock, createTextBoxBlock, normalizeBook,
-  type Block, type Book, type Note, type NoteKind, type ParagraphBlock, type TextBoxBlock,
+  createBook, createChapter, createCopyrightBlock, createFrontMatterBlock, createHeadingBlock, createListBlock,
+  createNote, createPageBreakBlock, createParagraphBlock, createPoemBlock, createQuoteBlock, createSceneBreakBlock,
+  createTextBoxBlock, hasText, normalizeBook,
+  type Block, type Book, type FrontMatterKind, type Note, type NoteKind, type TextBearingBlock,
 } from "@/lib/epub/types";
 import type { EpubFontId } from "@/lib/epub/fonts";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
 import { referencedNoteIdsInBlocks, replaceRangeWithNoteToken, stripNoteToken } from "@/lib/epub/notes";
+import { wrapRangeWithStyle, type InlineStyle } from "@/lib/epub/richtext";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
 import { loadDraft, saveDraft } from "@/lib/epub/storage";
 import { saveEpubFile } from "@/lib/epub/download";
@@ -23,18 +26,28 @@ function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
-/** 문단/텍스트박스 블록 목록에서 특정 블록의 text만 계산해서 바꿔치기한다. */
+/** 줄글이 있는 블록(문단/텍스트박스/인용구/시/소제목) 목록에서 특정 블록의 text만 계산해서 바꿔치기한다. */
 function updateBlockText(blocks: Block[], blockId: string, compute: (text: string) => string): Block[] {
   return blocks.map(b => {
-    if (b.id !== blockId || (b.type !== "paragraph" && b.type !== "textbox")) return b;
+    if (b.id !== blockId || !hasText(b)) return b;
     return { ...b, text: compute(b.text) };
   });
 }
 
-/** 같은 타입(문단/텍스트박스)의 새 블록을 만들되 내용은 지정한 텍스트로 채운다. id는 새로 발급된다. */
-function cloneTextBlockWithText(block: ParagraphBlock | TextBoxBlock, text: string): ParagraphBlock | TextBoxBlock {
-  if (block.type === "textbox") return { ...createTextBoxBlock(text), label: block.label };
-  return createParagraphBlock(text);
+/** 같은 타입의 새 블록을 만들되 내용은 지정한 텍스트로 채운다. id는 새로 발급된다. */
+function cloneTextBlockWithText(block: TextBearingBlock, text: string): TextBearingBlock {
+  switch (block.type) {
+    case "textbox":
+      return { ...createTextBoxBlock(text), label: block.label, align: block.align };
+    case "quote":
+      return { ...createQuoteBlock(text), citation: block.citation, align: block.align };
+    case "poem":
+      return { ...createPoemBlock(text), align: block.align };
+    case "heading":
+      return createHeadingBlock(text, block.level);
+    case "paragraph":
+      return { ...createParagraphBlock(text), align: block.align };
+  }
 }
 
 export default function EpubWorkspace() {
@@ -143,6 +156,38 @@ export default function EpubWorkspace() {
     updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, block] }));
   }
 
+  function handleAddQuote() {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createQuoteBlock("")] }));
+  }
+
+  function handleAddSceneBreak() {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createSceneBreakBlock()] }));
+  }
+
+  function handleAddPoem() {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createPoemBlock("")] }));
+  }
+
+  function handleAddHeading() {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createHeadingBlock("")] }));
+  }
+
+  function handleAddPageBreak() {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createPageBreakBlock()] }));
+  }
+
+  function handleAddList(ordered: boolean) {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createListBlock(ordered)] }));
+  }
+
+  function handleAddFrontMatter(kind: FrontMatterKind) {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: [...c.blocks, createFrontMatterBlock(kind)] }));
+  }
+
+  function handleToggleDropCap() {
+    updateChapter(activeChapter.id, c => ({ ...c, dropCap: !c.dropCap }));
+  }
+
   async function handleAddImages(files: FileList | File[]) {
     const blocks = await imageBlocksFromFiles(files);
     if (blocks.length === 0) return;
@@ -177,7 +222,7 @@ export default function EpubWorkspace() {
   /** 우클릭 메뉴: 드래그로 고른 글자를 뽑아 책 제목으로 쓰고, 본문에서는 지운다. */
   function handleSetBookTitle(blockId: string, start: number, end: number) {
     const block = activeChapter.blocks.find(b => b.id === blockId);
-    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    if (!block || !hasText(block)) return;
     const selected = block.text.slice(start, end).trim();
     if (!selected) return;
     updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
@@ -187,7 +232,7 @@ export default function EpubWorkspace() {
   /** 우클릭 메뉴: 드래그로 고른 글자를 뽑아 책 부제로 쓰고, 본문에서는 지운다. */
   function handleSetBookSubtitle(blockId: string, start: number, end: number) {
     const block = activeChapter.blocks.find(b => b.id === blockId);
-    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    if (!block || !hasText(block)) return;
     const selected = block.text.slice(start, end).trim();
     if (!selected) return;
     updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
@@ -197,7 +242,7 @@ export default function EpubWorkspace() {
   /** 우클릭 메뉴: 드래그로 고른 글자를 새 챕터의 제목으로 삼아, 그 지점에서 챕터를 나눈다. */
   function handleSplitAsChapter(blockId: string, start: number, end: number) {
     const targetBlock = activeChapter.blocks.find(b => b.id === blockId);
-    if (!targetBlock || (targetBlock.type !== "paragraph" && targetBlock.type !== "textbox")) return;
+    if (!targetBlock || !hasText(targetBlock)) return;
     const newTitle = targetBlock.text.slice(start, end).trim();
     if (!newTitle) return;
     const newChapterTemplate = createChapter(newTitle);
@@ -207,7 +252,7 @@ export default function EpubWorkspace() {
       const chapter = prev.chapters[chapterIdx];
       const idx = chapter.blocks.findIndex(b => b.id === blockId);
       const block = chapter.blocks[idx];
-      if (idx < 0 || !block || (block.type !== "paragraph" && block.type !== "textbox")) return prev;
+      if (idx < 0 || !block || !hasText(block)) return prev;
 
       const beforeText = block.text.slice(0, start);
       const afterText = block.text.slice(end);
@@ -235,7 +280,7 @@ export default function EpubWorkspace() {
   /** 우클릭 메뉴: 드래그로 고른 글자를 각주/미주 내용으로 옮기고, 본문 자리에는 참조 표시만 남긴다. */
   function handleConvertSelectionToNote(blockId: string, start: number, end: number, kind: NoteKind) {
     const block = activeChapter.blocks.find(b => b.id === blockId);
-    if (!block || (block.type !== "paragraph" && block.type !== "textbox")) return;
+    if (!block || !hasText(block)) return;
     const selected = block.text.slice(start, end).trim();
     if (!selected) return;
     const note: Note = { ...createNote(kind), text: selected };
@@ -244,6 +289,11 @@ export default function EpubWorkspace() {
       notes: [...c.notes, note],
       blocks: updateBlockText(c.blocks, blockId, t => replaceRangeWithNoteToken(t, start, end, note.id)),
     }));
+  }
+
+  /** 우클릭 메뉴: 굵게/기울임/밑줄/취소선/형광펜/위첨자/아래첨자 등 인라인 서식을 선택 영역에 적용한다. */
+  function handleApplyInlineStyle(blockId: string, start: number, end: number, style: InlineStyle) {
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => wrapRangeWithStyle(t, start, end, style)) }));
   }
 
   function handleAddNote(note: Note) {
@@ -261,9 +311,7 @@ export default function EpubWorkspace() {
     updateChapter(activeChapter.id, c => ({
       ...c,
       notes: c.notes.filter(n => n.id !== noteId),
-      blocks: c.blocks.map(b =>
-        b.type === "paragraph" || b.type === "textbox" ? { ...b, text: stripNoteToken(b.text, noteId) } : b
-      ),
+      blocks: c.blocks.map(b => (hasText(b) ? { ...b, text: stripNoteToken(b.text, noteId) } : b)),
     }));
   }
 
@@ -337,6 +385,14 @@ export default function EpubWorkspace() {
             onAddTextBox={handleAddTextBox}
             onAddImages={handleAddImages}
             onAddCopyright={handleAddCopyright}
+            onAddQuote={handleAddQuote}
+            onAddSceneBreak={handleAddSceneBreak}
+            onAddPoem={handleAddPoem}
+            onAddHeading={handleAddHeading}
+            onAddPageBreak={handleAddPageBreak}
+            onAddList={handleAddList}
+            onAddFrontMatter={handleAddFrontMatter}
+            onToggleDropCap={handleToggleDropCap}
             onAddNote={handleAddNote}
             onChangeNote={handleChangeNote}
             onDeleteNote={handleDeleteNote}
@@ -344,6 +400,7 @@ export default function EpubWorkspace() {
             onSetBookSubtitle={handleSetBookSubtitle}
             onSplitAsChapter={handleSplitAsChapter}
             onConvertSelectionToNote={handleConvertSelectionToNote}
+            onApplyInlineStyle={handleApplyInlineStyle}
           />
         </div>
 

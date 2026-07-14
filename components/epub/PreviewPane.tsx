@@ -73,7 +73,19 @@ export default function PreviewPane({
           className="w-full max-w-[480px] rounded-xl overflow-hidden"
           style={{ background: "#f6f1e6", boxShadow: "0 12px 40px rgba(0,0,0,0.35)" }}
         >
+          {chapter.dropCap && (
+            <style>{`
+              .dropcap-preview > p:first-of-type::first-letter {
+                font-size: 3em;
+                font-weight: 800;
+                float: left;
+                line-height: 0.8;
+                margin: 0.04em 0.08em 0 0;
+              }
+            `}</style>
+          )}
           <div
+            className={chapter.dropCap ? "dropcap-preview" : undefined}
             style={{
               fontSize,
               lineHeight: 1.8,

@@ -1,6 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import type { Block, Chapter, Note, NoteKind } from "@/lib/epub/types";
+import type { Block, Chapter, FrontMatterKind, Note, NoteKind } from "@/lib/epub/types";
+import { frontMatterLabel } from "@/lib/epub/types";
+import type { InlineStyle } from "@/lib/epub/richtext";
 import ChapterRail from "./ChapterRail";
 import BlockView from "./BlockView";
 import NotesPanel from "./NotesPanel";
@@ -21,6 +23,14 @@ interface Props {
   onAddTextBox: () => void;
   onAddImages: (files: FileList | File[]) => void;
   onAddCopyright: () => void;
+  onAddQuote: () => void;
+  onAddSceneBreak: () => void;
+  onAddPoem: () => void;
+  onAddHeading: () => void;
+  onAddPageBreak: () => void;
+  onAddList: (ordered: boolean) => void;
+  onAddFrontMatter: (kind: FrontMatterKind) => void;
+  onToggleDropCap: () => void;
   onAddNote: (note: Note) => void;
   onChangeNote: (noteId: string, text: string) => void;
   onDeleteNote: (noteId: string) => void;
@@ -28,14 +38,20 @@ interface Props {
   onSetBookSubtitle: (blockId: string, start: number, end: number) => void;
   onSplitAsChapter: (blockId: string, start: number, end: number) => void;
   onConvertSelectionToNote: (blockId: string, start: number, end: number, kind: NoteKind) => void;
+  onApplyInlineStyle: (blockId: string, start: number, end: number, style: InlineStyle) => void;
 }
+
+const FRONT_MATTER_KINDS: FrontMatterKind[] = ["dedication", "epigraph", "foreword", "afterword"];
+
+const addBtnStyle = { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)" };
 
 export default function EditorPane(props: Props) {
   const {
     chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter,
     onChangeBlock, onDeleteBlock, onMoveBlock, onSplitAt, onAddParagraph, onAddTextBox, onAddImages, onAddCopyright,
+    onAddQuote, onAddSceneBreak, onAddPoem, onAddHeading, onAddPageBreak, onAddList, onAddFrontMatter, onToggleDropCap,
     onAddNote, onChangeNote, onDeleteNote,
-    onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote,
+    onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote, onApplyInlineStyle,
   } = props;
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,6 +68,13 @@ export default function EditorPane(props: Props) {
           onDeleteChapter={onDeleteChapter}
           onMoveChapter={onMoveChapter}
         />
+        <label
+          className="flex items-center gap-1.5 text-[11px] px-3 py-2 border-t"
+          style={{ color: "rgba(255,255,255,0.5)", borderColor: "rgba(255,255,255,0.07)" }}
+        >
+          <input type="checkbox" checked={activeChapter.dropCap} onChange={onToggleDropCap} />
+          이 챕터 첫 글자 크게
+        </label>
       </div>
 
       <div
@@ -88,6 +111,7 @@ export default function EditorPane(props: Props) {
               onSetBookSubtitle={onSetBookSubtitle}
               onSplitAsChapter={onSplitAsChapter}
               onConvertSelectionToNote={onConvertSelectionToNote}
+              onApplyInlineStyle={onApplyInlineStyle}
             />
           ))}
         </div>
@@ -95,16 +119,11 @@ export default function EditorPane(props: Props) {
         <NotesPanel chapter={activeChapter} onChangeNote={onChangeNote} onDeleteNote={onDeleteNote} />
 
         <div
-          className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-2.5 border-t"
+          className="shrink-0 flex flex-wrap items-center gap-1.5 px-3 sm:px-4 py-2.5 border-t"
           style={{ borderColor: "rgba(255,255,255,0.07)" }}
         >
-          <button
-            onClick={onAddParagraph}
-            className="text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)" }}
-          >
-            + 문단
-          </button>
+          <button onClick={onAddParagraph} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 문단</button>
+          <button onClick={onAddHeading} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 소제목</button>
           <button
             onClick={onAddTextBox}
             className="text-xs font-bold px-3 py-1.5 rounded-full"
@@ -112,6 +131,12 @@ export default function EditorPane(props: Props) {
           >
             + 텍스트 박스
           </button>
+          <button onClick={onAddQuote} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 인용구</button>
+          <button onClick={onAddPoem} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 시</button>
+          <button onClick={onAddSceneBreak} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 장면 구분선</button>
+          <button onClick={onAddPageBreak} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 페이지 나눔</button>
+          <button onClick={() => onAddList(false)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 글머리 목록</button>
+          <button onClick={() => onAddList(true)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 번호 목록</button>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="text-xs font-bold px-3 py-1.5 rounded-full"
@@ -126,6 +151,20 @@ export default function EditorPane(props: Props) {
           >
             + 저작권 페이지
           </button>
+          <select
+            value=""
+            onChange={e => {
+              if (e.target.value) onAddFrontMatter(e.target.value as FrontMatterKind);
+              e.target.value = "";
+            }}
+            className="text-xs font-bold px-3 py-1.5 rounded-full"
+            style={{ background: "rgba(245,197,24,0.12)", color: "#e8c964" }}
+          >
+            <option value="">+ 특수 페이지...</option>
+            {FRONT_MATTER_KINDS.map(k => (
+              <option key={k} value={k} style={{ color: "#000" }}>{frontMatterLabel(k)}</option>
+            ))}
+          </select>
           <input
             ref={fileInputRef}
             type="file"
