@@ -68,10 +68,10 @@ export default function PreviewPane({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto flex justify-center py-4 px-2 sm:py-6 sm:px-4">
+      <div className="flex-1 min-h-0 flex justify-center p-3 sm:p-6">
         <div
-          className="w-full max-w-[480px] rounded-xl overflow-hidden"
-          style={{ background: "#f6f1e6", boxShadow: "0 12px 40px rgba(0,0,0,0.35)" }}
+          className="w-full h-full flex flex-col rounded-xl overflow-hidden"
+          style={{ maxWidth: 600, background: "#f6f1e6", boxShadow: "0 12px 40px rgba(0,0,0,0.35)" }}
         >
           {chapter.dropCap && (
             <style>{`
@@ -85,14 +85,13 @@ export default function PreviewPane({
             `}</style>
           )}
           <div
-            className={chapter.dropCap ? "dropcap-preview" : undefined}
+            className={`flex-1 min-h-0 overflow-y-auto ${chapter.dropCap ? "dropcap-preview" : ""}`}
             style={{
               fontSize,
               lineHeight: 1.8,
               color: "#1c1a14",
               fontFamily: previewFontFamily,
               padding: "2rem 1.6rem",
-              minHeight: 320,
             }}
           >
             <h1 style={{ fontSize: "1.3em", fontWeight: 800, margin: "0 0 1em" }}>{chapter.title}</h1>

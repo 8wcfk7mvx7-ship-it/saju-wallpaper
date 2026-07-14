@@ -264,7 +264,7 @@ export function createNote(kind: NoteKind): Note {
   return { id: makeId("note"), kind, text: "" };
 }
 
-function makeUuid(): string {
+export function makeUuid(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0;

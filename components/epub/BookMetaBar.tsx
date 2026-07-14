@@ -2,6 +2,8 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EPUB_FONTS, type EpubFontId } from "@/lib/epub/fonts";
+import type { ProjectMeta } from "@/lib/epub/storage";
+import FileMenu from "./FileMenu";
 
 interface Props {
   title: string;
@@ -16,6 +18,16 @@ interface Props {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  focusMode: boolean;
+  onToggleFocusMode: () => void;
+  onToggleFullscreen: () => void;
+  projects: ProjectMeta[];
+  currentProjectId: string | null;
+  onRefreshProjects: () => void;
+  onNewProject: () => void;
+  onSaveProject: () => void;
+  onSaveAsProject: () => void;
+  onOpenProject: (id: string) => void;
   onChangeTitle: (title: string) => void;
   onChangeSubtitle: (subtitle: string) => void;
   onChangeAuthor: (author: string) => void;
@@ -30,6 +42,8 @@ interface Props {
 
 export default function BookMetaBar({
   title, subtitle, author, date, coverImage, publisherLogo, fontId, exporting, canUndo, canRedo, onUndo, onRedo,
+  focusMode, onToggleFocusMode, onToggleFullscreen,
+  projects, currentProjectId, onRefreshProjects, onNewProject, onSaveProject, onSaveAsProject, onOpenProject,
   onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangeDate, onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
 }: Props) {
@@ -40,15 +54,45 @@ export default function BookMetaBar({
 
   return (
     <div className="shrink-0" style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-      <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5">
-        <button
-          onClick={() => router.push("/")}
-          className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.6)" }}
-          aria-label="뒤로"
-        >
-          ←
-        </button>
+      {/* 창 컨트롤 + 파일 메뉴 + 실행취소/다시실행 + 보기 전환 + 내보내기 */}
+      <div className="flex items-center gap-2 px-3 sm:px-4 pt-2.5">
+        <div className="flex items-center gap-1.5 shrink-0" title="창 컨트롤">
+          <button
+            onClick={() => router.push("/")}
+            aria-label="닫기"
+            title="닫기"
+            className="w-3 h-3 rounded-full"
+            style={{ background: "#ff5f57" }}
+          />
+          <button
+            onClick={onToggleFocusMode}
+            aria-label="최소화(집중 모드)"
+            title="최소화(집중 모드)"
+            className="w-3 h-3 rounded-full"
+            style={{ background: "#febc2e", boxShadow: focusMode ? "0 0 0 2px rgba(254,188,46,0.5)" : "none" }}
+          />
+          <button
+            onClick={onToggleFullscreen}
+            aria-label="최대화(전체 화면)"
+            title="최대화(전체 화면)"
+            className="w-3 h-3 rounded-full"
+            style={{ background: "#28c840" }}
+          />
+        </div>
+
+        <span className="text-xs font-black shrink-0 hidden sm:inline" style={{ color: "rgba(42,36,23,0.55)" }}>
+          이펍공장
+        </span>
+
+        <FileMenu
+          projects={projects}
+          currentProjectId={currentProjectId}
+          onOpenMenu={onRefreshProjects}
+          onNew={onNewProject}
+          onSave={onSaveProject}
+          onSaveAs={onSaveAsProject}
+          onOpenProject={onOpenProject}
+        />
 
         <div className="hidden sm:flex items-center gap-1 shrink-0">
           <button
@@ -73,15 +117,7 @@ export default function BookMetaBar({
           </button>
         </div>
 
-        <button
-          onClick={() => setShowMeta(v => !v)}
-          className="min-w-0 flex-1 text-left"
-        >
-          <p className="text-sm font-black truncate" style={{ color: "#2a2417" }}>{title || "제목 없는 책"}</p>
-          <p className="text-[11px] truncate" style={{ color: "rgba(42,36,23,0.45)" }}>
-            {subtitle || author || "책 정보 편집"}
-          </p>
-        </button>
+        <div className="flex-1" />
 
         <div className="sm:hidden flex rounded-full p-0.5 shrink-0" style={{ background: "rgba(0,0,0,0.045)" }}>
           <button
@@ -109,6 +145,14 @@ export default function BookMetaBar({
           {exporting ? "만드는 중…" : "EPUB 내보내기"}
         </button>
       </div>
+
+      {/* 책 제목/부제 요약 — 누르면 아래 상세 정보 패널이 열린다 */}
+      <button onClick={() => setShowMeta(v => !v)} className="w-full text-left px-3 sm:px-4 pt-1.5 pb-2.5">
+        <p className="text-sm font-black truncate" style={{ color: "#2a2417" }}>{title || "제목 없는 책"}</p>
+        <p className="text-[11px] truncate" style={{ color: "rgba(42,36,23,0.45)" }}>
+          {subtitle || author || "책 정보 편집"}
+        </p>
+      </button>
 
       {showMeta && (
         <div className="px-3 sm:px-4 pb-3 flex flex-col sm:flex-row gap-3">

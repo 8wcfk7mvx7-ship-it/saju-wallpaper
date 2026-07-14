@@ -1,13 +1,14 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { Block, Chapter, FrontMatterKind, Note, NoteKind } from "@/lib/epub/types";
-import { frontMatterLabel } from "@/lib/epub/types";
 import type { InlineStyle } from "@/lib/epub/richtext";
 import ChapterRail from "./ChapterRail";
 import BlockView from "./BlockView";
 import NotesPanel from "./NotesPanel";
+import Ribbon from "./Ribbon";
 
 interface Props {
+  focusMode: boolean;
   chapters: Chapter[];
   activeChapter: Chapter;
   onSelectChapter: (id: string) => void;
@@ -44,12 +45,9 @@ interface Props {
   onApplyInlineStyle: (blockId: string, start: number, end: number, style: InlineStyle) => void;
 }
 
-const FRONT_MATTER_KINDS: FrontMatterKind[] = ["dedication", "epigraph", "foreword", "afterword"];
-
-const addBtnStyle = { background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" };
-
 export default function EditorPane(props: Props) {
   const {
+    focusMode,
     chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter, onDuplicateChapter,
     onChangeBlock, onDeleteBlock, onMoveBlock, onReorderBlock, onDuplicateBlock, onSplitAt,
     onAddParagraph, onAddTextBox, onAddImages, onAddCopyright,
@@ -59,7 +57,6 @@ export default function EditorPane(props: Props) {
   } = props;
   const [dragOver, setDragOver] = useState(false);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex h-full min-h-0">
@@ -93,6 +90,21 @@ export default function EditorPane(props: Props) {
           if (e.dataTransfer.files.length) onAddImages(e.dataTransfer.files);
         }}
       >
+        {!focusMode && (
+          <Ribbon
+            onAddParagraph={onAddParagraph}
+            onAddHeading={onAddHeading}
+            onAddTextBox={onAddTextBox}
+            onAddQuote={onAddQuote}
+            onAddPoem={onAddPoem}
+            onAddSceneBreak={onAddSceneBreak}
+            onAddPageBreak={onAddPageBreak}
+            onAddList={onAddList}
+            onAddImages={onAddImages}
+            onAddCopyright={onAddCopyright}
+            onAddFrontMatter={onAddFrontMatter}
+          />
+        )}
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none px-3 sm:px-4 py-3 space-y-3 relative">
           {dragOver && (
             <div
@@ -147,66 +159,6 @@ export default function EditorPane(props: Props) {
         </div>
 
         <NotesPanel chapter={activeChapter} onChangeNote={onChangeNote} onDeleteNote={onDeleteNote} />
-
-        <div
-          className="shrink-0 flex flex-wrap items-center gap-1.5 px-3 sm:px-4 py-2.5 border-t"
-          style={{ borderColor: "rgba(0,0,0,0.08)" }}
-        >
-          <button onClick={onAddParagraph} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 문단</button>
-          <button onClick={onAddHeading} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 소제목</button>
-          <button
-            onClick={onAddTextBox}
-            className="text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(109,40,217,0.1)", color: "#6d28d9" }}
-          >
-            + 텍스트 박스
-          </button>
-          <button onClick={onAddQuote} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 인용구</button>
-          <button onClick={onAddPoem} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 시</button>
-          <button onClick={onAddSceneBreak} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 장면 구분선</button>
-          <button onClick={onAddPageBreak} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 페이지 나눔</button>
-          <button onClick={() => onAddList(false)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 글머리 목록</button>
-          <button onClick={() => onAddList(true)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={addBtnStyle}>+ 번호 목록</button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(37,99,235,0.1)", color: "#1d4ed8" }}
-          >
-            + 이미지
-          </button>
-          <button
-            onClick={onAddCopyright}
-            className="text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(146,114,14,0.12)", color: "#92720e" }}
-          >
-            + 저작권 페이지
-          </button>
-          <select
-            value=""
-            onChange={e => {
-              if (e.target.value) onAddFrontMatter(e.target.value as FrontMatterKind);
-              e.target.value = "";
-            }}
-            className="text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(146,114,14,0.12)", color: "#92720e" }}
-          >
-            <option value="">+ 특수 페이지...</option>
-            {FRONT_MATTER_KINDS.map(k => (
-              <option key={k} value={k}>{frontMatterLabel(k)}</option>
-            ))}
-          </select>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={e => {
-              if (e.target.files?.length) onAddImages(e.target.files);
-              e.target.value = "";
-            }}
-          />
-        </div>
       </div>
     </div>
   );

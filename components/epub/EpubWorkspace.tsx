@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   cloneBlock, cloneChapter, createBook, createChapter, createCopyrightBlock, createFrontMatterBlock, createHeadingBlock,
   createListBlock, createNote, createPageBreakBlock, createParagraphBlock, createPoemBlock, createQuoteBlock,
-  createSceneBreakBlock, createTextBoxBlock, hasText, normalizeBook,
+  createSceneBreakBlock, createTextBoxBlock, hasText, makeUuid, normalizeBook,
   type Block, type Book, type FrontMatterKind, type Note, type NoteKind, type TextBearingBlock,
 } from "@/lib/epub/types";
 import type { EpubFontId } from "@/lib/epub/fonts";
@@ -11,7 +11,7 @@ import { imageBlocksFromFiles } from "@/lib/epub/blocks";
 import { referencedNoteIdsInBlocks, replaceRangeWithNoteToken, stripNoteToken } from "@/lib/epub/notes";
 import { toggleRangeWithStyle, type InlineStyle } from "@/lib/epub/richtext";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
-import { loadDraft, saveDraft } from "@/lib/epub/storage";
+import { loadDraft, listProjects, loadProject, saveDraft, saveProject, type ProjectMeta } from "@/lib/epub/storage";
 import { saveEpubFile } from "@/lib/epub/download";
 import BookMetaBar from "./BookMetaBar";
 import EditorPane from "./EditorPane";
@@ -58,6 +58,9 @@ export default function EpubWorkspace() {
   const [ready, setReady] = useState(false);
   const [history, setHistory] = useState<Book[]>([]);
   const [future, setFuture] = useState<Book[]>([]);
+  const [focusMode, setFocusMode] = useState(false);
+  const [projects, setProjects] = useState<ProjectMeta[]>([]);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const lastSnapshotAt = useRef(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -419,6 +422,70 @@ export default function EpubWorkspace() {
     mutate(prev => ({ ...prev, fontId }));
   }
 
+  function handleToggleFocusMode() {
+    setFocusMode(v => !v);
+  }
+
+  function handleToggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  }
+
+  function handleRefreshProjects() {
+    listProjects().then(setProjects);
+  }
+
+  function resetHistory() {
+    setHistory([]);
+    setFuture([]);
+    lastSnapshotAt.current = 0;
+  }
+
+  function handleNewProject() {
+    if (!confirm("새 책을 시작할까요? 저장하지 않은 변경 사항은 사라져요.")) return;
+    const fresh = createBook();
+    setBook(fresh);
+    setActiveChapterId(fresh.chapters[0].id);
+    setCurrentProjectId(null);
+    resetHistory();
+  }
+
+  async function handleSaveProject() {
+    if (currentProjectId) {
+      const name = book.title || "제목 없는 책";
+      await saveProject(currentProjectId, name, book);
+      handleRefreshProjects();
+    } else {
+      await handleSaveAsProject();
+    }
+  }
+
+  async function handleSaveAsProject() {
+    const name = prompt("저장할 이름을 입력하세요.", book.title || "제목 없는 책");
+    if (name === null) return;
+    const newId = makeUuid();
+    const newBook: Book = { ...book, id: newId };
+    await saveProject(newId, name || "제목 없는 책", newBook);
+    setBook(newBook);
+    setCurrentProjectId(newId);
+    handleRefreshProjects();
+  }
+
+  async function handleOpenProject(id: string) {
+    if (id === currentProjectId) return;
+    if (!confirm("이 파일을 열까요? 저장하지 않은 변경 사항은 사라져요.")) return;
+    const loaded = await loadProject(id);
+    if (!loaded) return;
+    const normalized = normalizeBook(loaded);
+    setBook(normalized);
+    setActiveChapterId(normalized.chapters[0].id);
+    setCurrentProjectId(id);
+    resetHistory();
+  }
+
   async function handleExport() {
     setExporting(true);
     try {
@@ -447,6 +514,16 @@ export default function EpubWorkspace() {
         canRedo={future.length > 0}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        focusMode={focusMode}
+        onToggleFocusMode={handleToggleFocusMode}
+        onToggleFullscreen={handleToggleFullscreen}
+        projects={projects}
+        currentProjectId={currentProjectId}
+        onRefreshProjects={handleRefreshProjects}
+        onNewProject={handleNewProject}
+        onSaveProject={handleSaveProject}
+        onSaveAsProject={handleSaveAsProject}
+        onOpenProject={handleOpenProject}
         onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
         onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
         onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}
@@ -462,6 +539,7 @@ export default function EpubWorkspace() {
       <div className="flex-1 min-h-0 flex">
         <div className={`min-h-0 flex-1 sm:flex sm:w-1/2 ${mobileView === "editor" ? "flex" : "hidden"}`}>
           <EditorPane
+            focusMode={focusMode}
             chapters={book.chapters}
             activeChapter={activeChapter}
             onSelectChapter={setActiveChapterId}
