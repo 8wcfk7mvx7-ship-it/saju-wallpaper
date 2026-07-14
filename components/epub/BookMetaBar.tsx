@@ -21,6 +21,8 @@ interface Props {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  findReplaceOpen: boolean;
+  onToggleFindReplace: () => void;
   focusMode: boolean;
   onToggleFocusMode: () => void;
   onToggleFullscreen: () => void;
@@ -48,6 +50,7 @@ interface Props {
 
 export default function BookMetaBar({
   title, subtitle, author, publisher, isbn, description, date, coverImage, publisherLogo, fontId, exporting, canUndo, canRedo, onUndo, onRedo,
+  findReplaceOpen, onToggleFindReplace,
   focusMode, onToggleFocusMode, onToggleFullscreen,
   projects, currentProjectId, onRefreshProjects, onNewProject, onSaveProject, onSaveAsProject, onOpenProject,
   onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangePublisher, onChangeIsbn, onChangeDescription, onChangeDate,
@@ -121,6 +124,18 @@ export default function BookMetaBar({
             title="다시 실행"
           >
             ↷
+          </button>
+          <button
+            onClick={onToggleFindReplace}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-sm"
+            style={{
+              background: findReplaceOpen ? "rgba(79,70,229,0.15)" : "rgba(0,0,0,0.045)",
+              color: findReplaceOpen ? "#4f46e5" : "rgba(42,36,23,0.6)",
+            }}
+            aria-label="찾아 바꾸기"
+            title="찾아 바꾸기"
+          >
+            🔍
           </button>
         </div>
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createNote, hasText, type Align, type Block, type CopyrightBlock, type FrontMatterKind, type Note, type NoteKind } from "@/lib/epub/types";
-import { frontMatterLabel } from "@/lib/epub/types";
+import { FRONT_MATTER_KINDS, frontMatterLabel } from "@/lib/epub/types";
 import { insertNoteToken } from "@/lib/epub/notes";
 import { STYLE_TOKENS, type InlineStyle } from "@/lib/epub/richtext";
 import SelectionMenu from "./SelectionMenu";
@@ -29,6 +29,10 @@ interface SelectionState {
   start: number;
   end: number;
 }
+
+// ============================================================
+// 작은 재사용 컨트롤들 (정렬 버튼, 페이지 위치 고정, 서식/특수문자 프리셋)
+// ============================================================
 
 const btnStyle: CSSProperties = {
   color: "rgba(42,36,23,0.45)",
@@ -120,8 +124,6 @@ function PagePositionControl({ value, onChange }: { value: number | null; onChan
   );
 }
 
-const FRONT_MATTER_KINDS: FrontMatterKind[] = ["dedication", "epigraph", "foreword", "afterword"];
-
 const COPYRIGHT_PRESETS: { label: string; build: (b: CopyrightBlock) => string }[] = [
   { label: "표준 저작권 문구", build: b => `이 책의 저작권은 지은이${b.author.trim() ? `(${b.author.trim()})` : ""}와 출판사에게 있으며, 무단 전재와 복제를 금합니다.` },
   { label: "처벌 경고 문구", build: () => "본서의 내용을 사전 허가 없이 무단으로 전재하거나 복제할 경우, 저작권법에 의해 처벌받을 수 있습니다." },
@@ -135,11 +137,37 @@ const DEDICATION_PRESETS = [
   "이 책을 읽어줄 당신에게.",
 ];
 
+/** 키보드로 바로 치기 어려운 문장부호·기호. HTML 엔티티를 몰라도 고를 수 있게 드롭다운으로 제공한다. */
+const SPECIAL_CHARS: { label: string; char: string }[] = [
+  { label: "— 줄표(em dash)", char: "—" },
+  { label: "– 붙임표(en dash)", char: "–" },
+  { label: "… 줄임표", char: "…" },
+  { label: "“ 여는 큰따옴표", char: "“" },
+  { label: "” 닫는 큰따옴표", char: "”" },
+  { label: "‘ 여는 작은따옴표", char: "‘" },
+  { label: "’ 닫는 작은따옴표", char: "’" },
+  { label: "· 가운뎃점", char: "·" },
+  { label: "※ 참고표", char: "※" },
+  { label: "→ 오른쪽 화살표", char: "→" },
+  { label: "← 왼쪽 화살표", char: "←" },
+  { label: "° 도(度)", char: "°" },
+  { label: "× 곱하기", char: "×" },
+  { label: "÷ 나누기", char: "÷" },
+  { label: "§ 절 표시", char: "§" },
+  { label: "• 불릿", char: "•" },
+  { label: "© 저작권", char: "©" },
+  { label: "™ 트레이드마크", char: "™" },
+];
+
 /** 선택 영역 바로 앞뒤가 같은 서식 기호로 감싸져 있으면 "이미 적용된 상태"로 본다. */
 function isStyleActive(text: string, start: number, end: number, style: InlineStyle): boolean {
   const token = STYLE_TOKENS[style];
   return text.slice(Math.max(0, start - token.length), start) === token && text.slice(end, end + token.length) === token;
 }
+
+// ============================================================
+// 메인 컴포넌트 — 블록 타입별 편집 UI + 우클릭 서식 메뉴
+// ============================================================
 
 export default function BlockView({
   block, isFirst, isLast, onChange, onDelete, onMove, onDuplicate, onSplitHere, onAddNote,
@@ -168,6 +196,17 @@ export default function BlockView({
     const { text, cursor: newCursor } = insertNoteToken(block.text, cursor, note.id);
     onAddNote(note);
     pendingCursor.current = newCursor;
+    onChange({ ...block, text });
+  }
+
+  /** HTML을 몰라도 타이핑하기 어려운 기호(다는표, 줄임표, 구부러진 따옴표 등)를 커서 위치에 끼워 넣는다. */
+  function insertSpecialChar(char: string) {
+    if (!hasText(block)) return;
+    const el = textAreaRef.current;
+    const start = el?.selectionStart ?? block.text.length;
+    const end = el?.selectionEnd ?? start;
+    const text = block.text.slice(0, start) + char + block.text.slice(end);
+    pendingCursor.current = start + char.length;
     onChange({ ...block, text });
   }
 
@@ -365,6 +404,76 @@ export default function BlockView({
           >
             + 항목 추가
           </button>
+        </div>
+      )}
+
+      {block.type === "table" && (
+        <div>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(0,0,0,0.06)", color: "rgba(42,36,23,0.55)" }}>
+              표
+            </span>
+            <label className="flex items-center gap-1.5 text-[11px]" style={{ color: "rgba(42,36,23,0.5)" }}>
+              <input type="checkbox" checked={block.hasHeader} onChange={e => onChange({ ...block, hasHeader: e.target.checked })} />
+              첫 행을 제목으로
+            </label>
+          </div>
+          <div className="space-y-1.5 overflow-x-auto">
+            {block.rows.map((row, ri) => (
+              <div key={ri} className="flex items-center gap-1.5">
+                {row.map((cell, ci) => (
+                  <input
+                    key={ci}
+                    value={cell}
+                    onChange={e => {
+                      const rows = block.rows.map((r, i) => (i === ri ? r.map((c, j) => (j === ci ? e.target.value : c)) : r));
+                      onChange({ ...block, rows });
+                    }}
+                    placeholder={ri === 0 && block.hasHeader ? `제목 ${ci + 1}` : `내용`}
+                    className="min-w-[80px] flex-1 bg-transparent outline-none text-xs px-1.5 py-1 rounded"
+                    style={{
+                      background: ri === 0 && block.hasHeader ? "rgba(146,114,14,0.08)" : "rgba(0,0,0,0.03)",
+                      color: "rgba(42,36,23,0.8)",
+                      fontWeight: ri === 0 && block.hasHeader ? 700 : 400,
+                    }}
+                  />
+                ))}
+                <button
+                  onClick={() => onChange({ ...block, rows: block.rows.filter((_, i) => i !== ri) })}
+                  disabled={block.rows.length <= 1}
+                  className="text-[11px] px-1 shrink-0 disabled:opacity-30"
+                  style={{ color: "rgba(185,28,28,0.65)" }}
+                  title="이 행 삭제"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2">
+            <button
+              onClick={() => onChange({ ...block, rows: [...block.rows, block.rows[0] ? block.rows[0].map(() => "") : [""]] })}
+              className="text-[11px] px-2 py-1 rounded font-semibold"
+              style={{ background: "rgba(0,0,0,0.04)", color: "rgba(42,36,23,0.5)" }}
+            >
+              + 행 추가
+            </button>
+            <button
+              onClick={() => onChange({ ...block, rows: block.rows.map(r => [...r, ""]) })}
+              className="text-[11px] px-2 py-1 rounded font-semibold"
+              style={{ background: "rgba(0,0,0,0.04)", color: "rgba(42,36,23,0.5)" }}
+            >
+              + 열 추가
+            </button>
+            <button
+              onClick={() => onChange({ ...block, rows: block.rows.map(r => r.slice(0, -1)) })}
+              disabled={(block.rows[0]?.length ?? 0) <= 1}
+              className="text-[11px] px-2 py-1 rounded font-semibold disabled:opacity-30"
+              style={{ background: "rgba(0,0,0,0.04)", color: "rgba(42,36,23,0.5)" }}
+            >
+              - 열 삭제
+            </button>
+          </div>
         </div>
       )}
 
@@ -578,6 +687,21 @@ export default function BlockView({
             >
               + 미주
             </button>
+            <select
+              value=""
+              onChange={e => {
+                if (e.target.value) insertSpecialChar(e.target.value);
+                e.target.value = "";
+              }}
+              title="특수문자 삽입"
+              className="text-[11px] px-2 py-0.5 rounded font-semibold"
+              style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.55)" }}
+            >
+              <option value="">특수문자...</option>
+              {SPECIAL_CHARS.map(sc => (
+                <option key={sc.char} value={sc.char}>{sc.label}</option>
+              ))}
+            </select>
           </>
         )}
         {!isLast && (

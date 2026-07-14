@@ -10,6 +10,7 @@ interface Props {
   onDeleteChapter: (id: string) => void;
   onMoveChapter: (id: string, direction: -1 | 1) => void;
   onDuplicateChapter: (id: string) => void;
+  onMergeChapterWithNext: (id: string) => void;
 }
 
 export default function ChapterRail({
@@ -21,6 +22,7 @@ export default function ChapterRail({
   onDeleteChapter,
   onMoveChapter,
   onDuplicateChapter,
+  onMergeChapterWithNext,
 }: Props) {
   return (
     <div className="flex flex-col h-full">
@@ -87,6 +89,16 @@ export default function ChapterRail({
                 >
                   복제
                 </button>
+                {i < chapters.length - 1 && (
+                  <button
+                    onClick={e => { e.stopPropagation(); onMergeChapterWithNext(chapter.id); }}
+                    className="text-[11px] px-1.5 py-0.5 rounded"
+                    style={{ color: "rgba(42,36,23,0.5)" }}
+                    title="다음 챕터를 이 챕터 끝에 합치기"
+                  >
+                    병합
+                  </button>
+                )}
                 {chapters.length > 1 && (
                   <button
                     onClick={e => { e.stopPropagation(); onDeleteChapter(chapter.id); }}

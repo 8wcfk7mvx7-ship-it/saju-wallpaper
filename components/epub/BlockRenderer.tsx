@@ -1,7 +1,7 @@
 "use client";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Align, Block, Note } from "@/lib/epub/types";
-import { frontMatterLabel } from "@/lib/epub/types";
+import { frontMatterLabel, PROSE_FRONT_MATTER_KINDS } from "@/lib/epub/types";
 import { splitTextByNoteRefs } from "@/lib/epub/notes";
 import { parseRichText, type RichNode } from "@/lib/epub/richtext";
 
@@ -186,14 +186,43 @@ function renderBlockContent(block: Block, ctx: NoteContext, assets: BookAssets):
       );
     }
 
+    case "table": {
+      const cellStyle: CSSProperties = { border: "1px solid rgba(0,0,0,0.25)", padding: "0.4em 0.7em", textAlign: "left", verticalAlign: "top" };
+      const bodyStart = block.hasHeader ? 1 : 0;
+      return (
+        <table style={{ width: "100%", margin: "1.5em 0", borderCollapse: "collapse", fontSize: "0.9em" }}>
+          {block.hasHeader && block.rows[0] && (
+            <thead>
+              <tr>
+                {block.rows[0].map((cell, ci) => (
+                  <th key={ci} style={{ ...cellStyle, background: "rgba(0,0,0,0.06)", fontWeight: 700 }}>
+                    {renderRichNodes(parseRichText(cell))}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {block.rows.slice(bodyStart).map((row, ri) => (
+              <tr key={ri}>
+                {row.map((cell, ci) => (
+                  <td key={ci} style={cellStyle}>{renderRichNodes(parseRichText(cell))}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+
     case "frontmatter":
       return (
         <section style={{ textAlign: "center", padding: "3em 0 1em" }}>
           <p style={{ fontSize: "0.75em", letterSpacing: "0.2em", opacity: 0.5, margin: "0 0 1em" }}>{frontMatterLabel(block.kind)}</p>
           {block.title.trim() && <p style={{ fontWeight: 800, fontSize: "1.05em", margin: "0 0 1em" }}>{block.title}</p>}
           {block.body.trim() && (
-            <div style={{ textAlign: block.kind === "foreword" || block.kind === "afterword" ? "left" : "center", fontStyle: block.kind === "epigraph" ? "italic" : "normal" }}>
-              <RichParagraphs text={block.body} ctx={ctx} indent={block.kind === "foreword" || block.kind === "afterword"} />
+            <div style={{ textAlign: PROSE_FRONT_MATTER_KINDS.has(block.kind) ? "left" : "center", fontStyle: block.kind === "epigraph" ? "italic" : "normal" }}>
+              <RichParagraphs text={block.body} ctx={ctx} indent={PROSE_FRONT_MATTER_KINDS.has(block.kind)} />
             </div>
           )}
           {block.kind === "epigraph" && block.citation.trim() && (

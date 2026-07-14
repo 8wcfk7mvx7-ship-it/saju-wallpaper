@@ -17,6 +17,7 @@ interface Props {
   onDeleteChapter: (id: string) => void;
   onMoveChapter: (id: string, direction: -1 | 1) => void;
   onDuplicateChapter: (id: string) => void;
+  onMergeChapterWithNext: (id: string) => void;
   onChangeBlock: (blockId: string, block: Block) => void;
   onDeleteBlock: (blockId: string) => void;
   onMoveBlock: (blockId: string, direction: -1 | 1) => void;
@@ -33,6 +34,7 @@ interface Props {
   onAddHeading: () => void;
   onAddPageBreak: () => void;
   onAddList: (ordered: boolean) => void;
+  onAddTable: () => void;
   onAddFrontMatter: (kind: FrontMatterKind) => void;
   onToggleDropCap: () => void;
   onAddNote: (note: Note) => void;
@@ -48,10 +50,10 @@ interface Props {
 export default function EditorPane(props: Props) {
   const {
     focusMode,
-    chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter, onDuplicateChapter,
+    chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter, onDuplicateChapter, onMergeChapterWithNext,
     onChangeBlock, onDeleteBlock, onMoveBlock, onReorderBlock, onDuplicateBlock, onSplitAt,
     onAddParagraph, onAddTextBox, onAddImages, onAddCopyright,
-    onAddQuote, onAddSceneBreak, onAddPoem, onAddHeading, onAddPageBreak, onAddList, onAddFrontMatter, onToggleDropCap,
+    onAddQuote, onAddSceneBreak, onAddPoem, onAddHeading, onAddPageBreak, onAddList, onAddTable, onAddFrontMatter, onToggleDropCap,
     onAddNote, onChangeNote, onDeleteNote,
     onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote, onApplyInlineStyle,
   } = props;
@@ -70,6 +72,7 @@ export default function EditorPane(props: Props) {
           onDeleteChapter={onDeleteChapter}
           onMoveChapter={onMoveChapter}
           onDuplicateChapter={onDuplicateChapter}
+          onMergeChapterWithNext={onMergeChapterWithNext}
         />
         <label
           className="flex items-center gap-1.5 text-[11px] px-3 py-2 border-t"
@@ -100,6 +103,7 @@ export default function EditorPane(props: Props) {
             onAddSceneBreak={onAddSceneBreak}
             onAddPageBreak={onAddPageBreak}
             onAddList={onAddList}
+            onAddTable={onAddTable}
             onAddImages={onAddImages}
             onAddCopyright={onAddCopyright}
             onAddFrontMatter={onAddFrontMatter}

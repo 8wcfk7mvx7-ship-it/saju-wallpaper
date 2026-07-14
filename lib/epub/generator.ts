@@ -1,8 +1,13 @@
 import JSZip from "jszip";
 import type { Align, Block, Book, Chapter, Note } from "./types";
+import { PROSE_FRONT_MATTER_KINDS } from "./types";
 import { computeNoteNumbers, referencedNoteIds, splitTextByNoteRefs } from "./notes";
 import { getEpubFont, type EpubFontOption } from "./fonts";
 import { parseRichText, type RichNode } from "./richtext";
+
+// ============================================================
+// 인라인 서식 → XHTML 변환 (굵게/기울임/정렬/페이지 위치 고정 등)
+// ============================================================
 
 function escapeXml(input: string): string {
   return input
@@ -84,6 +89,10 @@ interface NoteRenderContext {
   renderedFootnotes: Set<string>;
 }
 
+// ============================================================
+// 각주/미주 인식 렌더링 (본문 속 [^id] 토큰 → <sup><a epub:type="noteref">)
+// ============================================================
+
 /** 본문 한 줄을 렌더링하며 각주/미주 참조는 <sup><a epub:type="noteref">로, 굵게/기울임 등은 실제 태그로 바꾼다. */
 function renderNoteAwareLine(line: string, ctx: NoteRenderContext, footnoteIdsInBlock: string[]): string {
   return splitTextByNoteRefs(line)
@@ -147,6 +156,10 @@ interface ResolvedImage {
   bytes: ArrayBuffer;
 }
 
+// ============================================================
+// 이미지 자산 처리 (표지/출판사 로고/본문 이미지: data URL → zip에 넣을 바이트)
+// ============================================================
+
 function mimeFromDataUrl(dataUrl: string): string {
   return /^data:([^;]+);/.exec(dataUrl)?.[1] ?? "image/png";
 }
@@ -179,11 +192,21 @@ async function collectImages(book: Book): Promise<ResolvedImage[]> {
   return images;
 }
 
+// ============================================================
+// 블록 → XHTML (11가지 블록 타입 각각의 실제 마크업 출력)
+// ============================================================
+
 const FRONT_MATTER_EPUB_TYPE: Record<string, string> = {
   dedication: "dedication",
   epigraph: "epigraph",
   foreword: "foreword",
+  preface: "preface",
+  prologue: "prologue",
   afterword: "afterword",
+  epilogue: "epilogue",
+  acknowledgments: "acknowledgments",
+  appendix: "appendix",
+  glossary: "glossary",
 };
 
 function blockToXhtml(
@@ -244,8 +267,20 @@ function blockToXhtml(
       const footnoteAsides = buildFootnoteAsides(footnoteIdsInBlock, ctx);
       return footnoteAsides ? `${listHtml}\n${footnoteAsides}` : listHtml;
     }
+    case "table": {
+      const bodyStart = block.hasHeader ? 1 : 0;
+      const thead =
+        block.hasHeader && block.rows[0]
+          ? `<thead><tr>${block.rows[0].map(cell => `<th>${richNodesToXhtml(parseRichText(cell))}</th>`).join("")}</tr></thead>`
+          : "";
+      const bodyRows = block.rows
+        .slice(bodyStart)
+        .map(row => `<tr>${row.map(cell => `<td>${richNodesToXhtml(parseRichText(cell))}</td>`).join("")}</tr>`)
+        .join("");
+      return `<table class="epub-table">${thead}<tbody>${bodyRows}</tbody></table>`;
+    }
     case "frontmatter": {
-      const isProse = block.kind === "foreword" || block.kind === "afterword";
+      const isProse = PROSE_FRONT_MATTER_KINDS.has(block.kind);
       const parts: string[] = [];
       if (block.title.trim()) parts.push(`<h2 class="fm-title">${escapeXml(block.title)}</h2>`);
       const { html: bodyHtml, footnoteAsides } = renderNoteAwareParagraphs(block.body, ctx, { indent: isProse, align: isProse ? undefined : "center" });
@@ -281,6 +316,10 @@ function blockToXhtml(
     }
   }
 }
+
+// ============================================================
+// 챕터 XHTML 조립 (블록 목록 + 미주 섹션 → 완성된 챕터 파일 한 장)
+// ============================================================
 
 /** 챕터 끝에 모아 두는 미주(rearnote) 섹션. */
 function endnotesSection(chapter: Chapter, ctx: NoteRenderContext): string {
@@ -331,6 +370,10 @@ ${endnotes}
 </body>
 </html>`;
 }
+
+// ============================================================
+// 목차 (nav.xhtml + toc.ncx) — 챕터 + 챕터 안 소제목까지 중첩된 목차
+// ============================================================
 
 function chapterHeadings(chapter: Chapter): Extract<Block, { type: "heading" }>[] {
   return chapter.blocks.filter((b): b is Extract<Block, { type: "heading" }> => b.type === "heading" && b.text.trim().length > 0);
@@ -403,6 +446,10 @@ ${navPoints}
 </navMap>
 </ncx>`;
 }
+
+// ============================================================
+// 패키지 문서 (content.opf) — 메타데이터/매니페스트/spine
+// ============================================================
 
 function contentOpf(book: Book, images: ResolvedImage[], assets: BookAssets, font: EpubFontOption): string {
   const modified = new Date().toISOString().replace(/\.\d+Z$/, "Z");
@@ -610,6 +657,22 @@ ul, ol {
 li {
   margin: 0 0 0.4em;
 }
+.epub-table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+.epub-table th, .epub-table td {
+  border: 1px solid rgba(0,0,0,0.25);
+  padding: 0.4em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+.epub-table thead th {
+  background: rgba(0,0,0,0.06);
+  font-weight: 700;
+}
 .epub-image {
   margin: 1.5em 0;
 }
@@ -702,7 +765,9 @@ aside.footnote p, aside.endnote p {
   font-size: 1.1em;
   margin: 0 0 1em;
 }
-.frontmatter .fm-foreword, .frontmatter .fm-afterword {
+.frontmatter .fm-foreword, .frontmatter .fm-preface, .frontmatter .fm-prologue,
+.frontmatter .fm-afterword, .frontmatter .fm-epilogue, .frontmatter .fm-acknowledgments,
+.frontmatter .fm-appendix, .frontmatter .fm-glossary {
   text-align: left;
   margin-top: 1em;
 }
@@ -736,6 +801,12 @@ aside.footnote p, aside.endnote p {
   }
   .endnotes, p.scenebreak {
     border-color: #555;
+  }
+  .epub-table th, .epub-table td {
+    border-color: #555;
+  }
+  .epub-table thead th {
+    background: rgba(255,255,255,0.08);
   }
   .text-red {
     color: #f87171;

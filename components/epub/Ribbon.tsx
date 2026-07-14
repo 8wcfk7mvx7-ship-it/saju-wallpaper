@@ -1,7 +1,7 @@
 "use client";
 import { useRef, type ReactNode } from "react";
 import type { FrontMatterKind } from "@/lib/epub/types";
-import { frontMatterLabel } from "@/lib/epub/types";
+import { FRONT_MATTER_KINDS, frontMatterLabel } from "@/lib/epub/types";
 
 interface Props {
   onAddParagraph: () => void;
@@ -12,12 +12,11 @@ interface Props {
   onAddSceneBreak: () => void;
   onAddPageBreak: () => void;
   onAddList: (ordered: boolean) => void;
+  onAddTable: () => void;
   onAddImages: (files: FileList | File[]) => void;
   onAddCopyright: () => void;
   onAddFrontMatter: (kind: FrontMatterKind) => void;
 }
-
-const FRONT_MATTER_KINDS: FrontMatterKind[] = ["dedication", "epigraph", "foreword", "afterword"];
 
 function RibbonGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -35,7 +34,7 @@ const btn = "text-[11px] font-bold px-2.5 py-1.5 rounded-lg whitespace-nowrap";
 
 export default function Ribbon({
   onAddParagraph, onAddHeading, onAddTextBox, onAddQuote, onAddPoem, onAddSceneBreak, onAddPageBreak,
-  onAddList, onAddImages, onAddCopyright, onAddFrontMatter,
+  onAddList, onAddTable, onAddImages, onAddCopyright, onAddFrontMatter,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -57,6 +56,7 @@ export default function Ribbon({
         <button onClick={onAddPageBreak} className={btn} style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}>페이지 나눔</button>
         <button onClick={() => onAddList(false)} className={btn} style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}>글머리 목록</button>
         <button onClick={() => onAddList(true)} className={btn} style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}>번호 목록</button>
+        <button onClick={onAddTable} className={btn} style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}>표</button>
       </RibbonGroup>
 
       <RibbonGroup label="삽입 · 특수 페이지">
