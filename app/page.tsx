@@ -793,17 +793,6 @@ const SERVICES: {
     categories: ["전체", "무료", "금전·투자"],
   },
   {
-    id: "zimidousu", emoji: "🔮",
-    title: "자미두수: 나의 명궁(命宮)과 대표 주성은?",
-    viral: "사주가 오행을 본다면, 자미두수는 별의 자리로 캐릭터를 본다",
-    desc: "음력 생월·생시로 명궁을 산출하고, 14주성 중 나를 대표하는 별의 성격·진로·연애 스타일을 확인하세요.",
-    tags: ["자미두수", "명궁", "주성"],
-    href: "/service/zimidousu", badge: "",
-    color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
-    border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
-    categories: ["전체", "무료", "라이프"],
-  },
-  {
     id: "newyear", emoji: "🐎",
     title: "2026·2027 신년운세",
     viral: "병오년·정미년, 내 사주와 부딪히는 진짜 흐름은?",
@@ -934,17 +923,6 @@ const SERVICES: {
     color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
     border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
     categories: ["전체", "무료", "운명·대운", "라이프"],
-  },
-  {
-    id: "taste", emoji: "🎬",
-    title: "사주로 보는 취향 분석",
-    viral: "내가 왜 그 영화에 울었는지 사주로 설명됩니다",
-    desc: "오행별 영화·책·음악·여행 취향 완전 분석. 지금까지 좋아했던 것들이 사주로 다 설명됩니다.",
-    tags: ["영화", "책", "여행 스타일"],
-    href: "/service/taste", badge: "",
-    color: "#9ca3af", badgeBg: "rgba(107,114,128,0.85)",
-    border: "rgba(156,163,175,0.3)", glow: "rgba(156,163,175,0.12)",
-    categories: ["전체", "무료", "라이프"],
   },
   {
     id: "exam", emoji: "📚",
@@ -1370,10 +1348,10 @@ export default function MainPage() {
 
               {/* 실시간 활동 피드 */}
               <div className="flex justify-start mb-7">
-                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
+                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs max-w-[68vw] sm:max-w-none overflow-hidden"
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
                   <span className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0" style={{ background: "#4ade80" }} />
-                  <span style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
+                  <span className="truncate" style={{ opacity: activityVisible ? 1 : 0, transition: "opacity 0.4s ease" }}>
                     {renderActivity(ACTIVITY_ENTRIES[activityIndex], lang)}
                   </span>
                 </div>
@@ -1381,15 +1359,14 @@ export default function MainPage() {
 
               {/* 헤드라인 */}
               <div className="text-left mb-6">
-                <h1 className="font-black leading-[1.1] text-white"
-                  style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", letterSpacing: "-0.03em" }}>
-                  {t.h1[0]}<br />
-                  <span style={{
+                <h1 className="font-black leading-[1.12] text-white"
+                  style={{ fontSize: "clamp(1.9rem, 5.5vw, 3.4rem)", letterSpacing: "-0.03em" }}>
+                  <span className="block">{t.h1[0]}</span>
+                  <span className="block" style={{
                     background: "linear-gradient(110deg, #f472b6 0%, #c084fc 50%, #818cf8 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
-                  }}>{t.h1[1]}</span><br />
-                  {t.h1[2]}
+                  }}>{t.h1[1]} {t.h1[2]}</span>
                 </h1>
               </div>
 
