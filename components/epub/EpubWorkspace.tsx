@@ -1,15 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  createBook, createChapter, createCopyrightBlock, createFrontMatterBlock, createHeadingBlock, createListBlock,
-  createNote, createPageBreakBlock, createParagraphBlock, createPoemBlock, createQuoteBlock, createSceneBreakBlock,
-  createTextBoxBlock, hasText, normalizeBook,
+  cloneBlock, cloneChapter, createBook, createChapter, createCopyrightBlock, createFrontMatterBlock, createHeadingBlock,
+  createListBlock, createNote, createPageBreakBlock, createParagraphBlock, createPoemBlock, createQuoteBlock,
+  createSceneBreakBlock, createTextBoxBlock, hasText, normalizeBook,
   type Block, type Book, type FrontMatterKind, type Note, type NoteKind, type TextBearingBlock,
 } from "@/lib/epub/types";
 import type { EpubFontId } from "@/lib/epub/fonts";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
 import { referencedNoteIdsInBlocks, replaceRangeWithNoteToken, stripNoteToken } from "@/lib/epub/notes";
-import { wrapRangeWithStyle, type InlineStyle } from "@/lib/epub/richtext";
+import { toggleRangeWithStyle, type InlineStyle } from "@/lib/epub/richtext";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
 import { loadDraft, saveDraft } from "@/lib/epub/storage";
 import { saveEpubFile } from "@/lib/epub/download";
@@ -56,7 +56,40 @@ export default function EpubWorkspace() {
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
   const [exporting, setExporting] = useState(false);
   const [ready, setReady] = useState(false);
+  const [history, setHistory] = useState<Book[]>([]);
+  const [future, setFuture] = useState<Book[]>([]);
+  const lastSnapshotAt = useRef(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** book을 바꾸는 유일한 통로. 실행 취소를 위해 바뀌기 전 상태를 스냅샷으로 남긴다.
+   *  타이핑처럼 짧은 시간 안에 몰아치는 변경은 하나의 되돌리기 단계로 묶는다. */
+  function mutate(updater: (prev: Book) => Book) {
+    const now = Date.now();
+    if (now - lastSnapshotAt.current > 800) {
+      setHistory(h => [...h.slice(-49), book]);
+      setFuture([]);
+    }
+    lastSnapshotAt.current = now;
+    setBook(updater);
+  }
+
+  const handleUndo = useCallback(() => {
+    if (history.length === 0) return;
+    const prev = history[history.length - 1];
+    setFuture(f => [...f, book]);
+    setHistory(h => h.slice(0, -1));
+    setBook(prev);
+    lastSnapshotAt.current = 0;
+  }, [history, book]);
+
+  const handleRedo = useCallback(() => {
+    if (future.length === 0) return;
+    const next = future[future.length - 1];
+    setHistory(h => [...h, book]);
+    setFuture(f => f.slice(0, -1));
+    setBook(next);
+    lastSnapshotAt.current = 0;
+  }, [future, book]);
 
   useEffect(() => {
     loadDraft().then(draft => {
@@ -68,6 +101,21 @@ export default function EpubWorkspace() {
       setReady(true);
     });
   }, []);
+
+  // 텍스트 입력 중 브라우저 기본 되돌리기(글자 단위)를 방해하지 않도록,
+  // 텍스트 입력 필드에 포커스가 없을 때만 Ctrl/Cmd+Z로 책 전체를 되돌린다.
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const tag = (document.activeElement as HTMLElement | null)?.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT") return;
+      if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      if (e.shiftKey) handleRedo();
+      else handleUndo();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [history, future, book, handleUndo, handleRedo]);
 
   useEffect(() => {
     if (!ready) return;
@@ -82,7 +130,7 @@ export default function EpubWorkspace() {
   const activeChapterIndex = book.chapters.findIndex(c => c.id === activeChapter.id);
 
   function updateChapter(chapterId: string, updater: (chapter: Book["chapters"][number]) => Book["chapters"][number]) {
-    setBook(prev => ({
+    mutate(prev => ({
       ...prev,
       chapters: prev.chapters.map(c => (c.id === chapterId ? updater(c) : c)),
     }));
@@ -90,7 +138,7 @@ export default function EpubWorkspace() {
 
   function handleAddChapter() {
     const chapter = createChapter(`${book.chapters.length + 1}장`);
-    setBook(prev => ({ ...prev, chapters: [...prev.chapters, chapter] }));
+    mutate(prev => ({ ...prev, chapters: [...prev.chapters, chapter] }));
     setActiveChapterId(chapter.id);
   }
 
@@ -99,7 +147,7 @@ export default function EpubWorkspace() {
   }
 
   function handleDeleteChapter(id: string) {
-    setBook(prev => {
+    mutate(prev => {
       const chapters = prev.chapters.filter(c => c.id !== id);
       if (chapters.length === 0) return prev;
       if (id === activeChapterId) setActiveChapterId(chapters[0].id);
@@ -108,7 +156,7 @@ export default function EpubWorkspace() {
   }
 
   function handleMoveChapter(id: string, direction: -1 | 1) {
-    setBook(prev => {
+    mutate(prev => {
       const idx = prev.chapters.findIndex(c => c.id === id);
       const target = idx + direction;
       if (target < 0 || target >= prev.chapters.length) return prev;
@@ -116,6 +164,18 @@ export default function EpubWorkspace() {
       [chapters[idx], chapters[target]] = [chapters[target], chapters[idx]];
       return { ...prev, chapters };
     });
+  }
+
+  function handleDuplicateChapter(id: string) {
+    const copy = cloneChapter(book.chapters.find(c => c.id === id)!);
+    mutate(prev => {
+      const idx = prev.chapters.findIndex(c => c.id === id);
+      if (idx < 0) return prev;
+      const chapters = [...prev.chapters];
+      chapters.splice(idx + 1, 0, copy);
+      return { ...prev, chapters };
+    });
+    setActiveChapterId(copy.id);
   }
 
   function handleChangeBlock(blockId: string, block: Block) {
@@ -139,6 +199,34 @@ export default function EpubWorkspace() {
       if (target < 0 || target >= c.blocks.length) return c;
       const blocks = [...c.blocks];
       [blocks[idx], blocks[target]] = [blocks[target], blocks[idx]];
+      return { ...c, blocks };
+    });
+  }
+
+  function handleDuplicateBlock(blockId: string) {
+    updateChapter(activeChapter.id, c => {
+      const idx = c.blocks.findIndex(b => b.id === blockId);
+      if (idx < 0) return c;
+      const copy = cloneBlock(c.blocks[idx]);
+      const blocks = [...c.blocks];
+      blocks.splice(idx + 1, 0, copy);
+      return { ...c, blocks };
+    });
+  }
+
+  /** 블록을 드래그해서 targetId 블록 바로 앞으로 옮긴다. */
+  function handleReorderBlock(draggedId: string, targetId: string) {
+    updateChapter(activeChapter.id, c => {
+      const fromIdx = c.blocks.findIndex(b => b.id === draggedId);
+      if (fromIdx < 0) return c;
+      const blocks = [...c.blocks];
+      const [dragged] = blocks.splice(fromIdx, 1);
+      const toIdx = blocks.findIndex(b => b.id === targetId);
+      if (toIdx < 0) {
+        blocks.splice(fromIdx, 0, dragged);
+        return c;
+      }
+      blocks.splice(toIdx, 0, dragged);
       return { ...c, blocks };
     });
   }
@@ -195,7 +283,7 @@ export default function EpubWorkspace() {
   }
 
   function handleSplitAt(blockId: string) {
-    setBook(prev => {
+    mutate(prev => {
       const chapterIdx = prev.chapters.findIndex(c => c.id === activeChapter.id);
       const chapter = prev.chapters[chapterIdx];
       const blockIdx = chapter.blocks.findIndex(b => b.id === blockId);
@@ -226,7 +314,7 @@ export default function EpubWorkspace() {
     const selected = block.text.slice(start, end).trim();
     if (!selected) return;
     updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
-    setBook(prev => ({ ...prev, title: selected }));
+    mutate(prev => ({ ...prev, title: selected }));
   }
 
   /** 우클릭 메뉴: 드래그로 고른 글자를 뽑아 책 부제로 쓰고, 본문에서는 지운다. */
@@ -236,7 +324,7 @@ export default function EpubWorkspace() {
     const selected = block.text.slice(start, end).trim();
     if (!selected) return;
     updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => t.slice(0, start) + t.slice(end)) }));
-    setBook(prev => ({ ...prev, subtitle: selected }));
+    mutate(prev => ({ ...prev, subtitle: selected }));
   }
 
   /** 우클릭 메뉴: 드래그로 고른 글자를 새 챕터의 제목으로 삼아, 그 지점에서 챕터를 나눈다. */
@@ -247,7 +335,7 @@ export default function EpubWorkspace() {
     if (!newTitle) return;
     const newChapterTemplate = createChapter(newTitle);
 
-    setBook(prev => {
+    mutate(prev => {
       const chapterIdx = prev.chapters.findIndex(c => c.id === activeChapter.id);
       const chapter = prev.chapters[chapterIdx];
       const idx = chapter.blocks.findIndex(b => b.id === blockId);
@@ -293,7 +381,7 @@ export default function EpubWorkspace() {
 
   /** 우클릭 메뉴: 굵게/기울임/밑줄/취소선/형광펜/위첨자/아래첨자 등 인라인 서식을 선택 영역에 적용한다. */
   function handleApplyInlineStyle(blockId: string, start: number, end: number, style: InlineStyle) {
-    updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => wrapRangeWithStyle(t, start, end, style)) }));
+    updateChapter(activeChapter.id, c => ({ ...c, blocks: updateBlockText(c.blocks, blockId, t => toggleRangeWithStyle(t, start, end, style)) }));
   }
 
   function handleAddNote(note: Note) {
@@ -318,17 +406,17 @@ export default function EpubWorkspace() {
   async function handleChangeCover(file: File | null) {
     if (!file) return;
     const dataUrl = await readFileAsDataUrl(file);
-    setBook(prev => ({ ...prev, coverImage: dataUrl }));
+    mutate(prev => ({ ...prev, coverImage: dataUrl }));
   }
 
   async function handleChangePublisherLogo(file: File | null) {
     if (!file) return;
     const dataUrl = await readFileAsDataUrl(file);
-    setBook(prev => ({ ...prev, publisherLogo: dataUrl }));
+    mutate(prev => ({ ...prev, publisherLogo: dataUrl }));
   }
 
   function handleChangeFont(fontId: EpubFontId) {
-    setBook(prev => ({ ...prev, fontId }));
+    mutate(prev => ({ ...prev, fontId }));
   }
 
   async function handleExport() {
@@ -345,7 +433,7 @@ export default function EpubWorkspace() {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: "100dvh" }}>
+    <div className="flex flex-col" style={{ height: "100dvh", background: "#f7f1e3", color: "#2a2417" }}>
       <BookMetaBar
         title={book.title}
         subtitle={book.subtitle}
@@ -355,10 +443,14 @@ export default function EpubWorkspace() {
         publisherLogo={book.publisherLogo}
         fontId={book.fontId}
         exporting={exporting}
-        onChangeTitle={t => setBook(prev => ({ ...prev, title: t }))}
-        onChangeSubtitle={s => setBook(prev => ({ ...prev, subtitle: s }))}
-        onChangeAuthor={a => setBook(prev => ({ ...prev, author: a }))}
-        onChangeDate={d => setBook(prev => ({ ...prev, date: d }))}
+        canUndo={history.length > 0}
+        canRedo={future.length > 0}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
+        onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
+        onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}
+        onChangeDate={d => mutate(prev => ({ ...prev, date: d }))}
         onChangeCover={handleChangeCover}
         onChangePublisherLogo={handleChangePublisherLogo}
         onChangeFont={handleChangeFont}
@@ -377,9 +469,12 @@ export default function EpubWorkspace() {
             onRenameChapter={handleRenameChapter}
             onDeleteChapter={handleDeleteChapter}
             onMoveChapter={handleMoveChapter}
+            onDuplicateChapter={handleDuplicateChapter}
             onChangeBlock={handleChangeBlock}
             onDeleteBlock={handleDeleteBlock}
             onMoveBlock={handleMoveBlock}
+            onReorderBlock={handleReorderBlock}
+            onDuplicateBlock={handleDuplicateBlock}
             onSplitAt={handleSplitAt}
             onAddParagraph={handleAddParagraph}
             onAddTextBox={handleAddTextBox}
@@ -406,7 +501,7 @@ export default function EpubWorkspace() {
 
         <div
           className={`min-h-0 flex-1 sm:flex sm:w-1/2 border-l ${mobileView === "preview" ? "flex" : "hidden"}`}
-          style={{ borderColor: "rgba(255,255,255,0.07)" }}
+          style={{ borderColor: "rgba(0,0,0,0.08)" }}
         >
           <PreviewPane
             chapter={activeChapter}
@@ -415,7 +510,7 @@ export default function EpubWorkspace() {
             fontSize={book.previewFontSize}
             fontId={book.fontId}
             assets={{ coverImage: book.coverImage, publisherLogo: book.publisherLogo }}
-            onFontSizeChange={size => setBook(prev => ({ ...prev, previewFontSize: size }))}
+            onFontSizeChange={size => mutate(prev => ({ ...prev, previewFontSize: size }))}
             onPrevChapter={() => {
               const target = book.chapters[activeChapterIndex - 1];
               if (target) setActiveChapterId(target.id);

@@ -43,6 +43,12 @@ function renderRichNodes(nodes: RichNode[]): ReactNode {
         return <sup key={i}>{children}</sup>;
       case "sub":
         return <sub key={i}>{children}</sub>;
+      case "red":
+        return <span key={i} style={{ color: "#c0392b" }}>{children}</span>;
+      case "blue":
+        return <span key={i} style={{ color: "#2563eb" }}>{children}</span>;
+      case "green":
+        return <span key={i} style={{ color: "#16a34a" }}>{children}</span>;
     }
   });
 }

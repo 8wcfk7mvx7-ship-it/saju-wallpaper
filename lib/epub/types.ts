@@ -318,3 +318,39 @@ function normalizeBlock(b: Block): Block {
   }
   return b;
 }
+
+const BLOCK_ID_PREFIX: Record<BlockType, string> = {
+  paragraph: "p",
+  textbox: "box",
+  image: "img",
+  copyright: "cr",
+  quote: "q",
+  scenebreak: "sb",
+  poem: "poem",
+  heading: "h",
+  pagebreak: "pb",
+  list: "list",
+  frontmatter: "fm",
+};
+
+/** 블록을 통째로 복제하되 id는 새로 발급한다("복제" 버튼에서 사용). */
+export function cloneBlock(block: Block): Block {
+  return { ...block, id: makeId(BLOCK_ID_PREFIX[block.type]) };
+}
+
+/** 챕터를 통째로 복제한다. 블록/노트 id를 전부 새로 발급하고, 본문에 남은 각주·미주 참조 토큰도
+ *  복제된 노트의 새 id를 가리키도록 맞춰준다("챕터 복제" 버튼에서 사용). */
+export function cloneChapter(chapter: Chapter): Chapter {
+  const noteIdMap = new Map(chapter.notes.map(n => [n.id, makeId("note")]));
+  const notes = chapter.notes.map(n => ({ ...n, id: noteIdMap.get(n.id)! }));
+  const blocks = chapter.blocks.map(b => {
+    const cloned = cloneBlock(b);
+    if (!hasText(cloned)) return cloned;
+    let text = cloned.text;
+    for (const [oldId, newId] of noteIdMap) {
+      text = text.split(`[^${oldId}]`).join(`[^${newId}]`);
+    }
+    return { ...cloned, text };
+  });
+  return { ...chapter, id: makeId("ch"), title: `${chapter.title} (복사본)`, blocks, notes };
+}

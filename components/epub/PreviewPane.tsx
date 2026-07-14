@@ -40,27 +40,27 @@ export default function PreviewPane({
     <div className="flex flex-col h-full min-h-0">
       <div
         className="shrink-0 flex items-center justify-between gap-2 px-3 sm:px-4 py-2 border-b"
-        style={{ borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: "rgba(0,0,0,0.08)" }}
       >
-        <span className="text-xs font-bold" style={{ color: "rgba(255,255,255,0.4)" }}>
+        <span className="text-xs font-bold" style={{ color: "rgba(42,36,23,0.45)" }}>
           미리보기 · {chapterIndex + 1}/{chapterCount}장
         </span>
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => onFontSizeChange(Math.max(MIN_FONT, fontSize - 1))}
             className="w-6 h-6 rounded-full text-xs font-bold"
-            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)" }}
+            style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.65)" }}
             aria-label="글자 작게"
           >
             A-
           </button>
-          <span className="text-[11px] w-6 text-center" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <span className="text-[11px] w-6 text-center" style={{ color: "rgba(42,36,23,0.45)" }}>
             {fontSize}
           </span>
           <button
             onClick={() => onFontSizeChange(Math.min(MAX_FONT, fontSize + 1))}
             className="w-6 h-6 rounded-full text-sm font-bold"
-            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)" }}
+            style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.65)" }}
             aria-label="글자 크게"
           >
             A+
@@ -127,13 +127,13 @@ export default function PreviewPane({
 
       <div
         className="shrink-0 flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5 border-t"
-        style={{ borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: "rgba(0,0,0,0.08)" }}
       >
         <button
           onClick={onPrevChapter}
           disabled={chapterIndex === 0}
           className="text-xs font-bold px-3 py-1.5 rounded-full disabled:opacity-30"
-          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)" }}
+          style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}
         >
           ◀ 이전 챕터
         </button>
@@ -141,7 +141,7 @@ export default function PreviewPane({
           onClick={onNextChapter}
           disabled={chapterIndex === chapterCount - 1}
           className="text-xs font-bold px-3 py-1.5 rounded-full disabled:opacity-30"
-          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)" }}
+          style={{ background: "rgba(0,0,0,0.045)", color: "rgba(42,36,23,0.7)" }}
         >
           다음 챕터 ▶
         </button>

@@ -5,6 +5,8 @@ export interface SelectionMenuItem {
   label: string;
   onClick: () => void;
   danger?: boolean;
+  /** 이미 적용된 서식이면 체크 표시를 곁들여 보여준다(다시 누르면 해제). */
+  active?: boolean;
 }
 
 interface Props {
@@ -35,7 +37,7 @@ export default function SelectionMenu({ x, y, items, onClose }: Props) {
   }, [onClose]);
 
   const left = typeof window !== "undefined" ? Math.min(x, window.innerWidth - 220) : x;
-  const top = typeof window !== "undefined" ? Math.min(y, window.innerHeight - items.length * 38 - 16) : y;
+  const top = typeof window !== "undefined" ? Math.min(y, window.innerHeight - items.length * 36 - 16) : y;
 
   return (
     <div
@@ -44,18 +46,19 @@ export default function SelectionMenu({ x, y, items, onClose }: Props) {
       style={{
         left: Math.max(8, left),
         top: Math.max(8, top),
-        background: "#181828",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+        background: "#fffdf7",
+        border: "1px solid rgba(0,0,0,0.1)",
+        boxShadow: "0 12px 32px rgba(0,0,0,0.25)",
       }}
     >
       {items.map((item, i) => (
         <button
           key={i}
           onClick={() => { item.onClick(); onClose(); }}
-          className="w-full text-left px-3.5 py-2 text-sm font-semibold hover:bg-white/5 transition-colors"
-          style={{ color: item.danger ? "#f87171" : "rgba(255,255,255,0.85)" }}
+          className="w-full text-left px-3.5 py-1.5 text-sm font-semibold hover:bg-black/5 transition-colors flex items-center gap-1.5"
+          style={{ color: item.danger ? "#b91c1c" : "#2a2417" }}
         >
+          {item.active && <span style={{ color: "#4f46e5" }}>✓</span>}
           {item.label}
         </button>
       ))}

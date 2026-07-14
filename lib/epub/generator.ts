@@ -34,6 +34,12 @@ function richNodesToXhtml(nodes: RichNode[]): string {
           return `<sup>${inner}</sup>`;
         case "sub":
           return `<sub>${inner}</sub>`;
+        case "red":
+          return `<span class="text-red">${inner}</span>`;
+        case "blue":
+          return `<span class="text-blue">${inner}</span>`;
+        case "green":
+          return `<span class="text-green">${inner}</span>`;
       }
     })
     .join("");
@@ -463,7 +469,7 @@ body {
   font-family: ${font.epubFontFamily};
   line-height: 1.8;
   padding: 1.2em;
-  background: #f6f1e6;
+  background: #ffffff;
   color: #1c1a14;
   -webkit-hyphens: auto;
   -moz-hyphens: auto;
@@ -507,6 +513,15 @@ mark {
 }
 .u {
   text-decoration: underline;
+}
+.text-red {
+  color: #c0392b;
+}
+.text-blue {
+  color: #2563eb;
+}
+.text-green {
+  color: #16a34a;
 }
 .textbox {
   display: block;
@@ -687,6 +702,15 @@ aside.footnote p, aside.endnote p {
   }
   .endnotes, p.scenebreak {
     border-color: #555;
+  }
+  .text-red {
+    color: #f87171;
+  }
+  .text-blue {
+    color: #60a5fa;
+  }
+  .text-green {
+    color: #4ade80;
   }
 }
 `;
