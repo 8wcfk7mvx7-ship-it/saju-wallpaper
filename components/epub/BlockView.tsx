@@ -1,6 +1,7 @@
 "use client";
-import type { CSSProperties } from "react";
-import type { Block } from "@/lib/epub/types";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { createNote, type Block, type Note, type NoteKind } from "@/lib/epub/types";
+import { insertNoteToken } from "@/lib/epub/notes";
 
 interface Props {
   block: Block;
@@ -10,6 +11,7 @@ interface Props {
   onDelete: () => void;
   onMove: (direction: -1 | 1) => void;
   onSplitHere: () => void;
+  onAddNote: (note: Note) => void;
 }
 
 const btnStyle: CSSProperties = {
@@ -17,11 +19,34 @@ const btnStyle: CSSProperties = {
   background: "rgba(255,255,255,0.05)",
 };
 
-export default function BlockView({ block, isFirst, isLast, onChange, onDelete, onMove, onSplitHere }: Props) {
+export default function BlockView({ block, isFirst, isLast, onChange, onDelete, onMove, onSplitHere, onAddNote }: Props) {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const pendingCursor = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (pendingCursor.current !== null && textAreaRef.current) {
+      const pos = pendingCursor.current;
+      textAreaRef.current.focus();
+      textAreaRef.current.setSelectionRange(pos, pos);
+      pendingCursor.current = null;
+    }
+  }, [block]);
+
+  function insertNote(kind: NoteKind) {
+    if (block.type !== "paragraph" && block.type !== "textbox") return;
+    const cursor = textAreaRef.current?.selectionStart ?? block.text.length;
+    const note = createNote(kind);
+    const { text, cursor: newCursor } = insertNoteToken(block.text, cursor, note.id);
+    onAddNote(note);
+    pendingCursor.current = newCursor;
+    onChange({ ...block, text });
+  }
+
   return (
     <div className="group relative rounded-xl px-3 py-2.5" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
       {block.type === "paragraph" && (
         <textarea
+          ref={textAreaRef}
           value={block.text}
           onChange={e => onChange({ ...block, text: e.target.value })}
           placeholder="이어서 써보세요..."
@@ -49,6 +74,7 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
             />
           </div>
           <textarea
+            ref={textAreaRef}
             value={block.text}
             onChange={e => onChange({ ...block, text: e.target.value })}
             placeholder="박스 안에 들어갈 내용을 써보세요..."
@@ -80,10 +106,28 @@ export default function BlockView({ block, isFirst, isLast, onChange, onDelete, 
         </div>
       )}
 
-      <div className="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="mt-2 flex items-center gap-1 flex-wrap opacity-0 group-hover:opacity-100 transition-opacity">
         <button onClick={() => onMove(-1)} disabled={isFirst} className="text-[11px] px-1.5 py-0.5 rounded disabled:opacity-30" style={btnStyle}>▲</button>
         <button onClick={() => onMove(1)} disabled={isLast} className="text-[11px] px-1.5 py-0.5 rounded disabled:opacity-30" style={btnStyle}>▼</button>
         <button onClick={onDelete} className="text-[11px] px-1.5 py-0.5 rounded" style={{ ...btnStyle, color: "rgba(248,113,113,0.7)" }}>삭제</button>
+        {(block.type === "paragraph" || block.type === "textbox") && (
+          <>
+            <button
+              onClick={() => insertNote("footnote")}
+              className="text-[11px] px-2 py-0.5 rounded font-semibold"
+              style={{ background: "rgba(245,197,24,0.12)", color: "#e8c964" }}
+            >
+              + 각주
+            </button>
+            <button
+              onClick={() => insertNote("endnote")}
+              className="text-[11px] px-2 py-0.5 rounded font-semibold"
+              style={{ background: "rgba(245,197,24,0.12)", color: "#e8c964" }}
+            >
+              + 미주
+            </button>
+          </>
+        )}
         {!isLast && (
           <button
             onClick={onSplitHere}

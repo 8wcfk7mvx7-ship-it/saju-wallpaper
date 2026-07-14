@@ -27,10 +27,20 @@ export interface ImageBlock {
 
 export type Block = ParagraphBlock | TextBoxBlock | ImageBlock;
 
+/** 각주(footnote, 본문 근처 팝업)와 미주(endnote, 챕터 끝에 모아서). */
+export type NoteKind = "footnote" | "endnote";
+
+export interface Note {
+  id: string;
+  kind: NoteKind;
+  text: string;
+}
+
 export interface Chapter {
   id: string;
   title: string;
   blocks: Block[];
+  notes: Note[];
 }
 
 export interface Book {
@@ -69,7 +79,11 @@ export function createImageBlock(src: string, alt = ""): ImageBlock {
 }
 
 export function createChapter(title = "새 챕터"): Chapter {
-  return { id: makeId("ch"), title, blocks: [createParagraphBlock("")] };
+  return { id: makeId("ch"), title, blocks: [createParagraphBlock("")], notes: [] };
+}
+
+export function createNote(kind: NoteKind): Note {
+  return { id: makeId("note"), kind, text: "" };
 }
 
 function makeUuid(): string {
@@ -89,5 +103,13 @@ export function createBook(): Book {
     coverImage: null,
     chapters: [createChapter("1장")],
     previewFontSize: 18,
+  };
+}
+
+/** 각주/미주 기능 추가 이전에 저장된 초안에는 chapter.notes가 없다. 불러올 때 채워준다. */
+export function normalizeBook(book: Book): Book {
+  return {
+    ...book,
+    chapters: book.chapters.map(c => ({ ...c, notes: c.notes ?? [] })),
   };
 }

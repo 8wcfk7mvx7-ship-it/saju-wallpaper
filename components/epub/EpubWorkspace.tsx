@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
-  createBook, createChapter, createParagraphBlock, createTextBoxBlock,
-  type Block, type Book,
+  createBook, createChapter, createParagraphBlock, createTextBoxBlock, normalizeBook,
+  type Block, type Book, type Note,
 } from "@/lib/epub/types";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
+import { extractNoteRefIds, stripNoteToken } from "@/lib/epub/notes";
 import { buildEpub, suggestFileName } from "@/lib/epub/generator";
 import { loadDraft, saveDraft } from "@/lib/epub/storage";
 import { saveEpubFile } from "@/lib/epub/download";
@@ -32,8 +33,9 @@ export default function EpubWorkspace() {
   useEffect(() => {
     loadDraft().then(draft => {
       if (draft && draft.chapters.length > 0) {
-        setBook(draft);
-        setActiveChapterId(draft.chapters[0].id);
+        const normalized = normalizeBook(draft);
+        setBook(normalized);
+        setActiveChapterId(normalized.chapters[0].id);
       }
       setReady(true);
     });
@@ -136,13 +138,49 @@ export default function EpubWorkspace() {
 
       const keep = chapter.blocks.slice(0, blockIdx + 1);
       const moved = chapter.blocks.slice(blockIdx + 1);
-      const newChapter = { ...createChapter(`${chapter.title} (계속)`), blocks: moved };
+
+      // 각주/미주는 실제로 참조되는 쪽 챕터를 따라간다. 양쪽에서 참조되면(드묾) 둘 다에 남긴다.
+      const referencedIn = (blocks: Block[]) => {
+        const ids = new Set<string>();
+        for (const b of blocks) {
+          if (b.type !== "paragraph" && b.type !== "textbox") continue;
+          for (const id of extractNoteRefIds(b.text)) ids.add(id);
+        }
+        return ids;
+      };
+      const keepIds = referencedIn(keep);
+      const movedIds = referencedIn(moved);
+      const keepNotes = chapter.notes.filter(n => keepIds.has(n.id) || !movedIds.has(n.id));
+      const movedNotes = chapter.notes.filter(n => movedIds.has(n.id));
+
+      const newChapter = { ...createChapter(`${chapter.title} (계속)`), blocks: moved, notes: movedNotes };
 
       const chapters = [...prev.chapters];
-      chapters[chapterIdx] = { ...chapter, blocks: keep };
+      chapters[chapterIdx] = { ...chapter, blocks: keep, notes: keepNotes };
       chapters.splice(chapterIdx + 1, 0, newChapter);
       return { ...prev, chapters };
     });
+  }
+
+  function handleAddNote(note: Note) {
+    updateChapter(activeChapter.id, c => ({ ...c, notes: [...c.notes, note] }));
+  }
+
+  function handleChangeNote(noteId: string, text: string) {
+    updateChapter(activeChapter.id, c => ({
+      ...c,
+      notes: c.notes.map(n => (n.id === noteId ? { ...n, text } : n)),
+    }));
+  }
+
+  function handleDeleteNote(noteId: string) {
+    updateChapter(activeChapter.id, c => ({
+      ...c,
+      notes: c.notes.filter(n => n.id !== noteId),
+      blocks: c.blocks.map(b =>
+        b.type === "paragraph" || b.type === "textbox" ? { ...b, text: stripNoteToken(b.text, noteId) } : b
+      ),
+    }));
   }
 
   async function handleChangeCover(file: File | null) {
@@ -196,6 +234,9 @@ export default function EpubWorkspace() {
             onAddParagraph={handleAddParagraph}
             onAddTextBox={handleAddTextBox}
             onAddImages={handleAddImages}
+            onAddNote={handleAddNote}
+            onChangeNote={handleChangeNote}
+            onDeleteNote={handleDeleteNote}
           />
         </div>
 

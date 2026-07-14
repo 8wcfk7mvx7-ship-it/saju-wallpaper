@@ -1,5 +1,7 @@
 "use client";
+import { useMemo } from "react";
 import type { Chapter } from "@/lib/epub/types";
+import { computeNoteNumbers, referencedNoteIds } from "@/lib/epub/notes";
 import BlockRenderer from "./BlockRenderer";
 
 interface Props {
@@ -18,6 +20,18 @@ const MAX_FONT = 30;
 export default function PreviewPane({
   chapter, chapterIndex, chapterCount, fontSize, onFontSizeChange, onPrevChapter, onNextChapter,
 }: Props) {
+  const noteById = useMemo(() => new Map(chapter.notes.map(n => [n.id, n])), [chapter.notes]);
+  const noteNumbers = useMemo(() => computeNoteNumbers(chapter), [chapter]);
+  const noteCtx = useMemo(() => ({ noteById, noteNumbers }), [noteById, noteNumbers]);
+
+  const referenced = useMemo(() => referencedNoteIds(chapter), [chapter]);
+  const footnotes = chapter.notes
+    .filter(n => n.kind === "footnote" && referenced.has(n.id))
+    .sort((a, b) => (noteNumbers.get(a.id) ?? 0) - (noteNumbers.get(b.id) ?? 0));
+  const endnotes = chapter.notes
+    .filter(n => n.kind === "endnote" && referenced.has(n.id))
+    .sort((a, b) => (noteNumbers.get(a.id) ?? 0) - (noteNumbers.get(b.id) ?? 0));
+
   return (
     <div className="flex flex-col h-full min-h-0">
       <div
@@ -67,8 +81,30 @@ export default function PreviewPane({
           >
             <h1 style={{ fontSize: "1.3em", fontWeight: 800, margin: "0 0 1em" }}>{chapter.title}</h1>
             {chapter.blocks.map(block => (
-              <BlockRenderer key={block.id} block={block} />
+              <BlockRenderer key={block.id} block={block} ctx={noteCtx} />
             ))}
+
+            {footnotes.length > 0 && (
+              <div style={{ marginTop: "2em", paddingTop: "0.8em", borderTop: "1px solid rgba(0,0,0,0.15)" }}>
+                <p style={{ fontWeight: 800, fontSize: "0.85em", marginBottom: "0.5em" }}>각주</p>
+                {footnotes.map(n => (
+                  <p key={n.id} style={{ fontSize: "0.8em", margin: "0 0 0.4em", opacity: 0.85 }}>
+                    [{noteNumbers.get(n.id)}] {n.text || "(내용 없음)"}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {endnotes.length > 0 && (
+              <div style={{ marginTop: "2em", paddingTop: "1em", borderTop: "2px solid rgba(0,0,0,0.25)" }}>
+                <p style={{ fontWeight: 800, fontSize: "0.95em", marginBottom: "0.6em" }}>미주</p>
+                {endnotes.map(n => (
+                  <p key={n.id} style={{ fontSize: "0.85em", margin: "0 0 0.5em", opacity: 0.85 }}>
+                    [{noteNumbers.get(n.id)}] {n.text || "(내용 없음)"}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

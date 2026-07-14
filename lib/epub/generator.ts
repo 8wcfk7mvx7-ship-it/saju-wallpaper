@@ -1,5 +1,6 @@
 import JSZip from "jszip";
-import type { Block, Book, Chapter } from "./types";
+import type { Block, Book, Chapter, Note } from "./types";
+import { computeNoteNumbers, referencedNoteIds, splitTextByNoteRefs } from "./notes";
 
 function escapeXml(input: string): string {
   return input
@@ -10,14 +11,59 @@ function escapeXml(input: string): string {
     .replace(/'/g, "&apos;");
 }
 
-/** 줄글 텍스트 -> 문단 태그들. 빈 줄 두 번은 문단 구분, 한 번은 줄바꿈. */
-function textToParagraphs(text: string): string {
+/** 줄글 텍스트 -> 문단 태그들 (각주/미주 본문처럼 참조 토큰이 없는 일반 텍스트용). */
+function plainParagraphs(text: string): string {
   const paragraphs = text.split(/\n{2,}/);
   return paragraphs
     .map(p => p.trim())
     .filter(p => p.length > 0)
     .map(p => `<p>${escapeXml(p).replace(/\n/g, "<br/>")}</p>`)
     .join("\n");
+}
+
+interface NoteRenderContext {
+  noteById: Map<string, Note>;
+  noteNumbers: Map<string, number>;
+  /** 이미 <aside>를 출력한 각주 id(같은 챕터에서 같은 각주가 두 번 참조돼도 본문 하나만 낸다). */
+  renderedFootnotes: Set<string>;
+}
+
+/** 본문 한 줄을 렌더링하며 각주/미주 참조를 <sup><a epub:type="noteref"> 마커로 바꾼다. */
+function renderNoteAwareLine(line: string, ctx: NoteRenderContext, footnoteIdsInBlock: string[]): string {
+  return splitTextByNoteRefs(line)
+    .map(seg => {
+      if (seg.type === "text") return escapeXml(seg.value);
+      const noteId = seg.noteId!;
+      const note = ctx.noteById.get(noteId);
+      const num = ctx.noteNumbers.get(noteId);
+      if (!note || num === undefined) return ""; // 노트가 삭제된 뒤 남은 토큰 등은 무시
+      if (note.kind === "footnote" && !footnoteIdsInBlock.includes(noteId)) {
+        footnoteIdsInBlock.push(noteId);
+      }
+      return `<sup class="noteref"><a epub:type="noteref" href="#${noteId}" id="ref-${noteId}">${num}</a></sup>`;
+    })
+    .join("");
+}
+
+/** 각주/미주 참조가 들어갈 수 있는 본문(문단, 텍스트 박스)을 렌더링한다. */
+function renderNoteAwareParagraphs(text: string, ctx: NoteRenderContext): { html: string; footnoteAsides: string } {
+  const footnoteIdsInBlock: string[] = [];
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
+    .map(p => `<p>${p.split("\n").map(line => renderNoteAwareLine(line, ctx, footnoteIdsInBlock)).join("<br/>")}</p>`);
+
+  const footnoteAsides = footnoteIdsInBlock
+    .filter(id => !ctx.renderedFootnotes.has(id))
+    .map(id => {
+      ctx.renderedFootnotes.add(id);
+      const note = ctx.noteById.get(id)!;
+      const num = ctx.noteNumbers.get(id)!;
+      return `<aside epub:type="footnote" id="${id}" class="footnote"><p class="note-number"><a epub:type="noteref-back" href="#ref-${id}">${num}.</a></p>${plainParagraphs(note.text) || "<p></p>"}</aside>`;
+    });
+
+  return { html: paragraphs.join("\n"), footnoteAsides: footnoteAsides.join("\n") };
 }
 
 const MIME_EXT: Record<string, string> = {
@@ -59,14 +105,18 @@ async function collectImages(book: Book): Promise<ResolvedImage[]> {
   return images;
 }
 
-function blockToXhtml(block: Block, imageByBlockId: Map<string, ResolvedImage>): string {
+function blockToXhtml(block: Block, imageByBlockId: Map<string, ResolvedImage>, ctx: NoteRenderContext): string {
   switch (block.type) {
-    case "paragraph":
-      return textToParagraphs(block.text);
+    case "paragraph": {
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx);
+      return footnoteAsides ? `${html}\n${footnoteAsides}` : html;
+    }
     case "textbox": {
       const label = block.label.trim();
       const labelHtml = label ? `<p class="textbox-label">${escapeXml(label)}</p>` : "";
-      return `<aside class="textbox">${labelHtml}${textToParagraphs(block.text)}</aside>`;
+      const { html, footnoteAsides } = renderNoteAwareParagraphs(block.text, ctx);
+      const aside = `<aside class="textbox">${labelHtml}${html}</aside>`;
+      return footnoteAsides ? `${aside}\n${footnoteAsides}` : aside;
     }
     case "image": {
       const resolved = imageByBlockId.get(block.id);
@@ -78,8 +128,32 @@ function blockToXhtml(block: Block, imageByBlockId: Map<string, ResolvedImage>):
   }
 }
 
+/** 챕터 끝에 모아 두는 미주(rearnote) 섹션. */
+function endnotesSection(chapter: Chapter, ctx: NoteRenderContext): string {
+  const referenced = referencedNoteIds(chapter);
+  const endnotes = chapter.notes
+    .filter(n => n.kind === "endnote" && referenced.has(n.id))
+    .sort((a, b) => (ctx.noteNumbers.get(a.id) ?? 0) - (ctx.noteNumbers.get(b.id) ?? 0));
+  if (endnotes.length === 0) return "";
+
+  const items = endnotes
+    .map(n => {
+      const num = ctx.noteNumbers.get(n.id)!;
+      return `<aside epub:type="rearnote" id="${n.id}" class="endnote"><p class="note-number"><a epub:type="noteref-back" href="#ref-${n.id}">${num}.</a></p>${plainParagraphs(n.text) || "<p></p>"}</aside>`;
+    })
+    .join("\n");
+
+  return `<section epub:type="endnotes" class="endnotes"><h2>미주</h2>\n${items}\n</section>`;
+}
+
 function chapterToXhtml(chapter: Chapter, book: Book, imageByBlockId: Map<string, ResolvedImage>): string {
-  const body = chapter.blocks.map(b => blockToXhtml(b, imageByBlockId)).join("\n");
+  const ctx: NoteRenderContext = {
+    noteById: new Map(chapter.notes.map(n => [n.id, n])),
+    noteNumbers: computeNoteNumbers(chapter),
+    renderedFootnotes: new Set(),
+  };
+  const body = chapter.blocks.map(b => blockToXhtml(b, imageByBlockId, ctx)).join("\n");
+  const endnotes = endnotesSection(chapter, ctx);
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${book.language}" xml:lang="${book.language}">
@@ -93,6 +167,7 @@ function chapterToXhtml(chapter: Chapter, book: Book, imageByBlockId: Map<string
 <h1>${escapeXml(chapter.title)}</h1>
 ${body}
 </section>
+${endnotes}
 </body>
 </html>`;
 }
@@ -230,6 +305,36 @@ p {
   font-size: 0.85em;
   color: #555;
   margin-top: 0.5em;
+}
+.noteref a {
+  text-decoration: none;
+  color: inherit;
+}
+aside.footnote, aside.endnote {
+  font-size: 0.85em;
+  line-height: 1.6;
+  margin: 0.6em 0 1.2em;
+  padding: 0.6em 1em;
+  border-top: 1px solid #ccc;
+  background: #f5f5f5;
+  color: #333;
+}
+aside.footnote p, aside.endnote p {
+  text-indent: 0;
+  margin: 0;
+}
+.note-number {
+  font-weight: bold;
+  margin-bottom: 0.3em !important;
+}
+.endnotes {
+  margin-top: 3em;
+  padding-top: 1em;
+  border-top: 2px solid #999;
+}
+.endnotes h2 {
+  font-size: 1.1em;
+  margin: 0 0 1em;
 }
 `;
 

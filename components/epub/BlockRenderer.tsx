@@ -1,7 +1,27 @@
 "use client";
-import type { Block } from "@/lib/epub/types";
+import type { Block, Note } from "@/lib/epub/types";
+import { splitTextByNoteRefs } from "@/lib/epub/notes";
 
-function ParagraphText({ text }: { text: string }) {
+export interface NoteContext {
+  noteById: Map<string, Note>;
+  noteNumbers: Map<string, number>;
+}
+
+function NoteMark({ noteId, ctx }: { noteId: string; ctx: NoteContext }) {
+  const note = ctx.noteById.get(noteId);
+  const num = ctx.noteNumbers.get(noteId);
+  if (!note || num === undefined) return null;
+  return (
+    <sup
+      title={note.text || (note.kind === "footnote" ? "각주" : "미주")}
+      style={{ color: "#7c6a3f", fontWeight: 700, cursor: "help", padding: "0 1px" }}
+    >
+      [{num}]
+    </sup>
+  );
+}
+
+function ParagraphText({ text, ctx }: { text: string; ctx: NoteContext }) {
   const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
   return (
     <>
@@ -9,7 +29,13 @@ function ParagraphText({ text }: { text: string }) {
         <p key={i} style={{ margin: "0 0 1em", textIndent: "1em" }}>
           {p.split("\n").map((line, j, arr) => (
             <span key={j}>
-              {line}
+              {splitTextByNoteRefs(line).map((seg, k) =>
+                seg.type === "text" ? (
+                  <span key={k}>{seg.value}</span>
+                ) : (
+                  <NoteMark key={k} noteId={seg.noteId!} ctx={ctx} />
+                )
+              )}
               {j < arr.length - 1 && <br />}
             </span>
           ))}
@@ -19,9 +45,9 @@ function ParagraphText({ text }: { text: string }) {
   );
 }
 
-export default function BlockRenderer({ block }: { block: Block }) {
+export default function BlockRenderer({ block, ctx }: { block: Block; ctx: NoteContext }) {
   if (block.type === "paragraph") {
-    return <ParagraphText text={block.text} />;
+    return <ParagraphText text={block.text} ctx={ctx} />;
   }
   if (block.type === "textbox") {
     return (
@@ -35,7 +61,7 @@ export default function BlockRenderer({ block }: { block: Block }) {
         }}
       >
         {block.label.trim() && <p style={{ fontWeight: "bold", margin: "0 0 0.5em" }}>{block.label}</p>}
-        <ParagraphText text={block.text} />
+        <ParagraphText text={block.text} ctx={ctx} />
       </aside>
     );
   }

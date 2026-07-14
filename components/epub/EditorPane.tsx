@@ -1,8 +1,9 @@
 "use client";
 import { useRef, useState } from "react";
-import type { Block, Chapter } from "@/lib/epub/types";
+import type { Block, Chapter, Note } from "@/lib/epub/types";
 import ChapterRail from "./ChapterRail";
 import BlockView from "./BlockView";
+import NotesPanel from "./NotesPanel";
 
 interface Props {
   chapters: Chapter[];
@@ -19,12 +20,16 @@ interface Props {
   onAddParagraph: () => void;
   onAddTextBox: () => void;
   onAddImages: (files: FileList | File[]) => void;
+  onAddNote: (note: Note) => void;
+  onChangeNote: (noteId: string, text: string) => void;
+  onDeleteNote: (noteId: string) => void;
 }
 
 export default function EditorPane(props: Props) {
   const {
     chapters, activeChapter, onSelectChapter, onAddChapter, onRenameChapter, onDeleteChapter, onMoveChapter,
     onChangeBlock, onDeleteBlock, onMoveBlock, onSplitAt, onAddParagraph, onAddTextBox, onAddImages,
+    onAddNote, onChangeNote, onDeleteNote,
   } = props;
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,9 +77,12 @@ export default function EditorPane(props: Props) {
               onDelete={() => onDeleteBlock(block.id)}
               onMove={dir => onMoveBlock(block.id, dir)}
               onSplitHere={() => onSplitAt(block.id)}
+              onAddNote={onAddNote}
             />
           ))}
         </div>
+
+        <NotesPanel chapter={activeChapter} onChangeNote={onChangeNote} onDeleteNote={onDeleteNote} />
 
         <div
           className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-2.5 border-t"
