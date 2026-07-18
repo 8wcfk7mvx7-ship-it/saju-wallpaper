@@ -1359,13 +1359,14 @@ export default function MainPage() {
 
               {/* 헤드라인 */}
               <div className="text-left mb-6">
-                <h1 className="font-black leading-[1.12] text-white"
-                  style={{ fontSize: "clamp(1.9rem, 5.5vw, 3.4rem)", letterSpacing: "-0.03em" }}>
-                  <span className="block">{t.h1[0]}</span>
-                  <span className="block" style={{
+                <h1 className="font-black leading-[1.15] text-white"
+                  style={{ fontSize: "clamp(1.45rem, 4.8vw, 3.2rem)", letterSpacing: "-0.03em" }}>
+                  {t.h1[0]}<br />
+                  <span style={{
                     background: "linear-gradient(110deg, #f472b6 0%, #c084fc 50%, #818cf8 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
+                    whiteSpace: "nowrap",
                   }}>{t.h1[1]} {t.h1[2]}</span>
                 </h1>
               </div>
