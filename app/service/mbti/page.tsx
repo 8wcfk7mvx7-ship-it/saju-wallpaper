@@ -732,6 +732,11 @@ export default function MbtiPage() {
                     ))}
                   </div>
                   <p className="text-sm text-gray-300 leading-relaxed">{info.detail}</p>
+                  {info.genderDetail && gender && (
+                    <p className="text-xs leading-relaxed mt-3 pt-3 text-gray-400" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      {gender === "male" ? info.genderDetail.male : info.genderDetail.female}
+                    </p>
+                  )}
                 </div>
               );
             })()}

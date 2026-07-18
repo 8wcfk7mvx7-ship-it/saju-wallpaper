@@ -816,6 +816,11 @@ export default function DaewoonPage() {
                 ))}
               </div>
               <p className="text-xs text-gray-200 leading-relaxed line-clamp-3">{info.detail}</p>
+              {info.genderDetail && gender && (
+                <p className="text-xs leading-relaxed mt-2" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  {gender === "male" ? info.genderDetail.male : info.genderDetail.female}
+                </p>
+              )}
             </div>
           );
         })()}

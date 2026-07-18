@@ -1076,6 +1076,13 @@ function ResultView({
             ))}
           </div>
           <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.7)" }}>{ilganInfo.detail}</p>
+          {ilganInfo.genderDetail && form.gender && (
+            <div className="rounded-xl px-4 py-3 mb-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                {form.gender === "male" ? ilganInfo.genderDetail.male : ilganInfo.genderDetail.female}
+              </p>
+            </div>
+          )}
           <div className="rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
             <p className="text-[10px] font-bold mb-2" style={{ color: "#6ee7b7" }}>{isYang ? "양간(陽干)" : "음간(陰干)"} 기질</p>
             <p className="text-xs leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>{yangYin.split(":")[1]?.trim() || yangYin}</p>

@@ -590,6 +590,11 @@ export default function CrushPage() {
                 ))}
               </div>
               <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{info.detail}</p>
+              {info.genderDetail && targetForm.gender && (
+                <p className="text-xs leading-relaxed mt-3 pt-3" style={{ color: "rgba(255,255,255,0.55)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                  {targetForm.gender === "male" ? info.genderDetail.male : info.genderDetail.female}
+                </p>
+              )}
             </div>
           );
         })()}
