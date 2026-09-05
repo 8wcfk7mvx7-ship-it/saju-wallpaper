@@ -8,8 +8,8 @@ import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
-  getMemo, setMemo as persistMemo, getLog, setLog as persistLog, getRecentLogs,
-  getCall, setCall as persistCall, exportAllData, importAllData,
+  getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
+  getCall, setCall as persistCall, getAllCalls, exportAllData, importAllData,
   type SajuProfile, type LuckLogEntry,
 } from "@/lib/storage";
 
@@ -55,6 +55,12 @@ function last7Dates(): string[] {
     out.push(d.toISOString().slice(0, 10));
   }
   return out;
+}
+
+// "2026-09-06" → "9월 6일" — 오늘이 아닌 과거 날짜도 표시할 때 씀
+function formatDateLabel(dateKey: string): string {
+  const [, m, d] = dateKey.split("-");
+  return `${Number(m)}월 ${Number(d)}일`;
 }
 
 async function toSolar(profile: SajuProfile): Promise<{ y: number; m: number; d: number }> {
@@ -122,6 +128,9 @@ export default function HomePage() {
   const [callSubmitted, setCallSubmitted] = useState(false);
   const [callJustSaved, setCallJustSaved] = useState(false);
 
+  const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
+  const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
+
   useEffect(() => {
     const p = getProfile();
     setProfile(p);
@@ -139,6 +148,8 @@ export default function HomePage() {
     const savedCall = getCall(dateKey);
     setCallInput(savedCall);
     setCallSubmitted(!!savedCall);
+    setPastMemos(getAllMemos());
+    setPastCalls(getAllCalls());
   }, [ready, dateKey]);
 
   useEffect(() => {
@@ -162,7 +173,11 @@ export default function HomePage() {
     setMemoState(v);
     setMemoSaved(false);
     if (memoTimer.current) clearTimeout(memoTimer.current);
-    memoTimer.current = setTimeout(() => { persistMemo(dateKey, v); setMemoSaved(true); }, 600);
+    memoTimer.current = setTimeout(() => {
+      persistMemo(dateKey, v);
+      setMemoSaved(true);
+      setPastMemos(getAllMemos());
+    }, 600);
   }
 
   function submitLog(r: number, nextTags = tags, nextNote = note) {
@@ -177,6 +192,7 @@ export default function HomePage() {
     persistCall(dateKey, callInput.trim());
     setCallSubmitted(true);
     setCallJustSaved(true);
+    setPastCalls(getAllCalls());
     setTimeout(() => setCallJustSaved(false), 2200);
   }
 
@@ -413,11 +429,30 @@ export default function HomePage() {
                 </div>
                 <textarea
                   value={memo} onChange={(e) => onMemoChange(e.target.value)}
-                  placeholder="오늘 있었던 일, 떠오른 생각을 자유롭게 남겨보세요." rows={10} maxLength={2000}
+                  placeholder="오늘 있었던 일, 떠오른 생각을 자유롭게 남겨보세요." rows={8} maxLength={2000}
                   className="w-full text-sm rounded p-3 resize-none focus:outline-none"
                   style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
                 />
               </Card>
+            </FadeIn>
+
+            <FadeIn delay={40}>
+              <div className="retro-card p-5 mt-4">
+                <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>지난 메모</p>
+                {pastMemos.filter((m) => m.date !== dateKey).length === 0 ? (
+                  <p className="text-sm" style={{ color: "var(--ink-soft)" }}>아직 지난 메모가 없어요.</p>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                    {pastMemos.filter((m) => m.date !== dateKey).map((m, i, arr) => (
+                      <div key={m.date}>
+                        <p className="text-[11px] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--ink)" }}>{m.content}</p>
+                        {i < arr.length - 1 && <Perforation />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </FadeIn>
           </div>
         )}
@@ -480,6 +515,24 @@ export default function HomePage() {
                   })}
                 </div>
               </Card>
+            </FadeIn>
+
+            <FadeIn delay={40}>
+              <div className="retro-card p-5 mt-4">
+                <p className="text-xs font-bold mb-3" style={{ color: "var(--amber)" }}>행운 부르기 기록</p>
+                {pastCalls.length === 0 ? (
+                  <p className="text-sm" style={{ color: "var(--ink-soft)" }}>아직 행운을 부른 기록이 없어요.</p>
+                ) : (
+                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    {pastCalls.map((c) => (
+                      <div key={c.date} className="flex items-baseline gap-2">
+                        <span className="text-[11px] font-bold shrink-0" style={{ color: "var(--ink-soft)" }}>{formatDateLabel(c.date)}</span>
+                        <span className="text-sm" style={{ color: "var(--ink)" }}>&ldquo;{c.text}&rdquo;</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </FadeIn>
           </div>
         )}

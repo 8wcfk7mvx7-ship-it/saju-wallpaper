@@ -78,6 +78,15 @@ export function setMemo(date: string, content: string): void {
   writeJson(MEMO_KEY, memos);
 }
 
+// 지금까지 쓴 모든 메모를 최신순으로 반환 (빈 메모는 제외)
+export function getAllMemos(): { date: string; content: string }[] {
+  const memos = readJson<Record<string, string>>(MEMO_KEY, {});
+  return Object.entries(memos)
+    .filter(([, content]) => content.trim().length > 0)
+    .sort(([a], [b]) => (a < b ? 1 : -1))
+    .map(([date, content]) => ({ date, content }));
+}
+
 // ── 하루 행운 기록 ────────────────────────────────────────────────────────
 export function getLog(date: string): LuckLogEntry | null {
   return readJson<Record<string, LuckLogEntry>>(LOG_KEY, {})[date] ?? null;
@@ -105,6 +114,15 @@ export function setCall(date: string, text: string): void {
   const calls = readJson<Record<string, string>>(CALL_KEY, {});
   calls[date] = text;
   writeJson(CALL_KEY, calls);
+}
+
+// 지금까지 불러본 모든 "행운 부르기" 문구를 최신순으로 반환
+export function getAllCalls(): { date: string; text: string }[] {
+  const calls = readJson<Record<string, string>>(CALL_KEY, {});
+  return Object.entries(calls)
+    .filter(([, text]) => text.trim().length > 0)
+    .sort(([a], [b]) => (a < b ? 1 : -1))
+    .map(([date, text]) => ({ date, text }));
 }
 
 // ── 백업/복원 ───────────────────────────────────────────────────────────
