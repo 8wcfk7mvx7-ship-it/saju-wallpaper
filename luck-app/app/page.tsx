@@ -310,6 +310,26 @@ export default function HomePage() {
               </p>
             </FadeIn>
 
+            {luck.specialDay && (
+              <FadeIn delay={20}>
+                <div className="retro-card p-5" style={{ background: "rgba(224,122,63,0.14)" }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <SparkleIcon size={16} style={{ color: "var(--amber)" }} />
+                    <p className="font-display text-base" style={{ color: "var(--amber)" }}>오늘은 {luck.specialDay.name}이에요</p>
+                  </div>
+                  <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.specialDay.meaning}</p>
+                  <div className="space-y-1.5">
+                    {luck.specialDay.ganwoonTips.map((tip, i) => (
+                      <p key={i} className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>· {tip}</p>
+                    ))}
+                  </div>
+                  <Perforation />
+                  <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.specialDay.aegmagiTip}</p>
+                </div>
+              </FadeIn>
+            )}
+
             <FadeIn delay={40}>
               <Card>
                 <div className="flex items-center gap-2 mb-2">

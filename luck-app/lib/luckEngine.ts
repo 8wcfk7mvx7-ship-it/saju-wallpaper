@@ -2,6 +2,7 @@
 // 절기(계절 기운) + 사용자의 용신(개인 기운) + 성별을 조합해
 // 같은 날에는 항상 같은 결과가 나오도록(캐시·새로고침에도 안 흔들리게) 결정적으로 하루 콘텐츠를 뽑는다.
 import { getCurrentSolarTerm, ELEMENT_LUCK, type SolarTermInfo } from "@/lib/solarTerms";
+import { getSpecialDay, type SpecialDay } from "@/lib/specialDays";
 import type { Element } from "@/lib/saju";
 
 export interface DailyLuck {
@@ -9,6 +10,8 @@ export interface DailyLuck {
   term: SolarTermInfo;
   ganwoonTip: string;
   aegmagiTip: string;
+  // 24절기에는 없지만 오늘이 해당하면 채워지는 특별한 날 (초복·중복·말복 등)
+  specialDay: SpecialDay | null;
   // 절기 행운색 — 오늘 절기 자체의 기운 (모두에게 동일)
   seasonColor: string;
   seasonItem: string;
@@ -140,6 +143,7 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const date = opts.date ?? new Date();
   const dateKey = getKstDateKey(date);
   const term = getCurrentSolarTerm(date);
+  const specialDay = getSpecialDay(date);
   const seed = hashSeed(dateKey);
 
   const ganwoonTip = pick(term.ganwoonTips, seed);
@@ -172,7 +176,7 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   }
 
   return {
-    dateKey, term, ganwoonTip, aegmagiTip: term.aegmagiTip,
+    dateKey, term, specialDay, ganwoonTip, aegmagiTip: term.aegmagiTip,
     seasonColor: term.luckyColor, seasonItem: term.luckyItem,
     personalColor, personalColorHex, personalItem,
     todayColor, todayColorHex, todayNumbers, todayRelationNote,
