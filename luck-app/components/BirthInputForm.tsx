@@ -29,7 +29,7 @@ export default function BirthInputForm({
         <input
           type="text" value={value.name} onChange={(e) => set({ name: e.target.value })}
           placeholder="예: 나, 민지" maxLength={20}
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </div>
@@ -65,7 +65,7 @@ export default function BirthInputForm({
             const [y, m, d] = e.target.value.split("-").map(Number);
             if (y && m && d) set({ birthYear: y, birthMonth: m, birthDay: d });
           }}
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </div>
@@ -75,7 +75,7 @@ export default function BirthInputForm({
         <select
           value={value.birthHour === null ? "unknown" : String(value.birthHour)}
           onChange={(e) => set({ birthHour: e.target.value === "unknown" ? null : Number(e.target.value) })}
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         >
           {HOURS.map((h) => <option key={h.v} value={h.v}>{h.label}</option>)}

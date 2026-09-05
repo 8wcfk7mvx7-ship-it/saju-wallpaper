@@ -4,21 +4,23 @@
 // 브랜드 톤(잉크색 선, 레트로 느낌)과 어울리게 만든다.
 type IconProps = { size?: number; className?: string; style?: React.CSSProperties };
 
+// 픽셀/도트 느낌에 맞춰 둥근 선 대신 각진 선(square/miter)을 사용
 const base = {
   fill: "none",
-  strokeWidth: 1.8,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
+  strokeWidth: 2,
+  strokeLinecap: "square" as const,
+  strokeLinejoin: "miter" as const,
 };
 
 export function CloverIcon({ size = 20, className, style }: IconProps) {
+  // 네 개의 원 + 줄기로 이루어진 단순한 실루엣 — 작은 크기에서도 클로버로 또렷하게 읽힌다
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" {...base} className={className} style={style}>
-      <path d="M12 12c0-3-2-5-4.5-5A2.5 2.5 0 0 0 5 9.5C5 12 7 14 12 12Z" />
-      <path d="M12 12c0-3 2-5 4.5-5A2.5 2.5 0 0 1 19 9.5C19 12 17 14 12 12Z" />
-      <path d="M12 12c3 0 5 2 5 4.5a2.5 2.5 0 0 1-2.5 2.5C12 19 10 17 12 12Z" />
-      <path d="M12 12c-3 0-5 2-5 4.5A2.5 2.5 0 0 0 9.5 19C12 19 14 17 12 12Z" />
-      <path d="M12 12v7" />
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+      <circle cx="9" cy="9" r="4.6" fill="currentColor" />
+      <circle cx="15" cy="9" r="4.6" fill="currentColor" />
+      <circle cx="9" cy="15" r="4.6" fill="currentColor" />
+      <circle cx="15" cy="15" r="4.6" fill="currentColor" />
+      <rect x="11" y="14" width="2" height="7" fill="currentColor" />
     </svg>
   );
 }

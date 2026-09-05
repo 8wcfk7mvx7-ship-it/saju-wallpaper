@@ -298,7 +298,7 @@ export default function HomePage() {
                   onChange={(e) => { setCallInput(e.target.value); setCallSubmitted(false); }}
                   placeholder="행운아, 내게로 와라"
                   maxLength={60}
-                  className="w-full text-sm rounded-xl px-4 py-3 mb-2.5 focus:outline-none"
+                  className="w-full text-sm rounded px-4 py-3 mb-2.5 focus:outline-none"
                   style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
                 />
                 <button
@@ -405,7 +405,7 @@ export default function HomePage() {
                 <textarea
                   value={memo} onChange={(e) => onMemoChange(e.target.value)}
                   placeholder="오늘 있었던 일, 떠오른 생각을 자유롭게 남겨보세요." rows={10} maxLength={2000}
-                  className="w-full text-sm rounded-xl p-3 resize-none focus:outline-none"
+                  className="w-full text-sm rounded p-3 resize-none focus:outline-none"
                   style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
                 />
               </Card>
@@ -453,7 +453,7 @@ export default function HomePage() {
                   value={note} onChange={(e) => setNote(e.target.value)}
                   onBlur={() => { if (rating) submitLog(rating, tags, note); }}
                   placeholder="한 줄로 이유를 남겨보세요 (선택)" maxLength={500}
-                  className="w-full text-sm rounded-xl px-3 py-2.5 focus:outline-none"
+                  className="w-full text-sm rounded px-3 py-2.5 focus:outline-none"
                   style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
                 />
 

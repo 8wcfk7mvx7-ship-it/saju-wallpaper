@@ -122,7 +122,7 @@ export default function OnboardingWizard({
         <input
           type="text" value={form.name} onChange={(e) => set({ name: e.target.value })}
           placeholder="예: 나, 민지" maxLength={20} autoFocus
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </StepShell>
@@ -160,7 +160,7 @@ export default function OnboardingWizard({
             const [y, m, d] = e.target.value.split("-").map(Number);
             if (y && m && d) set({ birthYear: y, birthMonth: m, birthDay: d });
           }}
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </StepShell>
@@ -173,7 +173,7 @@ export default function OnboardingWizard({
         <select
           value={form.birthHour === null ? "unknown" : String(form.birthHour)}
           onChange={(e) => set({ birthHour: e.target.value === "unknown" ? null : Number(e.target.value) })}
-          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          className="w-full px-4 py-3 rounded text-sm focus:outline-none"
           style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         >
           {HOURS.map((h) => <option key={h.v} value={h.v}>{h.label}</option>)}
@@ -212,7 +212,7 @@ export default function OnboardingWizard({
         <textarea
           value={memo} onChange={(e) => setMemo(e.target.value)}
           placeholder="예: 오늘부터 행운을 하나씩 모아볼래." rows={5} maxLength={2000} autoFocus
-          className="w-full text-sm rounded-xl p-3 resize-none focus:outline-none"
+          className="w-full text-sm rounded p-3 resize-none focus:outline-none"
           style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </div>
