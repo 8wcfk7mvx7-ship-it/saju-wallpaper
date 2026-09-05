@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
+import { SunPixel, CloudPixel, PouchPixel } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import {
@@ -263,16 +264,24 @@ export default function HomePage() {
     <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
       <div className="max-w-lg mx-auto px-5 pb-28">
         <FadeIn>
-          <div className="pt-8 pb-2">
-            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "var(--clover)" }}>
-              {todayLabel} · {luck.term.season}
-            </p>
-            <h1 className="font-display text-3xl mt-1" style={{ color: "var(--ink)" }}>
-              {tab === "today" && "오늘의 행운"}
-              {tab === "memo" && "오늘의 메모"}
-              {tab === "log" && "행운 기록"}
-              {tab === "settings" && "설정"}
-            </h1>
+          <div className="pt-8 pb-2 flex items-start justify-between">
+            <div>
+              <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "var(--clover)" }}>
+                {todayLabel} · {luck.term.season}
+              </p>
+              <h1 className="font-display text-3xl mt-1" style={{ color: "var(--ink)" }}>
+                {tab === "today" && "오늘의 행운"}
+                {tab === "memo" && "오늘의 메모"}
+                {tab === "log" && "행운 기록"}
+                {tab === "settings" && "설정"}
+              </h1>
+            </div>
+            {tab === "today" && (
+              <div className="flex items-center gap-1 shrink-0 pt-1">
+                <CloudPixel size={30} />
+                <SunPixel size={24} />
+              </div>
+            )}
           </div>
         </FadeIn>
 
@@ -286,8 +295,8 @@ export default function HomePage() {
 
             <FadeIn delay={40}>
               <Card>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <CloverIcon size={16} style={{ color: "var(--amber)" }} />
+                <div className="flex items-center gap-2 mb-2">
+                  <PouchPixel size={28} />
                   <p className="font-display text-base" style={{ color: "var(--amber)" }}>행운 부르기</p>
                 </div>
                 <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
