@@ -29,24 +29,34 @@ async function run() {
     });
     const page = await context.newPage();
 
-    // 1) 인트로 화면
-    await page.goto(BASE_URL, { waitUntil: "networkidle" });
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(dir, "01-intro.png") });
-
-    // 2) 생년월일 입력 화면
     try {
-      await page.click("text=시작하기");
-      await page.waitForTimeout(400);
-      await page.screenshot({ path: path.join(dir, "02-form.png") });
+      // 1) 온보딩 위저드 — STEP 1/7 (환영 화면)
+      await page.goto(BASE_URL, { waitUntil: "networkidle" });
+      await page.waitForTimeout(500);
+      await page.screenshot({ path: path.join(dir, "01-onboarding-step1.png") });
 
-      // 3) 생년월일 입력 후 대시보드 화면 (오늘 탭)
+      // 2) STEP 4/7 (생년월일) — 위저드 진행 UI를 보여주는 대표 스텝
+      await page.click("text=다음"); // step1 -> 2
+      await page.waitForTimeout(150);
+      await page.click("text=다음"); // step2 -> 3
+      await page.waitForTimeout(150);
+      await page.click("text=다음"); // step3 -> 4
+      await page.waitForTimeout(150);
       await page.fill('input[type="date"]', "1994-03-21");
+      await page.screenshot({ path: path.join(dir, "02-onboarding-step4.png") });
+
+      // 3) 나머지 스텝을 빠르게 통과해 대시보드 진입 (오늘 탭)
+      await page.click("text=다음"); // -> 5
+      await page.waitForTimeout(150);
+      await page.click("text=다음"); // -> 6
+      await page.waitForTimeout(150);
+      await page.click("text=다음"); // -> 7
+      await page.waitForTimeout(150);
       await page.click("text=시작하기");
       await page.waitForTimeout(800);
       await page.screenshot({ path: path.join(dir, "03-dashboard-today.png"), fullPage: true });
 
-      // 4) 메모 / 기록 / 설정 탭 (하단 탭바)
+      // 4) 메모 / 기록 탭 (하단 탭바)
       await page.click("text=메모");
       await page.waitForTimeout(300);
       await page.screenshot({ path: path.join(dir, "04-dashboard-memo.png") });

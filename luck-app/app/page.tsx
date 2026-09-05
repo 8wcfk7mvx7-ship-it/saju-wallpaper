@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
+import OnboardingWizard from "@/components/OnboardingWizard";
+import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import {
@@ -11,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-type Screen = "intro" | "form" | "dashboard";
+type Screen = "onboarding" | "edit" | "dashboard";
 type Tab = "today" | "memo" | "log" | "settings";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -37,16 +39,11 @@ function Perforation() {
 
 const TAG_OPTIONS = ["재물", "애정", "건강", "인간관계", "커리어"];
 const RATING_LABEL: Record<number, string> = { 1: "최악", 2: "별로", 3: "보통", 4: "좋음", 5: "최고" };
-const FEATURES = [
-  { icon: "🌗", text: "24절기마다 달라지는 개운법·액막이법" },
-  { icon: "🎨", text: "내 용신 기운에 맞춘 오늘의 행운 컬러" },
-  { icon: "📝", text: "오늘의 메모 & 행운 점수 기록" },
-];
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "today", label: "오늘", icon: "🍀" },
-  { id: "memo", label: "메모", icon: "📝" },
-  { id: "log", label: "기록", icon: "📊" },
-  { id: "settings", label: "설정", icon: "⚙️" },
+const TABS: { id: Tab; label: string; Icon: typeof CloverIcon }[] = [
+  { id: "today", label: "오늘", Icon: CloverIcon },
+  { id: "memo", label: "메모", Icon: MemoIcon },
+  { id: "log", label: "기록", Icon: ChartIcon },
+  { id: "settings", label: "설정", Icon: GearIcon },
 ];
 
 function last7Dates(): string[] {
@@ -71,24 +68,24 @@ async function toSolar(profile: SajuProfile): Promise<{ y: number; m: number; d:
   }
 }
 
-// 하단 탭바 — 내용이 한 화면에 몰리지 않도록 오늘/메모/기록/설정으로 분리
+// 하단 탭바 — 이모지 대신 브랜드 톤에 맞춘 단색 라인 아이콘을 써서 나머지 UI와 한 몸처럼 보이게 한다.
 function BottomTabs({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-20 flex mx-auto max-w-lg"
       style={{ background: "var(--card)", borderTop: "2px solid var(--card-border)", paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {TABS.map((t) => {
-        const active = tab === t.id;
+      {TABS.map(({ id, label, Icon }) => {
+        const active = tab === id;
         return (
           <button
-            key={t.id}
-            onClick={() => onChange(t.id)}
-            className="flex-1 flex flex-col items-center gap-0.5 py-2.5"
+            key={id}
+            onClick={() => onChange(id)}
+            className="flex-1 flex flex-col items-center gap-1 py-2.5"
             style={{ color: active ? "var(--clover)" : "var(--ink-soft)" }}
           >
-            <span style={{ fontSize: 20, lineHeight: 1, filter: active ? "none" : "grayscale(60%)", opacity: active ? 1 : 0.6 }}>{t.icon}</span>
-            <span className="text-[11px]" style={{ fontWeight: active ? 800 : 600 }}>{t.label}</span>
+            <Icon size={20} />
+            <span className="text-[11px]" style={{ fontWeight: active ? 800 : 600 }}>{label}</span>
           </button>
         );
       })}
@@ -98,7 +95,7 @@ function BottomTabs({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void })
 
 export default function HomePage() {
   const [ready, setReady] = useState(false);
-  const [screen, setScreen] = useState<Screen>("intro");
+  const [screen, setScreen] = useState<Screen>("onboarding");
   const [tab, setTab] = useState<Tab>("today");
   const [profile, setProfile] = useState<SajuProfile | null>(null);
   const [form, setForm] = useState<SajuProfile>(defaultProfile());
@@ -127,7 +124,7 @@ export default function HomePage() {
     const p = getProfile();
     setProfile(p);
     if (p || getSkipOnboarding()) setScreen("dashboard");
-    else setScreen("intro");
+    else setScreen("onboarding");
     setReady(true);
   }, []);
 
@@ -181,7 +178,14 @@ export default function HomePage() {
     setTimeout(() => setCallJustSaved(false), 2200);
   }
 
-  function finishForm() {
+  function finishOnboarding(p: SajuProfile, firstMemo: string) {
+    saveProfile(p);
+    setProfile(p);
+    if (firstMemo.trim()) { persistMemo(dateKey, firstMemo); setMemoState(firstMemo); }
+    setScreen("dashboard");
+  }
+
+  function finishEdit() {
     saveProfile(form);
     setProfile(form);
     setScreen("dashboard");
@@ -194,63 +198,22 @@ export default function HomePage() {
 
   if (!ready) return <main className="min-h-screen" style={{ background: "var(--bg)" }} />;
 
-  // ── 인트로 화면 ────────────────────────────────────────────────────────
-  if (screen === "intro") {
-    return (
-      <main className="min-h-screen page-fade-in flex flex-col" style={{ background: "var(--bg)" }}>
-        <div className="max-w-lg mx-auto px-6 pt-16 pb-10 flex-1 flex flex-col">
-          <FadeIn>
-            <div className="text-center">
-              <div className="text-6xl mb-4 float-leaf">🍀</div>
-              <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 어플</h1>
-              <p className="text-sm mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
-                행운은 가만히 있으면 오지 않아요.<br />매일 조금씩, 행운을 부르는 습관을 만들어보세요.
-              </p>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={120}>
-            <div className="mt-10 space-y-3">
-              {FEATURES.map((f) => (
-                <div key={f.text} className="retro-card flex items-center gap-3 px-4 py-3.5">
-                  <span className="text-xl">{f.icon}</span>
-                  <p className="text-sm" style={{ color: "var(--ink)" }}>{f.text}</p>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-
-          <div className="flex-1" />
-
-          <FadeIn delay={220}>
-            <div className="space-y-3 mt-10">
-              <button onClick={() => { setForm(defaultProfile()); setScreen("form"); }}
-                className="retro-btn font-display w-full py-4 text-base" style={{ background: "var(--clover)", color: "#fff" }}>
-                시작하기
-              </button>
-              <button onClick={viewWithoutBirthDate}
-                className="w-full py-2 text-sm font-bold underline underline-offset-4" style={{ color: "var(--ink-soft)" }}>
-                생년월일 없이 보기
-              </button>
-            </div>
-          </FadeIn>
-        </div>
-      </main>
-    );
+  // ── 첫 이용 온보딩 — STEP 1~7 위저드 ─────────────────────────────────────
+  if (screen === "onboarding") {
+    return <OnboardingWizard initial={defaultProfile()} onComplete={finishOnboarding} onSkipAll={viewWithoutBirthDate} />;
   }
 
-  // ── 생년월일 입력/수정 화면 ────────────────────────────────────────────
-  if (screen === "form") {
+  // ── 내 정보 수정(설정에서 진입) — 한 화면에서 전체 항목 수정 ──────────────
+  if (screen === "edit") {
     return (
       <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
         <div className="max-w-lg mx-auto px-5 pt-10 pb-16">
-          <button onClick={() => setScreen(profile ? "dashboard" : "intro")}
-            className="text-sm font-bold mb-4" style={{ color: "var(--ink-soft)" }}>
+          <button onClick={() => setScreen("dashboard")} className="text-sm font-bold mb-4" style={{ color: "var(--ink-soft)" }}>
             ← 뒤로
           </button>
           <div className="text-center mb-6">
-            <div className="text-5xl mb-3 float-leaf">🍀</div>
-            <h1 className="font-display text-2xl" style={{ color: "var(--ink)" }}>{profile ? "내 정보 수정" : "생년월일을 알려주세요"}</h1>
+            <CloverIcon size={44} className="mx-auto mb-3 float-leaf" />
+            <h1 className="font-display text-2xl" style={{ color: "var(--ink)" }}>내 정보 수정</h1>
             <p className="text-sm mt-2" style={{ color: "var(--ink-soft)" }}>
               당신의 용신 기운에 맞춘<br />오늘의 행운을 알려드려요.
             </p>
@@ -259,14 +222,9 @@ export default function HomePage() {
             <BirthInputForm value={form} onChange={setForm} />
           </Card>
           <div className="mt-4">
-            <button onClick={finishForm} className="retro-btn font-display w-full py-3.5 text-base" style={{ background: "var(--clover)", color: "#fff" }}>
-              {profile ? "저장하기" : "시작하기"}
+            <button onClick={finishEdit} className="retro-btn font-display w-full py-3.5 text-base" style={{ background: "var(--clover)", color: "#fff" }}>
+              저장하기
             </button>
-            {!profile && (
-              <button onClick={viewWithoutBirthDate} className="w-full py-3 mt-2 text-sm font-bold underline underline-offset-4" style={{ color: "var(--ink-soft)" }}>
-                생년월일 없이 보기
-              </button>
-            )}
           </div>
         </div>
       </main>
@@ -303,7 +261,10 @@ export default function HomePage() {
 
             <FadeIn delay={40}>
               <Card>
-                <p className="font-display text-base mb-2" style={{ color: "var(--amber)" }}>🍀 행운 부르기</p>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <CloverIcon size={16} style={{ color: "var(--amber)" }} />
+                  <p className="font-display text-base" style={{ color: "var(--amber)" }}>행운 부르기</p>
+                </div>
                 <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
                   행운은 가만히 기다리는 사람이 아니라, 부르는 사람에게 온다고 해요. 오늘, 한마디로 행운을 불러보세요.
                 </p>
@@ -326,7 +287,7 @@ export default function HomePage() {
                   {callSubmitted ? "다시 부르기" : "행운 부르기"}
                 </button>
                 {callJustSaved && (
-                  <p className="text-xs text-center mt-2.5" style={{ color: "var(--clover)" }}>🍀 오늘의 행운을 불렀어요</p>
+                  <p className="text-xs text-center mt-2.5" style={{ color: "var(--clover)" }}>오늘의 행운을 불렀어요</p>
                 )}
               </Card>
             </FadeIn>
@@ -334,7 +295,10 @@ export default function HomePage() {
             {/* 오늘의 행운 — 절기 기운 × 내 용신의 상생상극을 따져 오늘만 특별히 계산되는 컬러·숫자 */}
             <FadeIn delay={80}>
               <div className="retro-card p-5" style={{ background: luck.todayColorHex ? `${luck.todayColorHex}14` : "var(--card)" }}>
-                <p className="font-display text-base mb-3" style={{ color: "var(--ink)" }}>✨ 오늘의 행운</p>
+                <div className="flex items-center gap-1.5 mb-3">
+                  <SparkleIcon size={16} style={{ color: "var(--ink)" }} />
+                  <p className="font-display text-base" style={{ color: "var(--ink)" }}>오늘의 행운</p>
+                </div>
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <p className="text-[11px] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>행운의 컬러</p>
@@ -368,7 +332,7 @@ export default function HomePage() {
                 </Card>
               </div>
               {!profile && (
-                <button onClick={() => { setForm(defaultProfile()); setScreen("form"); }}
+                <button onClick={() => { setForm(defaultProfile()); setScreen("edit"); }}
                   className="retro-btn w-full mt-2 py-2.5 text-xs font-bold" style={{ background: "var(--card)", color: "var(--clover)" }}>
                   생년월일 넣고 맞춤 컬러 보기
                 </button>
@@ -377,10 +341,10 @@ export default function HomePage() {
 
             <FadeIn delay={160}>
               <Card>
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>오늘의 개운법</p>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--clover)" }}>오늘의 개운법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.ganwoonTip}</p>
                 <Perforation />
-                <p className="text-xs font-bold mb-2" style={{ color: "#c2410c" }}>액운을 막는 방법</p>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.aegmagiTip}</p>
               </Card>
             </FadeIn>
@@ -394,7 +358,7 @@ export default function HomePage() {
 
             <FadeIn delay={240}>
               <Card>
-                <p className="font-display text-base mb-2" style={{ color: "#be185d" }}>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>
                   오늘의 매력·이성운 {profile ? `(${profile.gender === "male" ? "남성" : "여성"})` : ""}
                 </p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.charmTip}</p>
@@ -499,7 +463,7 @@ export default function HomePage() {
                 ) : (
                   <p className="text-sm mb-3" style={{ color: "var(--ink-soft)" }}>아직 생년월일을 넣지 않았어요.</p>
                 )}
-                <button onClick={() => { setForm(profile ?? defaultProfile()); setScreen("form"); }}
+                <button onClick={() => { setForm(profile ?? defaultProfile()); setScreen("edit"); }}
                   className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--clover)", color: "#fff" }}>
                   {profile ? "내 정보 수정" : "생년월일 입력하기"}
                 </button>
