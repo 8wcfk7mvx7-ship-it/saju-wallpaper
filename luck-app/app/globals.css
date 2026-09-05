@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fdf6ec;
+  --bg-soft: #f7ecd9;
+  --ink: #2b2320;
+  --ink-soft: #6b5f52;
+  --clover: #2d6a4f;
+  --clover-soft: #74c69d;
+  --amber: #d97706;
+  --card: #ffffff;
+  --card-border: #ece1cd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.page-fade-in {
+  animation: pageFadeIn 0.4s ease both;
+}
+
+@keyframes floatLeaf {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(4deg); }
+}
+.float-leaf {
+  animation: floatLeaf 3.2s ease-in-out infinite;
+}
+
+::-webkit-scrollbar { width: 0px; height: 0px; }
