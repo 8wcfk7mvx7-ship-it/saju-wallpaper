@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
+import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
 import { SunPixel, CloudPixel, PouchPixel } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
@@ -439,19 +440,17 @@ export default function HomePage() {
             <FadeIn delay={40}>
               <div className="retro-card p-5 mt-4">
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>지난 메모</p>
-                {pastMemos.filter((m) => m.date !== dateKey).length === 0 ? (
-                  <p className="text-sm" style={{ color: "var(--ink-soft)" }}>아직 지난 메모가 없어요.</p>
-                ) : (
-                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
-                    {pastMemos.filter((m) => m.date !== dateKey).map((m, i, arr) => (
-                      <div key={m.date}>
-                        <p className="text-[11px] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
-                        <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--ink)" }}>{m.content}</p>
-                        {i < arr.length - 1 && <Perforation />}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <HistoryList
+                  items={pastMemos.filter((m) => m.date !== dateKey)}
+                  getDate={(m) => m.date}
+                  emptyText="아직 지난 메모가 없어요."
+                  renderItem={(m) => (
+                    <>
+                      <p className="text-[11px] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--ink)" }}>{m.content}</p>
+                    </>
+                  )}
+                />
               </div>
             </FadeIn>
           </div>
@@ -520,18 +519,17 @@ export default function HomePage() {
             <FadeIn delay={40}>
               <div className="retro-card p-5 mt-4">
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--amber)" }}>행운 부르기 기록</p>
-                {pastCalls.length === 0 ? (
-                  <p className="text-sm" style={{ color: "var(--ink-soft)" }}>아직 행운을 부른 기록이 없어요.</p>
-                ) : (
-                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                    {pastCalls.map((c) => (
-                      <div key={c.date} className="flex items-baseline gap-2">
-                        <span className="text-[11px] font-bold shrink-0" style={{ color: "var(--ink-soft)" }}>{formatDateLabel(c.date)}</span>
-                        <span className="text-sm" style={{ color: "var(--ink)" }}>&ldquo;{c.text}&rdquo;</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <HistoryList
+                  items={pastCalls}
+                  getDate={(c) => c.date}
+                  emptyText="아직 행운을 부른 기록이 없어요."
+                  renderItem={(c) => (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[11px] font-bold shrink-0" style={{ color: "var(--ink-soft)" }}>{formatDateLabel(c.date)}</span>
+                      <span className="text-sm" style={{ color: "var(--ink)" }}>&ldquo;{c.text}&rdquo;</span>
+                    </div>
+                  )}
+                />
               </div>
             </FadeIn>
           </div>
