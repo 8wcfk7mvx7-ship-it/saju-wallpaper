@@ -29,8 +29,8 @@ export default function BirthInputForm({
         <input
           type="text" value={value.name} onChange={(e) => set({ name: e.target.value })}
           placeholder="예: 나, 민지" maxLength={20}
-          className="w-full px-4 py-3 rounded-2xl text-sm focus:outline-none"
-          style={{ background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--ink)" }}
+          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </div>
 
@@ -39,11 +39,10 @@ export default function BirthInputForm({
         <div className="grid grid-cols-2 gap-2">
           {(["solar", "lunar"] as const).map((t) => (
             <button key={t} type="button" onClick={() => set({ calendarType: t })}
-              className="py-2.5 rounded-2xl text-sm font-bold transition"
+              className="retro-btn py-2.5 text-sm font-bold"
               style={{
                 background: value.calendarType === t ? "var(--clover)" : "var(--card)",
                 color: value.calendarType === t ? "#fff" : "var(--ink-soft)",
-                border: `1px solid ${value.calendarType === t ? "var(--clover)" : "var(--card-border)"}`,
               }}>
               {t === "solar" ? "양력" : "음력"}
             </button>
@@ -66,8 +65,8 @@ export default function BirthInputForm({
             const [y, m, d] = e.target.value.split("-").map(Number);
             if (y && m && d) set({ birthYear: y, birthMonth: m, birthDay: d });
           }}
-          className="w-full px-4 py-3 rounded-2xl text-sm focus:outline-none"
-          style={{ background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--ink)" }}
+          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         />
       </div>
 
@@ -76,8 +75,8 @@ export default function BirthInputForm({
         <select
           value={value.birthHour === null ? "unknown" : String(value.birthHour)}
           onChange={(e) => set({ birthHour: e.target.value === "unknown" ? null : Number(e.target.value) })}
-          className="w-full px-4 py-3 rounded-2xl text-sm focus:outline-none"
-          style={{ background: "var(--card)", border: "1px solid var(--card-border)", color: "var(--ink)" }}
+          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+          style={{ background: "var(--card)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
         >
           {HOURS.map((h) => <option key={h.v} value={h.v}>{h.label}</option>)}
         </select>
@@ -88,11 +87,10 @@ export default function BirthInputForm({
         <div className="grid grid-cols-2 gap-2">
           {(["female", "male"] as const).map((g) => (
             <button key={g} type="button" onClick={() => set({ gender: g })}
-              className="py-2.5 rounded-2xl text-sm font-bold transition"
+              className="retro-btn py-2.5 text-sm font-bold"
               style={{
                 background: value.gender === g ? "var(--clover)" : "var(--card)",
                 color: value.gender === g ? "#fff" : "var(--ink-soft)",
-                border: `1px solid ${value.gender === g ? "var(--clover)" : "var(--card-border)"}`,
               }}>
               {g === "female" ? "여성" : "남성"}
             </button>

@@ -23,6 +23,8 @@ export interface LuckLogEntry {
 const PROFILE_KEY = "luck_profile";
 const MEMO_KEY = "luck_memos";
 const LOG_KEY = "luck_logs";
+const SKIP_ONBOARDING_KEY = "luck_skip_onboarding";
+const CALL_KEY = "luck_calls";
 
 function readJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -53,6 +55,17 @@ export function clearProfile(): void {
   localStorage.removeItem(PROFILE_KEY);
 }
 
+// "생년월일 없이 보기"를 선택했는지 — 선택했다면 다음부터는 인트로를 다시 띄우지 않음
+export function getSkipOnboarding(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(SKIP_ONBOARDING_KEY) === "1";
+}
+
+export function setSkipOnboarding(): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SKIP_ONBOARDING_KEY, "1");
+}
+
 // ── 오늘의 메모 ───────────────────────────────────────────────────────────
 export function getMemo(date: string): string {
   return readJson<Record<string, string>>(MEMO_KEY, {})[date] ?? "";
@@ -80,4 +93,15 @@ export function getRecentLogs(dateKeys: string[]): Record<string, LuckLogEntry> 
   const result: Record<string, LuckLogEntry> = {};
   for (const d of dateKeys) if (all[d]) result[d] = all[d];
   return result;
+}
+
+// ── 행운 부르기 — 오늘 하루 한마디로 행운을 불러보는 문구 ─────────────────────
+export function getCall(date: string): string {
+  return readJson<Record<string, string>>(CALL_KEY, {})[date] ?? "";
+}
+
+export function setCall(date: string, text: string): void {
+  const calls = readJson<Record<string, string>>(CALL_KEY, {});
+  calls[date] = text;
+  writeJson(CALL_KEY, calls);
 }

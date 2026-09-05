@@ -29,19 +29,24 @@ async function run() {
     });
     const page = await context.newPage();
 
-    // 1) 온보딩 화면
+    // 1) 인트로 화면
     await page.goto(BASE_URL, { waitUntil: "networkidle" });
     await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(dir, "01-onboarding.png") });
+    await page.screenshot({ path: path.join(dir, "01-intro.png") });
 
-    // 2) 생년월일 입력 후 대시보드 화면
+    // 2) 생년월일 입력 화면
     try {
+      await page.click("text=시작하기");
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: path.join(dir, "02-form.png") });
+
+      // 3) 생년월일 입력 후 대시보드 화면
       await page.fill('input[type="date"]', "1994-03-21");
       await page.click("text=시작하기");
       await page.waitForTimeout(800);
-      await page.screenshot({ path: path.join(dir, "02-dashboard.png"), fullPage: true });
+      await page.screenshot({ path: path.join(dir, "03-dashboard.png"), fullPage: true });
     } catch (err) {
-      console.error(`${device.name}: 대시보드 캡처 실패`, err.message);
+      console.error(`${device.name}: 캡처 실패`, err.message);
     }
 
     await context.close();
