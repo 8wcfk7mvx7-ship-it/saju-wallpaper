@@ -3,6 +3,7 @@ import { useState } from "react";
 
 // 일기/메모 앱들(데이원, 5년 일기 등)의 흔한 패턴을 따름:
 // 700일치가 쌓여도 한 번에 다 그리지 않고, 월별로 묶고 "더 보기"로 필요한 만큼만 불러온다.
+// + 특정 날짜를 바로 찾아볼 수 있는 날짜 선택기.
 function monthLabel(dateKey: string): string {
   const [y, m] = dateKey.split("-");
   return `${y}년 ${Number(m)}월`;
@@ -18,9 +19,39 @@ export default function HistoryList<T>({
   emptyText: string;
 }) {
   const [visible, setVisible] = useState(pageSize);
+  const [filterDate, setFilterDate] = useState("");
 
   if (items.length === 0) {
     return <p className="text-sm" style={{ color: "var(--ink-soft)" }}>{emptyText}</p>;
+  }
+
+  const dateInput = (
+    <div className="flex items-center gap-2 mb-3">
+      <input
+        type="date"
+        value={filterDate}
+        onChange={(e) => setFilterDate(e.target.value)}
+        className="text-xs rounded px-3 py-2 focus:outline-none"
+        style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
+      />
+      {filterDate && (
+        <button onClick={() => setFilterDate("")} className="text-xs font-bold underline underline-offset-4" style={{ color: "var(--ink-soft)" }}>
+          전체 보기
+        </button>
+      )}
+    </div>
+  );
+
+  if (filterDate) {
+    const found = items.find((item) => getDate(item) === filterDate);
+    return (
+      <div>
+        {dateInput}
+        {found ? renderItem(found) : (
+          <p className="text-sm" style={{ color: "var(--ink-soft)" }}>이 날짜엔 기록이 없어요.</p>
+        )}
+      </div>
+    );
   }
 
   const shown = items.slice(0, visible);
@@ -39,6 +70,7 @@ export default function HistoryList<T>({
 
   return (
     <div>
+      {dateInput}
       <div className="space-y-3">
         {rows.map((row, i) => (
           <div key={row.date}>
