@@ -9,12 +9,18 @@ export interface DailyLuck {
   term: SolarTermInfo;
   ganwoonTip: string;
   aegmagiTip: string;
+  // 절기 행운색 — 오늘 절기 자체의 기운 (모두에게 동일)
   seasonColor: string;
   seasonItem: string;
+  // 기본 행운 — 내 용신에 따라 정해지는, 날짜와 무관한 "나의 기본값" 컬러
   personalColor?: string;
   personalColorHex?: string;
   personalItem?: string;
-  synergyNote?: string;
+  // 오늘의 행운 — 절기 기운과 내 용신의 상생상극 관계를 따져 "오늘 하루"만 특별히 계산되는 컬러·숫자
+  todayColor: string;
+  todayColorHex: string;
+  todayNumbers: [number, number];
+  todayRelationNote?: string; // 용신 정보가 있을 때만 채워짐(생년월일 없으면 undefined)
   charmTip: string;
   actionOfDay: string;
 }
@@ -93,6 +99,41 @@ export interface DailyLuckOptions {
   date?: Date;
   gender?: "male" | "female";
   yongshin?: Element;
+  heeshin?: Element; // 용신을 생해주는 오행 — analyzeSaju().yongshin.heeshin
+}
+
+// 오행 상생(生) — 각 원소가 무엇을 낳는가: 목생화, 화생토, 토생금, 금생수, 수생목
+const SAENG: Record<Element, Element> = { 목: "화", 화: "토", 토: "금", 금: "수", 수: "목" };
+// 오행 상극(剋) — 각 원소가 무엇을 극하는가: 목극토, 토극수, 수극화, 화극금, 금극목
+const GEUK: Record<Element, Element> = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" };
+
+// 오행 숫자(하도낙서 생성수) — 사주·역학에서 통용되는 오행별 숫자
+export const ELEMENT_NUMBER: Record<Element, [number, number]> = {
+  수: [1, 6], 화: [2, 7], 목: [3, 8], 금: [4, 9], 토: [5, 10],
+};
+
+interface TodayElementResult {
+  element: Element;
+  note: string;
+}
+
+// 오늘의 절기 기운(term)과 내 용신(yongshin)의 관계를 상생상극으로 따져
+// "오늘 하루" 특별히 힘을 주는 오행 하나를 골라낸다.
+function computeTodayElement(term: Element, yongshin: Element, heeshin: Element): TodayElementResult {
+  if (term === yongshin) {
+    return { element: yongshin, note: `오늘 기운과 당신의 용신이 같은 ${yongshin} 기운이에요. 하루 종일 든든하게 힘을 받는 날이에요.` };
+  }
+  if (SAENG[term] === yongshin) {
+    return { element: yongshin, note: `오늘 기운(${term})이 당신의 용신(${yongshin})을 생(生)해주는 날이에요. 용신 컬러를 곁들이면 기운이 배가돼요.` };
+  }
+  if (SAENG[yongshin] === term) {
+    return { element: heeshin, note: `오늘은 당신의 기운이 밖으로 많이 흘러나가는(설기) 날이에요. ${heeshin} 컬러로 기운을 채워보세요.` };
+  }
+  if (GEUK[term] === yongshin) {
+    return { element: heeshin, note: `오늘 기운(${term})이 당신의 용신(${yongshin})을 누르는 날이에요. ${heeshin} 컬러로 방어막을 세워보세요.` };
+  }
+  // GEUK[yongshin] === term — 남은 유일한 경우: 내 용신이 오늘 기운을 극(剋)함
+  return { element: yongshin, note: `당신의 용신(${yongshin})이 오늘 기운(${term})을 제압하는 날이에요. 자신감 있게 밀고 나가도 좋아요.` };
 }
 
 export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
@@ -109,22 +150,32 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   let personalColor: string | undefined;
   let personalColorHex: string | undefined;
   let personalItem: string | undefined;
-  let synergyNote: string | undefined;
+
+  // 기본값(비로그인/생년월일 미입력)은 절기 자체의 기운을 "오늘의 행운"으로 사용
+  let todayColor = term.luckyColor;
+  let todayColorHex = ELEMENT_LUCK[term.element].colorHex;
+  let todayNumbers = ELEMENT_NUMBER[term.element];
+  let todayRelationNote: string | undefined;
 
   if (opts.yongshin) {
     const lk = ELEMENT_LUCK[opts.yongshin];
     personalColor = lk.color;
     personalColorHex = lk.colorHex;
     personalItem = lk.item;
-    synergyNote = opts.yongshin === term.element
-      ? `오늘 ${term.name} 절기의 기운과 당신의 용신(${opts.yongshin}) 기운이 같은 결이에요. 절기가 주는 흐름을 그대로 타면 좋은 날이에요.`
-      : `오늘 ${term.name} 절기는 ${term.element} 기운이 강하고, 당신의 용신은 ${opts.yongshin}이에요. 절기 개운법과 함께 ${lk.color} 컬러를 곁들이면 부족한 기운이 채워져요.`;
+
+    const result = computeTodayElement(term.element, opts.yongshin, opts.heeshin ?? opts.yongshin);
+    const todayLk = ELEMENT_LUCK[result.element];
+    todayColor = todayLk.color;
+    todayColorHex = todayLk.colorHex;
+    todayNumbers = ELEMENT_NUMBER[result.element];
+    todayRelationNote = result.note;
   }
 
   return {
     dateKey, term, ganwoonTip, aegmagiTip: term.aegmagiTip,
     seasonColor: term.luckyColor, seasonItem: term.luckyItem,
-    personalColor, personalColorHex, personalItem, synergyNote,
+    personalColor, personalColorHex, personalItem,
+    todayColor, todayColorHex, todayNumbers, todayRelationNote,
     charmTip, actionOfDay,
   };
 }

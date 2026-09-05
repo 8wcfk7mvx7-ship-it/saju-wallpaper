@@ -40,11 +40,20 @@ async function run() {
       await page.waitForTimeout(400);
       await page.screenshot({ path: path.join(dir, "02-form.png") });
 
-      // 3) 생년월일 입력 후 대시보드 화면
+      // 3) 생년월일 입력 후 대시보드 화면 (오늘 탭)
       await page.fill('input[type="date"]', "1994-03-21");
       await page.click("text=시작하기");
       await page.waitForTimeout(800);
-      await page.screenshot({ path: path.join(dir, "03-dashboard.png"), fullPage: true });
+      await page.screenshot({ path: path.join(dir, "03-dashboard-today.png"), fullPage: true });
+
+      // 4) 메모 / 기록 / 설정 탭 (하단 탭바)
+      await page.click("text=메모");
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(dir, "04-dashboard-memo.png") });
+
+      await page.click("text=기록");
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(dir, "05-dashboard-log.png") });
     } catch (err) {
       console.error(`${device.name}: 캡처 실패`, err.message);
     }
