@@ -24,8 +24,6 @@
   --amber: #d4922a;
   --card: #fffaee;
   --card-border: #6b4423;
-  --card-bevel-light: rgba(255, 244, 214, 0.55);
-  --card-bevel-dark: rgba(74, 50, 32, 0.35);
 }
 
 * {
@@ -45,8 +43,8 @@ body {
   font-smooth: never;
   text-rendering: optimizeSpeed;
   letter-spacing: 0.01em;
-  /* 파치먼트 질감 — 은은한 도트 패턴 */
-  background-image: radial-gradient(rgba(107,68,35,0.07) 1px, transparent 1px);
+  /* 파치먼트 질감 — 아주 은은한 도트 패턴(카드가 깔끔해 보이도록 예전보다 옅게) */
+  background-image: radial-gradient(rgba(107,68,35,0.035) 1px, transparent 1px);
   background-size: 14px 14px;
 }
 
@@ -56,34 +54,28 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* ── 스타듀밸리풍 나무 패널 카드 ──────────────────────────────────────────
-   두꺼운 나무 갈색 테두리 + 안쪽 베벨(밝은 상단/어두운 하단)로 "조각된 나무판" 느낌,
-   바깥쪽엔 딱딱한 오프셋 그림자를 둬서 픽셀게임 대화창처럼 살짝 떠 보이게 한다. */
+/* ── 카드(텍스트박스) ─────────────────────────────────────────────────────
+   두꺼운 나무 베벨 대신, 음양관·헬로우봇류의 "오늘의 날씨 예보 카드" 같은
+   깔끔한 단일 소프트 섀도우 + 넉넉한 라운드로 정돈된 느낌을 준다.
+   폰트·아이콘·팔레트는 그대로 유지해 브랜드 톤은 이어간다. */
 .retro-card {
   background: var(--card);
-  border: 3px solid var(--card-border);
-  border-radius: 6px;
+  border: 1px solid rgba(107, 68, 35, 0.08);
+  border-radius: 20px;
   box-shadow:
-    inset 2px 2px 0 var(--card-bevel-light),
-    inset -2px -2px 0 var(--card-bevel-dark),
-    4px 4px 0 var(--card-border);
+    0 1px 2px rgba(74, 50, 32, 0.04),
+    0 8px 24px -8px rgba(74, 50, 32, 0.12);
 }
 
 .retro-btn {
-  border: 3px solid var(--card-border);
-  border-radius: 5px;
-  box-shadow:
-    inset 1px 1px 0 var(--card-bevel-light),
-    inset -1px -1px 0 var(--card-bevel-dark),
-    3px 3px 0 var(--card-border);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px -4px rgba(74, 50, 32, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .retro-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow:
-    inset 1px 1px 0 var(--card-bevel-light),
-    inset -1px -1px 0 var(--card-bevel-dark),
-    1px 1px 0 var(--card-border);
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px -2px rgba(74, 50, 32, 0.28);
 }
 
 /* 도장(스탬프) 느낌의 원형 배지 */
