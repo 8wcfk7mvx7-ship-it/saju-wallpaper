@@ -3,6 +3,7 @@
 // 같은 날에는 항상 같은 결과가 나오도록(캐시·새로고침에도 안 흔들리게) 결정적으로 하루 콘텐츠를 뽑는다.
 import { getCurrentSolarTerm, ELEMENT_LUCK, type SolarTermInfo } from "@/lib/solarTerms";
 import { getSpecialDay, type SpecialDay } from "@/lib/specialDays";
+import { getDailyGrades, type DailyGrades } from "@/lib/domainGrades";
 import type { Element } from "@/lib/saju";
 
 export interface DailyLuck {
@@ -26,6 +27,8 @@ export interface DailyLuck {
   todayRelationNote?: string; // 용신 정보가 있을 때만 채워짐(생년월일 없으면 undefined)
   charmTip: string;
   actionOfDay: string;
+  // 애정운·금전운·직장운 S~D 등급 — 생년월일이 있어야 나만의 등급으로 개인화됨
+  dailyGrades: DailyGrades;
 }
 
 function hashSeed(str: string): number {
@@ -103,6 +106,7 @@ export interface DailyLuckOptions {
   gender?: "male" | "female";
   yongshin?: Element;
   heeshin?: Element; // 용신을 생해주는 오행 — analyzeSaju().yongshin.heeshin
+  ilgan?: string; // 일간(사주 원국의 나) — analyzeSaju().pillarsDetail.day.cg, 도메인 등급 계산에 사용
 }
 
 // 오행 상생(生) — 각 원소가 무엇을 낳는가: 목생화, 화생토, 토생금, 금생수, 수생목
@@ -144,6 +148,7 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const dateKey = getKstDateKey(date);
   const term = getCurrentSolarTerm(date);
   const specialDay = getSpecialDay(date);
+  const dailyGrades = getDailyGrades(date, opts.ilgan);
   const seed = hashSeed(dateKey);
 
   const ganwoonTip = pick(term.ganwoonTips, seed);
@@ -180,6 +185,6 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
     seasonColor: term.luckyColor, seasonItem: term.luckyItem,
     personalColor, personalColorHex, personalItem,
     todayColor, todayColorHex, todayNumbers, todayRelationNote,
-    charmTip, actionOfDay,
+    charmTip, actionOfDay, dailyGrades,
   };
 }

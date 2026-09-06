@@ -41,6 +41,14 @@ function Perforation() {
 }
 
 const TAG_OPTIONS = ["재물", "애정", "건강", "인간관계", "커리어"];
+const GRADE_COLOR: Record<string, string> = {
+  S: "#d4922a", A: "#4d7c3a", B: "#8a6b4a", C: "#c2673a", D: "#b23a2e",
+};
+const GRADE_DOMAINS = [
+  { key: "love", label: "애정운" },
+  { key: "money", label: "금전운" },
+  { key: "career", label: "직장운" },
+] as const;
 const RATING_LABEL: Record<number, string> = { 1: "최악", 2: "별로", 3: "보통", 4: "좋음", 5: "최고" };
 const TABS: { id: Tab; label: string; Icon: typeof CloverIcon }[] = [
   { id: "today", label: "오늘", Icon: CloverIcon },
@@ -165,7 +173,10 @@ export default function HomePage() {
         name: profile.name || "나", gender: profile.gender,
         birthPlace: "서울", style: "auto", productType: "mobile", useJajasi: false,
       });
-      setLuck(getDailyLuck({ gender: profile.gender, yongshin: y.yongshin.yongshin, heeshin: y.yongshin.heeshin }));
+      setLuck(getDailyLuck({
+        gender: profile.gender, yongshin: y.yongshin.yongshin, heeshin: y.yongshin.heeshin,
+        ilgan: y.pillarsDetail.day.cg,
+      }));
     })();
     return () => { cancelled = true; };
   }, [profile]);
@@ -385,6 +396,36 @@ export default function HomePage() {
                   {luck.todayRelationNote ?? "생년월일을 넣으면 내 용신과 오늘 절기 기운의 상생상극을 따져 나만의 오늘의 행운 컬러·숫자를 볼 수 있어요."}
                 </p>
               </div>
+            </FadeIn>
+
+            <FadeIn delay={95}>
+              <Card>
+                <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>
+                  오늘의 운세{!luck.dailyGrades.personalized && " (기본값)"}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {GRADE_DOMAINS.map(({ key, label }) => {
+                    const g = luck.dailyGrades[key];
+                    return (
+                      <div key={key} className="flex flex-col items-center gap-1.5 py-1">
+                        <span className="text-[11px] font-bold" style={{ color: "var(--ink-soft)" }}>{label}</span>
+                        <span
+                          className="w-10 h-10 rounded-full flex items-center justify-center font-display text-lg"
+                          style={{ background: GRADE_COLOR[g.grade], color: "#fff" }}
+                        >
+                          {g.grade}
+                        </span>
+                        <span className="text-[10px]" style={{ color: "var(--ink-soft)" }}>{g.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {!luck.dailyGrades.personalized && (
+                  <p className="text-xs mt-3 text-center leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                    생년월일을 넣으면 내 사주를 바탕으로 한 정확한 등급을 볼 수 있어요.
+                  </p>
+                )}
+              </Card>
             </FadeIn>
 
             <FadeIn delay={110}>
