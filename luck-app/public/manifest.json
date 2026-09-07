@@ -1,6 +1,6 @@
 {
-  "name": "행운의 어플",
-  "short_name": "행운의 어플",
+  "name": "행운의 앱",
+  "short_name": "행운의 앱",
   "description": "24절기 개운법과 나만의 용신 기운으로 매일 알려주는 오늘의 행운, 나만의 행운 다이어리",
   "start_url": "/",
   "display": "standalone",

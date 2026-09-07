@@ -94,7 +94,7 @@ export default function OnboardingWizard({
             <div className="flex justify-center mb-4 float-leaf">
               <LuckStamp size={84} />
             </div>
-            <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 어플</h1>
+            <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 앱</h1>
             <p className="text-sm mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
               행운은 가만히 있으면 오지 않아요.<br />매일 조금씩, 행운을 부르는 습관을 만들어보세요.
             </p>

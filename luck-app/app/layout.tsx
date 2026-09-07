@@ -6,7 +6,7 @@ import "./globals.css";
 // (globals.css의 @font-face에서 로드)
 
 export const metadata: Metadata = {
-  title: "행운의 어플",
+  title: "행운의 앱",
   description: "24절기 개운법과 나만의 용신 기운으로 매일 하나씩 알려주는 오늘의 행운, 그리고 나만의 행운 다이어리.",
   manifest: "/manifest.json",
   icons: {

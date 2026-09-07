@@ -1,4 +1,4 @@
-export const metadata = { title: "이용약관 — 행운의 어플" };
+export const metadata = { title: "이용약관 — 행운의 앱" };
 
 function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
@@ -23,7 +23,7 @@ export default function TermsPage() {
       <div className="max-w-lg mx-auto space-y-5 text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>
         <h1 className="text-xl font-black" style={{ color: "var(--ink)" }}>이용약관</h1>
         <p>
-          본 약관은 [상호명](이하 &quot;회사&quot;)이 제공하는 모바일 애플리케이션 &quot;행운의 어플&quot;
+          본 약관은 [상호명](이하 &quot;회사&quot;)이 제공하는 모바일 애플리케이션 &quot;행운의 앱&quot;
           (이하 &quot;앱&quot; 또는 &quot;서비스&quot;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및
           책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
         </p>
@@ -40,7 +40,7 @@ export default function TermsPage() {
 
         <Section n={2} title="정의">
           <ol className="list-decimal pl-5 space-y-1">
-            <li>&quot;서비스&quot;란 회사가 제공하는 &quot;행운의 어플&quot; 앱 및 이에 부수하는 제반 서비스를 의미합니다.</li>
+            <li>&quot;서비스&quot;란 회사가 제공하는 &quot;행운의 앱&quot; 및 이에 부수하는 제반 서비스를 의미합니다.</li>
             <li>&quot;이용자&quot;란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 자를 의미합니다.</li>
             <li>&quot;콘텐츠&quot;란 서비스 내에서 제공되는 절기 정보, 개운법, 액운 방지 팁, 행운 컬러·숫자 등 회사가 제작하여 제공하는 정보성 콘텐츠를 의미합니다.</li>
             <li>&quot;이용자 콘텐츠&quot;란 이용자가 서비스 이용 과정에서 직접 작성·입력한 사주 정보, 메모, 행운 점수, 태그, &quot;행운 부르기&quot; 문구 등을 의미합니다.</li>

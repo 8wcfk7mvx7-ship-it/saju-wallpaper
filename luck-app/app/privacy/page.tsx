@@ -1,4 +1,4 @@
-export const metadata = { title: "개인정보처리방침 — 행운의 어플" };
+export const metadata = { title: "개인정보처리방침 — 행운의 앱" };
 
 function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <p>
           [상호명](이하 &quot;회사&quot;)은 「개인정보 보호법」 등 관계 법령을 준수하며, 이용자의 개인정보를
           안전하게 처리하기 위하여 다음과 같이 개인정보처리방침을 수립·공개합니다. 본 방침은 회사가 제공하는
-          모바일 애플리케이션 &quot;행운의 어플&quot;(이하 &quot;앱&quot;)에 적용됩니다.
+          모바일 애플리케이션 &quot;행운의 앱&quot;(이하 &quot;앱&quot;)에 적용됩니다.
         </p>
 
         <Section n={1} title="개인정보의 처리 목적">

@@ -5,7 +5,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 // iOS/Android 앱에도 즉시 동일한 화면이 반영됩니다. (배포 전에는 이 값을 실제 도메인으로 교체하세요)
 const config: CapacitorConfig = {
   appId: "kr.ai.luckyapp.app",
-  appName: "행운의 어플",
+  appName: "행운의 앱",
   webDir: "public",
   server: {
     url: "https://luckyapp.example.com", // TODO: 실제 배포 도메인으로 교체
