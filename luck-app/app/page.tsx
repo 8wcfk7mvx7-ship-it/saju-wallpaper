@@ -14,8 +14,6 @@ import {
   type SajuProfile, type LuckLogEntry,
 } from "@/lib/storage";
 
-export const dynamic = "force-dynamic";
-
 type Screen = "onboarding" | "edit" | "dashboard";
 type Tab = "today" | "memo" | "log" | "settings";
 

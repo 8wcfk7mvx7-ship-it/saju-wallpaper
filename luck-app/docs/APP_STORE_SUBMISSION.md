@@ -4,16 +4,18 @@
 > **일부 단계는 이 원격 리눅스 개발 환경에서 제가 직접 클릭·결제·서명할 수 없습니다.**
 > (macOS/Xcode가 없고, 사람 명의의 계정 생성·본인인증·카드 결제·2단계 인증을 대신 통과할 수 없어요.)
 
-이 앱(행운의 앱 / kr.ai.luckyapp.app)은 Capacitor로 웹사이트를 그대로 감싸는 구조입니다
-(`capacitor.config.ts`의 `server.url`). 웹을 배포하면 앱스토어 재심사 없이도 네이티브 앱 화면이 즉시 갱신됩니다.
+이 앱(행운의 앱 / kr.ai.luckyapp.app)은 서버 기능이 전혀 없는 완전한 클라이언트 앱입니다
+(사주 계산도 전부 브라우저에서 처리, 저장은 localStorage만 사용). 그래서 웹 호스팅 없이
+`next.config.ts`의 `output: "export"`로 뽑은 정적 파일(`out/`)을 Capacitor가 앱 안에 통째로
+번들링합니다(`capacitor.config.ts`의 `webDir: "out"`). 다만 이 방식은 콘텐츠를 고쳐도 웹처럼
+즉시 반영되지 않고 앱스토어에 새 버전을 다시 올려야 합니다 — 필요해지면 언제든 웹 호스팅 +
+`server.url` 방식으로 되돌릴 수 있습니다.
 
 ## ① 배포 전 필수 작업 (사람이 1회)
 
-1. **웹앱을 실제 도메인에 배포**하세요 (Vercel 추천 — `luck-app/` 폴더를 그대로 새 Vercel 프로젝트로 연결).
-   배포 후 `capacitor.config.ts`의 `server.url`을 실제 도메인으로 교체하세요.
-2. **Apple Developer Program** 가입 (https://developer.apple.com/programs/, 연 $99 — 신분증·카드 필요)
-3. **Google Play Console** 계정 개설 (https://play.google.com/console/, $25 + 신분증)
-4. 두 계정의 API 키를 한 번만 발급해서 GitHub Actions Secret으로 등록해두면, 이후 빌드·서명·업로드는
+1. **Apple Developer Program** 가입 (https://developer.apple.com/programs/, 연 $99 — 신분증·카드 필요)
+2. **Google Play Console** 계정 개설 (https://play.google.com/console/, $25 + 신분증)
+3. 두 계정의 API 키를 한 번만 발급해서 GitHub Actions Secret으로 등록해두면, 이후 빌드·서명·업로드는
    CI에서 Fastlane으로 자동화할 수 있습니다 (Summer Palace 프로젝트의 `docs/APP_STORE_SUBMISSION.md`와 동일한 방식).
 
 ## ② 지금 자동화해 둔 것
@@ -21,7 +23,8 @@
 - **스크린샷 자동 캡처**: `scripts/capture-store-screenshots.mjs` — 온보딩 화면 + 생년월일 입력 후
   대시보드 화면을 iOS 6.7형(1290×2796)·Android 폰(1080×1920) 해상도로 자동 캡처합니다.
   ```bash
-  BASE_URL=https://<실제-배포-도메인> node scripts/capture-store-screenshots.mjs
+  npm run dev -- -p 3200   # 로컬 개발 서버로도 충분함(호스팅 불필요)
+  node scripts/capture-store-screenshots.mjs
   ```
 - **앱 아이콘**: `public/icon-{192,512,1024}.png` — 클로버 심볼 기반 자체 아이콘을 스크립트로 생성해뒀습니다
   (`scripts/icon-source.html` 수정 후 재생성 가능).
