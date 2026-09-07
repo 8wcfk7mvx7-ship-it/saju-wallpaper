@@ -21,6 +21,7 @@ export default function BirthInputForm({
 }) {
   const set = (patch: Partial<SajuProfile>) => onChange({ ...value, ...patch });
   const dateStr = `${String(value.birthYear).padStart(4, "0")}-${String(value.birthMonth).padStart(2, "0")}-${String(value.birthDay).padStart(2, "0")}`;
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="space-y-4">
@@ -60,7 +61,7 @@ export default function BirthInputForm({
       <div>
         <label className="text-xs font-bold block mb-1.5" style={{ color: "var(--ink-soft)" }}>생년월일</label>
         <input
-          type="date" value={dateStr} min="1930-01-01" max="2020-12-31"
+          type="date" value={dateStr} min="1900-01-01" max={todayStr}
           onChange={(e) => {
             const [y, m, d] = e.target.value.split("-").map(Number);
             if (y && m && d) set({ birthYear: y, birthMonth: m, birthDay: d });

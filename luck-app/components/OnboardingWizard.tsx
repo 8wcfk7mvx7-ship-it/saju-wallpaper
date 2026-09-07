@@ -80,6 +80,7 @@ export default function OnboardingWizard({
   const [memo, setMemo] = useState("");
   const set = (patch: Partial<SajuProfile>) => setForm((prev) => ({ ...prev, ...patch }));
   const dateStr = `${String(form.birthYear).padStart(4, "0")}-${String(form.birthMonth).padStart(2, "0")}-${String(form.birthDay).padStart(2, "0")}`;
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const back = () => setStep((s) => Math.max(s - 1, 1));
@@ -160,7 +161,7 @@ export default function OnboardingWizard({
     return (
       <StepShell step={4} title="생년월일을 알려주세요" onNext={next} onBack={back} showSkip onSkipAll={onSkipAll}>
         <input
-          type="date" value={dateStr} min="1930-01-01" max="2020-12-31" autoFocus
+          type="date" value={dateStr} min="1900-01-01" max={todayStr} autoFocus
           onChange={(e) => {
             const [y, m, d] = e.target.value.split("-").map(Number);
             if (y && m && d) set({ birthYear: y, birthMonth: m, birthDay: d });
