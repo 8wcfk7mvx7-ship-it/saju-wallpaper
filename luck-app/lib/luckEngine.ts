@@ -4,6 +4,7 @@
 import { getCurrentSolarTerm, ELEMENT_LUCK, type SolarTermInfo } from "@/lib/solarTerms";
 import { getSpecialDay, type SpecialDay } from "@/lib/specialDays";
 import { getDailyGrades, type DailyGrades } from "@/lib/domainGrades";
+import { GANWOON_ONE_LINERS } from "@/lib/ganwoonOneLiners";
 import type { Element } from "@/lib/saju";
 
 export interface DailyLuck {
@@ -26,7 +27,7 @@ export interface DailyLuck {
   todayNumbers: [number, number];
   todayRelationNote?: string; // 용신 정보가 있을 때만 채워짐(생년월일 없으면 undefined)
   charmTip: string;
-  actionOfDay: string;
+  actionOfDay: string; // "하루 한 줄 개운법" — 매일 하나씩 결정적으로 뽑히는 짧은 개운법 (lib/ganwoonOneLiners.ts)
   // 애정운·금전운·직장운 S~D 등급 — 생년월일이 있어야 나만의 등급으로 개인화됨
   dailyGrades: DailyGrades;
 }
@@ -46,30 +47,6 @@ export function getKstDateKey(date: Date = new Date()): string {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
   return kst.toISOString().slice(0, 10);
 }
-
-// 절기·용신과 무관하게 매일 하나씩 뽑히는 범용 "오늘의 행운 행동" — 소소하지만 실천하기 쉬운 습관들
-const LUCK_ACTIONS: string[] = [
-  "아침에 물 한 잔을 마시고 하루를 시작해보세요.",
-  "오늘 만나는 사람에게 먼저 인사를 건네보세요.",
-  "책상 위를 5분만 정리해보세요.",
-  "평소 안 가던 길로 잠깐 산책해보세요.",
-  "고마운 사람에게 짧은 안부 메시지를 보내보세요.",
-  "핸드폰 사진첩을 정리하며 좋은 기억을 다시 꺼내보세요.",
-  "오늘 하루의 목표를 딱 하나만 정해보세요.",
-  "지갑 속 영수증을 정리해보세요.",
-  "좋아하는 음악을 들으며 하루를 시작해보세요.",
-  "창문을 열어 집 안 공기를 환기해보세요.",
-  "평소보다 10분 일찍 하루를 시작해보세요.",
-  "오늘 먹는 음식 중 하나를 사진으로 남겨보세요.",
-  "누군가에게 진심 어린 칭찬 한마디를 건네보세요.",
-  "미뤄뒀던 답장 하나를 보내보세요.",
-  "손이나 머리 정돈처럼 나를 위한 작은 관리를 해보세요.",
-  "평소 안 쓰던 향(향수·디퓨저 등)을 시도해보세요.",
-  "짧게라도 스트레칭으로 몸을 풀어보세요.",
-  "읽고 싶었던 글 한 편을 읽어보세요.",
-  "지갑에 여윳돈을 조금 넣어두세요.",
-  "오늘 하루를 사진 한 장으로 기록해보세요.",
-];
 
 const CHARM_TIPS_FEMALE: string[] = [
   "립밤 하나로도 표정이 화사해 보일 수 있어요. 입술 보습을 챙겨보세요.",
@@ -152,7 +129,7 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const seed = hashSeed(dateKey);
 
   const ganwoonTip = pick(term.ganwoonTips, seed);
-  const actionOfDay = pick(LUCK_ACTIONS, seed + 7);
+  const actionOfDay = pick(GANWOON_ONE_LINERS, seed + 7);
   const charmList = opts.gender === "male" ? CHARM_TIPS_MALE : CHARM_TIPS_FEMALE;
   const charmTip = pick(charmList, seed + 13);
 

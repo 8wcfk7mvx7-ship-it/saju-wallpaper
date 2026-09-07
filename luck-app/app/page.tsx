@@ -463,7 +463,7 @@ export default function HomePage() {
 
             <FadeIn delay={200}>
               <Card>
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>오늘의 행운 행동</p>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>하루 한 줄 개운법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.actionOfDay}</p>
               </Card>
             </FadeIn>
