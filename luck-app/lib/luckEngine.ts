@@ -42,6 +42,15 @@ function pick<T>(arr: T[], seed: number): T {
   return arr[seed % arr.length];
 }
 
+// 월별 누적 일수(평년 기준) — "하루 한 줄 개운법"을 연도와 무관하게 날짜(월/일)에
+// 고정으로 매핑하기 위한 인덱스. 윤년의 2/29은 2/28과 같은 인덱스를 재사용해서
+// 해가 바뀌어도(윤년이어도) 같은 날짜엔 항상 같은 개운법이 뜨도록 한다.
+const MONTH_CUM_DAYS = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+function fixedDayIndex(month: number, day: number): number {
+  const d = month === 2 && day === 29 ? 28 : day;
+  return MONTH_CUM_DAYS[month - 1] + (d - 1);
+}
+
 // 한국 시간(Asia/Seoul, UTC+9) 기준 "YYYY-MM-DD"
 export function getKstDateKey(date: Date = new Date()): string {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
@@ -129,7 +138,8 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const seed = hashSeed(dateKey);
 
   const ganwoonTip = pick(term.ganwoonTips, seed);
-  const actionOfDay = pick(GANWOON_ONE_LINERS, seed + 7);
+  const [, mStr, dStr] = dateKey.split("-");
+  const actionOfDay = GANWOON_ONE_LINERS[fixedDayIndex(Number(mStr), Number(dStr)) % GANWOON_ONE_LINERS.length];
   const charmList = opts.gender === "male" ? CHARM_TIPS_MALE : CHARM_TIPS_FEMALE;
   const charmTip = pick(charmList, seed + 13);
 
