@@ -4,9 +4,10 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
-import { SunPixel, CloudPixel, PouchPixel } from "@/components/LuckArt";
+import { SunPixel, CloudPixel, PouchPixel, CookiePixel } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
+import { getRandomFortune } from "@/lib/fortuneCookie";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
   getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
@@ -133,7 +134,9 @@ export default function HomePage() {
 
   const [callInput, setCallInput] = useState("");
   const [callSubmitted, setCallSubmitted] = useState(false);
-  const [callJustSaved, setCallJustSaved] = useState(false);
+  const [calledText, setCalledText] = useState("");
+  const [showLuckPopup, setShowLuckPopup] = useState(false);
+  const [cookieFortune, setCookieFortune] = useState<string | null>(null);
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
@@ -199,11 +202,17 @@ export default function HomePage() {
 
   function submitCall() {
     if (!callInput.trim()) return;
-    persistCall(dateKey, callInput.trim());
+    const text = callInput.trim();
+    persistCall(dateKey, text);
     setCallSubmitted(true);
-    setCallJustSaved(true);
+    setCalledText(text);
+    setShowLuckPopup(true);
     setPastCalls(getAllCalls());
-    setTimeout(() => setCallJustSaved(false), 2200);
+    setTimeout(() => setShowLuckPopup(false), 3000);
+  }
+
+  function crackCookie() {
+    setCookieFortune((prev) => getRandomFortune(prev ?? undefined));
   }
 
   function finishOnboarding(p: SajuProfile, firstMemo: string) {
@@ -286,7 +295,10 @@ export default function HomePage() {
   if (!luck) return <main className="min-h-screen" style={{ background: "var(--bg)" }} />;
 
   // ── 대시보드 (하단 탭바로 오늘/메모/기록/설정 분리) ─────────────────────
+  // 팝업은 main 바깥(형제)에 둔다 — main에 걸린 page-fade-in 애니메이션의 transform이
+  // fixed 포지셔닝의 기준(containing block)을 바꿔버려 화면 중앙에 뜨지 않는 문제를 피하기 위함.
   return (
+    <>
     <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
       <div className="max-w-lg mx-auto px-5 pb-28">
         <FadeIn>
@@ -366,8 +378,39 @@ export default function HomePage() {
                   }}>
                   {callSubmitted ? "다시 부르기" : "행운 부르기"}
                 </button>
-                {callJustSaved && (
-                  <p className="text-xs text-center mt-2.5" style={{ color: "var(--clover)" }}>오늘의 행운을 불렀어요</p>
+              </Card>
+            </FadeIn>
+
+            <FadeIn delay={55}>
+              <Card>
+                <div className="flex items-center gap-2 mb-2">
+                  <CookiePixel size={26} />
+                  <p className="font-display text-base" style={{ color: "var(--amber)" }}>포춘쿠키</p>
+                </div>
+                {cookieFortune ? (
+                  <>
+                    <p className="text-sm mb-3 leading-relaxed font-display" style={{ color: "var(--ink)" }}>
+                      &ldquo;{cookieFortune}&rdquo;
+                    </p>
+                    <button
+                      onClick={crackCookie}
+                      className="retro-btn w-full py-2.5 text-xs font-bold"
+                      style={{ background: "var(--bg-soft)", color: "var(--ink-soft)" }}>
+                      다시 뽑기
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                      쿠키를 열면 오늘의 짧은 포춘 메시지가 나와요.
+                    </p>
+                    <button
+                      onClick={crackCookie}
+                      className="retro-btn font-display w-full py-3 text-sm"
+                      style={{ background: "var(--amber)", color: "#fff" }}>
+                      포춘쿠키 열기
+                    </button>
+                  </>
                 )}
               </Card>
             </FadeIn>
@@ -649,5 +692,35 @@ export default function HomePage() {
 
       <BottomTabs tab={tab} onChange={setTab} />
     </main>
+
+    {showLuckPopup && (
+      <div
+        className="fixed inset-0 z-30 flex items-center justify-center p-6"
+        style={{ background: "rgba(74,50,32,0.45)" }}
+        onClick={() => setShowLuckPopup(false)}
+      >
+        <div
+          className="retro-card p-6 max-w-xs w-full text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-center mb-3 float-leaf">
+            <PouchPixel size={48} />
+          </div>
+          <p className="font-display text-lg mb-2" style={{ color: "var(--amber)" }}>
+            행운이 오늘 당신을 찾아갈 거예요
+          </p>
+          <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+            &ldquo;{calledText}&rdquo;
+          </p>
+          <button
+            onClick={() => setShowLuckPopup(false)}
+            className="retro-btn font-display w-full py-2.5 text-sm"
+            style={{ background: "var(--clover)", color: "#fff" }}>
+            확인
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
