@@ -4,7 +4,7 @@
 import { getCurrentSolarTerm, ELEMENT_LUCK, type SolarTermInfo } from "@/lib/solarTerms";
 import { getSpecialDay, type SpecialDay } from "@/lib/specialDays";
 import { getDailyGrades, type DailyGrades } from "@/lib/domainGrades";
-import { GANWOON_ONE_LINERS } from "@/lib/ganwoonOneLiners";
+import { GANWOON_ONE_LINERS, LEAP_DAY_ONE_LINERS } from "@/lib/ganwoonOneLiners";
 import type { Element } from "@/lib/saju";
 
 export interface DailyLuck {
@@ -43,12 +43,11 @@ function pick<T>(arr: T[], seed: number): T {
 }
 
 // 월별 누적 일수(평년 기준) — "하루 한 줄 개운법"을 연도와 무관하게 날짜(월/일)에
-// 고정으로 매핑하기 위한 인덱스. 윤년의 2/29은 2/28과 같은 인덱스를 재사용해서
-// 해가 바뀌어도(윤년이어도) 같은 날짜엔 항상 같은 개운법이 뜨도록 한다.
+// 고정으로 매핑하기 위한 인덱스. 해가 바뀌어도 같은 날짜엔 항상 같은 개운법이 뜨도록 한다.
+// 2/29(윤일)은 이 365개 풀과 별개로 LEAP_DAY_ONE_LINERS에서 전용 문구를 뽑는다.
 const MONTH_CUM_DAYS = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 function fixedDayIndex(month: number, day: number): number {
-  const d = month === 2 && day === 29 ? 28 : day;
-  return MONTH_CUM_DAYS[month - 1] + (d - 1);
+  return MONTH_CUM_DAYS[month - 1] + (day - 1);
 }
 
 // 한국 시간(Asia/Seoul, UTC+9) 기준 "YYYY-MM-DD"
@@ -138,8 +137,13 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const seed = hashSeed(dateKey);
 
   const ganwoonTip = pick(term.ganwoonTips, seed);
-  const [, mStr, dStr] = dateKey.split("-");
-  const actionOfDay = GANWOON_ONE_LINERS[fixedDayIndex(Number(mStr), Number(dStr)) % GANWOON_ONE_LINERS.length];
+  const [yStr, mStr, dStr] = dateKey.split("-");
+  const month = Number(mStr), day = Number(dStr);
+  // 윤년은 항상 4의 배수라 연도를 그대로 나머지 연산하면 짝수만 나와 절대 골고루 안 뽑힘 —
+  // 4로 나눈 몫으로 나머지 연산해야 윤년이 돌아올 때마다(4년 간격) 실제로 번갈아 뽑힌다.
+  const actionOfDay = month === 2 && day === 29
+    ? LEAP_DAY_ONE_LINERS[Math.floor(Number(yStr) / 4) % LEAP_DAY_ONE_LINERS.length]
+    : GANWOON_ONE_LINERS[fixedDayIndex(month, day) % GANWOON_ONE_LINERS.length];
   const charmList = opts.gender === "male" ? CHARM_TIPS_MALE : CHARM_TIPS_FEMALE;
   const charmTip = pick(charmList, seed + 13);
 
