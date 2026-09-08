@@ -4673,10 +4673,6 @@ export const OHAENG_ACTIONS: Record<string, { title: string; actions: string[] }
   },
 };
 
-// 십신(十神) 단문 설명 (Threads 참고)
-// SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY 는 lib/saju2.ts 로 이동됨
-export { SIPSEONG_DESC, SIPSEONG_MONEY_COMBO, JIJANGAN_DISPLAY } from "./saju2";
-
 // ── 格局 패턴 / 병존(竝存) 감지 ──────────────────────────────────────────────
 // 매력 분석(charm)뿐 아니라 만세력 등 사주 원국을 보여주는 모든 곳에서
 // 동일한 기준으로 격국·병존을 판정하기 위한 공용 로직.
