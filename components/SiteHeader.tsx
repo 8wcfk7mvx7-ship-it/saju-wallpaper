@@ -50,7 +50,7 @@ export default function SiteHeader() {
     return () => window.removeEventListener("sp-auth-changed", refresh);
   }, [pathname]);
 
-  if (SUPPRESS_PATHS.includes(pathname)) return null;
+  if (SUPPRESS_PATHS.includes(pathname) || pathname.startsWith("/epub")) return null;
 
   return (
     <header

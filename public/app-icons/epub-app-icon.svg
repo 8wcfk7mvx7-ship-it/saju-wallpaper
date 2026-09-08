@@ -1,0 +1,58 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#453A24"/>
+      <stop offset="0.55" stop-color="#2E2718"/>
+      <stop offset="1" stop-color="#1C170E"/>
+    </linearGradient>
+    <linearGradient id="pageLeft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E8DFC7"/>
+      <stop offset="0.85" stop-color="#FDFBF3"/>
+    </linearGradient>
+    <linearGradient id="pageRight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0.15" stop-color="#FDFBF3"/>
+      <stop offset="1" stop-color="#E8DFC7"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0C14B"/>
+      <stop offset="1" stop-color="#D19B25"/>
+    </linearGradient>
+    <filter id="pageShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#000" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- 은은한 상단 빛 -->
+  <ellipse cx="512" cy="120" rx="520" ry="300" fill="#FFFFFF" opacity="0.05"/>
+
+  <g filter="url(#pageShadow)">
+    <!-- 왼쪽 페이지 -->
+    <path d="M512 356 C 424 300, 300 286, 206 306 L 206 716 C 300 698, 424 712, 512 764 Z" fill="url(#pageLeft)"/>
+    <!-- 오른쪽 페이지 -->
+    <path d="M512 356 C 600 300, 724 286, 818 306 L 818 716 C 724 698, 600 712, 512 764 Z" fill="url(#pageRight)"/>
+  </g>
+
+  <!-- 책등 -->
+  <path d="M512 356 L 512 764" stroke="#B9AC8C" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- 왼쪽 페이지 글줄 -->
+  <g fill="#2E2718" opacity="0.32">
+    <rect x="268" y="392" width="196" height="20" rx="10"/>
+    <rect x="268" y="446" width="196" height="20" rx="10"/>
+    <rect x="268" y="500" width="196" height="20" rx="10"/>
+    <rect x="268" y="554" width="140" height="20" rx="10"/>
+  </g>
+
+  <!-- 오른쪽 페이지 글줄 -->
+  <g fill="#2E2718" opacity="0.32">
+    <rect x="560" y="392" width="196" height="20" rx="10"/>
+    <rect x="560" y="446" width="196" height="20" rx="10"/>
+    <rect x="560" y="500" width="196" height="20" rx="10"/>
+    <rect x="560" y="554" width="140" height="20" rx="10"/>
+  </g>
+
+  <!-- 책갈피 리본 -->
+  <path d="M660 286 L 748 286 L 748 470 L 704 424 L 660 470 Z" fill="url(#ribbon)"/>
+</svg>

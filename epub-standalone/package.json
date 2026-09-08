@@ -1,0 +1,61 @@
+{
+  "name": "epub-factory-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "build": "vite build",
+    "start": "vite build && electron .",
+    "dist:mac": "vite build && electron-builder --mac dmg zip --arm64 --x64 --publish=never",
+    "dist:win": "vite build && electron-builder --win nsis --x64 --publish=never"
+  },
+  "dependencies": {
+    "idb-keyval": "^6.3.0",
+    "jszip": "^3.10.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33",
+    "electron-builder": "^25",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vite": "^6.0.0",
+    "vite-plugin-singlefile": "^2.1.0"
+  },
+  "build": {
+    "appId": "kr.ai.summerpalace.epub.desktop",
+    "productName": "이펍공장",
+    "files": [
+      "electron/**/*",
+      "dist/**/*"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "dmg": {
+      "title": "이펍공장"
+    }
+  },
+  "description": "이펍공장 데스크톱 앱"
+}

@@ -10,7 +10,7 @@ const TABS = [
 ];
 
 // 자체 풀스크린 플로우(결제/로딩/생성 등)에서는 하단 탭바를 숨김
-const SUPPRESS_PREFIXES = ["/loading", "/generating", "/pay", "/success"];
+const SUPPRESS_PREFIXES = ["/loading", "/generating", "/pay", "/success", "/epub"];
 
 export default function MobileBottomNav() {
   const pathname = usePathname();

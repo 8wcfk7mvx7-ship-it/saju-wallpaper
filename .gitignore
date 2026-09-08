@@ -40,3 +40,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/worktrees/
+
+# Capacitor (네이티브 프로젝트는 커밋하되, 생성물은 제외)
+ios/App/App/public
+ios/App/Pods
+ios/App/output
+ios/App/build
+ios/capacitor-cordova-ios-plugins
+android/app/src/main/assets/public
+android/app/build
+android/build
