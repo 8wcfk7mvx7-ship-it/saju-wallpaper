@@ -26,7 +26,6 @@ export interface DailyLuck {
   todayColorHex: string;
   todayNumbers: [number, number];
   todayRelationNote?: string; // 용신 정보가 있을 때만 채워짐(생년월일 없으면 undefined)
-  charmTip: string;
   actionOfDay: string; // "하루 한 줄 개운법" — 매일 하나씩 결정적으로 뽑히는 짧은 개운법 (lib/ganwoonOneLiners.ts)
   // 애정운·금전운·직장운 S~D 등급 — 생년월일이 있어야 나만의 등급으로 개인화됨
   dailyGrades: DailyGrades;
@@ -55,36 +54,6 @@ export function getKstDateKey(date: Date = new Date()): string {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
   return kst.toISOString().slice(0, 10);
 }
-
-const CHARM_TIPS_FEMALE: string[] = [
-  "립밤 하나로도 표정이 화사해 보일 수 있어요. 입술 보습을 챙겨보세요.",
-  "먼저 웃으며 인사하면 오늘 하루 호감도가 확 올라가요.",
-  "좋아하는 향수를 은은하게 뿌려보세요. 향은 기억에 오래 남아요.",
-  "머리를 평소와 다르게 묶어보는 것만으로 분위기가 바뀌어요.",
-  "대화할 때 상대의 눈을 조금 더 오래 마주쳐보세요.",
-  "고민을 들어주는 것만으로도 매력 포인트가 될 수 있어요.",
-  "편한 신발 대신 살짝 포인트 있는 신발을 신어보세요.",
-  "메시지에 이모티콘 하나만 더해도 다정한 인상을 줘요.",
-  "거울 앞에서 미소 짓는 연습을 오늘 한 번 해보세요.",
-  "관심 있는 사람에게 안부를 먼저 물어보세요.",
-  "손을 자주 만지작거리기보단 편안하게 두는 게 더 매력적으로 보여요.",
-  "오늘 입는 옷 색깔 하나만 밝게 바꿔보세요.",
-];
-
-const CHARM_TIPS_MALE: string[] = [
-  "목소리 톤을 살짝 낮추고 천천히 말해보세요. 안정감을 줘요.",
-  "문을 잡아주거나 작은 배려를 자연스럽게 해보세요.",
-  "손톱이나 신발처럼 디테일 하나를 정돈해보세요.",
-  "상대의 말을 끊지 않고 끝까지 들어보세요.",
-  "향이 좋은 섬유유연제나 향수를 살짝 활용해보세요.",
-  "약속 시간보다 5분 일찍 도착해보세요. 신뢰감을 줘요.",
-  "오늘은 자세를 곧게 펴고 걸어보세요.",
-  "리액션을 조금 더 크게 해보세요. 대화가 더 즐거워져요.",
-  "먼저 연락하는 것을 망설이지 말아보세요.",
-  "오늘 입는 셔츠나 니트를 한 번 다려서 입어보세요.",
-  "무거운 짐을 들어주는 등 자연스러운 배려를 해보세요.",
-  "많은 말보다 진심 담은 한마디를 건네보세요.",
-];
 
 export interface DailyLuckOptions {
   date?: Date;
@@ -144,8 +113,6 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const actionOfDay = month === 2 && day === 29
     ? LEAP_DAY_ONE_LINERS[Math.floor(Number(yStr) / 4) % LEAP_DAY_ONE_LINERS.length]
     : GANWOON_ONE_LINERS[fixedDayIndex(month, day) % GANWOON_ONE_LINERS.length];
-  const charmList = opts.gender === "male" ? CHARM_TIPS_MALE : CHARM_TIPS_FEMALE;
-  const charmTip = pick(charmList, seed + 13);
 
   let personalColor: string | undefined;
   let personalColorHex: string | undefined;
@@ -176,6 +143,6 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
     seasonColor: term.luckyColor, seasonItem: term.luckyItem,
     personalColor, personalColorHex, personalItem,
     todayColor, todayColorHex, todayNumbers, todayRelationNote,
-    charmTip, actionOfDay, dailyGrades,
+    actionOfDay, dailyGrades,
   };
 }

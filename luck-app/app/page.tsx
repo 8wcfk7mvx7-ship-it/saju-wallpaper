@@ -553,15 +553,6 @@ export default function HomePage() {
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.aegmagiTip}</p>
               </Card>
             </FadeIn>
-
-            <FadeIn delay={200}>
-              <Card>
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>
-                  오늘의 매력·이성운 {profile ? `(${profile.gender === "male" ? "남성" : "여성"})` : ""}
-                </p>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.charmTip}</p>
-              </Card>
-            </FadeIn>
           </div>
         )}
 
