@@ -4,7 +4,7 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
-import { SunPixel, CloudPixel, PouchPixel, CookiePixel } from "@/components/LuckArt";
+import { SunPixel, CloudPixel, PouchPixel, CookiePixel, LuckStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getRandomFortune } from "@/lib/fortuneCookie";
@@ -37,6 +37,21 @@ function Card({ children }: { children: React.ReactNode }) {
 // 카드 안에서 섹션을 나눌 때 쓰는 절취선(점선) 구분선 — 영수증/티켓의 절취선 모티프
 function Perforation() {
   return <div className="my-4" style={{ borderTop: "2px dashed var(--card-border)", opacity: 0.35 }} />;
+}
+
+// 데이터 준비 중(프로필 조회, 사주 계산 등) 잠깐 뜨는 로딩 화면 — 빈 화면 대신
+// 앱의 톤에 맞는 문구로 버퍼링 순간을 채운다.
+function LoadingScreen() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center px-10" style={{ background: "var(--bg)" }}>
+      <div className="float-leaf mb-5">
+        <LuckStamp size={64} />
+      </div>
+      <p className="font-display text-lg text-center leading-relaxed" style={{ color: "var(--ink)" }}>
+        행운은 필요로 하는<br />사람에게 찾아간다
+      </p>
+    </main>
+  );
 }
 
 const TAG_OPTIONS = ["재물", "애정", "건강", "인간관계", "커리어"];
@@ -257,7 +272,7 @@ export default function HomePage() {
     reader.readAsText(file);
   }
 
-  if (!ready) return <main className="min-h-screen" style={{ background: "var(--bg)" }} />;
+  if (!ready) return <LoadingScreen />;
 
   // ── 첫 이용 온보딩 — STEP 1~7 위저드 ─────────────────────────────────────
   if (screen === "onboarding") {
@@ -292,7 +307,7 @@ export default function HomePage() {
     );
   }
 
-  if (!luck) return <main className="min-h-screen" style={{ background: "var(--bg)" }} />;
+  if (!luck) return <LoadingScreen />;
 
   // ── 대시보드 (하단 탭바로 오늘/메모/기록/설정 분리) ─────────────────────
   // 팝업은 main 바깥(형제)에 둔다 — main에 걸린 page-fade-in 애니메이션의 transform이
