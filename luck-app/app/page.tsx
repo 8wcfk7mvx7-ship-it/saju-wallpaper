@@ -345,7 +345,7 @@ export default function HomePage() {
             ← 뒤로
           </button>
           <div className="text-center mb-6">
-            <CloverIcon size={44} className="mx-auto mb-3 float-leaf" />
+            <CloverStamp size={56} className="mx-auto mb-3 float-leaf" />
             <h1 className="font-display text-2xl" style={{ color: "var(--ink)" }}>내 정보 수정</h1>
             <p className="text-sm mt-2" style={{ color: "var(--ink-soft)" }}>
               당신의 사주 기운에 맞춘<br />오늘의 행운을 알려드려요.
@@ -540,6 +540,7 @@ export default function HomePage() {
               <Card>
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--clover)" }}>오늘의 개운법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.ganwoonTip}</p>
+                <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.actionOfDay}</p>
                 <Perforation />
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.aegmagiTip}</p>
@@ -547,13 +548,6 @@ export default function HomePage() {
             </FadeIn>
 
             <FadeIn delay={200}>
-              <Card>
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>하루 한 줄 개운법</p>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.actionOfDay}</p>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={240}>
               <Card>
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>
                   오늘의 매력·이성운 {profile ? `(${profile.gender === "male" ? "남성" : "여성"})` : ""}

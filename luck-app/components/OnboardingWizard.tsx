@@ -42,7 +42,7 @@ function StepShell({
         <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "var(--clover)" }}>STEP {step} / {TOTAL_STEPS}</p>
         <h1 className="font-display text-2xl mb-1" style={{ color: "var(--ink)" }}>{title}</h1>
         {subtitle && <p className="text-sm mb-6" style={{ color: "var(--ink-soft)" }}>{subtitle}</p>}
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 flex flex-col justify-center">{children}</div>
 
         <div className="mt-8 space-y-2.5">
           <div className={onBack ? "grid grid-cols-3 gap-2" : ""}>
@@ -88,27 +88,28 @@ export default function OnboardingWizard({
   if (step === 1) {
     return (
       <main className="min-h-screen page-fade-in flex flex-col" style={{ background: "var(--bg)" }}>
-        <div className="max-w-lg mx-auto px-6 pt-16 pb-10 flex-1 flex flex-col">
-          <div className="text-center relative">
-            <SunPixel size={30} className="absolute -top-2 right-8" />
-            <CloudPixel size={44} className="absolute top-1 left-2 opacity-90" />
-            <div className="flex justify-center mb-4 float-leaf">
-              <CloverStamp size={84} />
-            </div>
-            <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 앱</h1>
-            <p className="text-sm mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
-              행운은 가만히 있으면 오지 않아요.<br />매일 조금씩, 행운을 부르는 습관을 만들어보세요.
-            </p>
-          </div>
-          <div className="mt-10 space-y-3">
-            {FEATURES.map((f) => (
-              <div key={f.text} className="retro-card flex items-center gap-3 px-4 py-3.5">
-                <SparkleBullet />
-                <p className="text-sm" style={{ color: "var(--ink)" }}>{f.text}</p>
+        <div className="max-w-lg mx-auto px-6 pt-10 pb-10 flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="text-center relative">
+              <SunPixel size={30} className="absolute -top-2 right-8" />
+              <CloudPixel size={44} className="absolute top-1 left-2 opacity-90" />
+              <div className="flex justify-center mb-4 float-leaf">
+                <CloverStamp size={84} />
               </div>
-            ))}
+              <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 앱</h1>
+              <p className="text-sm mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                행운은 가만히 있으면 오지 않아요.<br />매일 조금씩, 행운을 부르는 습관을 만들어보세요.
+              </p>
+            </div>
+            <div className="mt-10 space-y-3">
+              {FEATURES.map((f) => (
+                <div key={f.text} className="retro-card flex items-center gap-3 px-4 py-3.5">
+                  <SparkleBullet />
+                  <p className="text-sm" style={{ color: "var(--ink)" }}>{f.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex-1" />
           <div className="space-y-3 mt-10">
             <button onClick={next} className="retro-btn font-display w-full py-4 text-base" style={{ background: "var(--clover)", color: "#fff" }}>
               다음

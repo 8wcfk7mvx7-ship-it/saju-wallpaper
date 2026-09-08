@@ -36,6 +36,17 @@ html, body {
   overscroll-behavior-y: none;
 }
 
+/* 네이티브 앱처럼 느껴지도록 — 탭할 때 웹 특유의 회색 하이라이트를 없애고
+   더블탭 확대 지연도 없앤다. 단, 입력창·textarea는 길게 눌러 선택/붙여넣기 하는
+   네이티브 텍스트 편집 제스처를 그대로 써야 하므로 건드리지 않는다. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button, a, label, .retro-card, .retro-btn {
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
 body {
   font-family: "Galmuri", "Apple SD Gothic Neo", sans-serif;
   /* 비트맵 폰트는 안티에일리어싱이 흐려지면 픽셀감이 죽으므로 최대한 또렷하게 렌더링 */
