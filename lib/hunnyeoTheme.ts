@@ -5,13 +5,14 @@
 export const RETRO_FONT =
   "'Comic Sans MS', 'Chalkboard SE', 'HY견고딕', 'Gulim', '굴림', sans-serif";
 
-// 사탕색 사선 줄무늬 + 물방울무늬 배경
+// 분홍이 주인공인 사탕색 배경: 하얀 물방울 + 분홍 사선 줄무늬 + 연분홍 바탕
 export const PAGE_BG = [
-  "radial-gradient(circle at 12px 12px, rgba(255,255,255,0.85) 3px, transparent 3.5px)",
-  "repeating-linear-gradient(45deg, #ffe3f2 0px, #ffe3f2 22px, #fff6da 22px, #fff6da 44px, #e2f4ff 44px, #e2f4ff 66px, #e6ffe9 66px, #e6ffe9 88px)",
+  "radial-gradient(circle at 12px 12px, rgba(255,255,255,0.9) 3px, transparent 3.5px)",
+  "radial-gradient(circle at 30px 30px, rgba(255,255,255,0.55) 2px, transparent 2.5px)",
+  "repeating-linear-gradient(45deg, #ffd9ec 0px, #ffd9ec 26px, #ffe9f4 26px, #ffe9f4 52px, #fff3d9 52px, #fff3d9 66px, #ffe1f0 66px, #ffe1f0 92px)",
 ].join(",");
 
-export const PAGE_BG_SIZE = "24px 24px, auto";
+export const PAGE_BG_SIZE = "24px 24px, 40px 40px, auto";
 
 export const pageStyle = {
   background: PAGE_BG,
@@ -46,6 +47,42 @@ export const RETRO_CSS = `
     border: 3px solid #ff3d9a;
     border-radius: 14px;
     box-shadow: 4px 4px 0 #ffc6e2;
+  }
+
+  /* 비뚤게 붙인 스티커 라벨 */
+  .hn-sticker {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 900;
+    background: #fff45e;
+    color: #d4348a;
+    border: 2px solid #ff3d9a;
+    box-shadow: 1.5px 1.5px 0 rgba(255,61,154,0.4);
+    transform: rotate(-8deg);
+  }
+  .hn-sticker-pink { background: #ffd9ec; color: #c9186d; }
+
+  /* 반짝이 뿌린 카드 */
+  .hn-glitter { position: relative; overflow: hidden; }
+  .hn-glitter::after {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(255,255,255,.95) 1.5px, transparent 2px),
+      radial-gradient(circle at 78% 34%, rgba(255,255,255,.9) 1.2px, transparent 1.8px),
+      radial-gradient(circle at 42% 78%, rgba(255,255,255,.85) 1.4px, transparent 2px),
+      radial-gradient(circle at 88% 82%, rgba(255,255,255,.9) 1.2px, transparent 1.8px);
+  }
+
+  /* 하트 물결 구분선 */
+  .hn-hearts {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #ff9ecb;
   }
   .hn-box-y { border-color: #f5b400; box-shadow: 4px 4px 0 #ffe9a8; }
   .hn-box-p { border-color: #9b6bf5; box-shadow: 4px 4px 0 #ddd0ff; }

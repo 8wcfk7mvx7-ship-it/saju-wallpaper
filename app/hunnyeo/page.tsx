@@ -190,51 +190,73 @@ export default function HunnyeoPage() {
       </div>
 
       <header className="max-w-2xl mx-auto px-4 pt-4 text-center">
+        <div className="flex justify-center gap-1 text-sm mb-1">
+          {["🎀", "💗", "✨", "💗", "🎀"].map((e, i) => (
+            <span key={i} className="hn-twinkle" style={{ animationDelay: `${i * 0.18}s` }}>{e}</span>
+          ))}
+        </div>
         <h1 className="text-4xl font-black mb-1 hn-title">훈녀생정</h1>
-        <p className="text-[11px] font-black mb-3" style={{ color: "#9b6bf5" }}>
-          ★☆★ 메뉴를 골라주세요 ★☆★
+        <p className="text-[11px] font-black mb-3" style={{ color: "#ff6fb5" }}>
+          ♡ 오늘은 뭘 해볼까요? ♡
         </p>
         <HunnyeoScoreBar points={totalPoints} />
       </header>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <p className="hn-hearts my-4">♡ ⋆ ♥ ⋆ ♡ ⋆ ♥ ⋆ ♡</p>
 
       {/* 메뉴판 */}
-      <div className="max-w-2xl mx-auto px-4 grid grid-cols-2 gap-3">
+      <div className="max-w-2xl mx-auto px-4 grid grid-cols-2 gap-3.5">
         {tiles.map((c, idx) => {
           const catTips = TIPS.filter(t => t.category === c.key);
           const done = catTips.filter(t => checked[t.id]).length;
           const complete = catTips.length > 0 && done === catTips.length;
+          const started = done > 0 && !complete;
           return (
             <button
               key={c.key}
               onClick={() => router.push(`/hunnyeo/${c.key}`)}
-              className="hn-box p-3 text-left relative"
-              style={{ borderColor: c.accent, boxShadow: `4px 4px 0 ${c.accent}44` }}
+              className="hn-box hn-glitter p-3 pt-5 text-center relative"
+              style={{
+                borderColor: c.accent,
+                boxShadow: `4px 4px 0 ${c.accent}55`,
+                background: `linear-gradient(#fff 55%, ${c.accent}1f)`,
+              }}
             >
-              {complete && (
-                <span className="absolute -top-2.5 -right-2 text-[10px] font-black px-2 py-0.5 rounded-full hn-blink" style={{ background: "#ffd93d", color: "#8a5b00", border: "2px solid #f5b400" }}>
-                  완료!
-                </span>
-              )}
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-2xl hn-float inline-block" style={{ animationDelay: `${idx * 0.15}s` }}>{c.emoji}</span>
-                <span className="font-black text-sm" style={{ color: c.accent }}>{c.label}</span>
-              </div>
-              <p className="text-[10px] font-bold mb-2" style={{ color: "#a08a99" }}>{c.desc}</p>
+              {/* 비뚤게 붙인 스티커 */}
+              <span
+                className={`hn-sticker absolute -top-2.5 -left-2 ${complete ? "hn-blink" : ""}`}
+                style={{ borderColor: c.accent, color: complete ? "#c9186d" : "#d4348a" }}
+              >
+                {complete ? "올클리어!" : started ? "하는중♡" : `제${idx + 1}장`}
+              </span>
 
-              <div className="h-3 rounded-full overflow-hidden mb-1" style={{ background: "#f6f0f4", border: `2px solid ${c.accent}66` }}>
-                <div className="h-full" style={{ width: catTips.length ? `${(done / catTips.length) * 100}%` : "0%", background: c.accent }} />
+              <span
+                className="block text-4xl mb-1.5 hn-float"
+                style={{ animationDelay: `${idx * 0.13}s` }}
+              >
+                {c.emoji}
+              </span>
+              <p className="font-black text-[15px] mb-0.5" style={{ color: c.accent }}>{c.label}</p>
+              <p className="text-[10px] font-bold mb-2 leading-tight" style={{ color: "#bb95a9" }}>{c.desc}</p>
+
+              <div className="h-3.5 rounded-full overflow-hidden mb-1.5" style={{ background: "#fff", border: `2px solid ${c.accent}88` }}>
+                <div
+                  className="h-full"
+                  style={{
+                    width: catTips.length ? `${(done / catTips.length) * 100}%` : "0%",
+                    background: `repeating-linear-gradient(45deg, ${c.accent} 0 5px, ${c.accent}99 5px 10px)`,
+                  }}
+                />
               </div>
-              <p className="text-[10px] font-black" style={{ color: c.accent }}>
-                {done} / {catTips.length} 개 완료
+              <p className="text-[11px] font-black" style={{ color: c.accent }}>
+                ♡ {done} / {catTips.length}
               </p>
             </button>
           );
         })}
       </div>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <p className="hn-hearts my-4">♡ ⋆ ♥ ⋆ ♡ ⋆ ♥ ⋆ ♡</p>
 
       {/* 방명록 */}
       <div className="max-w-2xl mx-auto px-4">

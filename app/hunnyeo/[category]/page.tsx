@@ -61,42 +61,53 @@ export default function HunnyeoCategoryPage() {
       </div>
 
       <header className="max-w-2xl mx-auto px-4 pt-4 text-center">
-        <div className="text-4xl mb-1 hn-wiggle">{cat.emoji}</div>
+        <div className="text-5xl mb-1 hn-wiggle">{cat.emoji}</div>
         <h1 className="text-3xl font-black mb-1 hn-title">{cat.label}</h1>
         <p className="text-[11px] font-black mb-3" style={{ color: cat.accent }}>
-          ★ {cat.desc} · {doneCount}/{tips.length} 완료 ★
+          ♡ {cat.desc} · {doneCount}/{tips.length} 완료 ♡
         </p>
         <HunnyeoScoreBar points={totalPoints} compact />
       </header>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <p className="hn-hearts my-4">♡ ⋆ ♥ ⋆ ♡ ⋆ ♥ ⋆ ♡</p>
 
       <div className="max-w-2xl mx-auto px-4 space-y-4">
         {tips.map((tip, idx) => {
           const isChecked = !!checked[tip.id];
           const actionLabel = tip.type === "read" ? "읽었어요" : "따라했어요";
           return (
-            <article key={tip.id} className="hn-box p-4" style={{ borderColor: cat.accent, boxShadow: `4px 4px 0 ${cat.accent}44` }}>
+            <article
+              key={tip.id}
+              className="hn-box hn-glitter p-4 relative"
+              style={{
+                borderColor: cat.accent,
+                boxShadow: `4px 4px 0 ${cat.accent}55`,
+                background: isChecked ? `linear-gradient(#fff 60%, ${cat.accent}22)` : "#fff",
+              }}
+            >
+              {isChecked && (
+                <span className="hn-sticker absolute -top-2.5 -right-2">완료 ♡</span>
+              )}
+
               {/* 제목 */}
               <div className="flex items-start gap-2 mb-3">
                 <span
-                  className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                  style={{ background: cat.accent }}
+                  className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-black text-white"
+                  style={{ background: cat.accent, boxShadow: `2px 2px 0 ${cat.accent}55` }}
                 >
                   {idx + 1}
                 </span>
-                <h2 className="font-black text-[16px] leading-snug" style={{ color: "#4a2c3d" }}>
+                <h2 className="font-black text-[16px] leading-snug" style={{ color: "#c9186d" }}>
                   {tip.title}
-                  {isChecked && <span className="ml-1">💗</span>}
                 </h2>
               </div>
 
               {/* 준비물 */}
               {tip.materials && (
-                <div className="rounded-xl px-3 py-2 mb-3" style={{ background: "#fffbe8", border: `2px dotted ${cat.accent}88` }}>
+                <div className="rounded-2xl px-3 py-2 mb-3" style={{ background: "#fffbe8", border: "2px dotted #f5b400" }}>
                   <p className="text-[11px] font-black mb-1" style={{ color: "#c98a00" }}>🧺 준비물</p>
                   <p className="text-[12px] font-bold leading-relaxed" style={{ color: "#7a6a3a" }}>
-                    {tip.materials.join(" · ")}
+                    {tip.materials.map(m => `♡ ${m}`).join("  ")}
                   </p>
                 </div>
               )}
