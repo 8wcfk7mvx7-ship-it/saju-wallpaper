@@ -155,6 +155,22 @@ export const HAIR_TIPS: HunnyeoTip[] = [
     type: "action",
   },
   {
+    id: "hair-roll",
+    category: "hair",
+    title: "헤어롤로 앞머리 세우기",
+    materials: ["벨크로 헤어롤 1~2개"],
+    steps: [
+      "앞머리를 반쯤 말린 상태에서 헤어롤에 감아 주세요.",
+      "드라이어 따뜻한 바람을 20초 쐬어 주세요.",
+      "찬바람으로 10초 식혀 주세요.",
+      "5분 정도 두었다가 풀어 주세요.",
+    ],
+    effect: "앞머리에 자연스러운 볼륨이 생겨 얼굴이 작아 보여요.",
+    tags: ["앞머리", "볼륨", "5분"],
+    points: 10,
+    type: "action",
+  },
+  {
     id: "hair-trim",
     category: "hair",
     title: "두 달에 한 번 끝 다듬기",

@@ -83,6 +83,22 @@ export const EYE_TIPS: HunnyeoTip[] = [
     type: "action",
   },
   {
+    id: "eye-bigger-makeup",
+    category: "eye",
+    title: "눈 커 보이게 그리기",
+    materials: ["아이라이너", "밝은 색 섀도"],
+    steps: [
+      "눈두덩 안쪽에 밝은 색 섀도를 얇게 올려 주세요.",
+      "속눈썹 사이를 메우듯 아이라인을 짧게 그어 주세요.",
+      "눈꼬리는 1~2mm만 살짝 빼 주세요.",
+      "아래 눈꼬리 3분의 1에만 연하게 이어 주세요.",
+    ],
+    effect: "화장한 티는 덜 나면서 눈매가 또렷해져요.",
+    tags: ["아이라인", "또렷한 눈매", "요령"],
+    points: 8,
+    type: "action",
+  },
+  {
     id: "eye-dark-circle",
     category: "eye",
     title: "다크서클 관리 습관",

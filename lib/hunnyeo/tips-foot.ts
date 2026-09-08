@@ -97,6 +97,21 @@ export const FOOT_TIPS: HunnyeoTip[] = [
     type: "action",
   },
   {
+    id: "foot-tea-deodorize",
+    category: "foot",
+    title: "녹차 티백으로 신발 냄새 잡기",
+    materials: ["쓰지 않은 녹차 티백 2개"],
+    steps: [
+      "신발을 하루 통풍이 되는 곳에 두세요.",
+      "마른 녹차 티백을 신발 안에 하나씩 넣어 주세요.",
+      "다음 날 아침에 꺼내 주세요.",
+    ],
+    effect: "신발에 밴 냄새가 옅어지고 습기도 함께 잡혀요.",
+    tags: ["냄새", "녹차", "하룻밤"],
+    points: 6,
+    type: "action",
+  },
+  {
     id: "foot-shoe-rotate",
     category: "foot",
     title: "신발 번갈아 신기",
