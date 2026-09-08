@@ -14,6 +14,7 @@ import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
+import PixelFall from "@/components/PixelFall";
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -52,6 +53,7 @@ export default function HunnyeoMyPage() {
   return (
     <main className="min-h-screen pb-20" style={pageStyle}>
       <style>{RETRO_CSS}</style>
+        <PixelFall />
 
       <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
         <button onClick={() => router.push("/hunnyeo")} className="hn-btn px-3 py-1.5 text-[11px]">
@@ -102,7 +104,7 @@ export default function HunnyeoMyPage() {
             <HunnyeoScoreBar points={totalPoints} />
           </div>
 
-          <p className="text-[11px] font-bold mt-3" style={{ color: "#b06a94" }}>
+          <p className="text-[12px] font-bold mt-3" style={{ color: "#b06a94" }}>
             전체 {TOTAL_POSSIBLE_POINTS}점 중 {totalPoints}점 · {checkedTips.length}/{TIPS.length}개 완료
           </p>
         </div>
@@ -117,7 +119,7 @@ export default function HunnyeoMyPage() {
       {/* 등급표 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-y p-4">
-          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#c98a00" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#c98a00" }}>
             <PixelIcon name="crown" size={15} /> 훈녀력 등급표
           </h3>
           <div className="space-y-2">
@@ -136,7 +138,7 @@ export default function HunnyeoMyPage() {
                 >
                   <PixelIcon name={lv.icon} size={22} />
                   <div className="flex-1">
-                    <p className="text-xs font-black" style={{ color: reached ? "#7a5b00" : "#b5a98a" }}>{lv.name}</p>
+                    <p className="hn-cute text-[13px]" style={{ color: reached ? "#7a5b00" : "#b5a98a" }}>{lv.name}</p>
                     <p className="text-[10px] font-bold" style={{ color: "#b5a98a" }}>{lv.min}점부터</p>
                   </div>
                   {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white hn-blink" style={{ background: "#f5b400" }}>지금 여기!</span>}
@@ -157,7 +159,7 @@ export default function HunnyeoMyPage() {
       {/* 카테고리별 현황 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box p-4">
-          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#e0399b" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#e0399b" }}>
             <PixelIcon name="note" size={15} /> 메뉴별 완료 현황
           </h3>
           <div className="space-y-2.5">
@@ -174,7 +176,7 @@ export default function HunnyeoMyPage() {
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-black flex items-center gap-1.5" style={{ color: c.accent }}>
-                      <PixelIcon name={c.icon} size={16} /> {c.label}
+                      <PixelIcon name={c.icon} size={16} /> <span className="hn-cute text-[13px]">{c.label}</span>
                       {complete && <PixelIcon name="crown" size={13} className="hn-blink" />}
                     </span>
                     <span className="text-[11px] font-black" style={{ color: c.accent }}>{done}/{catTips.length}</span>
@@ -198,7 +200,7 @@ export default function HunnyeoMyPage() {
       {/* 완료 목록 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-p p-4">
-          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
             <PixelIcon name="heart" size={15} /> 내가 해본 것 ({checkedTips.length})
           </h3>
           {checkedTips.length === 0 ? (
@@ -209,7 +211,7 @@ export default function HunnyeoMyPage() {
             <div className="space-y-1.5">
               {checkedTips.map(t => (
                 <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
-                  <span className="text-[12px] font-bold truncate pr-2" style={{ color: "#57406b" }}>{t.title}</span>
+                  <span className="text-[13px] font-bold truncate pr-2" style={{ color: "#57406b" }}>{t.title}</span>
                   <span className="text-[10px] font-black shrink-0" style={{ color: "#7c3aed" }}>+{t.points}점</span>
                 </div>
               ))}

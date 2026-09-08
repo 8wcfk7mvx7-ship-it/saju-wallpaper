@@ -2,8 +2,12 @@
 // 2000년대 초중반 개인 홈페이지 감성: 사탕색 배경, 물방울무늬, 각진 그림자,
 // 반짝이는 별, 흐르는 글씨, 무지개 제목.
 
+// app/hunnyeo/layout.tsx 에서 next/font 로 불러온 큐티 서체
+// (Gaegu = 손글씨 본문, Jua = 동글동글 제목). 변수를 못 읽는 경우를 대비해 대체 서체를 둔다.
 export const RETRO_FONT =
-  "'Comic Sans MS', 'Chalkboard SE', 'HY견고딕', 'Gulim', '굴림', sans-serif";
+  "var(--font-hn-body), 'Gaegu', 'Comic Sans MS', 'Gulim', '굴림', sans-serif";
+export const TITLE_FONT =
+  "var(--font-hn-title), 'Jua', 'Comic Sans MS', 'Gulim', '굴림', sans-serif";
 
 // 분홍이 주인공인 사탕색 배경: 하얀 물방울 + 분홍 사선 줄무늬 + 연분홍 바탕
 export const PAGE_BG = [
@@ -49,8 +53,12 @@ export const RETRO_CSS = `
     box-shadow: 4px 4px 0 #ffc6e2;
   }
 
+  /* 동글동글 제목 서체 (손글씨 본문과 대비) */
+  .hn-cute { font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif; }
+
   /* 비뚤게 붙인 스티커 라벨 */
   .hn-sticker {
+    font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
     display: inline-block;
     padding: 2px 8px;
     border-radius: 999px;
@@ -77,6 +85,31 @@ export const RETRO_CSS = `
       radial-gradient(circle at 88% 82%, rgba(255,255,255,.9) 1.2px, transparent 1.8px);
   }
 
+  /* 화면에 드문드문 떨어지는 도트 장식 */
+  @keyframes hnFall {
+    0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { transform: translate3d(var(--hn-drift, 14px), 108vh, 0) rotate(320deg); opacity: 0; }
+  }
+  .hn-fall-layer {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .hn-fall-item {
+    position: absolute;
+    top: 0;
+    animation-name: hnFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hn-fall-layer { display: none; }
+  }
+
   /* 하트 물결 구분선 */
   .hn-hearts {
     text-align: center;
@@ -89,6 +122,8 @@ export const RETRO_CSS = `
 
   /* 무지개 제목 */
   .hn-title {
+    font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
+    letter-spacing: 0.02em;
     background: linear-gradient(90deg, #ff3d9a, #ff8a3d, #f5d400, #4ecb71, #3db6ff, #a259ff);
     -webkit-background-clip: text;
     background-clip: text;
@@ -102,6 +137,7 @@ export const RETRO_CSS = `
 
   /* 입체 버튼 */
   .hn-btn {
+    font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
     border: 3px solid #ff3d9a;
     border-radius: 999px;
     background: linear-gradient(#fff, #ffe3f2);

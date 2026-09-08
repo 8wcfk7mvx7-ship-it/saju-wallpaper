@@ -14,6 +14,7 @@ import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
+import PixelFall from "@/components/PixelFall";
 
 type Step = "loading" | "splash" | "menu";
 
@@ -91,6 +92,7 @@ export default function HunnyeoPage() {
         onClick={() => setStep("splash")}
       >
         <style>{RETRO_CSS}</style>
+        <PixelFall />
         <div className="w-full max-w-xs text-center">
           <div className="mb-3"><PixelIcon name="floppy" size={44} className="hn-wiggle" /></div>
           <p className="text-lg font-black mb-1 hn-title">훈녀생정</p>
@@ -126,6 +128,7 @@ export default function HunnyeoPage() {
     return (
       <main className="min-h-screen flex items-center justify-center px-4 py-8" style={pageStyle}>
         <style>{RETRO_CSS}</style>
+        <PixelFall />
         <div className="w-full max-w-sm hn-box p-5 text-center relative" style={{ borderStyle: "dashed", borderWidth: 4 }}>
           <PixelIcon name="ribbon" size={30} className="absolute -top-3 -left-3 hn-float" />
           <PixelIcon name="heart" size={26} className="absolute -top-3 -right-3 hn-float" style={{ animationDelay: ".7s" }} />
@@ -178,6 +181,7 @@ export default function HunnyeoPage() {
   return (
     <main className="min-h-screen pb-20" style={pageStyle}>
       <style>{RETRO_CSS}</style>
+        <PixelFall />
 
       <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
         <button onClick={() => router.push("/")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}>
@@ -195,7 +199,7 @@ export default function HunnyeoPage() {
           ))}
         </div>
         <h1 className="text-4xl font-black mb-1 hn-title">훈녀생정</h1>
-        <p className="text-[11px] font-black mb-3" style={{ color: "#ff6fb5" }}>
+        <p className="hn-cute text-[12px] mb-3" style={{ color: "#ff6fb5" }}>
 오늘은 뭘 해볼까요?
         </p>
         <HunnyeoScoreBar points={totalPoints} />
@@ -239,8 +243,8 @@ export default function HunnyeoPage() {
                 className="hn-float"
                 style={{ display: "block", margin: "0 auto 6px", animationDelay: `${idx * 0.13}s` }}
               />
-              <p className="font-black text-[15px] mb-0.5" style={{ color: c.accent }}>{c.label}</p>
-              <p className="text-[10px] font-bold mb-2 leading-tight" style={{ color: "#bb95a9" }}>{c.desc}</p>
+              <p className="hn-cute text-[16px] mb-0.5" style={{ color: c.accent }}>{c.label}</p>
+              <p className="text-[11px] font-bold mb-2 leading-tight" style={{ color: "#a8798f" }}>{c.desc}</p>
 
               <div className="h-3.5 rounded-full overflow-hidden mb-1.5" style={{ background: "#fff", border: `2px solid ${c.accent}88` }}>
                 <div
@@ -251,7 +255,7 @@ export default function HunnyeoPage() {
                   }}
                 />
               </div>
-              <p className="text-[11px] font-black" style={{ color: c.accent }}>
+              <p className="hn-cute text-[12px]" style={{ color: c.accent }}>
 {done} / {catTips.length}
               </p>
             </button>
@@ -268,10 +272,10 @@ export default function HunnyeoPage() {
       {/* 방명록 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-p p-4">
-          <h3 className="font-black text-sm mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
             <PixelIcon name="note" size={15} /> 방명록
           </h3>
-          <p className="text-[10px] font-bold mb-3" style={{ color: "#a58ac9" }}>흔적을 남겨주세요</p>
+          <p className="text-[11px] font-bold mb-3" style={{ color: "#9375b8" }}>흔적을 남겨주세요</p>
 
           <form onSubmit={submitGuestbook} className="space-y-2 mb-4">
             <input
@@ -308,7 +312,7 @@ export default function HunnyeoPage() {
                   <span className="text-xs font-black" style={{ color: "#7c3aed" }}>{g.name}</span>
                   <span className="text-[10px] font-bold" style={{ color: "#c4b5fd" }}>{g.date}</span>
                 </div>
-                <p className="text-[12px] font-bold" style={{ color: "#57406b" }}>{g.message}</p>
+                <p className="text-[13px] font-bold" style={{ color: "#57406b" }}>{g.message}</p>
               </div>
             ))}
           </div>

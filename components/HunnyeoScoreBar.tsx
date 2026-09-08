@@ -8,11 +8,11 @@ export default function HunnyeoScoreBar({ points, compact = false }: { points: n
   return (
     <div className="hn-box hn-box-y p-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-black flex items-center gap-1" style={{ color: "#e0399b" }}>
+        <span className="hn-cute text-[15px] flex items-center gap-1" style={{ color: "#e0399b" }}>
           <PixelIcon name={info.level.icon} size={18} className="hn-wiggle" />
           {info.level.name}
         </span>
-        <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "#fff0f7", color: "#ff2b8d", border: "2px solid #ffb3d8" }}>
+        <span className="hn-cute text-[13px] px-2 py-0.5 rounded-full" style={{ background: "#fff0f7", color: "#ff2b8d", border: "2px solid #ffb3d8" }}>
           훈녀력 {points}점
         </span>
       </div>
@@ -29,7 +29,7 @@ export default function HunnyeoScoreBar({ points, compact = false }: { points: n
       </div>
 
       {!compact && (
-        <p className="text-[11px] mt-2 font-bold text-center" style={{ color: "#b06a94" }}>
+        <p className="text-[12px] mt-2 font-bold text-center" style={{ color: "#b06a94" }}>
           {info.next
             ? `다음 등급 「${info.next.name}」까지 ${info.pointsToNext}점 남았어요!`
             : "최고 등급이에요. 완전 소중 그 자체"}
