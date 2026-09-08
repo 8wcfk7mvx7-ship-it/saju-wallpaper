@@ -127,6 +127,9 @@ function BottomTabs({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void })
 export default function HomePage() {
   const [ready, setReady] = useState(false);
   const [screen, setScreen] = useState<Screen>("onboarding");
+  // 이미 온보딩을 마친 사람이 앱을 다시 열 때만 쓰는 짧은 스플래시 대기 —
+  // 첫 방문(온보딩 위저드)에는 필요 없고, 재방문 때만 최소 3초는 클릭 없이 자동으로 넘어가게 한다.
+  const [splashDone, setSplashDone] = useState(false);
   const [tab, setTab] = useState<Tab>("today");
   const [profile, setProfile] = useState<SajuProfile | null>(null);
   const [form, setForm] = useState<SajuProfile>(defaultProfile());
@@ -159,8 +162,13 @@ export default function HomePage() {
   useEffect(() => {
     const p = getProfile();
     setProfile(p);
-    if (p || getSkipOnboarding()) setScreen("dashboard");
-    else setScreen("onboarding");
+    if (p || getSkipOnboarding()) {
+      setScreen("dashboard");
+      setTimeout(() => setSplashDone(true), 3000);
+    } else {
+      setScreen("onboarding");
+      setSplashDone(true); // 첫 방문은 위저드로 바로 들어가므로 스플래시 대기가 필요 없음
+    }
     setNotifyOn(getMorningNotifyEnabled());
     setReady(true);
   }, []);
@@ -312,7 +320,8 @@ export default function HomePage() {
     );
   }
 
-  if (!luck) return <LoadingScreen />;
+  // 재방문 시 최소 3초는 클릭 없이 스플래시만 보여주고 자동으로 메인으로 넘어간다
+  if (!splashDone || !luck) return <LoadingScreen />;
 
   // ── 대시보드 (하단 탭바로 오늘/메모/기록/설정 분리) ─────────────────────
   // 팝업은 main 바깥(형제)에 둔다 — main에 걸린 page-fade-in 애니메이션의 transform이
