@@ -90,6 +90,8 @@ export default function EpubWorkspace({
   // 아이패드 앱의 왼쪽 챕터 사이드바(가로 화면에서는 기본으로 펼침)
   const [railOpen, setRailOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
+  // 앱에서 파일을 저장한 뒤 어디에 저장됐는지 잠깐 알려주는 안내
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [history, setHistory] = useState<Book[]>([]);
   const [future, setFuture] = useState<Book[]>([]);
@@ -618,12 +620,22 @@ export default function EpubWorkspace({
       if (!proceed) return;
     }
     setExporting(true);
+    const fileName = suggestFileName(book);
     try {
       const blob = await buildEpub(book);
-      await saveEpubFile(blob, suggestFileName(book));
+      const result = await saveEpubFile(blob, fileName);
+      // 앱에서는 파일이 어디 저장됐는지 알려주지 않으면 사용자가 찾지 못한다.
+      if (result.method === "native-share" || result.method === "native-file") {
+        setExportNotice(`${fileName} 파일을 저장했어요.\n"파일" 앱 > 이펍공장 폴더에서 볼 수 있어요.`);
+      }
     } catch (err) {
+      // 공유 시트를 사용자가 닫은 것은 실패가 아니다.
+      if (err instanceof DOMException && err.name === "AbortError") return;
       console.error("EPUB export failed", err);
-      alert("EPUB 파일을 만드는 중 문제가 발생했어요. 다시 시도해 주세요.");
+      alert(
+        "EPUB 파일을 저장하지 못했어요.\n" +
+        "저장 공간이 부족하거나 앱 권한이 막혀 있을 수 있어요. 다시 시도해 주세요."
+      );
     } finally {
       setExporting(false);
     }
@@ -637,6 +649,33 @@ export default function EpubWorkspace({
     position: "relative",
     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif',
   };
+
+  // 저장 위치 안내(앱). 확인을 누를 때까지 남겨둔다.
+  const exportToast = exportNotice && (
+    <div
+      className="fixed inset-x-0 bottom-0 z-[300] px-4"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
+    >
+      <div
+        className="mx-auto rounded-2xl px-4 py-3.5 flex items-start gap-3"
+        style={{
+          maxWidth: 460,
+          background: "#2a2417",
+          color: "#fff",
+          boxShadow: "0 12px 32px rgba(0,0,0,0.28)",
+        }}
+      >
+        <p className="flex-1 text-[13px] leading-relaxed whitespace-pre-line">{exportNotice}</p>
+        <button
+          onClick={() => setExportNotice(null)}
+          className="shrink-0 text-[13px] font-bold px-2 py-1"
+          style={{ color: "#c9c2ae" }}
+        >
+          확인
+        </button>
+      </div>
+    </div>
+  );
 
   const findReplacePanel = findReplaceOpen && (
     <FindReplacePanel
@@ -780,6 +819,7 @@ export default function EpubWorkspace({
     return (
       <div className="flex flex-col" style={{ ...shellStyle, paddingTop: "env(safe-area-inset-top)" }}>
         {findReplacePanel}
+        {exportToast}
 
         {/* 상단 바: 제목 + 실행취소 + 내보내기 */}
         <header
@@ -888,6 +928,7 @@ export default function EpubWorkspace({
     return (
       <div className="flex flex-col" style={{ ...shellStyle, paddingTop: "env(safe-area-inset-top)" }}>
         {findReplacePanel}
+        {exportToast}
         {metaBar}
 
         <div className="flex-1 min-h-0 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
@@ -940,6 +981,7 @@ export default function EpubWorkspace({
       style={shellStyle}
     >
       {findReplacePanel}
+        {exportToast}
       {metaBar}
 
       <div className="flex-1 min-h-0 flex">
