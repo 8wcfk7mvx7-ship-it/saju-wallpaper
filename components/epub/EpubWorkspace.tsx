@@ -6,7 +6,7 @@ import {
   createSceneBreakBlock, createTextBoxBlock, hasText, makeUuid, normalizeBook,
   type Block, type Book, type FrontMatterKind, type Note, type NoteKind, type TextBearingBlock,
 } from "@/lib/epub/types";
-import type { EpubFontId } from "@/lib/epub/fonts";
+import { EPUB_FONTS, type EpubFontId } from "@/lib/epub/fonts";
 import { imageBlocksFromFiles } from "@/lib/epub/blocks";
 import { referencedNoteIdsInBlocks, replaceRangeWithNoteToken, stripNoteToken } from "@/lib/epub/notes";
 import { toggleRangeWithStyle, type InlineStyle } from "@/lib/epub/richtext";
@@ -17,6 +17,7 @@ import { countMatches, replaceAllInBook } from "@/lib/epub/findReplace";
 import { validateBook } from "@/lib/epub/validate";
 import { docxToChapters } from "@/lib/epub/docxImport";
 import BookMetaBar from "./BookMetaBar";
+import ChapterRail from "./ChapterRail";
 import EditorPane from "./EditorPane";
 import PreviewPane from "./PreviewPane";
 import FindReplacePanel from "./FindReplacePanel";
@@ -54,11 +55,25 @@ function cloneTextBlockWithText(block: TextBearingBlock, text: string): TextBear
   }
 }
 
-export default function EpubWorkspace() {
+/**
+ * 편집기 화면 구성 방식.
+ * - web:    데스크톱 브라우저(좌우 분할 + 전체 메뉴 바)
+ * - phone:  아이폰 앱(한 번에 한 화면 + 하단 탭 바)
+ * - tablet: 아이패드 앱(좌우 분할 + 큼직한 터치 영역)
+ */
+export type WorkspaceLayout = "web" | "phone" | "tablet";
+
+export default function EpubWorkspace({ layout = "web" }: { layout?: WorkspaceLayout } = {}) {
+  const isPhone = layout === "phone";
+  const isTablet = layout === "tablet";
   // ── 상태 ──
   const [book, setBook] = useState<Book>(() => createBook());
   const [activeChapterId, setActiveChapterId] = useState(book.chapters[0].id);
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
+  // 아이폰 앱에서 하단 탭으로 오가는 화면
+  const [phoneTab, setPhoneTab] = useState<"chapters" | "editor" | "preview" | "book">("editor");
+  // 아이패드 앱의 왼쪽 챕터 사이드바(가로 화면에서는 기본으로 펼침)
+  const [railOpen, setRailOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [ready, setReady] = useState(false);
   const [history, setHistory] = useState<Book[]>([]);
@@ -101,6 +116,12 @@ export default function EpubWorkspace() {
     setBook(next);
     lastSnapshotAt.current = 0;
   }, [future, book]);
+
+  // 아이패드: 가로 화면이면 챕터 사이드바를 처음부터 펼쳐둔다.
+  useEffect(() => {
+    if (layout !== "tablet") return;
+    setRailOpen(window.innerWidth >= 1000);
+  }, [layout]);
 
   useEffect(() => {
     loadDraft()
@@ -585,136 +606,516 @@ export default function EpubWorkspace() {
   }
 
   // ── 렌더 ──
+  const shellStyle: React.CSSProperties = {
+    height: "100dvh",
+    background: "#f7f1e3",
+    color: "#2a2417",
+    position: "relative",
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif',
+  };
+
+  const findReplacePanel = findReplaceOpen && (
+    <FindReplacePanel
+      find={findQuery}
+      matchCount={findMatchCount}
+      onChangeFind={setFindQuery}
+      onReplaceAll={handleReplaceAll}
+      onClose={() => setFindReplaceOpen(false)}
+    />
+  );
+
+  const editorPane = (
+    <EditorPane
+      focusMode={focusMode}
+      hideChapterRail={isPhone || isTablet}
+      chapters={book.chapters}
+      activeChapter={activeChapter}
+      onSelectChapter={setActiveChapterId}
+      onAddChapter={handleAddChapter}
+      onRenameChapter={handleRenameChapter}
+      onDeleteChapter={handleDeleteChapter}
+      onMoveChapter={handleMoveChapter}
+      onDuplicateChapter={handleDuplicateChapter}
+      onMergeChapterWithNext={handleMergeChapterWithNext}
+      onChangeBlock={handleChangeBlock}
+      onDeleteBlock={handleDeleteBlock}
+      onMoveBlock={handleMoveBlock}
+      onReorderBlock={handleReorderBlock}
+      onDuplicateBlock={handleDuplicateBlock}
+      onSplitAt={handleSplitAt}
+      onAddParagraph={handleAddParagraph}
+      onAddTextBox={handleAddTextBox}
+      onAddImages={handleAddImages}
+      onAddCopyright={handleAddCopyright}
+      onAddQuote={handleAddQuote}
+      onAddSceneBreak={handleAddSceneBreak}
+      onAddPoem={handleAddPoem}
+      onAddHeading={handleAddHeading}
+      onAddPageBreak={handleAddPageBreak}
+      onAddList={handleAddList}
+      onAddTable={handleAddTable}
+      onAddFrontMatter={handleAddFrontMatter}
+      onToggleDropCap={handleToggleDropCap}
+      onAddNote={handleAddNote}
+      onChangeNote={handleChangeNote}
+      onDeleteNote={handleDeleteNote}
+      onSetBookTitle={handleSetBookTitle}
+      onSetBookSubtitle={handleSetBookSubtitle}
+      onSplitAsChapter={handleSplitAsChapter}
+      onConvertSelectionToNote={handleConvertSelectionToNote}
+      onApplyInlineStyle={handleApplyInlineStyle}
+    />
+  );
+
+  const previewPane = (
+    <PreviewPane
+      chapter={activeChapter}
+      chapterIndex={activeChapterIndex}
+      chapterCount={book.chapters.length}
+      fontSize={book.previewFontSize}
+      fontId={book.fontId}
+      assets={{ coverImage: book.coverImage, publisherLogo: book.publisherLogo }}
+      onFontSizeChange={size => mutate(prev => ({ ...prev, previewFontSize: size }))}
+      onPrevChapter={() => {
+        const target = book.chapters[activeChapterIndex - 1];
+        if (target) setActiveChapterId(target.id);
+      }}
+      onNextChapter={() => {
+        const target = book.chapters[activeChapterIndex + 1];
+        if (target) setActiveChapterId(target.id);
+      }}
+    />
+  );
+
+  const metaBar = (
+    <BookMetaBar
+      title={book.title}
+      subtitle={book.subtitle}
+      author={book.author}
+      publisher={book.publisher}
+      isbn={book.isbn}
+      description={book.description}
+      date={book.date}
+      coverImage={book.coverImage}
+      publisherLogo={book.publisherLogo}
+      fontId={book.fontId}
+      exporting={exporting}
+      canUndo={history.length > 0}
+      canRedo={future.length > 0}
+      onUndo={handleUndo}
+      onRedo={handleRedo}
+      findReplaceOpen={findReplaceOpen}
+      onToggleFindReplace={() => setFindReplaceOpen(v => !v)}
+      focusMode={focusMode}
+      onToggleFocusMode={handleToggleFocusMode}
+      onToggleFullscreen={handleToggleFullscreen}
+      projects={projects}
+      currentProjectId={currentProjectId}
+      onRefreshProjects={handleRefreshProjects}
+      onNewProject={handleNewProject}
+      onSaveProject={handleSaveProject}
+      onSaveAsProject={handleSaveAsProject}
+      onOpenProject={handleOpenProject}
+      onImportDocx={handleImportDocx}
+      onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
+      onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
+      onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}
+      onChangePublisher={p => mutate(prev => ({ ...prev, publisher: p }))}
+      onChangeIsbn={i => mutate(prev => ({ ...prev, isbn: i }))}
+      onChangeDescription={d => mutate(prev => ({ ...prev, description: d }))}
+      onChangeDate={d => mutate(prev => ({ ...prev, date: d }))}
+      onChangeCover={handleChangeCover}
+      onChangePublisherLogo={handleChangePublisherLogo}
+      onChangeFont={handleChangeFont}
+      onExport={handleExport}
+      view={mobileView}
+      onChangeView={setMobileView}
+    />
+  );
+
+  // ── 아이폰 앱: 한 번에 한 화면 + 하단 탭 바 ──
+  if (isPhone) {
+    const tabs = [
+      { id: "chapters" as const, label: "챕터", icon: "☰" },
+      { id: "editor" as const, label: "편집", icon: "✎" },
+      { id: "preview" as const, label: "미리보기", icon: "▤" },
+      { id: "book" as const, label: "책 정보", icon: "◫" },
+    ];
+    return (
+      <div className="flex flex-col" style={{ ...shellStyle, paddingTop: "env(safe-area-inset-top)" }}>
+        {findReplacePanel}
+
+        {/* 상단 바: 제목 + 실행취소 + 내보내기 */}
+        <header
+          className="shrink-0 flex items-center gap-2 px-4"
+          style={{ height: 52, borderBottom: "1px solid rgba(0,0,0,0.08)" }}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="text-[15px] font-black truncate">{book.title || "제목 없는 책"}</div>
+            <div className="text-[11px] truncate" style={{ color: "rgba(42,36,23,0.5)" }}>
+              {activeChapter.title} · {activeChapterIndex + 1}/{book.chapters.length}장
+            </div>
+          </div>
+          <button
+            onClick={handleUndo}
+            disabled={history.length === 0}
+            aria-label="실행 취소"
+            className="w-9 h-9 rounded-full text-base disabled:opacity-30"
+            style={{ background: "rgba(0,0,0,0.05)" }}
+          >
+            ↩
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="px-3.5 rounded-full text-[13px] font-bold disabled:opacity-60"
+            style={{ height: 36, background: "#2a2417", color: "#fff" }}
+          >
+            {exporting ? "만드는 중" : "내보내기"}
+          </button>
+        </header>
+
+        {/* 본문: 탭에 따라 한 화면씩 */}
+        <div className="flex-1 min-h-0">
+          {phoneTab === "chapters" && (
+            <ChapterRail
+              chapters={book.chapters}
+              activeChapterId={activeChapter.id}
+              onSelect={id => { setActiveChapterId(id); setPhoneTab("editor"); }}
+              onAddChapter={handleAddChapter}
+              onRenameChapter={handleRenameChapter}
+              onDeleteChapter={handleDeleteChapter}
+              onMoveChapter={handleMoveChapter}
+              onDuplicateChapter={handleDuplicateChapter}
+              onMergeChapterWithNext={handleMergeChapterWithNext}
+            />
+          )}
+          {phoneTab === "editor" && <div className="h-full">{editorPane}</div>}
+          {phoneTab === "preview" && <div className="h-full">{previewPane}</div>}
+          {phoneTab === "book" && (
+            <PhoneBookPanel
+              book={book}
+              projects={projects}
+              onChange={(patch) => mutate(prev => ({ ...prev, ...patch }))}
+              onChangeCover={handleChangeCover}
+              onChangeFont={handleChangeFont}
+              onNewProject={handleNewProject}
+              onSaveProject={handleSaveProject}
+              onOpenProject={handleOpenProject}
+              onRefreshProjects={handleRefreshProjects}
+              onImportDocx={handleImportDocx}
+              onToggleFindReplace={() => setFindReplaceOpen(v => !v)}
+            />
+          )}
+        </div>
+
+        {/* 하단 탭 바 */}
+        <nav
+          className="shrink-0 flex"
+          style={{
+            borderTop: "1px solid rgba(0,0,0,0.08)",
+            background: "rgba(255,253,247,0.96)",
+            paddingBottom: "env(safe-area-inset-bottom)",
+          }}
+        >
+          {tabs.map(tab => {
+            const active = phoneTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setPhoneTab(tab.id)}
+                className="flex-1 flex flex-col items-center justify-center gap-0.5"
+                style={{ height: 56, color: active ? "#4338ca" : "rgba(42,36,23,0.45)" }}
+              >
+                <span style={{ fontSize: 17, lineHeight: 1 }}>{tab.icon}</span>
+                <span className="text-[10px] font-bold">{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    );
+  }
+
+  // ── 아이패드 앱: 챕터 사이드바 + 편집 + 미리보기 ──
+  if (isTablet) {
+    return (
+      <div className="flex flex-col" style={{ ...shellStyle, paddingTop: "env(safe-area-inset-top)" }}>
+        {findReplacePanel}
+        {metaBar}
+
+        <div className="flex-1 min-h-0 flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+          {/* 챕터 사이드바 (접었다 폈다) */}
+          <aside
+            className="shrink-0 flex flex-col overflow-hidden border-r"
+            style={{ width: railOpen ? 208 : 44, borderColor: "rgba(0,0,0,0.08)", transition: "width 160ms ease" }}
+          >
+            <button
+              onClick={() => setRailOpen(v => !v)}
+              aria-label={railOpen ? "챕터 목록 접기" : "챕터 목록 펼치기"}
+              className="shrink-0 flex items-center justify-center text-base"
+              style={{ height: 40, color: "rgba(42,36,23,0.55)" }}
+            >
+              {railOpen ? "‹" : "☰"}
+            </button>
+            {railOpen && (
+              <div className="flex-1 min-h-0">
+                <ChapterRail
+                  chapters={book.chapters}
+                  activeChapterId={activeChapter.id}
+                  onSelect={setActiveChapterId}
+                  onAddChapter={handleAddChapter}
+                  onRenameChapter={handleRenameChapter}
+                  onDeleteChapter={handleDeleteChapter}
+                  onMoveChapter={handleMoveChapter}
+                  onDuplicateChapter={handleDuplicateChapter}
+                  onMergeChapterWithNext={handleMergeChapterWithNext}
+                />
+              </div>
+            )}
+          </aside>
+
+          <div className="flex-1 min-w-0 overflow-hidden flex">{editorPane}</div>
+          <div
+            className="flex-1 min-w-0 overflow-hidden flex border-l"
+            style={{ borderColor: "rgba(0,0,0,0.08)" }}
+          >
+            {previewPane}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 데스크톱 웹: 좌우 분할 ──
   return (
     <div
       className="flex flex-col"
-      style={{
-        height: "100dvh",
-        background: "#f7f1e3",
-        color: "#2a2417",
-        position: "relative",
-        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif',
-      }}
+      style={shellStyle}
     >
-      {findReplaceOpen && (
-        <FindReplacePanel
-          find={findQuery}
-          matchCount={findMatchCount}
-          onChangeFind={setFindQuery}
-          onReplaceAll={handleReplaceAll}
-          onClose={() => setFindReplaceOpen(false)}
-        />
-      )}
-      <BookMetaBar
-        title={book.title}
-        subtitle={book.subtitle}
-        author={book.author}
-        publisher={book.publisher}
-        isbn={book.isbn}
-        description={book.description}
-        date={book.date}
-        coverImage={book.coverImage}
-        publisherLogo={book.publisherLogo}
-        fontId={book.fontId}
-        exporting={exporting}
-        canUndo={history.length > 0}
-        canRedo={future.length > 0}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        findReplaceOpen={findReplaceOpen}
-        onToggleFindReplace={() => setFindReplaceOpen(v => !v)}
-        focusMode={focusMode}
-        onToggleFocusMode={handleToggleFocusMode}
-        onToggleFullscreen={handleToggleFullscreen}
-        projects={projects}
-        currentProjectId={currentProjectId}
-        onRefreshProjects={handleRefreshProjects}
-        onNewProject={handleNewProject}
-        onSaveProject={handleSaveProject}
-        onSaveAsProject={handleSaveAsProject}
-        onOpenProject={handleOpenProject}
-        onImportDocx={handleImportDocx}
-        onChangeTitle={t => mutate(prev => ({ ...prev, title: t }))}
-        onChangeSubtitle={s => mutate(prev => ({ ...prev, subtitle: s }))}
-        onChangeAuthor={a => mutate(prev => ({ ...prev, author: a }))}
-        onChangePublisher={p => mutate(prev => ({ ...prev, publisher: p }))}
-        onChangeIsbn={i => mutate(prev => ({ ...prev, isbn: i }))}
-        onChangeDescription={d => mutate(prev => ({ ...prev, description: d }))}
-        onChangeDate={d => mutate(prev => ({ ...prev, date: d }))}
-        onChangeCover={handleChangeCover}
-        onChangePublisherLogo={handleChangePublisherLogo}
-        onChangeFont={handleChangeFont}
-        onExport={handleExport}
-        view={mobileView}
-        onChangeView={setMobileView}
-      />
+      {findReplacePanel}
+      {metaBar}
 
       <div className="flex-1 min-h-0 flex">
-        <div className={`min-h-0 flex-1 sm:flex sm:w-1/2 ${mobileView === "editor" ? "flex" : "hidden"}`}>
-          <EditorPane
-            focusMode={focusMode}
-            chapters={book.chapters}
-            activeChapter={activeChapter}
-            onSelectChapter={setActiveChapterId}
-            onAddChapter={handleAddChapter}
-            onRenameChapter={handleRenameChapter}
-            onDeleteChapter={handleDeleteChapter}
-            onMoveChapter={handleMoveChapter}
-            onDuplicateChapter={handleDuplicateChapter}
-            onMergeChapterWithNext={handleMergeChapterWithNext}
-            onChangeBlock={handleChangeBlock}
-            onDeleteBlock={handleDeleteBlock}
-            onMoveBlock={handleMoveBlock}
-            onReorderBlock={handleReorderBlock}
-            onDuplicateBlock={handleDuplicateBlock}
-            onSplitAt={handleSplitAt}
-            onAddParagraph={handleAddParagraph}
-            onAddTextBox={handleAddTextBox}
-            onAddImages={handleAddImages}
-            onAddCopyright={handleAddCopyright}
-            onAddQuote={handleAddQuote}
-            onAddSceneBreak={handleAddSceneBreak}
-            onAddPoem={handleAddPoem}
-            onAddHeading={handleAddHeading}
-            onAddPageBreak={handleAddPageBreak}
-            onAddList={handleAddList}
-            onAddTable={handleAddTable}
-            onAddFrontMatter={handleAddFrontMatter}
-            onToggleDropCap={handleToggleDropCap}
-            onAddNote={handleAddNote}
-            onChangeNote={handleChangeNote}
-            onDeleteNote={handleDeleteNote}
-            onSetBookTitle={handleSetBookTitle}
-            onSetBookSubtitle={handleSetBookSubtitle}
-            onSplitAsChapter={handleSplitAsChapter}
-            onConvertSelectionToNote={handleConvertSelectionToNote}
-            onApplyInlineStyle={handleApplyInlineStyle}
-          />
+        {/* 아이패드에서는 두 화면을 항상 함께 보여준다(웹은 좁은 화면에서만 한쪽씩). */}
+        <div
+          className={
+            isTablet
+              ? "min-h-0 min-w-0 overflow-hidden flex w-1/2"
+              : `min-h-0 min-w-0 overflow-hidden flex-1 sm:flex sm:w-1/2 ${mobileView === "editor" ? "flex" : "hidden"}`
+          }
+        >
+          {editorPane}
         </div>
 
         <div
-          className={`min-h-0 flex-1 sm:flex sm:w-1/2 border-l ${mobileView === "preview" ? "flex" : "hidden"}`}
+          className={
+            isTablet
+              ? "min-h-0 min-w-0 overflow-hidden flex w-1/2 border-l"
+              : `min-h-0 min-w-0 overflow-hidden flex-1 sm:flex sm:w-1/2 border-l ${mobileView === "preview" ? "flex" : "hidden"}`
+          }
           style={{ borderColor: "rgba(0,0,0,0.08)" }}
         >
-          <PreviewPane
-            chapter={activeChapter}
-            chapterIndex={activeChapterIndex}
-            chapterCount={book.chapters.length}
-            fontSize={book.previewFontSize}
-            fontId={book.fontId}
-            assets={{ coverImage: book.coverImage, publisherLogo: book.publisherLogo }}
-            onFontSizeChange={size => mutate(prev => ({ ...prev, previewFontSize: size }))}
-            onPrevChapter={() => {
-              const target = book.chapters[activeChapterIndex - 1];
-              if (target) setActiveChapterId(target.id);
-            }}
-            onNextChapter={() => {
-              const target = book.chapters[activeChapterIndex + 1];
-              if (target) setActiveChapterId(target.id);
+          {previewPane}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 아이폰 앱의 "책 정보" 탭. 좁은 화면에 맞춰 꼭 필요한 것만 세로로 배치한다. */
+function PhoneBookPanel({
+  book, projects, onChange, onChangeCover, onChangeFont,
+  onNewProject, onSaveProject, onOpenProject, onRefreshProjects, onImportDocx, onToggleFindReplace,
+}: {
+  book: Book;
+  projects: ProjectMeta[];
+  onChange: (patch: Partial<Book>) => void;
+  onChangeCover: (file: File | null) => void;
+  onChangeFont: (fontId: EpubFontId) => void;
+  onNewProject: () => void;
+  onSaveProject: () => void;
+  onOpenProject: (id: string) => void;
+  onRefreshProjects: () => void;
+  onImportDocx: (file: File) => void;
+  onToggleFindReplace: () => void;
+}) {
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const docxInputRef = useRef<HTMLInputElement>(null);
+  const [showOpen, setShowOpen] = useState(false);
+
+  const fieldStyle: React.CSSProperties = {
+    background: "#fffdf7",
+    border: "1px solid rgba(0,0,0,0.1)",
+    color: "#2a2417",
+  };
+
+  return (
+    <div className="h-full overflow-y-auto scrollbar-none px-4 py-4 space-y-4">
+      <section className="space-y-2.5">
+        <PhoneLabel>책 정보</PhoneLabel>
+        <input
+          value={book.title}
+          onChange={e => onChange({ title: e.target.value })}
+          placeholder="책 제목"
+          className="w-full rounded-xl px-4 py-3 text-[15px] font-bold outline-none"
+          style={fieldStyle}
+        />
+        <input
+          value={book.subtitle}
+          onChange={e => onChange({ subtitle: e.target.value })}
+          placeholder="부제 (없으면 비워두세요)"
+          className="w-full rounded-xl px-4 py-3 text-[14px] outline-none"
+          style={fieldStyle}
+        />
+        <input
+          value={book.author}
+          onChange={e => onChange({ author: e.target.value })}
+          placeholder="지은이"
+          className="w-full rounded-xl px-4 py-3 text-[14px] outline-none"
+          style={fieldStyle}
+        />
+        <input
+          value={book.publisher}
+          onChange={e => onChange({ publisher: e.target.value })}
+          placeholder="출판사"
+          className="w-full rounded-xl px-4 py-3 text-[14px] outline-none"
+          style={fieldStyle}
+        />
+      </section>
+
+      <section className="space-y-2">
+        <PhoneLabel>표지</PhoneLabel>
+        <div className="flex items-center gap-3">
+          {book.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={book.coverImage} alt="표지" className="rounded-lg object-cover" style={{ width: 54, height: 76 }} />
+          ) : (
+            <div
+              className="rounded-lg flex items-center justify-center text-[10px]"
+              style={{ width: 54, height: 76, background: "rgba(0,0,0,0.05)", color: "rgba(42,36,23,0.4)" }}
+            >
+              없음
+            </div>
+          )}
+          <div className="flex-1 flex gap-2">
+            <button
+              onClick={() => coverInputRef.current?.click()}
+              className="flex-1 rounded-xl py-3 text-[13px] font-bold"
+              style={fieldStyle}
+            >
+              사진 고르기
+            </button>
+            {book.coverImage && (
+              <button
+                onClick={() => onChangeCover(null)}
+                className="px-4 rounded-xl text-[13px] font-bold"
+                style={{ ...fieldStyle, color: "#b91c1c" }}
+              >
+                삭제
+              </button>
+            )}
+          </div>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={e => onChangeCover(e.target.files?.[0] ?? null)}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <PhoneLabel>글꼴</PhoneLabel>
+        <div className="grid grid-cols-2 gap-2">
+          {EPUB_FONTS.map(font => {
+            const active = book.fontId === font.id;
+            return (
+              <button
+                key={font.id}
+                onClick={() => onChangeFont(font.id)}
+                className="rounded-xl py-3 px-3 text-[13px] font-bold text-left"
+                style={{
+                  ...fieldStyle,
+                  background: active ? "rgba(79,70,229,0.1)" : "#fffdf7",
+                  borderColor: active ? "rgba(79,70,229,0.4)" : "rgba(0,0,0,0.1)",
+                  color: active ? "#4338ca" : "#2a2417",
+                }}
+              >
+                {font.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <PhoneLabel>파일</PhoneLabel>
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={onSaveProject} className="rounded-xl py-3 text-[13px] font-bold" style={fieldStyle}>
+            저장하기
+          </button>
+          <button
+            onClick={() => { onRefreshProjects(); setShowOpen(v => !v); }}
+            className="rounded-xl py-3 text-[13px] font-bold"
+            style={fieldStyle}
+          >
+            불러오기
+          </button>
+          <button onClick={onNewProject} className="rounded-xl py-3 text-[13px] font-bold" style={fieldStyle}>
+            새 책 만들기
+          </button>
+          <button
+            onClick={() => docxInputRef.current?.click()}
+            className="rounded-xl py-3 text-[13px] font-bold"
+            style={fieldStyle}
+          >
+            Word 가져오기
+          </button>
+          <button onClick={onToggleFindReplace} className="rounded-xl py-3 text-[13px] font-bold col-span-2" style={fieldStyle}>
+            찾아 바꾸기
+          </button>
+          <input
+            ref={docxInputRef}
+            type="file"
+            accept=".docx"
+            hidden
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (file) onImportDocx(file);
+              e.target.value = "";
             }}
           />
         </div>
-      </div>
+
+        {showOpen && (
+          <div className="space-y-1.5 pt-1">
+            {projects.length === 0 ? (
+              <p className="text-[12px] px-1" style={{ color: "rgba(42,36,23,0.5)" }}>저장된 책이 없어요.</p>
+            ) : (
+              projects.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => { onOpenProject(p.id); setShowOpen(false); }}
+                  className="w-full rounded-xl px-4 py-3 text-left text-[13px] font-bold"
+                  style={fieldStyle}
+                >
+                  {p.name || "제목 없는 책"}
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function PhoneLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[11px] font-black px-1" style={{ color: "rgba(42,36,23,0.45)" }}>
+      {children}
     </div>
   );
 }

@@ -45,6 +45,8 @@ interface Props {
   onSplitAsChapter: (blockId: string, start: number, end: number) => void;
   onConvertSelectionToNote: (blockId: string, start: number, end: number, kind: NoteKind) => void;
   onApplyInlineStyle: (blockId: string, start: number, end: number, style: InlineStyle) => void;
+  /** 아이폰처럼 화면이 좁을 때는 챕터 목록을 별도 탭으로 빼고 여기서는 숨긴다. */
+  hideChapterRail?: boolean;
 }
 
 export default function EditorPane(props: Props) {
@@ -56,13 +58,17 @@ export default function EditorPane(props: Props) {
     onAddQuote, onAddSceneBreak, onAddPoem, onAddHeading, onAddPageBreak, onAddList, onAddTable, onAddFrontMatter, onToggleDropCap,
     onAddNote, onChangeNote, onDeleteNote,
     onSetBookTitle, onSetBookSubtitle, onSplitAsChapter, onConvertSelectionToNote, onApplyInlineStyle,
+    hideChapterRail = false,
   } = props;
   const [dragOver, setDragOver] = useState(false);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
 
   return (
-    <div className="flex h-full min-h-0">
-      <div className="w-40 sm:w-48 shrink-0 border-r" style={{ borderColor: "rgba(0,0,0,0.08)" }}>
+    <div className="flex h-full w-full min-h-0 min-w-0">
+      <div
+        className={`w-40 sm:w-48 shrink-0 border-r ${hideChapterRail ? "hidden" : ""}`}
+        style={{ borderColor: "rgba(0,0,0,0.08)" }}
+      >
         <ChapterRail
           chapters={chapters}
           activeChapterId={activeChapter.id}
