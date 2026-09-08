@@ -9,7 +9,10 @@
     "lint": "eslint",
     "cap:sync": "cap sync",
     "cap:ios": "cap open ios",
-    "cap:android": "cap open android"
+    "cap:android": "cap open android",
+    "cap:epub": "node scripts/cap-epub.mjs",
+    "app:icons": "node scripts/render-app-icons.mjs",
+    "app:shots": "node scripts/shoot-app-screens.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",

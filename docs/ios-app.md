@@ -1,49 +1,88 @@
-# 이펍공장 iOS 앱 만들기
+# 이펍공장 iOS 앱
 
 앱 화면은 `/epub-app` 경로에 있다. Capacitor가 이 웹 화면을 네이티브 WebView로 감싸서
-아이폰·아이패드 앱으로 만든다.
+아이폰·아이패드 앱으로 만든다. `ios/` 폴더에 Xcode 프로젝트가 이미 만들어져 있다.
 
-## 화면 구성
+## 화면 흐름
 
-| 경로 | 화면 |
-| --- | --- |
-| `/epub-app` | 로그인(구글/애플/이메일/게스트) → 편집기 |
-| `/epub-app?device=phone` | 아이폰 레이아웃 강제(미리보기용) |
-| `/epub-app?device=tablet` | 아이패드 레이아웃 강제(미리보기용) |
-| `/epub-app?screen=login` | 로그인 화면 강제(미리보기용) |
+```
+로그인(구글/애플/이메일/게스트)
+      ↓
+   내 책장  ──설정──▶  설정(계정/보관/앱 정보)
+      ↓
+    편집기  ──‹ 책장──▶  내 책장
+```
+
+| 화면 | 아이폰 | 아이패드 |
+| --- | --- | --- |
+| 로그인 | 세로 버튼 4개 | 같은 구성, 카드 폭만 넓음 |
+| 내 책장 | 표지 2단 그리드 | 3단 그리드, 가운데 정렬(최대 720px) |
+| 편집기 | 하단 탭 4개(챕터/편집/미리보기/책 정보) | 챕터 사이드바 + 편집 + 미리보기 3분할 |
+| 설정 | 전체 화면 | 전체 화면 |
 
 기기 판별은 화면 폭 700px 기준이다(그 이상이면 아이패드 레이아웃).
+아이패드는 가로로 돌리면(1000px 이상) 챕터 사이드바가 자동으로 펼쳐진다.
 
-- **아이폰**: 한 번에 한 화면 + 하단 탭 바(챕터 / 편집 / 미리보기 / 책 정보)
-- **아이패드**: 접었다 펼 수 있는 챕터 사이드바 + 편집 + 미리보기 3분할
+### 미리보기용 주소
 
-## 아이콘
+| 주소 | 여는 화면 |
+| --- | --- |
+| `/epub-app?screen=login` | 로그인 |
+| `/epub-app?screen=library` | 내 책장 |
+| `/epub-app?screen=settings` | 설정 |
+| `/epub-app?device=phone` | 아이폰 레이아웃 강제 |
+| `/epub-app?device=tablet` | 아이패드 레이아웃 강제 |
 
-`public/app-icons/`에 있다. 원본은 `epub-app-icon.svg`이고, PNG는 아래 명령으로 다시 만든다.
+## 앱 설정 파일이 두 개인 이유
+
+- `capacitor.config.ts` — 메인 사이트 앱(Summer Palace, `kr.ai.summerpalace.app`)
+- `capacitor.epub.config.ts` — 이펍공장 앱(`kr.ai.summerpalace.epub`), 켜면 바로 `/epub-app`이 열린다
+
+Capacitor CLI는 `capacitor.config.ts`만 읽기 때문에, 이펍공장 앱 작업은 아래 스크립트로 한다.
+실행하는 동안만 설정 파일을 바꿔치기하고 끝나면 원래대로 되돌린다.
 
 ```
-node scripts/render-app-icons.mjs
+npm run cap:epub -- sync ios     # 웹 변경사항을 앱에 반영
+npm run cap:epub -- open ios     # Xcode 열기 (맥에서만)
 ```
 
-Xcode에는 `icon-1024.png`를 App Store 아이콘으로 넣으면 나머지 크기는 Xcode가 처리한다.
+## 맥에서 앱스토어에 올리기
 
-## 맥에서 실제 앱으로 빌드하기
-
-이 저장소를 맥에 내려받은 뒤(Xcode 설치 필요):
+Xcode와 CocoaPods이 필요하다(이 저장소가 만들어진 리눅스 환경에는 둘 다 없어서 여기까지만 준비되어 있다).
 
 ```
 npm install
-npx cap add ios          # ios/ 폴더가 없을 때 한 번만
-npx cap sync ios
-npx cap open ios         # Xcode가 열린다
+sudo gem install cocoapods        # 처음 한 번만
+npm run cap:epub -- sync ios      # pod install까지 함께 실행된다
+npm run cap:epub -- open ios      # Xcode 실행
 ```
 
-Xcode에서 Signing & Capabilities에 애플 개발자 계정을 연결하고,
-Product → Archive → Distribute App 순서로 App Store에 올린다.
+Xcode에서:
 
-`capacitor.config.ts`의 `server.url`이 라이브 도메인을 가리키고 있어서,
-웹을 배포하면 앱 심사를 다시 받지 않아도 앱 화면이 함께 갱신된다.
-앱이 이펍공장 화면으로 바로 열리게 하려면 `server.url`을 `https://<도메인>/epub-app`으로 바꾼다.
+1. App 타겟 → Signing & Capabilities → Team에 애플 개발자 계정 연결
+2. Bundle Identifier가 `kr.ai.summerpalace.epub`인지 확인
+3. Product → Archive → Distribute App → App Store Connect
+
+`server.url`이 라이브 도메인을 가리키고 있어서, 웹을 배포하면 앱 심사를 다시 받지 않아도
+앱 화면이 함께 갱신된다. **단, 앱을 올리기 전에 `/epub-app`이 실제 도메인에 배포되어 있어야 한다.**
+
+## 아이콘과 스플래시
+
+`public/app-icons/`에 원본이 있고, iOS 프로젝트에는 이미 복사되어 있다.
+
+```
+npm run app:icons     # 아이콘 PNG 다시 만들기
+```
+
+- 아이콘 원본: `epub-app-icon.svg` → `icon-1024.png` (앱스토어 제출용)
+- 스플래시 원본: `epub-splash.svg` → `splash-2732.png`
+
+## 화면 샘플 다시 찍기
+
+```
+npm run dev -- -p 3100
+npm run app:shots
+```
 
 ## 로그인
 
@@ -55,3 +94,10 @@ Product → Archive → Distribute App 순서로 App Store에 올린다.
 - 게스트: 계정 없이 진입하고 `epub-app-guest` 플래그를 localStorage에 남긴다(원고는 기기에만 저장)
 
 애플 심사 기준상 소셜 로그인을 넣으면 **Sign in with Apple도 함께 제공해야 한다**(이미 포함되어 있다).
+
+## 아직 남은 일
+
+- 앱 안에서 구글 로그인은 웹 팝업 방식이라, 네이티브 앱 심사에서 반려되면
+  `@capacitor/browser`나 네이티브 구글 로그인 플러그인으로 바꿔야 할 수 있다.
+- 게스트 원고는 기기에만 저장된다. 계정 간 동기화는 아직 없다.
+- 앱스토어 심사용 스크린샷(6.7"/6.5"/12.9" 규격)은 `npm run app:shots` 결과를 규격에 맞게 다시 다듬어야 한다.

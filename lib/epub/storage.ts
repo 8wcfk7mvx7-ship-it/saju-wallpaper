@@ -26,6 +26,10 @@ export interface ProjectMeta {
   id: string;
   name: string;
   updatedAt: number;
+  /** 책장 화면에서 표지/지은이/분량을 보여주기 위한 요약(예전에 저장한 항목에는 없을 수 있다). */
+  author?: string;
+  coverImage?: string | null;
+  chapterCount?: number;
 }
 
 const PROJECTS_INDEX_KEY = "epub-creator-projects-index";
@@ -44,7 +48,15 @@ export async function listProjects(): Promise<ProjectMeta[]> {
 export async function saveProject(id: string, name: string, book: Book): Promise<void> {
   await set(projectKey(id), book);
   const index = (await get<ProjectMeta[]>(PROJECTS_INDEX_KEY)) ?? [];
-  const next = [...index.filter(p => p.id !== id), { id, name, updatedAt: Date.now() }];
+  const summary: ProjectMeta = {
+    id,
+    name,
+    updatedAt: Date.now(),
+    author: book.author,
+    coverImage: book.coverImage,
+    chapterCount: book.chapters.length,
+  };
+  const next = [...index.filter(p => p.id !== id), summary];
   await set(PROJECTS_INDEX_KEY, next);
 }
 

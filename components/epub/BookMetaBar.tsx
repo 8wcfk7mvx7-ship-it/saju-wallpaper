@@ -47,6 +47,10 @@ interface Props {
   onExport: () => void;
   view: "editor" | "preview";
   onChangeView: (view: "editor" | "preview") => void;
+  /** 아이패드 앱에서는 맥 창 버튼(빨강/노랑/초록) 대신 앱다운 상단 바를 쓴다. */
+  appMode?: boolean;
+  /** appMode일 때 왼쪽에 놓을 뒤로가기 버튼. */
+  backButton?: React.ReactNode;
 }
 
 export default function BookMetaBar({
@@ -57,6 +61,7 @@ export default function BookMetaBar({
   onChangeTitle, onChangeSubtitle, onChangeAuthor, onChangePublisher, onChangeIsbn, onChangeDescription, onChangeDate,
   onChangeCover, onChangePublisherLogo, onChangeFont, onExport,
   view, onChangeView,
+  appMode = false, backButton,
 }: Props) {
   const router = useRouter();
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -67,33 +72,39 @@ export default function BookMetaBar({
     <div className="shrink-0" style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
       {/* 창 컨트롤 + 파일 메뉴 + 실행취소/다시실행 + 보기 전환 + 내보내기 */}
       <div className="flex items-center gap-2 px-3 sm:px-4 pt-2.5">
-        <div className="flex items-center gap-1.5 shrink-0" title="창 컨트롤">
-          <button
-            onClick={() => router.push("/")}
-            aria-label="닫기"
-            title="닫기"
-            className="w-3 h-3 rounded-full"
-            style={{ background: "#ff5f57" }}
-          />
-          <button
-            onClick={onToggleFocusMode}
-            aria-label="최소화(집중 모드)"
-            title="최소화(집중 모드)"
-            className="w-3 h-3 rounded-full"
-            style={{ background: "#febc2e", boxShadow: focusMode ? "0 0 0 2px rgba(254,188,46,0.5)" : "none" }}
-          />
-          <button
-            onClick={onToggleFullscreen}
-            aria-label="최대화(전체 화면)"
-            title="최대화(전체 화면)"
-            className="w-3 h-3 rounded-full"
-            style={{ background: "#28c840" }}
-          />
-        </div>
+        {appMode ? (
+          backButton
+        ) : (
+          <>
+            <div className="flex items-center gap-1.5 shrink-0" title="창 컨트롤">
+              <button
+                onClick={() => router.push("/")}
+                aria-label="닫기"
+                title="닫기"
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#ff5f57" }}
+              />
+              <button
+                onClick={onToggleFocusMode}
+                aria-label="최소화(집중 모드)"
+                title="최소화(집중 모드)"
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#febc2e", boxShadow: focusMode ? "0 0 0 2px rgba(254,188,46,0.5)" : "none" }}
+              />
+              <button
+                onClick={onToggleFullscreen}
+                aria-label="최대화(전체 화면)"
+                title="최대화(전체 화면)"
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#28c840" }}
+              />
+            </div>
 
-        <span className="text-xs font-black shrink-0 hidden sm:inline" style={{ color: "rgba(42,36,23,0.55)" }}>
-          이펍공장
-        </span>
+            <span className="text-xs font-black shrink-0 hidden sm:inline" style={{ color: "rgba(42,36,23,0.55)" }}>
+              이펍공장
+            </span>
+          </>
+        )}
 
         <FileMenu
           projects={projects}

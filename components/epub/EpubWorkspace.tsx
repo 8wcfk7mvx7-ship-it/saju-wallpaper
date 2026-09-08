@@ -63,7 +63,22 @@ function cloneTextBlockWithText(block: TextBearingBlock, text: string): TextBear
  */
 export type WorkspaceLayout = "web" | "phone" | "tablet";
 
-export default function EpubWorkspace({ layout = "web" }: { layout?: WorkspaceLayout } = {}) {
+interface WorkspaceProps {
+  layout?: WorkspaceLayout;
+  /** 앱에서 책장 화면으로 돌아가는 버튼을 띄운다. 없으면 버튼도 없다. */
+  onExit?: () => void;
+  /** 앱의 책장에서 특정 책을 골라 들어온 경우 그 책을 연다. */
+  openProjectId?: string | null;
+  /** 책장에서 "새 책 만들기"로 들어온 경우 저장된 초안 대신 빈 책으로 시작한다. */
+  startNew?: boolean;
+}
+
+export default function EpubWorkspace({
+  layout = "web",
+  onExit,
+  openProjectId = null,
+  startNew = false,
+}: WorkspaceProps = {}) {
   const isPhone = layout === "phone";
   const isTablet = layout === "tablet";
   // ── 상태 ──
@@ -124,20 +139,29 @@ export default function EpubWorkspace({ layout = "web" }: { layout?: WorkspaceLa
   }, [layout]);
 
   useEffect(() => {
-    loadDraft()
-      .then(draft => {
-        if (draft) {
-          const normalized = normalizeBook(draft);
+    // 앱 책장에서 "새 책"으로 들어왔으면 저장된 초안을 불러오지 않는다.
+    if (startNew) {
+      setReady(true);
+      return;
+    }
+
+    // 책장에서 고른 책이 있으면 그 책을, 없으면 마지막 초안을 연다.
+    const load = openProjectId ? loadProject(openProjectId) : loadDraft();
+    load
+      .then(saved => {
+        if (saved) {
+          const normalized = normalizeBook(saved);
           setBook(normalized);
           setActiveChapterId(normalized.chapters[0].id);
+          if (openProjectId) setCurrentProjectId(openProjectId);
         }
       })
       .catch(err => {
         // 저장된 초안이 손상되어 있어도 새 책으로 계속 작업할 수 있어야 한다.
-        console.error("자동 저장된 초안을 불러오지 못했어요", err);
+        console.error("저장된 원고를 불러오지 못했어요", err);
       })
       .finally(() => setReady(true));
-  }, []);
+  }, [openProjectId, startNew]);
 
   // 텍스트 입력 중 브라우저 기본 되돌리기(글자 단위)를 방해하지 않도록,
   // 텍스트 입력 필드에 포커스가 없을 때만 Ctrl/Cmd+Z로 책 전체를 되돌린다.
@@ -730,6 +754,18 @@ export default function EpubWorkspace({ layout = "web" }: { layout?: WorkspaceLa
       onExport={handleExport}
       view={mobileView}
       onChangeView={setMobileView}
+      appMode={isTablet}
+      backButton={
+        onExit ? (
+          <button
+            onClick={onExit}
+            className="shrink-0 text-[14px] font-bold pr-1"
+            style={{ color: "#4338ca" }}
+          >
+            ‹ 책장
+          </button>
+        ) : null
+      }
     />
   );
 
@@ -750,6 +786,16 @@ export default function EpubWorkspace({ layout = "web" }: { layout?: WorkspaceLa
           className="shrink-0 flex items-center gap-2 px-4"
           style={{ height: 52, borderBottom: "1px solid rgba(0,0,0,0.08)" }}
         >
+          {onExit && (
+            <button
+              onClick={onExit}
+              aria-label="책장으로"
+              className="shrink-0 text-[15px] font-bold -ml-1 pr-0.5"
+              style={{ color: "#4338ca" }}
+            >
+              ‹
+            </button>
+          )}
           <div className="min-w-0 flex-1">
             <div className="text-[15px] font-black truncate">{book.title || "제목 없는 책"}</div>
             <div className="text-[11px] truncate" style={{ color: "rgba(42,36,23,0.5)" }}>
