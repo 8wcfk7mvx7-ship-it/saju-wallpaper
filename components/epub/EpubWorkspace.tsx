@@ -135,20 +135,21 @@ export default function EpubWorkspace({
   }, [future, book]);
 
   // 아이패드: 가로 화면이면 챕터 사이드바를 처음부터 펼쳐둔다.
+  // 화면 크기는 그려진 뒤에 재야 정확하므로 첫 페인트 후에 판단한다.
   useEffect(() => {
     if (layout !== "tablet") return;
-    setRailOpen(window.innerWidth >= 1000);
+    const frame = requestAnimationFrame(() => setRailOpen(window.innerWidth >= 1000));
+    return () => cancelAnimationFrame(frame);
   }, [layout]);
 
   useEffect(() => {
-    // 앱 책장에서 "새 책"으로 들어왔으면 저장된 초안을 불러오지 않는다.
-    if (startNew) {
-      setReady(true);
-      return;
-    }
-
-    // 책장에서 고른 책이 있으면 그 책을, 없으면 마지막 초안을 연다.
-    const load = openProjectId ? loadProject(openProjectId) : loadDraft();
+    // 앱 책장에서 "새 책"으로 들어왔으면 저장된 초안을 불러오지 않고 빈 책으로 시작한다.
+    // 책장에서 고른 책이 있으면 그 책을, 그 밖에는 마지막 초안을 연다.
+    const load = startNew
+      ? Promise.resolve(null)
+      : openProjectId
+        ? loadProject(openProjectId)
+        : loadDraft();
     load
       .then(saved => {
         if (saved) {

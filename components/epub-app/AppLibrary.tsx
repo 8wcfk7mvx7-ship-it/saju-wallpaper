@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { deleteProject, listProjects, loadDraft, type ProjectMeta } from "@/lib/epub/storage";
 
 interface Props {
@@ -18,16 +18,17 @@ export default function AppLibrary({ wide = false, onOpenProject, onContinueDraf
   const [draftTitle, setDraftTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function refresh() {
-    const [list, draft] = await Promise.all([listProjects(), loadDraft()]);
-    setProjects(list);
-    // 아직 이름 붙여 저장하지 않았지만 쓰던 원고가 있으면 "이어서 쓰기"로 보여준다.
-    const hasContent = draft?.chapters.some(c => c.blocks.length > 0);
-    setDraftTitle(hasContent ? (draft?.title || "제목 없는 책") : null);
-    setLoading(false);
-  }
+  const refresh = useCallback(() => {
+    return Promise.all([listProjects(), loadDraft()]).then(([list, draft]) => {
+      setProjects(list);
+      // 아직 이름 붙여 저장하지 않았지만 쓰던 원고가 있으면 "이어서 쓰기"로 보여준다.
+      const hasContent = draft?.chapters.some(c => c.blocks.length > 0);
+      setDraftTitle(hasContent ? (draft?.title || "제목 없는 책") : null);
+      setLoading(false);
+    });
+  }, []);
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
   async function handleDelete(project: ProjectMeta) {
     if (!confirm(`"${project.name}"을(를) 삭제할까요? 되돌릴 수 없어요.`)) return;

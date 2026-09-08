@@ -18,6 +18,13 @@ declare global {
   }
 }
 
+/** Capacitor로 감싼 앱(iOS/안드로이드) 안에서 실행 중인가. */
+function isNativeApp(): boolean {
+  if (typeof window === "undefined") return false;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return Boolean(cap?.isNativePlatform?.());
+}
+
 interface Props {
   /** 로그인(또는 게스트 진입)이 끝나면 호출된다. */
   onDone: (mode: "account" | "guest") => void;
@@ -39,7 +46,10 @@ export default function AppLogin({ onDone, wide = false }: Props) {
   const [busy, setBusy] = useState(false);
 
   // 구글 로그인: 우리 디자인의 버튼을 쓰기 위해 구글이 그려주는 버튼은 숨겨두고 클릭만 전달한다.
+  // 단, 앱(WebView) 안에서는 구글 팝업이 뜨지 않으므로 리다이렉트 방식으로 넘긴다.
   useEffect(() => {
+    if (isNativeApp()) return;
+
     function init() {
       if (!window.google?.accounts?.id || !googleHostRef.current) return;
       window.google.accounts.id.initialize({
@@ -83,6 +93,14 @@ export default function AppLogin({ onDone, wide = false }: Props) {
 
   function handleGoogleClick() {
     setError("");
+
+    // 앱 안에서는 구글 JS 팝업이 동작하지 않는다(구글도 WebView 내 팝업 로그인을 막는다).
+    // 애플 로그인과 동일하게 화면 전체를 넘겼다가 되돌아오는 방식을 쓴다.
+    if (isNativeApp()) {
+      window.location.href = "/api/auth/google/start?redirect=/epub-app";
+      return;
+    }
+
     // 구글이 렌더한 실제 버튼을 대신 눌러준다(디자인은 우리 것, 동작은 구글 것).
     const realButton = googleHostRef.current?.querySelector<HTMLElement>('div[role="button"]');
     if (realButton) {
