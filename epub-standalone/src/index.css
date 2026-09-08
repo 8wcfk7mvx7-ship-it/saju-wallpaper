@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* 화면 코드가 이 폴더 바깥(웹앱 소스)에 있으므로 그쪽도 훑어보게 알려준다.
+   이게 없으면 Tailwind가 클래스를 못 찾아 스타일이 통째로 빠진다. */
+@source "../../components";
+@source "../../lib";
+
 @font-face {
   font-family: "EpubChosunMyungjo";
   src: url("./assets/fonts/chosunilbo-myungjo.woff") format("woff");
@@ -20,6 +25,11 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+
+/* 원본 fonts.ts가 미리보기 글꼴로 var(--font-chosun)을 쓴다(웹에서는 next/font가 넣어주는 값). */
+:root {
+  --font-chosun: "EpubChosunMyungjo";
 }
 
 html, body, #root {

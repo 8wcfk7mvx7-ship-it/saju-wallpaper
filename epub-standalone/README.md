@@ -1,34 +1,59 @@
-# 이펍공장 오프라인 빌드
+# 이펍공장 데스크톱 앱 (맥 / 윈도우)
 
-`/epub` 편집기(components/epub, lib/epub 원본은 앱 루트에 있음)를 인터넷 연결 없이도 쓸 수 있는
-**단일 HTML 파일**로 빌드하기 위한 별도의 작은 Vite 프로젝트입니다. 메인 Next.js 앱의 빌드/배포와는
-무관하고, 필요할 때 로컬에서 수동으로 빌드해서 사용자에게 파일로 전달하는 용도입니다.
+맥북·윈도우에 설치해서 쓰는 앱이다. **인터넷 없이 완전히 동작하고**, 원고는 그 컴퓨터에만 저장된다.
 
-이펍공장의 편집 로직 자체는 100% 클라이언트 사이드(JSZip + IndexedDB)라서 서버 없이도 완전히
-동작하고, 그 점을 이용해 브라우저에서 더블클릭으로 여는 오프라인 버전을 만들었습니다.
+## 웹앱과의 관계
+
+화면 코드를 복사해 오지 않는다. 웹앱 소스(`../components`, `../lib`)를 **그대로 가져다 빌드**하므로
+웹앱을 고치면 데스크톱 앱도 같이 최신이 된다. 데스크톱에만 없는 것들만 껍데기로 바꿔치기한다.
+
+| 바꿔치기 대상 | 이유 | 위치 |
+| --- | --- | --- |
+| `next/navigation` | 데스크톱엔 Next.js 라우터가 없다 | `src/shims/next-navigation.ts` |
+| `@capacitor/filesystem`, `@capacitor/share` | 네이티브 플러그인을 쓰지 않는다 | `src/shims/capacitor.ts` |
+| `@/lib/supabaseClient` | 계정 없이 이 기기에만 저장한다 | `src/shims/supabaseClient.ts` |
+| `lib/epub/fonts.ts` | 폰트를 파일 안에 base64로 넣어야 `file://`에서 열린다 | `src/shims/fonts.ts` |
+
+폰트 바꿔치기만 별칭이 아니라 작은 Vite 플러그인으로 처리하는데, 웹앱 안에서 `./fonts`처럼
+상대 경로로 부르는 곳이 있어 "최종적으로 어떤 파일인지"를 보고 판단해야 하기 때문이다.
+
+> Tailwind에게 `@source "../../components"`로 바깥 폴더도 훑으라고 알려줘야 한다
+> (`src/index.css`). 이걸 빠뜨리면 스타일이 통째로 빠진 화면이 나온다.
+
+## 화면
+
+로그인 없이 **책장 → 편집기 → 설정**으로 이어진다. 편집기는 아이패드와 같은 3분할
+(챕터 사이드바 + 편집 + 미리보기)을 쓰고, 창이 넓으면 사이드바가 자동으로 펼쳐진다.
 
 ## 빌드
 
 ```
 npm install
-npm run build
+npm run build            # dist/index.html 한 장으로 묶는다(폰트까지 포함)
+npm start                # 만들고 바로 실행해 보기
 ```
 
-`dist/index.html` 하나가 완성된 결과물입니다(JS/CSS/폰트가 base64로 전부 인라인되어 있음).
-이 파일만 있으면 인터넷 없이도 더블클릭으로 열어 바로 쓸 수 있습니다.
+확인:
 
-## 원본과 다른 점
+```
+node scripts/verify-desktop.mjs   # 오프라인 동작 + EPUB 생성까지 11개 항목 검사
+```
 
-- `next/navigation`의 `useRouter` 의존(닫기 버튼)을 제거했습니다.
-- Capacitor 네이티브 저장 경로를 제거하고 항상 일반 브라우저 다운로드를 사용합니다(`src/lib/epub/download.ts`).
-- 폰트 파일을 `fetch(publicPath)`가 아니라 Vite 에셋 import(base64 인라인)로 가져옵니다
-  (`file://`로 열었을 때 상대 경로 fetch가 막히는 브라우저 제약을 피하기 위함, `src/lib/epub/fonts.ts`).
-- `lib/epub`, `components/epub`는 메인 앱에서 복사해온 것이라, 메인 앱을 고치면 이쪽도 수동으로
-  다시 복사해줘야 최신 상태가 유지됩니다(자동 동기화 없음).
+## 설치 파일 만들기
 
-## 네이티브 macOS 앱(.app) 관련
+```
+npm run dist:mac    # 맥용 (.zip / .dmg)
+npm run dist:win    # 윈도우용 (.exe 설치 파일)
+```
 
-`electron/main.cjs`, `package.json`의 `dist:mac` 스크립트로 Electron 앱 패키징을 시도했으나,
-이 저장소가 처음 만들어진 개발 환경(샌드박스)의 네트워크 정책이 Electron 바이너리 다운로드를 막고
-있어 실제로 빌드하지는 못했습니다. 일반 인터넷 환경에서 `npm install && npm run dist:mac`을
-실행하면 빌드될 수 있지만, Apple 개발자 서명이 없어 macOS Gatekeeper 경고가 뜹니다.
+- **`.dmg`는 맥에서만 만들어진다.** 리눅스에서는 `hdiutil` 같은 맥 전용 도구가 없어
+  `.zip`까지만 만들어진다. 맥에서 `npm run dist:mac`을 돌리면 `.dmg`도 함께 나온다.
+- 애플 개발자 인증서로 서명하지 않으면 처음 열 때 "확인되지 않은 개발자" 경고가 뜬다.
+  우클릭 → 열기로 한 번 넘기면 그다음부터는 그냥 열린다.
+  맥 앱스토어에 올리려면 서명과 공증(notarization)이 필요하다.
+- Electron이 브라우저 엔진을 통째로 안고 있어서 결과물이 300~400MB로 큰 편이다.
+
+## 파일이 저장되는 곳
+
+- 원고: 그 컴퓨터의 브라우저 저장소(IndexedDB)에 자동 저장된다.
+- 완성한 책: "EPUB 내보내기"를 누르면 일반 다운로드 폴더에 저장된다.
