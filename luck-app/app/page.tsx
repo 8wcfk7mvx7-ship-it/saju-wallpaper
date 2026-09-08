@@ -204,7 +204,12 @@ export default function HomePage() {
   }
 
   useEffect(() => {
+    // localStorage는 브라우저에만 있어서, 정적으로 미리 만들어둔 화면(서버·빌드 시점)과
+    // 똑같은 화면(ready=false → 로딩 화면)을 먼저 보여준 뒤 마운트 후에만 실제 값을 읽어야
+    // 화면이 깜빡이며 어긋나는 하이드레이션 불일치가 안 생긴다. 그래서 이 값들은
+    // useState 초기값이 아니라 반드시 effect 안에서 한 번만 읽어와야 한다.
     const p = getProfile();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setProfile(p);
     if (p || getSkipOnboarding()) {
       setScreen("dashboard");
@@ -219,6 +224,8 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!ready) return;
+    // 위와 같은 이유로(하이드레이션 불일치 방지) 마운트 후 한 번만 localStorage를 읽는다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMemoState(getMemo(dateKey));
     const log = getLog(dateKey);
     if (log) { setRating(log.rating); setTags(log.tags); setNote(log.note); }

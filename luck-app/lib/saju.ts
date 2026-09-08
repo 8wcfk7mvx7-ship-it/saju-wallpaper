@@ -1088,10 +1088,9 @@ export function getMonthPillar(year: number, month: number, day: number): {cg: s
   // 절기 기준으로 전통 월(月) 결정
   // 해당 월의 절기 시작일 이전이면 전월로 처리
   let calcMonth = month;
-  let calcYear = year;
   if (day < SOLAR_TERM_DAYS[month]) {
     calcMonth = month - 1;
-    if (calcMonth === 0) { calcMonth = 12; calcYear = year - 1; }
+    if (calcMonth === 0) calcMonth = 12;
   }
 
   // 월간(月干) 계산에 쓰는 연도:
@@ -1256,7 +1255,7 @@ function computeYongshin(
   // 인성은 나를 생하는 기운이지 내 자신이 아니므로 65% 반영 (인성 과다 신강 오판 방지)
   const jiwon = scores[ilganEl] * 1.0 + scores[inseongEl] * 0.65;
   // 득령 × 득지 × 득세 순서로 보정
-  let jiwonAdj = jiwon * deuklFactor * tonggeunFactor * seFactor;
+  const jiwonAdj = jiwon * deuklFactor * tonggeunFactor * seFactor;
 
   let strength: "신강" | "신약" | "중화";
   let yongshin: Element;
@@ -2241,7 +2240,7 @@ export function calcDaewoon(
   // 첫 교운 = 생일 + floor(daysDiff/3)년 + (daysDiff%3)*4개월
   function addYearsMonths(y: number, m: number, d: number, addY: number, addM: number) {
     let rm = m + addM;
-    let ry = y + addY + Math.floor((rm - 1) / 12);
+    const ry = y + addY + Math.floor((rm - 1) / 12);
     rm = ((rm - 1) % 12 + 12) % 12 + 1;
     const maxD = new Date(ry, rm, 0).getDate();
     return { year: ry, month: rm, day: Math.min(d, maxD) };
@@ -3709,11 +3708,6 @@ export interface SipseongStrengthInfo {
   reason: string;
 }
 
-const SIPSEONG_TO_GROUP: Record<string, "비겁" | "식상" | "재성" | "관성" | "인성"> = {
-  비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상",
-  정재: "재성", 편재: "재성", 정관: "관성", 편관: "관성", 정인: "인성", 편인: "인성",
-};
-
 const SIPSEONG_OF_GROUP: Record<"비겁" | "식상" | "재성" | "관성" | "인성", string[]> = {
   비겁: ["비견", "겁재"], 식상: ["식신", "상관"], 재성: ["정재", "편재"],
   관성: ["정관", "편관"], 인성: ["정인", "편인"],
@@ -3736,7 +3730,6 @@ export function getSipseongStrength(r: SajuResult): SipseongStrengthInfo[] {
 
   // 천간충 쌍 (갑경, 을신, 병임, 정계)
   const CG_CHUNG_PAIRS: [string, string][] = [["갑","경"],["을","신"],["병","임"],["정","계"]];
-  const cgList = pillars.map(p => p.cg);
 
   const results: SipseongStrengthInfo[] = [];
 
