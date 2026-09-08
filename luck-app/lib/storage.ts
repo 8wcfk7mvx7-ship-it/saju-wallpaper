@@ -131,9 +131,9 @@ export function getAllCalls(): { date: string; text: string }[] {
     .map(([date, text]) => ({ date, text }));
 }
 
-// ── 백업/복원 ───────────────────────────────────────────────────────────
-// v1은 이 기기의 localStorage에만 저장되므로(계정·서버 없음), 기기를 바꾸거나
-// 앱 데이터를 지우기 전에 이 함수로 내보낸 파일을 보관해두면 그대로 복원할 수 있다.
+// ── 백업 내보내기 ────────────────────────────────────────────────────────
+// 로그인하지 않은 기기는 데이터가 이 기기의 localStorage에만 저장되므로,
+// 기기를 바꾸거나 앱 데이터를 지우기 전에 이 함수로 내보낸 파일을 보관해둘 수 있다.
 export function exportAllData(): string {
   const data: Record<string, unknown> = {};
   if (typeof window !== "undefined") {
@@ -145,18 +145,4 @@ export function exportAllData(): string {
     }
   }
   return JSON.stringify({ app: "luck-app", version: 1, exportedAt: new Date().toISOString(), data }, null, 2);
-}
-
-export function importAllData(json: string): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const parsed = JSON.parse(json) as { data?: Record<string, unknown> };
-    if (!parsed || typeof parsed.data !== "object" || parsed.data === null) return false;
-    for (const key of ALL_KEYS) {
-      if (key in parsed.data) localStorage.setItem(key, JSON.stringify(parsed.data[key]));
-    }
-    return true;
-  } catch {
-    return false;
-  }
 }

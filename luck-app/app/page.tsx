@@ -15,7 +15,7 @@ import type { User } from "@supabase/supabase-js";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
   getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
-  getCall, setCall as persistCall, getAllCalls, exportAllData, importAllData,
+  getCall, setCall as persistCall, getAllCalls, exportAllData,
   type SajuProfile, type LuckLogEntry,
 } from "@/lib/storage";
 
@@ -321,19 +321,6 @@ export default function HomePage() {
     a.download = `luck-app-backup-${dateKey}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }
-
-  function handleImportBackup(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const ok = importAllData(String(reader.result ?? ""));
-      if (ok) { alert("백업을 불러왔어요. 앱을 새로고침할게요."); window.location.reload(); }
-      else alert("백업 파일을 읽지 못했어요. 파일을 확인해주세요.");
-    };
-    reader.readAsText(file);
   }
 
   if (!ready) return <LoadingScreen />;
@@ -748,13 +735,9 @@ export default function HomePage() {
                   메모·행운기록·내 정보는 지금 이 기기 안에만 저장돼요. 기기를 바꾸거나 앱을 지우기 전엔 백업 파일로 내보내두세요.
                 </p>
                 <button onClick={handleExportBackup}
-                  className="retro-btn w-full py-3 text-sm font-bold mb-2" style={{ background: "var(--card)", color: "var(--ink)" }}>
+                  className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--card)", color: "var(--ink)" }}>
                   백업 파일 내보내기
                 </button>
-                <label className="retro-btn w-full py-3 text-sm font-bold flex items-center justify-center cursor-pointer" style={{ background: "var(--card)", color: "var(--ink)" }}>
-                  백업 파일 가져오기
-                  <input type="file" accept="application/json" onChange={handleImportBackup} className="hidden" />
-                </label>
               </Card>
             </FadeIn>
             <FadeIn delay={80}>
