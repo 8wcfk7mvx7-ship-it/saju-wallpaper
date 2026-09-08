@@ -8,20 +8,20 @@ import {
   CHECKED_STORAGE_KEY,
   GUESTBOOK_STORAGE_KEY,
   VISITED_STORAGE_KEY,
+  getLevelInfo,
+  pageOfCategory,
   type GuestbookEntry,
 } from "@/lib/hunnyeoData";
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
-import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
-import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
+import { pageStyle, RETRO_CSS, INK, INK_RED, INK_LIGHT, BOOK_FONT_GOTHIC } from "@/lib/hunnyeoTheme";
 
-type Step = "loading" | "splash" | "menu";
+type Step = "loading" | "cover" | "toc";
 
 export default function HunnyeoPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("loading");
   const [progress, setProgress] = useState(0);
-  const [visitTotal, setVisitTotal] = useState(38471);
-  const [visitToday, setVisitToday] = useState(48);
+  const [printCount, setPrintCount] = useState(38471);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [guestbook, setGuestbook] = useState<GuestbookEntry[]>(GUESTBOOK_SEED);
   const [gbName, setGbName] = useState("");
@@ -30,13 +30,13 @@ export default function HunnyeoPage() {
   useEffect(() => {
     if (step !== "loading") return;
     const start = Date.now();
-    const duration = 1600;
+    const duration = 1500;
     const timer = setInterval(() => {
       const pct = Math.min(100, Math.round(((Date.now() - start) / duration) * 100));
       setProgress(pct);
       if (pct >= 100) {
         clearInterval(timer);
-        setTimeout(() => setStep("splash"), 250);
+        setTimeout(() => setStep("cover"), 200);
       }
     }, 60);
     return () => clearInterval(timer);
@@ -47,15 +47,13 @@ export default function HunnyeoPage() {
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setGuestbook(loadJSON(GUESTBOOK_STORAGE_KEY, GUESTBOOK_SEED));
     if (loadJSON<boolean>(VISITED_STORAGE_KEY, false)) {
-      setVisitTotal(v => v + Math.floor(Math.random() * 30));
+      setPrintCount(v => v + Math.floor(Math.random() * 30));
     }
   }, []);
 
-  function handleEnter() {
+  function openBook() {
     localStorage.setItem(VISITED_STORAGE_KEY, "true");
-    setVisitTotal(v => v + 1);
-    setVisitToday(v => v + 1);
-    setStep("menu");
+    setStep("toc");
   }
 
   function submitGuestbook(e: React.FormEvent) {
@@ -78,169 +76,192 @@ export default function HunnyeoPage() {
     () => TIPS.reduce((sum, t) => sum + (checked[t.id] ? t.points : 0), 0),
     [checked]
   );
+  const level = getLevelInfo(totalPoints);
+  const chapters = CATEGORIES.filter(c => c.key !== "all");
 
-  const tiles = CATEGORIES.filter(c => c.key !== "all");
-
-  // ── 로딩 화면 ─────────────────────────────────────────────────────────
+  // ── 인쇄 중 (로딩) ───────────────────────────────────────────────────
   if (step === "loading") {
     return (
       <main
-        className="min-h-screen flex items-center justify-center px-6 cursor-pointer"
-        style={{ background: "#12002b", fontFamily: "'Courier New', monospace" }}
-        onClick={() => setStep("splash")}
+        className="min-h-screen flex items-center justify-center px-8 cursor-pointer"
+        style={{ ...pageStyle }}
+        onClick={() => setStep("cover")}
       >
         <style>{RETRO_CSS}</style>
         <div className="w-full max-w-xs text-center">
-          <div className="text-4xl mb-3 hn-wiggle">💾</div>
-          <p className="text-lg font-black mb-1 hn-title">훈녀생정</p>
-          <p className="text-[11px] mb-5" style={{ color: "#9df5c0" }}>
-            지금 접속하고 있어요<span className="hn-blink">...</span>
+          <p className="text-[11px] mb-6" style={{ color: INK_LIGHT, letterSpacing: ".3em" }}>
+            완 소 문 고
+          </p>
+          <p className="text-2xl mb-1 hn-title">인 쇄 중</p>
+          <p className="text-[12px] mb-6" style={{ color: INK_LIGHT }}>
+            잠시만 기다려 주세요<span className="hn-blink">…</span>
           </p>
 
-          <div className="h-5 rounded-full overflow-hidden mb-2" style={{ background: "#2a0b4d", border: "2px solid #ff6fb5" }}>
+          <div className="h-4 mb-2" style={{ border: `2px solid ${INK}`, background: "#fffdf5" }}>
             <div
               className="h-full"
               style={{
                 width: `${progress}%`,
-                background: "repeating-linear-gradient(45deg,#ff3d9a 0 8px,#ffd93d 8px 16px)",
+                background: `repeating-linear-gradient(90deg, ${INK} 0 4px, transparent 4px 8px)`,
                 transition: "width 60ms linear",
               }}
             />
           </div>
-          <p className="text-sm font-black" style={{ color: "#ffd93d" }}>{progress}%</p>
+          <p className="text-[12px]" style={{ color: INK_RED, fontFamily: BOOK_FONT_GOTHIC }}>{progress}%</p>
 
-          <div className="mt-6 flex justify-center gap-1.5 text-lg">
-            {["🎀", "💗", "⭐", "🌸", "💾"].map((e, i) => (
-              <span key={i} className="hn-twinkle" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
-            ))}
-          </div>
-          <p className="text-[10px] mt-5" style={{ color: "#7a5ea8" }}>화면을 누르면 바로 들어가요</p>
+          <p className="text-[10px] mt-10" style={{ color: INK_LIGHT }}>
+            화면을 누르면 바로 넘어갑니다
+          </p>
         </div>
       </main>
     );
   }
 
-  // ── 들어가기 화면 ─────────────────────────────────────────────────────
-  if (step === "splash") {
+  // ── 표지 ─────────────────────────────────────────────────────────────
+  if (step === "cover") {
     return (
       <main className="min-h-screen flex items-center justify-center px-4 py-8" style={pageStyle}>
         <style>{RETRO_CSS}</style>
-        <div className="w-full max-w-sm hn-box p-5 text-center relative" style={{ borderStyle: "dashed", borderWidth: 4 }}>
-          <div className="absolute -top-3 -left-3 text-3xl hn-float">🎀</div>
-          <div className="absolute -top-3 -right-3 text-3xl hn-float" style={{ animationDelay: ".6s" }}>💗</div>
-          <div className="absolute -bottom-3 -left-2 text-2xl hn-float" style={{ animationDelay: "1.1s" }}>🌸</div>
-          <div className="absolute -bottom-3 -right-2 text-2xl hn-float" style={{ animationDelay: "1.6s" }}>⭐</div>
+        <div className="hn-staple" />
 
-          <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>
-            ★☆★ 90년대생 전용 미니홈피 ★☆★
+        <div className="w-full max-w-sm hn-frame-double p-6 relative" style={{ marginLeft: 10 }}>
+          {/* 가격 스티커 */}
+          <div
+            className="hn-price absolute -top-4 -right-3 w-16 h-16 flex flex-col items-center justify-center"
+            style={{ zIndex: 2 }}
+          >
+            <span className="text-[9px] leading-none">정가</span>
+            <span className="text-[15px] font-black leading-tight">500</span>
+            <span className="text-[9px] leading-none">원</span>
+          </div>
+
+          <p className="text-center text-[10px] mb-1" style={{ color: INK_LIGHT, letterSpacing: ".4em" }}>
+            완소문고 제 7 권
+          </p>
+          <p className="text-center text-[11px] mb-5" style={{ color: INK_RED }}>
+            ─── 소녀 필독 ───
           </p>
 
-          <h1 className="text-5xl font-black mb-1 hn-title">훈녀생정</h1>
-          <p className="text-xs font-black mb-4" style={{ color: "#9b6bf5" }}>
-            훈훈한 여자 생활정보 <span className="hn-blink">☆</span>
+          <div className="hn-frame py-5 px-3 mb-5 text-center" style={{ background: "rgba(255,253,245,0.75)" }}>
+            <h1 className="text-[42px] font-black leading-none mb-2 hn-title">훈녀생정</h1>
+            <p className="text-[12px]" style={{ color: INK }}>훈훈한 여자 생활정보</p>
+          </div>
+
+          <div className="text-center mb-5">
+            <p className="text-[12px] leading-relaxed" style={{ color: INK }}>
+              밀가루팩 · 봉숭아물 들이기<br />
+              덴마크 다이어트 · 머릿결 관리<br />
+              발 관리 · 완소템 총정리
+            </p>
+          </div>
+
+          <p className="text-center text-[11px] mb-5 hn-underline inline-block w-full" style={{ color: INK_RED }}>
+            집에 있는 재료로 누구나 할 수 있습니다
           </p>
 
-          <div className="hn-marquee mb-4 py-1.5 rounded-full" style={{ background: "#fff6da", border: "2px solid #f5b400" }}>
-            <div>
-              {[0, 1].map(i => (
-                <span key={i} className="text-[11px] font-black" style={{ color: "#c98a00" }}>
-                  ♡ 밀가루팩 · 봉숭아물 · 덴마크 다이어트 · 완소템까지 전부 모았어요 ♡ 따라 한 만큼 훈녀력이 쌓여요 ♡
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl px-3 py-3 mb-4 text-[13px] leading-relaxed font-bold" style={{ background: "#fff0f7", border: "2px dashed #ff9ecb", color: "#a04a75" }}>
-            집에 있는 재료로 하는<br />
-            그 시절 관리법을 모아두었어요 🍎🍉💅
-          </div>
-
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "#1a1a1a", border: "2px solid #666" }}>
-            <span className="text-[10px] font-black" style={{ color: "#4ade80", fontFamily: "monospace" }}>
-              TODAY {String(visitToday).padStart(5, "0")}
-            </span>
-            <span className="text-[10px] font-black" style={{ color: "#facc15", fontFamily: "monospace" }}>
-              TOTAL {String(visitTotal).padStart(7, "0")}
-            </span>
-          </div>
-
-          <button onClick={handleEnter} className="hn-btn hn-btn-on w-full py-3.5 text-base">
-            ♡ 들어가기 ♡
+          <button onClick={openBook} className="hn-btn hn-btn-on w-full py-3 text-[15px]">
+            책 펴 보기 ▶
           </button>
-          <button onClick={() => router.push("/")} className="mt-3 text-[11px] font-black underline" style={{ color: "#b06a94" }}>
-            다른 서비스 둘러보기
+
+          <div className="flex items-center justify-between mt-5 pt-3" style={{ borderTop: `1px solid ${INK_LIGHT}` }}>
+            <span className="text-[9px]" style={{ color: INK_LIGHT }}>완소문고 편집부 엮음</span>
+            <span className="text-[9px]" style={{ color: INK_LIGHT }}>{printCount.toLocaleString()}부 발행</span>
+          </div>
+
+          {/* 조악한 바코드 */}
+          <div className="flex justify-center gap-[1.5px] mt-3 h-7 items-end">
+            {Array.from({ length: 34 }, (_, i) => (
+              <span key={i} style={{ width: (i * 7) % 3 === 0 ? 3 : 1.5, height: (i % 5) * 3 + 14, background: INK }} />
+            ))}
+          </div>
+
+          <button onClick={() => router.push("/")} className="mt-4 w-full text-[10px] underline" style={{ color: INK_LIGHT }}>
+            다른 서비스 보러 가기
           </button>
         </div>
       </main>
     );
   }
 
-  // ── 메뉴 화면 ─────────────────────────────────────────────────────────
+  // ── 차례 ─────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen pb-20" style={pageStyle}>
+    <main className="min-h-screen pb-16" style={pageStyle}>
       <style>{RETRO_CSS}</style>
+      <div className="hn-staple" />
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
-        <button onClick={() => router.push("/")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}>
-          🏠 홈으로
-        </button>
-        <button onClick={() => router.push("/hunnyeo/mypage")} className="hn-btn px-3 py-1.5 text-[11px]">
-          👧 내 정보
-        </button>
-      </div>
+      <div className="max-w-2xl mx-auto px-5 pt-4" style={{ marginLeft: 14 }}>
+        <div className="flex items-center justify-between mb-5">
+          <button onClick={() => setStep("cover")} className="hn-btn px-3 py-1.5 text-[11px]">◀ 표지</button>
+          <button onClick={() => router.push("/hunnyeo/mypage")} className="hn-btn px-3 py-1.5 text-[11px]">
+            내 기록장
+          </button>
+        </div>
 
-      <header className="max-w-2xl mx-auto px-4 pt-4 text-center">
-        <h1 className="text-4xl font-black mb-1 hn-title">훈녀생정</h1>
-        <p className="text-[11px] font-black mb-3" style={{ color: "#9b6bf5" }}>
-          ★☆★ 메뉴를 골라주세요 ★☆★
-        </p>
-        <HunnyeoScoreBar points={totalPoints} />
-      </header>
+        {/* 차례 제목 */}
+        <div className="text-center mb-5">
+          <h1 className="text-[30px] font-black hn-title mb-1">차　례</h1>
+          <p className="text-[11px]" style={{ color: INK_LIGHT }}>─────── 훈녀생정 ───────</p>
+        </div>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+        {/* 훈녀력 표시 */}
+        <div className="hn-frame p-3 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[12px] font-bold" style={{ fontFamily: BOOK_FONT_GOTHIC }}>
+              나의 훈녀력
+            </span>
+            <span className="text-[12px] font-black" style={{ color: INK_RED, fontFamily: BOOK_FONT_GOTHIC }}>
+              {totalPoints}점 · {level.level.name}
+            </span>
+          </div>
+          <div className="h-3" style={{ border: `1.5px solid ${INK}`, background: "#fffdf5" }}>
+            <div
+              className="h-full"
+              style={{ width: `${Math.max(level.progress * 100, totalPoints > 0 ? 5 : 0)}%`, background: `repeating-linear-gradient(90deg, ${INK_RED} 0 5px, rgba(198,45,31,0.35) 5px 10px)` }}
+            />
+          </div>
+          <p className="text-[10px] mt-1.5 text-center" style={{ color: INK_LIGHT }}>
+            {level.next ? `다음 등급 「${level.next.name}」까지 ${level.pointsToNext}점` : "최고 등급입니다"}
+          </p>
+        </div>
 
-      {/* 메뉴판 */}
-      <div className="max-w-2xl mx-auto px-4 grid grid-cols-2 gap-3">
-        {tiles.map((c, idx) => {
-          const catTips = TIPS.filter(t => t.category === c.key);
-          const done = catTips.filter(t => checked[t.id]).length;
-          const complete = catTips.length > 0 && done === catTips.length;
-          return (
-            <button
-              key={c.key}
-              onClick={() => router.push(`/hunnyeo/${c.key}`)}
-              className="hn-box p-3 text-left relative"
-              style={{ borderColor: c.accent, boxShadow: `4px 4px 0 ${c.accent}44` }}
-            >
-              {complete && (
-                <span className="absolute -top-2.5 -right-2 text-[10px] font-black px-2 py-0.5 rounded-full hn-blink" style={{ background: "#ffd93d", color: "#8a5b00", border: "2px solid #f5b400" }}>
-                  완료!
-                </span>
-              )}
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-2xl hn-float inline-block" style={{ animationDelay: `${idx * 0.15}s` }}>{c.emoji}</span>
-                <span className="font-black text-sm" style={{ color: c.accent }}>{c.label}</span>
-              </div>
-              <p className="text-[10px] font-bold mb-2" style={{ color: "#a08a99" }}>{c.desc}</p>
+        {/* 목차 항목 */}
+        <div className="space-y-3.5 mb-8">
+          {chapters.map((c, i) => {
+            const catTips = TIPS.filter(t => t.category === c.key);
+            const done = catTips.filter(t => checked[t.id]).length;
+            const complete = done === catTips.length;
+            return (
+              <button key={c.key} onClick={() => router.push(`/hunnyeo/${c.key}`)} className="w-full text-left">
+                <div className="flex items-end">
+                  <span className="text-[13px] font-bold shrink-0" style={{ fontFamily: BOOK_FONT_GOTHIC, color: INK }}>
+                    제{i + 1}장　{c.label}
+                  </span>
+                  <span className="hn-dots" />
+                  <span className="text-[12px] shrink-0" style={{ color: INK_LIGHT }}>
+                    {pageOfCategory(c.key)}쪽
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mt-0.5 pl-1">
+                  <span className="text-[10px]" style={{ color: INK_LIGHT }}>{c.desc}</span>
+                  <span className="text-[10px] font-bold" style={{ color: complete ? INK_RED : INK_LIGHT, fontFamily: BOOK_FONT_GOTHIC }}>
+                    {complete ? "◎ 완료" : `${done}/${catTips.length}`}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
 
-              <div className="h-3 rounded-full overflow-hidden mb-1" style={{ background: "#f6f0f4", border: `2px solid ${c.accent}66` }}>
-                <div className="h-full" style={{ width: catTips.length ? `${(done / catTips.length) * 100}%` : "0%", background: c.accent }} />
-              </div>
-              <p className="text-[10px] font-black" style={{ color: c.accent }}>
-                {done} / {catTips.length} 개 완료
-              </p>
-            </button>
-          );
-        })}
-      </div>
+        <p className="text-center text-[11px] mb-6" style={{ color: INK_LIGHT }}>· · · · ·</p>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
-
-      {/* 방명록 */}
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="hn-box hn-box-p p-4">
-          <h3 className="font-black text-sm mb-1" style={{ color: "#7c3aed" }}>📔 방명록</h3>
-          <p className="text-[10px] font-bold mb-3" style={{ color: "#a58ac9" }}>흔적을 남겨주세요 ♡</p>
+        {/* 독자 엽서 (방명록) */}
+        <div className="hn-frame-red p-4 mb-6">
+          <p className="text-center text-[13px] font-bold mb-1" style={{ fontFamily: BOOK_FONT_GOTHIC, color: INK_RED }}>
+            독 자 엽 서
+          </p>
+          <p className="text-center text-[10px] mb-3" style={{ color: INK_LIGHT }}>
+            읽고 나서 한마디 적어 주세요
+          </p>
 
           <form onSubmit={submitGuestbook} className="space-y-2 mb-4">
             <input
@@ -248,45 +269,46 @@ export default function HunnyeoPage() {
               onChange={e => setGbName(e.target.value)}
               placeholder="이름"
               maxLength={12}
-              className="w-full rounded-lg px-3 py-2 text-xs font-bold outline-none"
-              style={{ border: "2px solid #ddd0ff", color: "#4b2e63" }}
+              className="w-full px-2 py-1.5 text-[12px] outline-none"
+              style={{ border: `1.5px solid ${INK}`, background: "#fffdf5", color: INK }}
             />
             <textarea
               value={gbMsg}
               onChange={e => setGbMsg(e.target.value)}
-              placeholder="한마디 남겨주세요"
+              placeholder="한마디"
               rows={2}
               maxLength={200}
-              className="w-full rounded-lg px-3 py-2 text-xs font-bold outline-none resize-none"
-              style={{ border: "2px solid #ddd0ff", color: "#4b2e63" }}
+              className="w-full px-2 py-1.5 text-[12px] outline-none resize-none"
+              style={{ border: `1.5px solid ${INK}`, background: "#fffdf5", color: INK }}
             />
-            <button
-              type="submit"
-              disabled={!gbName.trim() || !gbMsg.trim()}
-              className="hn-btn w-full py-2 text-xs disabled:opacity-40"
-              style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}
-            >
-              ✎ 남기기
+            <button type="submit" disabled={!gbName.trim() || !gbMsg.trim()} className="hn-btn w-full py-1.5 text-[11px] disabled:opacity-40">
+              보내기
             </button>
           </form>
 
-          <div className="space-y-2 max-h-80 overflow-y-auto scrollbar-none">
+          <div className="space-y-2 max-h-72 overflow-y-auto scrollbar-none">
             {guestbook.map(g => (
-              <div key={g.id} className="rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
+              <div key={g.id} className="px-2 py-1.5" style={{ borderBottom: `1px dotted ${INK_LIGHT}` }}>
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-xs font-black" style={{ color: "#7c3aed" }}>♡ {g.name}</span>
-                  <span className="text-[10px] font-bold" style={{ color: "#c4b5fd" }}>{g.date}</span>
+                  <span className="text-[11px] font-bold" style={{ color: INK, fontFamily: BOOK_FONT_GOTHIC }}>{g.name}</span>
+                  <span className="text-[9px]" style={{ color: INK_LIGHT }}>{g.date}</span>
                 </div>
-                <p className="text-[12px] font-bold" style={{ color: "#57406b" }}>{g.message}</p>
+                <p className="text-[11.5px] leading-relaxed" style={{ color: INK }}>{g.message}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      <p className="text-center text-[10px] mt-5 px-6 font-bold leading-relaxed" style={{ color: "#c093ac" }}>
-        2000년대 생활 정보를 정리한 추억용 콘텐츠예요.<br />건강 관련 내용은 참고용으로만 봐주세요.
-      </p>
+        <p className="text-center text-[9px] leading-relaxed mb-3" style={{ color: INK_LIGHT }}>
+          이 책은 2000년대 생활 정보를 정리한 추억용 읽을거리입니다.<br />
+          건강 관련 내용은 참고용으로만 봐 주세요.
+        </p>
+        <p className="hn-pageno text-[11px]">— 2 —</p>
+
+        <button onClick={() => router.push("/")} className="mt-4 w-full text-[10px] underline" style={{ color: INK_LIGHT }}>
+          다른 서비스 보러 가기
+        </button>
+      </div>
     </main>
   );
 }

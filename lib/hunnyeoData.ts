@@ -470,6 +470,23 @@ export const TIPS: HunnyeoTip[] = [
 
 export const TOTAL_POSSIBLE_POINTS = TIPS.reduce((sum, t) => sum + t.points, 0);
 
+// ── 책 페이지 번호 (표지 1p, 차례 2~3p 뒤부터 본문 시작) ────────────────
+export const FIRST_CONTENT_PAGE = 4;
+
+export function pageOfTip(id: string): number {
+  const idx = TIPS.findIndex(t => t.id === id);
+  return idx < 0 ? FIRST_CONTENT_PAGE : FIRST_CONTENT_PAGE + idx * 2;
+}
+
+export function pageOfCategory(key: HunnyeoCategoryKey): number {
+  const first = TIPS.find(t => t.category === key);
+  return first ? pageOfTip(first.id) : FIRST_CONTENT_PAGE;
+}
+
+export function chapterOfCategory(key: HunnyeoCategoryKey): number {
+  return CATEGORIES.filter(c => c.key !== "all").findIndex(c => c.key === key) + 1;
+}
+
 // ── 훈녀력 레벨 시스템 ────────────────────────────────────────────────────
 export interface HunnyeoLevel {
   name: string;
