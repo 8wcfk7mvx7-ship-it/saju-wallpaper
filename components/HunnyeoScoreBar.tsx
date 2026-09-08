@@ -1,5 +1,6 @@
 "use client";
 import { getLevelInfo } from "@/lib/hunnyeoData";
+import PixelIcon from "@/components/PixelIcon";
 
 export default function HunnyeoScoreBar({ points, compact = false }: { points: number; compact?: boolean }) {
   const info = getLevelInfo(points);
@@ -8,7 +9,7 @@ export default function HunnyeoScoreBar({ points, compact = false }: { points: n
     <div className="hn-box hn-box-y p-3">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-black flex items-center gap-1" style={{ color: "#e0399b" }}>
-          <span className="text-lg hn-wiggle inline-block">{info.level.emoji}</span>
+          <PixelIcon name={info.level.icon} size={18} className="hn-wiggle" />
           {info.level.name}
         </span>
         <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "#fff0f7", color: "#ff2b8d", border: "2px solid #ffb3d8" }}>
@@ -30,8 +31,8 @@ export default function HunnyeoScoreBar({ points, compact = false }: { points: n
       {!compact && (
         <p className="text-[11px] mt-2 font-bold text-center" style={{ color: "#b06a94" }}>
           {info.next
-            ? `다음 등급 ${info.next.emoji} ${info.next.name}까지 ${info.pointsToNext}점 남았어요!`
-            : "최고 등급이에요! 완전 소중 그 자체 ♡"}
+            ? `다음 등급 「${info.next.name}」까지 ${info.pointsToNext}점 남았어요!`
+            : "최고 등급이에요. 완전 소중 그 자체"}
         </p>
       )}
     </div>

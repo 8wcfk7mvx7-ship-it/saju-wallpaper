@@ -13,6 +13,7 @@ import {
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
+import PixelIcon from "@/components/PixelIcon";
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -54,26 +55,26 @@ export default function HunnyeoMyPage() {
 
       <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
         <button onClick={() => router.push("/hunnyeo")} className="hn-btn px-3 py-1.5 text-[11px]">
-          ← 메뉴판
+          ◀ 메뉴판
         </button>
         <button onClick={() => router.push("/")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}>
-          🏠 홈으로
+          <PixelIcon name="home" size={13} /> 홈으로
         </button>
       </div>
 
       {/* 프로필 */}
       <div className="max-w-2xl mx-auto px-4 pt-4">
         <div className="hn-box p-5 text-center relative" style={{ borderStyle: "dashed", borderWidth: 4 }}>
-          <div className="absolute -top-3 -left-3 text-2xl hn-float">⭐</div>
-          <div className="absolute -top-3 -right-3 text-2xl hn-float" style={{ animationDelay: ".7s" }}>🎀</div>
+          <PixelIcon name="star" size={24} className="absolute -top-3 -left-3 hn-float" />
+          <PixelIcon name="ribbon" size={26} className="absolute -top-3 -right-3 hn-float" style={{ animationDelay: ".7s" }} />
 
-          <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>★☆★ 내 정보 ★☆★</p>
+          <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>─── 내 정보 ───</p>
 
           <div
-            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-2 hn-wiggle"
+            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-2 hn-wiggle"
             style={{ background: "repeating-linear-gradient(45deg,#ffe3f2 0 8px,#fff6da 8px 16px)", border: "3px solid #ff9ecb" }}
           >
-            {info.level.emoji}
+            <PixelIcon name={info.level.icon} size={44} />
           </div>
 
           {editingName ? (
@@ -91,7 +92,7 @@ export default function HunnyeoMyPage() {
             </div>
           ) : (
             <button onClick={() => { setNameDraft(nickname); setEditingName(true); }} className="text-xl font-black mb-1" style={{ color: "#4a2c3d" }}>
-              {nickname} ✎
+              {nickname}
             </button>
           )}
 
@@ -107,12 +108,18 @@ export default function HunnyeoMyPage() {
         </div>
       </div>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <div className="flex justify-center gap-1.5 my-4">
+        {[0, 1, 2].map(i => (
+          <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
+        ))}
+      </div>
 
       {/* 등급표 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-y p-4">
-          <h3 className="font-black text-sm mb-3" style={{ color: "#c98a00" }}>🏆 훈녀력 등급표</h3>
+          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#c98a00" }}>
+            <PixelIcon name="crown" size={15} /> 훈녀력 등급표
+          </h3>
           <div className="space-y-2">
             {LEVELS.map((lv, i) => {
               const reached = totalPoints >= lv.min;
@@ -127,13 +134,13 @@ export default function HunnyeoMyPage() {
                     opacity: reached ? 1 : 0.5,
                   }}
                 >
-                  <span className="text-xl">{lv.emoji}</span>
+                  <PixelIcon name={lv.icon} size={22} />
                   <div className="flex-1">
                     <p className="text-xs font-black" style={{ color: reached ? "#7a5b00" : "#b5a98a" }}>{lv.name}</p>
                     <p className="text-[10px] font-bold" style={{ color: "#b5a98a" }}>{lv.min}점부터</p>
                   </div>
                   {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white hn-blink" style={{ background: "#f5b400" }}>지금 여기!</span>}
-                  {reached && !current && <span className="text-sm">✅</span>}
+                  {reached && !current && <PixelIcon name="check" size={15} />}
                 </div>
               );
             })}
@@ -141,12 +148,18 @@ export default function HunnyeoMyPage() {
         </div>
       </div>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <div className="flex justify-center gap-1.5 my-4">
+        {[0, 1, 2].map(i => (
+          <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
+        ))}
+      </div>
 
       {/* 카테고리별 현황 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box p-4">
-          <h3 className="font-black text-sm mb-3" style={{ color: "#e0399b" }}>📋 메뉴별 완료 현황</h3>
+          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#e0399b" }}>
+            <PixelIcon name="note" size={15} /> 메뉴별 완료 현황
+          </h3>
           <div className="space-y-2.5">
             {tiles.map(c => {
               const catTips = TIPS.filter(t => t.category === c.key);
@@ -161,7 +174,8 @@ export default function HunnyeoMyPage() {
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-black flex items-center gap-1.5" style={{ color: c.accent }}>
-                      {c.emoji} {c.label} {complete && <span className="hn-blink">🏆</span>}
+                      <PixelIcon name={c.icon} size={16} /> {c.label}
+                      {complete && <PixelIcon name="crown" size={13} className="hn-blink" />}
                     </span>
                     <span className="text-[11px] font-black" style={{ color: c.accent }}>{done}/{catTips.length}</span>
                   </div>
@@ -175,13 +189,17 @@ export default function HunnyeoMyPage() {
         </div>
       </div>
 
-      <p className="hn-divider my-4">☆·°*.☆ ★ ☆.*°·☆</p>
+      <div className="flex justify-center gap-1.5 my-4">
+        {[0, 1, 2].map(i => (
+          <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
+        ))}
+      </div>
 
       {/* 완료 목록 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-p p-4">
-          <h3 className="font-black text-sm mb-3" style={{ color: "#7c3aed" }}>
-            💗 내가 해본 것 ({checkedTips.length})
+          <h3 className="font-black text-sm mb-3 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+            <PixelIcon name="heart" size={15} /> 내가 해본 것 ({checkedTips.length})
           </h3>
           {checkedTips.length === 0 ? (
             <p className="text-xs font-bold text-center py-6" style={{ color: "#a58ac9" }}>
@@ -191,7 +209,7 @@ export default function HunnyeoMyPage() {
             <div className="space-y-1.5">
               {checkedTips.map(t => (
                 <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
-                  <span className="text-[12px] font-bold truncate pr-2" style={{ color: "#57406b" }}>♡ {t.title}</span>
+                  <span className="text-[12px] font-bold truncate pr-2" style={{ color: "#57406b" }}>{t.title}</span>
                   <span className="text-[10px] font-black shrink-0" style={{ color: "#7c3aed" }}>+{t.points}점</span>
                 </div>
               ))}

@@ -24,6 +24,7 @@ import { LIFE_TIPS } from "./hunnyeo/tips-life";
 import { ITEM_TIPS } from "./hunnyeo/tips-item";
 import { WORDS_TIPS } from "./hunnyeo/tips-words";
 import type { HunnyeoTip } from "./hunnyeo/types";
+import type { PixelIconName } from "@/components/PixelIcon";
 
 export { CATEGORIES } from "./hunnyeo/types";
 export type { HunnyeoCategoryKey, HunnyeoCategory, HunnyeoTip, TipType } from "./hunnyeo/types";
@@ -50,16 +51,16 @@ export const TOTAL_POSSIBLE_POINTS = TIPS.reduce((sum, t) => sum + t.points, 0);
 // ── 훈녀력 레벨 ───────────────────────────────────────────────────────────
 export interface HunnyeoLevel {
   name: string;
-  emoji: string;
+  icon: PixelIconName; // 직접 찍은 도트 아이콘
   min: number;
 }
 
 export const LEVELS: HunnyeoLevel[] = [
-  { name: "새내기 훈녀",      emoji: "🌱", min: 0 },
-  { name: "완소 훈녀",        emoji: "🎀", min: 80 },
-  { name: "인기짱 훈녀",      emoji: "💅", min: 250 },
-  { name: "얼짱각도 마스터",   emoji: "📸", min: 550 },
-  { name: "전설의 왕언니",     emoji: "👑", min: 900 },
+  { name: "새내기 훈녀",     icon: "sprout", min: 0 },
+  { name: "완소 훈녀",       icon: "ribbon", min: 80 },
+  { name: "인기짱 훈녀",     icon: "polish", min: 250 },
+  { name: "얼짱각도 마스터", icon: "camera", min: 550 },
+  { name: "전설의 왕언니",   icon: "crown",  min: 900 },
 ];
 
 export interface LevelInfo {

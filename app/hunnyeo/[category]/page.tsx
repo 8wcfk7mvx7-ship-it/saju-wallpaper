@@ -5,6 +5,7 @@ import { CATEGORIES, TIPS, CHECKED_STORAGE_KEY, type HunnyeoCategoryKey } from "
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
+import PixelIcon from "@/components/PixelIcon";
 
 export default function HunnyeoCategoryPage() {
   const router = useRouter();
@@ -53,23 +54,27 @@ export default function HunnyeoCategoryPage() {
 
       <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
         <button onClick={() => router.push("/hunnyeo")} className="hn-btn px-3 py-1.5 text-[11px]">
-          ← 메뉴판
+          ◀ 메뉴판
         </button>
         <button onClick={() => router.push("/hunnyeo/mypage")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}>
-          👧 내 정보
+          <PixelIcon name="user" size={13} /> 내 정보
         </button>
       </div>
 
       <header className="max-w-2xl mx-auto px-4 pt-4 text-center">
-        <div className="text-5xl mb-1 hn-wiggle">{cat.emoji}</div>
+        <div className="mb-1"><PixelIcon name={cat.icon} size={52} className="hn-wiggle" /></div>
         <h1 className="text-3xl font-black mb-1 hn-title">{cat.label}</h1>
         <p className="text-[11px] font-black mb-3" style={{ color: cat.accent }}>
-          ♡ {cat.desc} · {doneCount}/{tips.length} 완료 ♡
+          {cat.desc} · {doneCount}/{tips.length} 완료
         </p>
         <HunnyeoScoreBar points={totalPoints} compact />
       </header>
 
-      <p className="hn-hearts my-4">♡ ⋆ ♥ ⋆ ♡ ⋆ ♥ ⋆ ♡</p>
+      <div className="flex justify-center gap-1.5 my-4">
+        {[0, 1, 2].map(i => (
+          <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
+        ))}
+      </div>
 
       <div className="max-w-2xl mx-auto px-4 space-y-4">
         {tips.map((tip, idx) => {
@@ -86,7 +91,9 @@ export default function HunnyeoCategoryPage() {
               }}
             >
               {isChecked && (
-                <span className="hn-sticker absolute -top-2.5 -right-2">완료 ♡</span>
+                <span className="hn-sticker absolute -top-2.5 -right-2 flex items-center gap-1">
+                  <PixelIcon name="check" size={11} /> 완료
+                </span>
               )}
 
               {/* 제목 */}
@@ -105,21 +112,24 @@ export default function HunnyeoCategoryPage() {
               {/* 준비물 */}
               {tip.materials && (
                 <div className="rounded-2xl px-3 py-2 mb-3" style={{ background: "#fffbe8", border: "2px dotted #f5b400" }}>
-                  <p className="text-[11px] font-black mb-1" style={{ color: "#c98a00" }}>🧺 준비물</p>
+                  <p className="text-[11px] font-black mb-1 flex items-center gap-1" style={{ color: "#c98a00" }}>
+                    <PixelIcon name="basket" size={13} /> 준비물
+                  </p>
                   <p className="text-[12px] font-bold leading-relaxed" style={{ color: "#7a6a3a" }}>
-                    {tip.materials.map(m => `♡ ${m}`).join("  ")}
+                    {tip.materials.join(" · ")}
                   </p>
                 </div>
               )}
 
               {/* 방법 */}
-              <p className="text-[11px] font-black mb-1.5" style={{ color: cat.accent }}>
-                {tip.type === "read" ? "📖 알아두기" : "✏️ 하는 방법"}
+              <p className="text-[11px] font-black mb-1.5 flex items-center gap-1" style={{ color: cat.accent }}>
+                <PixelIcon name={tip.type === "read" ? "book" : "pencil"} size={13} />
+                {tip.type === "read" ? "알아두기" : "하는 방법"}
               </p>
               <ol className="space-y-1.5 mb-3">
                 {tip.steps.map((s, i) => (
                   <li key={i} className="flex gap-2 text-[13px] leading-relaxed font-bold" style={{ color: "#5c4653" }}>
-                    <span className="shrink-0" style={{ color: cat.accent }}>{tip.type === "read" ? "♡" : `${i + 1}.`}</span>
+                    <span className="shrink-0" style={{ color: cat.accent }}>{tip.type === "read" ? "·" : `${i + 1}.`}</span>
                     <span>{s}</span>
                   </li>
                 ))}
@@ -127,14 +137,16 @@ export default function HunnyeoCategoryPage() {
 
               {/* 효과 */}
               <div className="rounded-xl px-3 py-2 mb-3" style={{ background: "#fff0f7", border: "2px solid #ffb3d8" }}>
-                <p className="text-[12px] font-black leading-relaxed" style={{ color: "#c9186d" }}>
-                  ✨ {tip.effect}
+                <p className="text-[12px] font-black leading-relaxed flex gap-1.5" style={{ color: "#c9186d" }}>
+                  <PixelIcon name="sparkle" size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span>{tip.effect}</span>
                 </p>
               </div>
 
               {tip.caution && (
-                <div className="rounded-xl px-3 py-2 mb-3 text-[11px] leading-relaxed font-bold" style={{ background: "#fff5f5", border: "2px dotted #f7a8a8", color: "#c0392b" }}>
-                  ⚠️ {tip.caution}
+                <div className="rounded-xl px-3 py-2 mb-3 text-[11px] leading-relaxed font-bold flex gap-1.5" style={{ background: "#fff5f5", border: "2px dotted #f7a8a8", color: "#c0392b" }}>
+                  <PixelIcon name="warning" size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span>{tip.caution}</span>
                 </div>
               )}
 
@@ -150,7 +162,10 @@ export default function HunnyeoCategoryPage() {
                   onClick={() => toggleCheck(tip.id)}
                   className={`hn-btn shrink-0 px-3.5 py-2 text-[12px] ${isChecked ? "hn-btn-on" : ""} ${justChecked === tip.id ? "hn-pop" : ""}`}
                 >
-                  {isChecked ? "✅" : "☐"} {actionLabel} +{tip.points}점
+                  <span className="flex items-center gap-1">
+                    <PixelIcon name={isChecked ? "check" : "box"} size={12} />
+                    {actionLabel} +{tip.points}점
+                  </span>
                 </button>
               </div>
             </article>
