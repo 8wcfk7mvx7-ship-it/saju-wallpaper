@@ -15,6 +15,7 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
+import { HunnyeoDisclaimerLine } from "@/components/HunnyeoDisclaimer";
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -228,6 +229,10 @@ export default function HunnyeoMyPage() {
         >
           훈녀력 초기화하기
         </button>
+      </div>
+
+      <div className="mt-6">
+        <HunnyeoDisclaimerLine />
       </div>
     </main>
   );

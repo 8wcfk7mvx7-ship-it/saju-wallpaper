@@ -7,6 +7,7 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
+import { HunnyeoDisclaimerBox, HunnyeoDisclaimerLine } from "@/components/HunnyeoDisclaimer";
 
 export default function HunnyeoCategoryPage() {
   const router = useRouter();
@@ -76,6 +77,10 @@ export default function HunnyeoCategoryPage() {
         {[0, 1, 2].map(i => (
           <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
         ))}
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 mb-4">
+        <HunnyeoDisclaimerBox />
       </div>
 
       <div className="max-w-2xl mx-auto px-4 space-y-4">
@@ -175,9 +180,9 @@ export default function HunnyeoCategoryPage() {
         })}
       </div>
 
-      <p className="text-center text-[10px] mt-6 px-6 font-bold leading-relaxed" style={{ color: "#c093ac" }}>
-        2000년대 생활 정보를 정리한 추억용 콘텐츠예요.<br />건강 관련 내용은 참고용으로만 봐주세요.
-      </p>
+      <div className="mt-6">
+        <HunnyeoDisclaimerLine />
+      </div>
     </main>
   );
 }
