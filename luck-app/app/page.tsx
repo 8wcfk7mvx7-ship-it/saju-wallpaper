@@ -557,7 +557,7 @@ export default function HomePage() {
         )}
 
         {tab === "memo" && (
-          <div className="mt-2">
+          <div className="space-y-4 mt-2">
             <FadeIn>
               <Card>
                 <div className="flex items-center justify-between mb-2">
@@ -576,7 +576,7 @@ export default function HomePage() {
             </FadeIn>
 
             <FadeIn delay={40}>
-              <div className="retro-card p-5 mt-4">
+              <Card>
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>지난 메모</p>
                 <HistoryList
                   items={pastMemos.filter((m) => m.date !== dateKey)}
@@ -589,13 +589,13 @@ export default function HomePage() {
                     </>
                   )}
                 />
-              </div>
+              </Card>
             </FadeIn>
           </div>
         )}
 
         {tab === "log" && (
-          <div className="mt-2">
+          <div className="space-y-4 mt-2">
             <FadeIn>
               <Card>
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>오늘 하루, 운이 얼마나 좋았나요?</p>
@@ -655,7 +655,7 @@ export default function HomePage() {
             </FadeIn>
 
             <FadeIn delay={40}>
-              <div className="retro-card p-5 mt-4">
+              <Card>
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--amber)" }}>행운 부르기 기록</p>
                 <HistoryList
                   items={pastCalls}
@@ -668,13 +668,13 @@ export default function HomePage() {
                     </div>
                   )}
                 />
-              </div>
+              </Card>
             </FadeIn>
           </div>
         )}
 
         {tab === "settings" && (
-          <div className="mt-2 space-y-3">
+          <div className="space-y-4 mt-2">
             <FadeIn>
               <Card>
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>계정</p>
