@@ -65,26 +65,6 @@ export function PouchPixel({ size = 48, className, style }: ArtProps) {
   return <PixelArt grid={pouchGrid()} size={size} className={className} style={style} />;
 }
 
-// ── 포춘쿠키 — 초승달처럼 접힌 실루엣(두 원의 겹침으로 표현) ───────────────────
-const COOKIE_W = 20, COOKIE_H = 14;
-function cookieGrid(): Grid {
-  const body = makeMask(COOKIE_W, COOKIE_H, (x, y) => {
-    const outer = Math.hypot(x - 10, y - 8) <= 7.2;
-    const bite = Math.hypot(x - 10, y - 2.5) <= 6.6; // 위쪽을 파내 초승달(접힌 쿠키) 모양으로
-    return outer && !bite;
-  });
-  const layer = outlineify(body, "#e3b871", "#8a5a2b");
-  // 살짝 접힌 자국을 표현하는 대각선 하이라이트
-  const grid = mergeGrids(COOKIE_W, COOKIE_H, layer);
-  for (const [x, y] of [[6, 9], [7, 10], [8, 11], [13, 9], [12, 10], [11, 11]]) {
-    if (grid[y]?.[x]) grid[y][x] = "#f3d9a4";
-  }
-  return grid;
-}
-export function CookiePixel({ size = 40, className, style }: ArtProps) {
-  return <PixelArt grid={cookieGrid()} size={size} className={className} style={style} />;
-}
-
 // ── 네잎클로버 — 앱 로고/브랜드 마크. 탭바의 CloverIcon(선 아이콘)과 같은
 //    4원+줄기 구도를 픽셀아트로 그려서, 앱 아이콘·온보딩·로딩 화면까지
 //    하나의 로고로 통일한다(기존 "幸" 도장은 다른 아이콘들과 스타일이

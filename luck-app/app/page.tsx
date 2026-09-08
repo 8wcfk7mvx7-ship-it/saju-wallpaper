@@ -4,10 +4,9 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
-import { SunPixel, CloudPixel, PouchPixel, CookiePixel, CloverStamp } from "@/components/LuckArt";
+import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
-import { getRandomFortune } from "@/lib/fortuneCookie";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
@@ -17,7 +16,7 @@ import {
 } from "@/lib/storage";
 
 type Screen = "onboarding" | "edit" | "dashboard";
-type Tab = "today" | "cookie" | "memo" | "log" | "settings";
+type Tab = "today" | "memo" | "log" | "settings";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const [v, setV] = useState(false);
@@ -67,7 +66,6 @@ const GRADE_DOMAINS = [
 const RATING_LABEL: Record<number, string> = { 1: "최악", 2: "별로", 3: "보통", 4: "좋음", 5: "최고" };
 const TABS: { id: Tab; label: string; Icon: typeof CloverIcon }[] = [
   { id: "today", label: "오늘", Icon: CloverIcon },
-  { id: "cookie", label: "쿠키", Icon: CookiePixel },
   { id: "memo", label: "메모", Icon: MemoIcon },
   { id: "log", label: "기록", Icon: ChartIcon },
   { id: "settings", label: "설정", Icon: GearIcon },
@@ -153,7 +151,6 @@ export default function HomePage() {
   const [callSubmitted, setCallSubmitted] = useState(false);
   const [calledText, setCalledText] = useState("");
   const [showLuckPopup, setShowLuckPopup] = useState(false);
-  const [cookieFortune, setCookieFortune] = useState<string | null>(null);
   const [notifyOn, setNotifyOn] = useState(false);
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
@@ -228,10 +225,6 @@ export default function HomePage() {
     setShowLuckPopup(true);
     setPastCalls(getAllCalls());
     setTimeout(() => setShowLuckPopup(false), 3000);
-  }
-
-  function crackCookie() {
-    setCookieFortune((prev) => getRandomFortune(prev ?? undefined));
   }
 
   async function toggleMorningNotify() {
@@ -336,7 +329,6 @@ export default function HomePage() {
               </p>
               <h1 className="font-display text-3xl mt-1" style={{ color: "var(--ink)" }}>
                 {tab === "today" && "오늘의 행운"}
-                {tab === "cookie" && "포춘쿠키"}
                 {tab === "memo" && "오늘의 메모"}
                 {tab === "log" && "행운 기록"}
                 {tab === "settings" && "설정"}
@@ -510,41 +502,6 @@ export default function HomePage() {
                 </p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.charmTip}</p>
               </Card>
-            </FadeIn>
-          </div>
-        )}
-
-        {tab === "cookie" && (
-          <div className="mt-6 flex flex-col items-center text-center">
-            <FadeIn>
-              <div className="flex justify-center mb-4 float-leaf">
-                <CookiePixel size={72} />
-              </div>
-              {cookieFortune ? (
-                <>
-                  <p className="font-display text-xl mb-6 leading-relaxed max-w-xs" style={{ color: "var(--ink)" }}>
-                    &ldquo;{cookieFortune}&rdquo;
-                  </p>
-                  <button
-                    onClick={crackCookie}
-                    className="retro-btn font-display px-8 py-3.5 text-base"
-                    style={{ background: "var(--amber)", color: "#fff" }}>
-                    다시 뽑기
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm mb-6 leading-relaxed max-w-xs" style={{ color: "var(--ink-soft)" }}>
-                    쿠키를 열면 오늘의 짧은 포춘 메시지가 나와요. 몇 번이고 다시 열어볼 수 있어요.
-                  </p>
-                  <button
-                    onClick={crackCookie}
-                    className="retro-btn font-display px-8 py-3.5 text-base"
-                    style={{ background: "var(--amber)", color: "#fff" }}>
-                    포춘쿠키 열기
-                  </button>
-                </>
-              )}
             </FadeIn>
           </div>
         )}
