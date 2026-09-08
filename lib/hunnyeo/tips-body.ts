@@ -91,23 +91,6 @@ export const BODY_TIPS: HunnyeoTip[] = [
     type: "action",
   },
   {
-    id: "body-frog-legs",
-    category: "body",
-    title: "개구리 뒷다리 자세",
-    materials: ["요가매트 또는 두꺼운 이불"],
-    steps: [
-      "엎드린 자세에서 무릎을 굽혀 양옆으로 벌려 주세요.",
-      "발바닥끼리 마주 보게 하고 양쪽 무릎 높이를 같게 맞춰 주세요.",
-      "팔은 앞으로 뻗어 상체를 바닥에 편하게 내려 주세요.",
-      "숨을 길게 내쉬며 30초 유지하고, 세 번 반복해 주세요.",
-    ],
-    effect: "골반과 허벅지 안쪽이 시원하게 늘어나고 다리 선이 반듯해져요.",
-    caution: "무릎이나 사타구니가 찌릿하면 각도를 좁혀 주세요. 통증이 있으면 바로 멈춰야 합니다.",
-    tags: ["골반", "30초", "엎드려서"],
-    points: 12,
-    type: "action",
-  },
-  {
     id: "body-pelvis-stretch",
     category: "body",
     title: "골반 좌우 균형 잡기",

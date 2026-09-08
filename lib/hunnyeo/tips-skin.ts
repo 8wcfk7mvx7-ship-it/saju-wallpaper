@@ -115,6 +115,23 @@ export const SKIN_TIPS: HunnyeoTip[] = [
     type: "action",
   },
   {
+    id: "skin-ice-massage",
+    category: "skin",
+    title: "얼음 마사지",
+    materials: ["얼음 1~2개", "얇은 거즈나 손수건"],
+    steps: [
+      "얼음을 거즈에 싸 주세요.",
+      "세안 후 볼과 코 위주로 굴리듯 문질러 주세요.",
+      "한 자리에 오래 대지 말고 5초 이상 머무르지 않게 옮겨 주세요.",
+      "전체 1~2분이면 충분해요.",
+    ],
+    effect: "모공이 조여지고 화장이 잘 먹는 상태가 돼요.",
+    caution: "얼음을 맨살에 직접 오래 대면 동상이나 홍조가 생길 수 있어요. 반드시 천에 싸서 짧게 쓰세요.",
+    tags: ["모공", "1분", "화장전"],
+    points: 8,
+    type: "action",
+  },
+  {
     id: "skin-toner-pack",
     category: "skin",
     title: "화장솜 토너팩",
