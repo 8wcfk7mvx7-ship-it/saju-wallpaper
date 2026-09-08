@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { SajuProfile } from "@/lib/storage";
 import { MemoIcon } from "@/components/Icons";
-import { LuckStamp, SunPixel, CloudPixel } from "@/components/LuckArt";
+import { CloverStamp, SunPixel, CloudPixel } from "@/components/LuckArt";
 
 const HOURS = [
   { v: "unknown", label: "시간 모름" },
@@ -93,7 +93,7 @@ export default function OnboardingWizard({
             <SunPixel size={30} className="absolute -top-2 right-8" />
             <CloudPixel size={44} className="absolute top-1 left-2 opacity-90" />
             <div className="flex justify-center mb-4 float-leaf">
-              <LuckStamp size={84} />
+              <CloverStamp size={84} />
             </div>
             <h1 className="font-display text-4xl" style={{ color: "var(--ink)" }}>행운의 앱</h1>
             <p className="text-sm mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>

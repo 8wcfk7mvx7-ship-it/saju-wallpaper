@@ -4,7 +4,7 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
-import { SunPixel, CloudPixel, PouchPixel, CookiePixel, LuckStamp } from "@/components/LuckArt";
+import { SunPixel, CloudPixel, PouchPixel, CookiePixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getRandomFortune } from "@/lib/fortuneCookie";
@@ -46,7 +46,7 @@ function LoadingScreen() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-10" style={{ background: "var(--bg)" }}>
       <div className="float-leaf mb-5">
-        <LuckStamp size={64} />
+        <CloverStamp size={64} />
       </div>
       <p className="font-display text-lg text-center leading-relaxed" style={{ color: "var(--ink)" }}>
         행운은 필요로 하는<br />사람에게 찾아간다

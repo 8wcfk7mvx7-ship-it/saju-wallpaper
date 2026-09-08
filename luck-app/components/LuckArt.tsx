@@ -85,26 +85,21 @@ export function CookiePixel({ size = 40, className, style }: ArtProps) {
   return <PixelArt grid={cookieGrid()} size={size} className={className} style={style} />;
 }
 
-// ── "행운" 도장(스탬프) — 전통 도장을 본뜬 배지 ───────────────────────────────
-export function LuckStamp({ size = 88, rotate = -8, text = "幸" }: { size?: number; rotate?: number; text?: string }) {
-  return (
-    <div
-      style={{
-        width: size, height: size,
-        background: "#b3382c",
-        border: "3px solid #7a1f18",
-        borderRadius: 6,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transform: `rotate(${rotate}deg)`,
-        boxShadow: "3px 3px 0 rgba(74,50,32,0.35)",
-        color: "#fdf3e0",
-        fontFamily: "Galmuri, sans-serif",
-        fontWeight: 700,
-        fontSize: size * 0.42,
-        lineHeight: 1,
-      }}
-    >
-      {text}
-    </div>
-  );
+// ── 네잎클로버 — 앱 로고/브랜드 마크. 탭바의 CloverIcon(선 아이콘)과 같은
+//    4원+줄기 구도를 픽셀아트로 그려서, 앱 아이콘·온보딩·로딩 화면까지
+//    하나의 로고로 통일한다(기존 "幸" 도장은 다른 아이콘들과 스타일이
+//    겉돌아서 이 클로버로 교체했다).
+const CLOVER_W = 22, CLOVER_H = 24;
+function cloverGrid(): Grid {
+  const petal = (cx: number, cy: number) => makeMask(CLOVER_W, CLOVER_H, (x, y) => Math.hypot(x - cx, y - cy) <= 4.3);
+  const petals = unionMask(petal(7.5, 8), petal(14.5, 8), petal(7.5, 15), petal(14.5, 15));
+  const stem = makeMask(CLOVER_W, CLOVER_H, (x, y) => x >= 10 && x <= 12 && y >= 13 && y <= 22);
+  const petalLayer = outlineify(petals, "#4d7c3a", "#2d4a22");
+  const stemLayer = outlineify(stem, "#4d7c3a", "#2d4a22");
+  const dot = makeMask(CLOVER_W, CLOVER_H, (x, y) => Math.hypot(x - 11, y - 11.5) <= 1.8);
+  const dotLayer = outlineify(dot, "#d4922a", "#8a5a18");
+  return mergeGrids(CLOVER_W, CLOVER_H, stemLayer, petalLayer, dotLayer);
+}
+export function CloverStamp({ size = 88, className, style }: ArtProps) {
+  return <PixelArt grid={cloverGrid()} size={size} className={className} style={style} />;
 }
