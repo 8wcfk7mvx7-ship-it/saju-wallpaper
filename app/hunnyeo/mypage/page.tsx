@@ -15,7 +15,7 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
-import { HunnyeoDisclaimerLine } from "@/components/HunnyeoDisclaimer";
+import { HunnyeoDisclaimerBox } from "@/components/HunnyeoDisclaimer";
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -231,8 +231,8 @@ export default function HunnyeoMyPage() {
         </button>
       </div>
 
-      <div className="mt-6">
-        <HunnyeoDisclaimerLine />
+      <div className="max-w-2xl mx-auto px-4 mt-6">
+        <HunnyeoDisclaimerBox />
       </div>
     </main>
   );

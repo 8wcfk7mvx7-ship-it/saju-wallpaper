@@ -15,7 +15,6 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
-import { HunnyeoDisclaimerBox, HunnyeoDisclaimerLine } from "@/components/HunnyeoDisclaimer";
 
 type Step = "loading" | "splash" | "menu";
 
@@ -167,11 +166,6 @@ export default function HunnyeoPage() {
             </span>
           </div>
 
-          <p className="text-[10.5px] leading-relaxed font-bold mb-3 px-1" style={{ color: "#a8798f" }}>
-            그 시절 민간요법을 모은 추억 콘텐츠예요.<br />
-            과학적으로 검증된 방법이 아니니 재미로 봐주세요.
-          </p>
-
           <button onClick={handleEnter} className="hn-btn hn-btn-on w-full py-3.5 text-base">
 들어가기 ▶
           </button>
@@ -215,11 +209,6 @@ export default function HunnyeoPage() {
         {[0, 1, 2].map(i => (
           <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
         ))}
-      </div>
-
-      {/* 면책 문구 */}
-      <div className="max-w-2xl mx-auto px-4 mb-4">
-        <HunnyeoDisclaimerBox />
       </div>
 
       {/* 메뉴판 */}
@@ -330,9 +319,9 @@ export default function HunnyeoPage() {
         </div>
       </div>
 
-      <div className="mt-6">
-        <HunnyeoDisclaimerLine />
-      </div>
+      <p className="text-center text-[10px] mt-6 px-6 font-bold" style={{ color: "#c093ac" }}>
+        그 시절 민간요법을 모은 추억 콘텐츠예요
+      </p>
     </main>
   );
 }
