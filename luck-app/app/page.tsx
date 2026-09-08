@@ -2,12 +2,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
+import AuthScreen from "@/components/AuthScreen";
 import HistoryList from "@/components/HistoryList";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
 import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
+import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut } from "@/lib/auth";
+import { syncOnLogin } from "@/lib/cloudSync";
+import type { User } from "@supabase/supabase-js";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
   getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
@@ -15,7 +19,7 @@ import {
   type SajuProfile, type LuckLogEntry,
 } from "@/lib/storage";
 
-type Screen = "onboarding" | "edit" | "dashboard";
+type Screen = "onboarding" | "edit" | "auth" | "dashboard";
 type Tab = "today" | "memo" | "log" | "settings";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -158,6 +162,46 @@ export default function HomePage() {
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
+
+  const [user, setUser] = useState<User | null>(null);
+  const [syncMsg, setSyncMsg] = useState<string | null>(null);
+
+  // 로그인한 계정이 있으면 화면에 다시 반영한다 (동기화 직후 & 최초 진입 시)
+  function reloadFromLocalStorage() {
+    setProfile(getProfile());
+    setMemoState(getMemo(dateKey));
+    const log = getLog(dateKey);
+    if (log) { setRating(log.rating); setTags(log.tags); setNote(log.note); }
+    setHistory(getRecentLogs(last7Dates()));
+    setCallInput(getCall(dateKey));
+    setCallSubmitted(!!getCall(dateKey));
+    setPastMemos(getAllMemos());
+    setPastCalls(getAllCalls());
+  }
+
+  useEffect(() => {
+    if (!isCloudSyncConfigured()) return;
+    let cancelled = false;
+    getCurrentUser().then((u) => { if (!cancelled) setUser(u); });
+    const unsubscribe = onAuthChange((session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        syncOnLogin(session.user.id).then((result) => {
+          if (cancelled) return;
+          reloadFromLocalStorage();
+          setSyncMsg(result === "pulled" ? "클라우드에 있던 데이터를 불러왔어요." : result === "pushed" ? "이 기기의 데이터를 클라우드에 백업했어요." : null);
+          if (result !== "error") setTimeout(() => setSyncMsg(null), 4000);
+        });
+      }
+    });
+    return () => { cancelled = true; unsubscribe(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleLogout() {
+    await signOut();
+    setUser(null);
+  }
 
   useEffect(() => {
     const p = getProfile();
@@ -318,6 +362,11 @@ export default function HomePage() {
         </div>
       </main>
     );
+  }
+
+  // ── 로그인/회원가입 ───────────────────────────────────────────────────
+  if (screen === "auth") {
+    return <AuthScreen onBack={() => setScreen("dashboard")} onAuthed={() => setScreen("dashboard")} />;
   }
 
   // 재방문 시 짧게 클릭 없이 스플래시만 보여주고 자동으로 메인으로 넘어간다
@@ -636,6 +685,34 @@ export default function HomePage() {
           <div className="mt-2 space-y-3">
             <FadeIn>
               <Card>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>계정</p>
+                {!isCloudSyncConfigured() ? (
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                    아직 로그인 기능이 서버에 연결되지 않았어요. 지금은 이 기기에만 데이터가 저장돼요.
+                  </p>
+                ) : user ? (
+                  <>
+                    <p className="text-sm mb-3" style={{ color: "var(--ink)" }}>{user.email}</p>
+                    <button onClick={handleLogout}
+                      className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--card)", color: "var(--ink)" }}>
+                      로그아웃
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                      로그인하면 여러 기기에서 내 사주 정보·메모·기록을 백업하고 이어서 쓸 수 있어요.
+                    </p>
+                    <button onClick={() => setScreen("auth")}
+                      className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--clover)", color: "#fff" }}>
+                      로그인 / 회원가입
+                    </button>
+                  </>
+                )}
+              </Card>
+            </FadeIn>
+            <FadeIn>
+              <Card>
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>내 사주 정보</p>
                 {profile ? (
                   <p className="text-sm mb-3" style={{ color: "var(--ink)" }}>
@@ -701,6 +778,13 @@ export default function HomePage() {
 
       <BottomTabs tab={tab} onChange={setTab} />
     </main>
+
+    {syncMsg && (
+      <div className="fixed left-1/2 bottom-24 z-30 -translate-x-1/2 px-4 py-2.5 rounded-full text-xs font-bold"
+        style={{ background: "var(--ink)", color: "var(--bg)" }}>
+        {syncMsg}
+      </div>
+    )}
 
     {showLuckPopup && (
       <div

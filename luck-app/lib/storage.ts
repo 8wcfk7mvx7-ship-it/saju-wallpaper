@@ -105,6 +105,12 @@ export function getRecentLogs(dateKeys: string[]): Record<string, LuckLogEntry> 
   return result;
 }
 
+// 클라우드 동기화(백업 업로드)를 위해 지금까지 쌓인 모든 행운 기록을 반환
+export function getAllLogs(): { date: string; entry: LuckLogEntry }[] {
+  const logs = readJson<Record<string, LuckLogEntry>>(LOG_KEY, {});
+  return Object.entries(logs).map(([date, entry]) => ({ date, entry }));
+}
+
 // ── 행운 부르기 — 오늘 하루 한마디로 행운을 불러보는 문구 ─────────────────────
 export function getCall(date: string): string {
   return readJson<Record<string, string>>(CALL_KEY, {})[date] ?? "";

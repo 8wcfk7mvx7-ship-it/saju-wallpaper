@@ -1,10 +1,10 @@
 -- ─────────────────────────────────────────────────────────────────
 -- 행운의 앱 — 데이터베이스 설계 (Supabase / Postgres)
 --
--- v1 앱은 로그인 없이 기기 안 localStorage(lib/storage.ts)만으로 동작합니다.
--- 이 스키마는 "여러 기기 동기화 + 로그인"을 붙이는 v2를 위한 설계도이며,
--- Supabase 프로젝트를 새로 만든 뒤 SQL Editor에서 그대로 실행하면 바로 쓸 수 있습니다.
--- (Supabase 프로젝트 생성 자체는 계정 소유자만 할 수 있는 부분입니다 — docs/APP_STORE_SUBMISSION.md 참고)
+-- 로그인하지 않아도 기기 안 localStorage(lib/storage.ts)만으로 계속 쓸 수 있고,
+-- 로그인(애플/구글/이메일)하면 이 스키마로 클라우드에 백업·동기화됩니다 (lib/supabase.ts, lib/cloudSync.ts 참고).
+-- Supabase 프로젝트 자체는 계정 소유자만 만들 수 있어서, 새 프로젝트를 만든 뒤 SQL Editor에서
+-- 이 파일을 그대로 실행하고, Authentication > Providers에서 Apple/Google을 켜주세요.
 -- ─────────────────────────────────────────────────────────────────
 
 -- ── 1. profiles — 사용자당 1건, 사주 원본 입력값 + 계산 결과 캐시 ──────────────
@@ -93,7 +93,22 @@ CREATE TABLE IF NOT EXISTS solar_terms (
 ALTER TABLE solar_terms ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public_read_solar_terms" ON solar_terms FOR SELECT TO anon, authenticated USING (true);
 
--- ── 5. push_tokens — 매일 알림(선택) 발송용 디바이스 토큰 ───────────────────
+-- ── 5. daily_luck_calls — "행운 부르기" 한마디 기록 (날짜별 1건) ────────────
+CREATE TABLE IF NOT EXISTS daily_luck_calls (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  call_date   date        NOT NULL,
+  text        text        NOT NULL DEFAULT '',
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now(),
+  UNIQUE (user_id, call_date)
+);
+
+ALTER TABLE daily_luck_calls ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "own_luck_calls" ON daily_luck_calls FOR ALL TO authenticated
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ── 6. push_tokens — 매일 알림(선택) 발송용 디바이스 토큰 ───────────────────
 -- "하루에 하나씩 알려주고" 요구사항을 푸시 알림으로 확장할 때 사용.
 -- APNs/FCM 발급은 계정 소유자가 해야 하는 부분이라 v1에는 미포함, 스키마만 준비.
 CREATE TABLE IF NOT EXISTS push_tokens (
@@ -131,7 +146,12 @@ DROP TRIGGER IF EXISTS trg_daily_luck_logs_updated_at ON daily_luck_logs;
 CREATE TRIGGER trg_daily_luck_logs_updated_at BEFORE UPDATE ON daily_luck_logs
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+DROP TRIGGER IF EXISTS trg_daily_luck_calls_updated_at ON daily_luck_calls;
+CREATE TRIGGER trg_daily_luck_calls_updated_at BEFORE UPDATE ON daily_luck_calls
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
 -- ── 인덱스 ────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_daily_memos_user_date ON daily_memos (user_id, memo_date DESC);
 CREATE INDEX IF NOT EXISTS idx_daily_luck_logs_user_date ON daily_luck_logs (user_id, log_date DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_luck_calls_user_date ON daily_luck_calls (user_id, call_date DESC);
 CREATE INDEX IF NOT EXISTS idx_push_tokens_user ON push_tokens (user_id);

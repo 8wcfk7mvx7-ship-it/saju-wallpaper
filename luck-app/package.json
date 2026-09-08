@@ -18,6 +18,7 @@
     "@capacitor/local-notifications": "^7.0.7",
     "@capacitor/splash-screen": "^7.0.4",
     "@capacitor/status-bar": "^7.0.4",
+    "@supabase/supabase-js": "^2.116.0",
     "korean-lunar-calendar": "^0.3.6",
     "lunar-typescript": "^1.8.6",
     "next": "16.2.6",
