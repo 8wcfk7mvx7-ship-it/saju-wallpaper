@@ -8,6 +8,7 @@ import { SunPixel, CloudPixel, PouchPixel, CookiePixel, LuckStamp } from "@/comp
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getRandomFortune } from "@/lib/fortuneCookie";
+import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
   getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
@@ -16,7 +17,7 @@ import {
 } from "@/lib/storage";
 
 type Screen = "onboarding" | "edit" | "dashboard";
-type Tab = "today" | "memo" | "log" | "settings";
+type Tab = "today" | "cookie" | "memo" | "log" | "settings";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const [v, setV] = useState(false);
@@ -66,6 +67,7 @@ const GRADE_DOMAINS = [
 const RATING_LABEL: Record<number, string> = { 1: "최악", 2: "별로", 3: "보통", 4: "좋음", 5: "최고" };
 const TABS: { id: Tab; label: string; Icon: typeof CloverIcon }[] = [
   { id: "today", label: "오늘", Icon: CloverIcon },
+  { id: "cookie", label: "쿠키", Icon: CookiePixel },
   { id: "memo", label: "메모", Icon: MemoIcon },
   { id: "log", label: "기록", Icon: ChartIcon },
   { id: "settings", label: "설정", Icon: GearIcon },
@@ -152,6 +154,7 @@ export default function HomePage() {
   const [calledText, setCalledText] = useState("");
   const [showLuckPopup, setShowLuckPopup] = useState(false);
   const [cookieFortune, setCookieFortune] = useState<string | null>(null);
+  const [notifyOn, setNotifyOn] = useState(false);
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
@@ -161,6 +164,7 @@ export default function HomePage() {
     setProfile(p);
     if (p || getSkipOnboarding()) setScreen("dashboard");
     else setScreen("onboarding");
+    setNotifyOn(getMorningNotifyEnabled());
     setReady(true);
   }, []);
 
@@ -228,6 +232,14 @@ export default function HomePage() {
 
   function crackCookie() {
     setCookieFortune((prev) => getRandomFortune(prev ?? undefined));
+  }
+
+  async function toggleMorningNotify() {
+    const result = await setMorningNotifyEnabled(!notifyOn);
+    setNotifyOn(result);
+    if (!notifyOn && !result) {
+      alert("알림을 켜지 못했어요. 기기 알림 권한을 확인해주세요.");
+    }
   }
 
   function finishOnboarding(p: SajuProfile, firstMemo: string) {
@@ -324,6 +336,7 @@ export default function HomePage() {
               </p>
               <h1 className="font-display text-3xl mt-1" style={{ color: "var(--ink)" }}>
                 {tab === "today" && "오늘의 행운"}
+                {tab === "cookie" && "포춘쿠키"}
                 {tab === "memo" && "오늘의 메모"}
                 {tab === "log" && "행운 기록"}
                 {tab === "settings" && "설정"}
@@ -393,40 +406,6 @@ export default function HomePage() {
                   }}>
                   {callSubmitted ? "다시 부르기" : "행운 부르기"}
                 </button>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={55}>
-              <Card>
-                <div className="flex items-center gap-2 mb-2">
-                  <CookiePixel size={26} />
-                  <p className="font-display text-base" style={{ color: "var(--amber)" }}>포춘쿠키</p>
-                </div>
-                {cookieFortune ? (
-                  <>
-                    <p className="text-sm mb-3 leading-relaxed font-display" style={{ color: "var(--ink)" }}>
-                      &ldquo;{cookieFortune}&rdquo;
-                    </p>
-                    <button
-                      onClick={crackCookie}
-                      className="retro-btn w-full py-2.5 text-xs font-bold"
-                      style={{ background: "var(--bg-soft)", color: "var(--ink-soft)" }}>
-                      다시 뽑기
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
-                      쿠키를 열면 오늘의 짧은 포춘 메시지가 나와요.
-                    </p>
-                    <button
-                      onClick={crackCookie}
-                      className="retro-btn font-display w-full py-3 text-sm"
-                      style={{ background: "var(--amber)", color: "#fff" }}>
-                      포춘쿠키 열기
-                    </button>
-                  </>
-                )}
               </Card>
             </FadeIn>
 
@@ -531,6 +510,41 @@ export default function HomePage() {
                 </p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.charmTip}</p>
               </Card>
+            </FadeIn>
+          </div>
+        )}
+
+        {tab === "cookie" && (
+          <div className="mt-6 flex flex-col items-center text-center">
+            <FadeIn>
+              <div className="flex justify-center mb-4 float-leaf">
+                <CookiePixel size={72} />
+              </div>
+              {cookieFortune ? (
+                <>
+                  <p className="font-display text-xl mb-6 leading-relaxed max-w-xs" style={{ color: "var(--ink)" }}>
+                    &ldquo;{cookieFortune}&rdquo;
+                  </p>
+                  <button
+                    onClick={crackCookie}
+                    className="retro-btn font-display px-8 py-3.5 text-base"
+                    style={{ background: "var(--amber)", color: "#fff" }}>
+                    다시 뽑기
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm mb-6 leading-relaxed max-w-xs" style={{ color: "var(--ink-soft)" }}>
+                    쿠키를 열면 오늘의 짧은 포춘 메시지가 나와요. 몇 번이고 다시 열어볼 수 있어요.
+                  </p>
+                  <button
+                    onClick={crackCookie}
+                    className="retro-btn font-display px-8 py-3.5 text-base"
+                    style={{ background: "var(--amber)", color: "#fff" }}>
+                    포춘쿠키 열기
+                  </button>
+                </>
+              )}
             </FadeIn>
           </div>
         )}
@@ -676,6 +690,20 @@ export default function HomePage() {
                     내 사주 정보 삭제
                   </button>
                 )}
+              </Card>
+            </FadeIn>
+            <FadeIn delay={20}>
+              <Card>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>아침 알림</p>
+                <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                  매일 아침 6시에 &ldquo;오늘도 행운을 불러보세요&rdquo; 알림을 보내드려요.
+                </p>
+                <button
+                  onClick={toggleMorningNotify}
+                  className="retro-btn w-full py-3 text-sm font-bold"
+                  style={{ background: notifyOn ? "var(--clover)" : "var(--card)", color: notifyOn ? "#fff" : "var(--ink-soft)" }}>
+                  {notifyOn ? "알림 켜짐 (끄려면 눌러주세요)" : "알림 켜기"}
+                </button>
               </Card>
             </FadeIn>
             <FadeIn delay={40}>
