@@ -296,7 +296,7 @@ export default function HomePage() {
             <CloverIcon size={44} className="mx-auto mb-3 float-leaf" />
             <h1 className="font-display text-2xl" style={{ color: "var(--ink)" }}>내 정보 수정</h1>
             <p className="text-sm mt-2" style={{ color: "var(--ink-soft)" }}>
-              당신의 용신 기운에 맞춘<br />오늘의 행운을 알려드려요.
+              당신의 사주 기운에 맞춘<br />오늘의 행운을 알려드려요.
             </p>
           </div>
           <Card>
@@ -420,7 +420,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-xs mt-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
-                  {luck.todayRelationNote ?? "생년월일을 넣으면 내 용신과 오늘 절기 기운의 상생상극을 따져 나만의 오늘의 행운 컬러·숫자를 볼 수 있어요."}
+                  {luck.todayRelationNote ?? "생년월일을 넣으면 내 사주 기운과 오늘 절기 기운의 상생상극을 따져 나만의 오늘의 행운 컬러·숫자를 볼 수 있어요."}
                 </p>
               </div>
             </FadeIn>

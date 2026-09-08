@@ -113,19 +113,19 @@ interface TodayElementResult {
 // "오늘 하루" 특별히 힘을 주는 오행 하나를 골라낸다.
 function computeTodayElement(term: Element, yongshin: Element, heeshin: Element): TodayElementResult {
   if (term === yongshin) {
-    return { element: yongshin, note: `오늘 기운과 당신의 용신이 같은 ${yongshin} 기운이에요. 하루 종일 든든하게 힘을 받는 날이에요.` };
+    return { element: yongshin, note: `오늘 기운과 당신의 사주 기운이 같은 ${yongshin} 기운이에요. 하루 종일 든든하게 힘을 받는 날이에요.` };
   }
   if (SAENG[term] === yongshin) {
-    return { element: yongshin, note: `오늘 기운(${term})이 당신의 용신(${yongshin})을 생(生)해주는 날이에요. 용신 컬러를 곁들이면 기운이 배가돼요.` };
+    return { element: yongshin, note: `오늘 기운(${term})이 당신의 사주 기운(${yongshin})을 생(生)해주는 날이에요. 이 컬러를 곁들이면 기운이 배가돼요.` };
   }
   if (SAENG[yongshin] === term) {
     return { element: heeshin, note: `오늘은 당신의 기운이 밖으로 많이 흘러나가는(설기) 날이에요. ${heeshin} 컬러로 기운을 채워보세요.` };
   }
   if (GEUK[term] === yongshin) {
-    return { element: heeshin, note: `오늘 기운(${term})이 당신의 용신(${yongshin})을 누르는 날이에요. ${heeshin} 컬러로 방어막을 세워보세요.` };
+    return { element: heeshin, note: `오늘 기운(${term})이 당신의 사주 기운(${yongshin})을 누르는 날이에요. ${heeshin} 컬러로 방어막을 세워보세요.` };
   }
-  // GEUK[yongshin] === term — 남은 유일한 경우: 내 용신이 오늘 기운을 극(剋)함
-  return { element: yongshin, note: `당신의 용신(${yongshin})이 오늘 기운(${term})을 제압하는 날이에요. 자신감 있게 밀고 나가도 좋아요.` };
+  // GEUK[yongshin] === term — 남은 유일한 경우: 내 사주 기운이 오늘 기운을 극(剋)함
+  return { element: yongshin, note: `당신의 사주 기운(${yongshin})이 오늘 기운(${term})을 제압하는 날이에요. 자신감 있게 밀고 나가도 좋아요.` };
 }
 
 export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {

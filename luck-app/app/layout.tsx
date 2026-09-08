@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "행운의 앱",
-  description: "24절기 개운법과 나만의 용신 기운으로 매일 하나씩 알려주는 오늘의 행운, 그리고 나만의 행운 다이어리.",
+  description: "24절기 개운법과 나만의 사주 기운으로 매일 하나씩 알려주는 오늘의 행운, 그리고 나만의 행운 다이어리.",
   manifest: "/manifest.json",
   icons: {
     icon: [
