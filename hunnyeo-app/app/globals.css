@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+/* 훈녀생정 단독 앱은 분홍 배경만 쓴다.
+   아이폰 노치·홈 인디케이터 영역까지 배경이 이어지도록 safe-area 를 둔다. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffd6e8;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
