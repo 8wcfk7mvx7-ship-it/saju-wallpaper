@@ -105,3 +105,5 @@ export const CHECKED_STORAGE_KEY = "hunnyeo_checked_v2";
 export const GUESTBOOK_STORAGE_KEY = "hunnyeo_guestbook_v1";
 export const VISITED_STORAGE_KEY = "hunnyeo_visited_v1";
 export const NICKNAME_STORAGE_KEY = "hunnyeo_nickname_v1";
+export const AVATAR_STORAGE_KEY = "hunnyeo_avatar_v1";
+export const DISCLAIMER_ACK_KEY = "hunnyeo_disclaimer_ack_v1";

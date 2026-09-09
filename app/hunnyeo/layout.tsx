@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Jua, Gaegu } from "next/font/google";
+import HunnyeoIntroPopup from "@/components/HunnyeoIntroPopup";
 
 // 훈녀생정 전용 큐티 서체
 // - Jua: 동글동글한 제목용 고딕
@@ -27,5 +28,11 @@ export const metadata: Metadata = {
 };
 
 export default function HunnyeoLayout({ children }: { children: React.ReactNode }) {
-  return <div className={`${jua.variable} ${gaegu.variable}`}>{children}</div>;
+  return (
+    <div className={`${jua.variable} ${gaegu.variable}`}>
+      {/* 앱을 처음 열었을 때 한 번만 뜨는 안내 팝업 */}
+      <HunnyeoIntroPopup />
+      {children}
+    </div>
+  );
 }

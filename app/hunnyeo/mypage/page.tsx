@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CATEGORIES,
@@ -8,9 +8,11 @@ import {
   TOTAL_POSSIBLE_POINTS,
   CHECKED_STORAGE_KEY,
   NICKNAME_STORAGE_KEY,
+  AVATAR_STORAGE_KEY,
   getLevelInfo,
 } from "@/lib/hunnyeoData";
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
+import { fileToSquareDataUrl } from "@/lib/hunnyeoImage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
@@ -23,11 +25,15 @@ export default function HunnyeoMyPage() {
   const [nickname, setNickname] = useState("완소소녀");
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
+  const [avatar, setAvatar] = useState<string>("");
+  const [photoError, setPhotoError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setNickname(loadJSON(NICKNAME_STORAGE_KEY, "완소소녀"));
+    setAvatar(loadJSON(AVATAR_STORAGE_KEY, ""));
   }, []);
 
   const totalPoints = useMemo(
@@ -43,6 +49,26 @@ export default function HunnyeoMyPage() {
     setNickname(clean);
     saveJSON(NICKNAME_STORAGE_KEY, clean);
     setEditingName(false);
+  }
+
+  async function handlePickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // 같은 파일을 다시 골라도 동작하도록 초기화
+    if (!file) return;
+    setPhotoError("");
+    try {
+      const dataUrl = await fileToSquareDataUrl(file);
+      setAvatar(dataUrl);
+      saveJSON(AVATAR_STORAGE_KEY, dataUrl);
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "사진을 넣지 못했어요.");
+    }
+  }
+
+  function removePhoto() {
+    setAvatar("");
+    saveJSON(AVATAR_STORAGE_KEY, "");
+    setPhotoError("");
   }
 
   function resetProgress() {
@@ -73,12 +99,57 @@ export default function HunnyeoMyPage() {
 
           <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>─── 내 정보 ───</p>
 
-          <div
-            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-2 hn-wiggle"
-            style={{ background: "repeating-linear-gradient(45deg,#ffe3f2 0 8px,#fff6da 8px 16px)", border: "3px solid #ff9ecb" }}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePickPhoto}
+            className="hidden"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="relative w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-2 overflow-hidden"
+            style={{
+              background: "repeating-linear-gradient(45deg,#ffe3f2 0 8px,#fff6da 8px 16px)",
+              border: "3px solid #ff9ecb",
+              boxShadow: "3px 3px 0 #ffd3e6",
+            }}
+            aria-label={avatar ? "프로필 사진 바꾸기" : "앨범에서 프로필 사진 넣기"}
           >
-            <PixelIcon name={info.level.icon} size={44} />
-          </div>
+            {avatar ? (
+              // 사용자가 고른 사진 (localStorage에만 저장되는 data URL)
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatar} alt="내 프로필 사진" className="w-full h-full object-cover" />
+            ) : (
+              <PixelIcon name={info.level.icon} size={46} className="hn-wiggle" />
+            )}
+
+            <span
+              className="absolute bottom-0 left-0 right-0 py-0.5 text-[9px] font-black"
+              style={{ background: "rgba(255,61,154,0.85)", color: "#fff" }}
+            >
+              {avatar ? "사진 바꾸기" : "사진 넣기"}
+            </span>
+          </button>
+
+          {avatar && (
+            <button
+              type="button"
+              onClick={removePhoto}
+              className="text-[10px] font-bold underline mb-1"
+              style={{ color: "#b06a94" }}
+            >
+              사진 지우기
+            </button>
+          )}
+
+          {photoError && (
+            <p className="text-[11px] font-bold mb-1" style={{ color: "#c0392b" }}>{photoError}</p>
+          )}
 
           {editingName ? (
             <div className="flex items-center justify-center gap-2 mb-1">
