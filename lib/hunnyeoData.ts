@@ -24,6 +24,7 @@ import { LIFE_TIPS } from "./hunnyeo/tips-life";
 import { ITEM_TIPS } from "./hunnyeo/tips-item";
 import { WORDS_TIPS } from "./hunnyeo/tips-words";
 import { SPELL_TIPS } from "./hunnyeo/tips-spell";
+import { LOVE_TIPS } from "./hunnyeo/tips-love";
 import type { HunnyeoTip } from "./hunnyeo/types";
 import type { PixelIconName } from "@/components/PixelIcon";
 
@@ -46,6 +47,7 @@ export const TIPS: HunnyeoTip[] = [
   ...ITEM_TIPS,
   ...WORDS_TIPS,
   ...SPELL_TIPS,
+  ...LOVE_TIPS,
 ];
 
 export const TOTAL_POSSIBLE_POINTS = TIPS.reduce((sum, t) => sum + t.points, 0);

@@ -20,7 +20,8 @@ export type HunnyeoCategoryKey =
   | "life"      // 제12장 생활습관
   | "item"      // 제13장 완소템
   | "words"     // 제14장 추억사전
-  | "spell";    // 제15장 글자스킬
+  | "spell"     // 제15장 글자스킬
+  | "love";     // 제16장 애정운
 
 export interface HunnyeoCategory {
   key: HunnyeoCategoryKey;
@@ -49,6 +50,7 @@ export const CATEGORIES: HunnyeoCategory[] = [
   { key: "item",     label: "완소템",      desc: "그 시절 필수 아이템",         icon: "heart",      accent: "#ff5ca8" },
   { key: "words",    label: "추억사전",    desc: "그 시절 말과 유행 이야기",    icon: "book",       accent: "#fbbf24" },
   { key: "spell",    label: "글자스킬",    desc: "공책에 적던 주문, 일명 문자스킬",     icon: "note",       accent: "#d17bd8" },
+  { key: "love",     label: "애정운",      desc: "그 시절 짝사랑 미신 모음",     icon: "letter",     accent: "#f43f5e" },
 ];
 
 export type TipType = "action" | "read";
