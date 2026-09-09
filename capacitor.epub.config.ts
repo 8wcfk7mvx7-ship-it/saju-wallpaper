@@ -1,21 +1,19 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
-// 이펍공장 전용 앱 설정.
-// 메인 사이트 앱(capacitor.config.ts)과 별개의 앱으로 앱스토어에 올리기 위한 것이며,
-// 앱을 켜면 곧바로 이펍공장 화면(/epub-app)이 열린다.
+// 이펍공장 앱 설정. 메인 사이트(Summer Palace)와는 별개의 앱이다.
+//
+// 화면을 앱 안에 넣어서 배포한다(server.url을 쓰지 않는다).
+// 그래서 이 앱은 summerpalace.ai.kr이 살아 있든 말든, 인터넷이 되든 말든 혼자 동작한다.
+// 넣는 내용은 epub-standalone이 만든 단일 파일이며, 맥·윈도우 데스크톱 앱과 같은 것이다.
 //
 // 사용법(맥):
-//   npx cap add ios --config capacitor.epub.config.ts
-//   npx cap sync ios --config capacitor.epub.config.ts
+//   npm run cap:epub -- sync ios      # epub-standalone 빌드 후 실행할 것
+//   npm run cap:epub -- open ios
 const config: CapacitorConfig = {
   appId: "kr.ai.summerpalace.epub",
   appName: "이펍공장",
-  webDir: "public",
-  server: {
-    url: "https://summerpalace.ai.kr/epub-app",
-    cleartext: false,
-    androidScheme: "https",
-  },
+  // 앱에 담을 화면. epub-standalone에서 `npm run build`로 만든다.
+  webDir: "epub-standalone/dist",
   ios: {
     contentInset: "always",
   },
