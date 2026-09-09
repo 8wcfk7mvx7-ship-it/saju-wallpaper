@@ -146,7 +146,7 @@ export default function HunnyeoPage() {
             <div>
               {[0, 1].map(i => (
                 <span key={i} className="text-[11px] font-black" style={{ color: "#c98a00" }}>
-                  밀가루팩 · 봉숭아물 · 황제 다이어트 · L자 다리 · 꿀 입술팩 · 완소템까지 총 {TIPS.length}가지 · 따라 한 만큼 훈녀력이 쌓여요 ·
+                  밀가루팩 · 봉숭아물 · 황제 다이어트 · L자 다리 · 꿀 입술팩 · 글자스킬까지 총 {TIPS.length}가지 · 따라 한 만큼 훈녀력이 쌓여요 ·
                 </span>
               ))}
             </div>
