@@ -9,8 +9,6 @@
 export interface CalorieActivity {
   name: string;
   met: number;
-  /** 그 시절 표에 얽힌 한마디 (없을 수도 있다) */
-  note?: string;
 }
 
 export interface CalorieGroup {
@@ -26,10 +24,10 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
     label: "가만히 있어도",
     accent: "#93c5fd",
     items: [
-      { name: "자기", met: 0.95, note: "누워서 자는 동안에도 몸은 계속 일해요." },
+      { name: "자기", met: 0.95 },
       { name: "텔레비전 보기", met: 1.0 },
-      { name: "껌 씹기", met: 1.2, note: "한 시간에 11kcal쯤 더 쓴다는 연구가 있어요. 껌 한 통 열량과 비슷해요." },
-      { name: "웃기", met: 1.2, note: "많이 웃으면 소모가 20%까지 오른다는 연구가 있어요. 15분에 10~40kcal 정도예요." },
+      { name: "껌 씹기", met: 1.2 },
+      { name: "웃기", met: 1.2 },
       { name: "가만히 서 있기", met: 1.3 },
       { name: "버스·지하철 앉아서 가기", met: 1.3 },
       { name: "책 읽기", met: 1.3 },
@@ -40,7 +38,7 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
       { name: "앉아서 수다 떨기", met: 1.5 },
       { name: "밥 먹기", met: 1.5 },
       { name: "사무실에서 앉아 일하기", met: 1.5 },
-      { name: "앉아서 공부하기", met: 1.8, note: "머리를 쓰는 만큼 앉아만 있는 것보다는 조금 더 써요." },
+      { name: "앉아서 공부하기", met: 1.8 },
     ],
   },
   {
@@ -48,7 +46,7 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
     label: "하루를 보내며",
     accent: "#ff9a6c",
     items: [
-      { name: "노래 부르기", met: 2.0, note: "서서 부를 때예요. 노래방에서 춤까지 추면 훨씬 올라가요." },
+      { name: "노래 부르기", met: 2.0 },
       { name: "서서 지하철 타고 가기", met: 2.0 },
       { name: "아이 안고 서 있기", met: 2.0 },
       { name: "장보기 (카트 밀며)", met: 2.3 },
@@ -60,9 +58,9 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
       { name: "강아지 산책", met: 3.0 },
       { name: "장바구니 들고 걷기", met: 3.5 },
       { name: "계단 내려가기", met: 3.5 },
-      { name: "빠르게 걷기 (6km/h)", met: 5.0, note: "파워워킹이 여기예요." },
+      { name: "빠르게 걷기 (6km/h)", met: 5.0 },
       { name: "노래방에서 춤추며 노래", met: 5.0 },
-      { name: "계단 오르기", met: 8.0, note: "짧게 해도 세요. 한 층만 올라가도 걷기보다 훨씬 많이 써요." },
+      { name: "계단 오르기", met: 8.0 },
     ],
   },
   {
@@ -80,7 +78,7 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
       { name: "청소기 돌리기", met: 3.3 },
       { name: "침구 정리하기", met: 3.3 },
       { name: "손빨래", met: 3.3 },
-      { name: "걸레질·바닥 닦기", met: 3.5, note: "집안일 중에서는 제일 세요." },
+      { name: "걸레질·바닥 닦기", met: 3.5 },
       { name: "화장실 청소", met: 3.5 },
     ],
   },
@@ -100,7 +98,7 @@ export const CALORIE_GROUPS: CalorieGroup[] = [
       { name: "에어로빅", met: 6.5 },
       { name: "자전거 타기", met: 6.8 },
       { name: "달리기 (8km/h)", met: 8.3 },
-      { name: "줄넘기", met: 11.0, note: "시간당으로는 가장 높은 축이에요." },
+      { name: "줄넘기", met: 11.0 },
     ],
   },
 ];

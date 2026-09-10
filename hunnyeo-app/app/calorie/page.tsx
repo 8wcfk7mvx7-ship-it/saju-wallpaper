@@ -125,11 +125,6 @@ export default function CaloriePage() {
                         style={{ width: `${ratio * 100}%`, background: group.accent }}
                       />
                     </div>
-                    {item.note && (
-                      <p className="text-[11px] font-bold mt-1" style={{ color: "#a8869a" }}>
-                        {item.note}
-                      </p>
-                    )}
                   </li>
                 );
               })}
@@ -175,8 +170,7 @@ export default function CaloriePage() {
             <li>· 소모 열량 = MET(활동 강도) × 몸무게(kg) × 시간</li>
             <li>· MET 값은 활동별 강도를 정리한 국제 자료를 따랐어요.</li>
             <li>· 나이·근육량·숙련도에 따라 실제로는 15%쯤 차이가 날 수 있어요.</li>
-            <li>· 껌 씹기와 웃기는 실제로 연구가 있어서 함께 넣었어요. 다만 하루치로 보면 아주 작은 양이에요.</li>
-            <li>· 몇 분 만에 끝나는 일(이 닦기·샤워 등)은 시간을 채울 수 없어 표에서 뺐어요.</li>
+            <li>· 껌 씹기는 시간당 11kcal, 웃기는 소모가 20%까지 오른다는 연구를 따랐어요.</li>
           </ul>
         </div>
       </section>
