@@ -33,7 +33,7 @@ The app is completely free with no in-app purchases, no subscriptions, no
 external payment links, and no advertising SDKs of any kind.
 
 NATIVE FEATURES
-Beyond the archive itself the app provides: full-text search across all 227
+Beyond the archive itself the app provides: full-text search across all 259
 entries, favourites, a daily rotating pick, a random draw, a "remaining only"
 filter, haptic feedback on completion, an opt-in daily local notification
 (scheduled on-device, no server), adjustable text size, a shareable
