@@ -144,7 +144,7 @@ export default function CaloriePage() {
             먹은 것과 견주면
           </h2>
           <p className="text-[11.5px] font-bold mb-3" style={{ color: "#a8869a" }}>
-            그 시절 표에는 늘 이 비교가 같이 붙어 있었어요.
+            얼마나 움직여야 되돌릴 수 있는지 견주어 보세요.
           </p>
           <ul className="space-y-1.5">
             {FOOD_COMPARE.map(f => (
@@ -175,7 +175,7 @@ export default function CaloriePage() {
             <li>· MET 값은 활동별 강도를 정리한 국제 자료를 따랐어요.</li>
             <li>· 나이·근육량·숙련도에 따라 실제로는 15%쯤 차이가 날 수 있어요.</li>
             <li>· 껌 씹기와 웃기는 실제로 연구가 있어서 함께 넣었어요. 다만 하루치로 보면 아주 작은 양이에요.</li>
-            <li>· 그 시절 표에는 근거 없이 크게 부풀린 숫자도 섞여 있었어요. 여기 값은 그렇게 하지 않았어요.</li>
+            <li>· 몇 분 만에 끝나는 일(이 닦기·샤워 등)은 시간을 채울 수 없어 표에서 뺐어요.</li>
           </ul>
         </div>
       </section>
