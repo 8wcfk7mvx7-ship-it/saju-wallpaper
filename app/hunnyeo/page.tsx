@@ -205,6 +205,26 @@ export default function HunnyeoPage() {
         <HunnyeoScoreBar points={totalPoints} />
       </header>
 
+      {/* 칼로리표 — 그 시절 잡지에 꼭 있던 그 표 */}
+      <section className="max-w-2xl mx-auto px-4 mt-3">
+        <button
+          onClick={() => router.push("/hunnyeo/calorie")}
+          className="hn-box w-full p-3.5 flex items-center gap-3 text-left"
+          style={{ borderColor: "#f97316", boxShadow: "4px 4px 0 #fed7aa" }}
+        >
+          <PixelIcon name="flame" size={30} />
+          <span className="flex-1">
+            <span className="hn-cute text-[15px] block" style={{ color: "#c2410c" }}>
+              행동별 칼로리표
+            </span>
+            <span className="text-[11.5px] font-bold" style={{ color: "#7a6070" }}>
+              책 읽기도, 노래 부르기도 칼로리가 있어요
+            </span>
+          </span>
+          <span className="text-[15px] font-black shrink-0" style={{ color: "#f97316" }}>▶</span>
+        </button>
+      </section>
+
       <div className="flex justify-center gap-1.5 my-4">
         {[0, 1, 2].map(i => (
           <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
