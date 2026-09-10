@@ -7,7 +7,6 @@ import {
   FAVORITE_STORAGE_KEY,
   STREAK_STORAGE_KEY,
   CHECKED_STORAGE_KEY,
-  VISITED_STORAGE_KEY,
 } from "@/lib/hunnyeoData";
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
@@ -41,8 +40,6 @@ export default function HunnyeoPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("loading");
   const [progress, setProgress] = useState(0);
-  const [visitTotal, setVisitTotal] = useState(38471);
-  const [visitToday, setVisitToday] = useState(48);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [favorite, setFavorite] = useState<Record<string, boolean>>({});
   const [drawn, setDrawn] = useState<HunnyeoTip | null>(null);
@@ -67,9 +64,6 @@ export default function HunnyeoPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setFavorite(loadJSON(FAVORITE_STORAGE_KEY, {} as Record<string, boolean>));
-    if (loadJSON<boolean>(VISITED_STORAGE_KEY, false)) {
-      setVisitTotal(v => v + Math.floor(Math.random() * 30));
-    }
     setStreak(updateStreak());
   }, []);
 
@@ -89,9 +83,6 @@ export default function HunnyeoPage() {
   }
 
   function handleEnter() {
-    localStorage.setItem(VISITED_STORAGE_KEY, "true");
-    setVisitTotal(v => v + 1);
-    setVisitToday(v => v + 1);
     setStep("menu");
   }
 
@@ -180,10 +171,10 @@ export default function HunnyeoPage() {
 
           <div className="mx-auto mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "#1a1a1a", border: "2px solid #666" }}>
             <span className="text-[10px] font-black" style={{ color: "#4ade80", fontFamily: "monospace" }}>
-              TODAY {String(visitToday).padStart(5, "0")}
+              STREAK {String(streak).padStart(3, "0")}일
             </span>
             <span className="text-[10px] font-black" style={{ color: "#facc15", fontFamily: "monospace" }}>
-              TOTAL {String(visitTotal).padStart(7, "0")}
+              POINT {String(totalPoints).padStart(5, "0")}
             </span>
           </div>
 
