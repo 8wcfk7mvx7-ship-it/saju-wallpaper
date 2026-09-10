@@ -5,7 +5,7 @@ export const WORDS_TIPS: HunnyeoTip[] = [
   {
     id: "words-wannso",
     category: "words",
-    title: "'완소'는 무슨 뜻일까요",
+    title: "'완소'의 뜻",
     steps: [
       "완소는 '완전 소중'을 줄인 말이에요.",
       "2000년대 초반 한 프로게이머의 팬들이 쓰던 응원 문구에서 퍼졌다는 이야기가 전해져요.",
@@ -19,7 +19,7 @@ export const WORDS_TIPS: HunnyeoTip[] = [
   {
     id: "words-hunnyeo",
     category: "words",
-    title: "'훈녀생정'은 무슨 뜻일까요",
+    title: "'훈녀생정'의 뜻",
     steps: [
       "훈녀생정은 '훈훈한 여자 생활정보'를 줄인 말이에요.",
       "2000년대 중반, 학생들이 블로그와 카페에 올리던 미용·생활 팁 모음을 부르던 이름이에요.",

@@ -25,6 +25,7 @@ import { ITEM_TIPS } from "./hunnyeo/tips-item";
 import { WORDS_TIPS } from "./hunnyeo/tips-words";
 import { SPELL_TIPS } from "./hunnyeo/tips-spell";
 import { LOVE_TIPS } from "./hunnyeo/tips-love";
+import { WORKOUT_TIPS } from "./hunnyeo/tips-workout";
 import type { HunnyeoTip } from "./hunnyeo/types";
 import type { PixelIconName } from "@/components/PixelIcon";
 
@@ -48,6 +49,7 @@ export const TIPS: HunnyeoTip[] = [
   ...WORDS_TIPS,
   ...SPELL_TIPS,
   ...LOVE_TIPS,
+  ...WORKOUT_TIPS,
 ];
 
 export const TOTAL_POSSIBLE_POINTS = TIPS.reduce((sum, t) => sum + t.points, 0);
@@ -111,3 +113,5 @@ export const VISITED_STORAGE_KEY = "hunnyeo_visited_v1";
 export const NICKNAME_STORAGE_KEY = "hunnyeo_nickname_v1";
 export const AVATAR_STORAGE_KEY = "hunnyeo_avatar_v1";
 export const DISCLAIMER_ACK_KEY = "hunnyeo_disclaimer_ack_v1";
+export const FAVORITE_STORAGE_KEY = "hunnyeo_favorite_v1";
+export const STREAK_STORAGE_KEY = "hunnyeo_streak_v1";

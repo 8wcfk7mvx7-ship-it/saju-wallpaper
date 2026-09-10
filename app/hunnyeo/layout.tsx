@@ -24,7 +24,7 @@ const gaegu = Gaegu({
 export const metadata: Metadata = {
   title: "훈녀생정 — 90년대생 추억 뷰티 노트",
   description:
-    "밀가루팩, 봉숭아물 들이기, 덴마크 다이어트까지. 2000년대 '훈훈한 여자 생활정보'를 모은 추억 콘텐츠입니다.",
+    "밀가루팩, 봉숭아물 들이기, 빌리의 부트캠프까지. 2000년대 '훈훈한 여자 생활정보'를 모은 추억 콘텐츠예요.",
 };
 
 export default function HunnyeoLayout({ children }: { children: React.ReactNode }) {
