@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES, TIPS, CHECKED_STORAGE_KEY, type HunnyeoCategoryKey } from "@/lib/hunnyeoData";
+import { CATEGORIES, TIPS, CHECKED_STORAGE_KEY, FAVORITE_STORAGE_KEY, type HunnyeoCategoryKey } from "@/lib/hunnyeoData";
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
+import { tapFeedback, successFeedback } from "@/lib/hunnyeoHaptics";
 
 export default function CategoryView({ category }: { category: HunnyeoCategoryKey }) {
   const router = useRouter();
@@ -15,10 +16,13 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
 
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [justChecked, setJustChecked] = useState<string | null>(null);
+  const [favorite, setFavorite] = useState<Record<string, boolean>>({});
+  const [onlyTodo, setOnlyTodo] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
+    setFavorite(loadJSON(FAVORITE_STORAGE_KEY, {} as Record<string, boolean>));
   }, []);
 
   useEffect(() => {
@@ -32,6 +36,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
     [checked]
   );
   const doneCount = tips.filter(t => checked[t.id]).length;
+  const visibleTips = onlyTodo ? tips.filter(t => !checked[t.id]) : tips;
 
   function toggleCheck(id: string) {
     setChecked(prev => {
@@ -39,9 +44,23 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
       const next = { ...prev, [id]: willCheck };
       saveJSON(CHECKED_STORAGE_KEY, next);
       if (willCheck) {
+        // 이 체크로 장이 다 채워지면 축하 쪽 진동을 준다.
+        const allDone = tips.every(t => (t.id === id ? true : next[t.id]));
+        if (allDone) successFeedback();
+        else tapFeedback();
         setJustChecked(id);
         setTimeout(() => setJustChecked(cur => (cur === id ? null : cur)), 1200);
       }
+      return next;
+    });
+  }
+
+  function toggleFavorite(id: string) {
+    tapFeedback();
+    setFavorite(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      if (!next[id]) delete next[id];
+      saveJSON(FAVORITE_STORAGE_KEY, next);
       return next;
     });
   }
@@ -77,14 +96,40 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
         ))}
       </div>
 
+      {/* 남은 것만 보기 */}
+      <div className="max-w-2xl mx-auto px-4 mb-3 flex justify-end">
+        <button
+          onClick={() => setOnlyTodo(v => !v)}
+          className={`hn-btn px-3 py-1.5 text-[11px] ${onlyTodo ? "hn-btn-on" : ""}`}
+          aria-pressed={onlyTodo}
+        >
+          <span className="flex items-center gap-1">
+            <PixelIcon name={onlyTodo ? "check" : "box"} size={12} />
+            {onlyTodo ? "남은 것만 보는 중" : "남은 것만 보기"}
+          </span>
+        </button>
+      </div>
+
       <div className="max-w-2xl mx-auto px-4 space-y-4">
-        {tips.map((tip, idx) => {
+        {visibleTips.length === 0 && (
+          <div className="hn-box p-6 text-center">
+            <PixelIcon name="crown" size={30} className="hn-float" />
+            <p className="hn-cute text-[16px] mt-2" style={{ color: "#c9186d" }}>
+              이 장은 다 했어요!
+            </p>
+            <p className="text-[12px] font-bold mt-1" style={{ color: "#b08aa0" }}>
+              다른 장도 채우러 가볼까요?
+            </p>
+          </div>
+        )}
+        {visibleTips.map((tip, idx) => {
           const isChecked = !!checked[tip.id];
           const actionLabel = tip.type === "read" ? "읽었어요" : "따라했어요";
           return (
             <article
               key={tip.id}
-              className="hn-box hn-glitter p-4 relative"
+              id={tip.id}
+              className="hn-box hn-glitter p-4 relative scroll-mt-4"
               style={{
                 borderColor: cat.accent,
                 boxShadow: `4px 4px 0 ${cat.accent}55`,
@@ -105,9 +150,23 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
                 >
                   {idx + 1}
                 </span>
-                <h2 className="hn-cute text-[17px] leading-snug" style={{ color: "#c9186d" }}>
+                <h2 className="hn-cute text-[17px] leading-snug flex-1" style={{ color: "#c9186d" }}>
                   {tip.title}
                 </h2>
+                <button
+                  type="button"
+                  onClick={() => toggleFavorite(tip.id)}
+                  className="shrink-0 p-1 -mt-1"
+                  aria-label={favorite[tip.id] ? "찜 해제" : "찜하기"}
+                  aria-pressed={!!favorite[tip.id]}
+                >
+                  <PixelIcon
+                    name="heart"
+                    size={17}
+                    style={{ opacity: favorite[tip.id] ? 1 : 0.22 }}
+                    className={favorite[tip.id] ? "hn-pop" : ""}
+                  />
+                </button>
               </div>
 
               {/* 준비물 */}

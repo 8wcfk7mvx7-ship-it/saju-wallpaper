@@ -18,6 +18,7 @@ import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
 import { HunnyeoDisclaimerBox } from "@/components/HunnyeoDisclaimer";
+import { exportRecord, importRecord } from "@/lib/hunnyeoBackup";
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -27,6 +28,9 @@ export default function HunnyeoMyPage() {
   const [nameDraft, setNameDraft] = useState("");
   const [avatar, setAvatar] = useState<string>("");
   const [photoError, setPhotoError] = useState("");
+  const [backupCode, setBackupCode] = useState("");
+  const [restoreInput, setRestoreInput] = useState("");
+  const [backupMsg, setBackupMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -75,6 +79,31 @@ export default function HunnyeoMyPage() {
     if (!confirm("훈녀력을 정말 초기화할까요? 체크했던 기록이 모두 사라져요.")) return;
     setChecked({});
     saveJSON(CHECKED_STORAGE_KEY, {});
+  }
+
+  // ── 백업 / 복원 ─────────────────────────────────────────────────────
+  function makeBackupCode() {
+    setBackupCode(exportRecord());
+    setBackupMsg("");
+  }
+
+  async function copyBackupCode() {
+    try {
+      await navigator.clipboard.writeText(backupCode);
+      setBackupMsg("복사했어요. 메모장에 붙여 두세요.");
+    } catch {
+      setBackupMsg("길게 눌러서 직접 복사해 주세요.");
+    }
+  }
+
+  function restoreFromCode() {
+    const result = importRecord(restoreInput);
+    setBackupMsg(result.message);
+    if (result.ok) {
+      setRestoreInput("");
+      // 되살린 기록이 화면에 바로 보이도록 다시 읽어 온다.
+      setTimeout(() => window.location.reload(), 700);
+    }
   }
 
   return (
@@ -286,6 +315,75 @@ export default function HunnyeoMyPage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* 기록 옮기기 */}
+      <div className="max-w-2xl mx-auto px-4 mt-4">
+        <div className="hn-box p-4">
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+            <PixelIcon name="floppy" size={15} /> 기록 옮기기
+          </h3>
+          <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
+            기록은 이 기기에만 저장돼요. 폰을 바꾸기 전에 코드를 뽑아 두면 그대로 옮길 수 있어요.
+          </p>
+
+          <button onClick={makeBackupCode} className="hn-btn w-full py-2.5 text-[12px] mb-2">
+            <span className="flex items-center justify-center gap-1.5">
+              <PixelIcon name="note" size={13} /> 백업 코드 만들기
+            </span>
+          </button>
+
+          {backupCode && (
+            <div className="mb-3">
+              <textarea
+                readOnly
+                value={backupCode}
+                onFocus={e => e.currentTarget.select()}
+                rows={3}
+                className="w-full text-[10px] font-mono p-2 rounded-xl resize-none"
+                style={{ background: "#fff8fb", border: "2px dashed #ffb3d8", color: "#8a6c7d" }}
+                aria-label="백업 코드"
+              />
+              <button onClick={copyBackupCode} className="hn-btn hn-btn-on w-full py-2 text-[12px] mt-1.5">
+                코드 복사하기
+              </button>
+            </div>
+          )}
+
+          <details>
+            <summary className="text-[12px] font-black cursor-pointer py-1" style={{ color: "#c9186d" }}>
+              코드로 되살리기
+            </summary>
+            <div className="mt-2">
+              <textarea
+                value={restoreInput}
+                onChange={e => setRestoreInput(e.target.value)}
+                rows={3}
+                placeholder="백업 코드를 붙여 넣으세요"
+                className="w-full text-[11px] p-2 rounded-xl resize-none font-bold"
+                style={{ background: "#fff", border: "2px solid #ffd0e6", color: "#8a6c7d" }}
+                aria-label="복원할 백업 코드"
+              />
+              <button
+                onClick={restoreFromCode}
+                disabled={!restoreInput.trim()}
+                className="hn-btn w-full py-2 text-[12px] mt-1.5"
+                style={{ opacity: restoreInput.trim() ? 1 : 0.45 }}
+              >
+                되살리기
+              </button>
+              <p className="text-[10.5px] font-bold mt-1.5" style={{ color: "#c0392b" }}>
+                되살리면 지금 기록은 코드의 내용으로 바뀌어요.
+              </p>
+            </div>
+          </details>
+
+          {backupMsg && (
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+              {backupMsg}
+            </p>
           )}
         </div>
       </div>

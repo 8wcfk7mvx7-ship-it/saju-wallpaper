@@ -5,6 +5,8 @@ import {
   CATEGORIES,
   TIPS,
   GUESTBOOK_SEED,
+  FAVORITE_STORAGE_KEY,
+  STREAK_STORAGE_KEY,
   CHECKED_STORAGE_KEY,
   GUESTBOOK_STORAGE_KEY,
   VISITED_STORAGE_KEY,
@@ -15,8 +17,28 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
+import HunnyeoTipCard from "@/components/HunnyeoTipCard";
+import { getTodayTip, getRandomTip, todayKey } from "@/lib/hunnyeoPick";
+import { tapFeedback } from "@/lib/hunnyeoHaptics";
+import type { HunnyeoTip } from "@/lib/hunnyeoData";
 
 type Step = "loading" | "splash" | "menu";
+
+// 며칠째 이어서 열었는지 센다. 어제 열었으면 +1, 하루라도 걸렀으면 1부터 다시.
+// 컴포넌트 상태를 쓰지 않으므로 바깥에 둔다.
+function updateStreak(): number {
+  const today = todayKey();
+  const saved = loadJSON<{ last: string; count: number }>(STREAK_STORAGE_KEY, {
+    last: "",
+    count: 0,
+  });
+  if (saved.last === today) return saved.count || 1;
+
+  const yesterday = todayKey(new Date(Date.now() - 86400000));
+  const count = saved.last === yesterday ? saved.count + 1 : 1;
+  saveJSON(STREAK_STORAGE_KEY, { last: today, count });
+  return count;
+}
 
 export default function HunnyeoPage() {
   const router = useRouter();
@@ -28,6 +50,9 @@ export default function HunnyeoPage() {
   const [guestbook, setGuestbook] = useState<GuestbookEntry[]>(GUESTBOOK_SEED);
   const [gbName, setGbName] = useState("");
   const [gbMsg, setGbMsg] = useState("");
+  const [favorite, setFavorite] = useState<Record<string, boolean>>({});
+  const [drawn, setDrawn] = useState<HunnyeoTip | null>(null);
+  const [streak, setStreak] = useState(1);
 
   useEffect(() => {
     if (step !== "loading") return;
@@ -48,10 +73,27 @@ export default function HunnyeoPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setGuestbook(loadJSON(GUESTBOOK_STORAGE_KEY, GUESTBOOK_SEED));
+    setFavorite(loadJSON(FAVORITE_STORAGE_KEY, {} as Record<string, boolean>));
     if (loadJSON<boolean>(VISITED_STORAGE_KEY, false)) {
       setVisitTotal(v => v + Math.floor(Math.random() * 30));
     }
+    setStreak(updateStreak());
   }, []);
+
+  function drawRandom() {
+    tapFeedback();
+    setDrawn(prev => getRandomTip(prev?.id));
+  }
+
+  function toggleFavorite(id: string) {
+    tapFeedback();
+    setFavorite(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      if (!next[id]) delete next[id];
+      saveJSON(FAVORITE_STORAGE_KEY, next);
+      return next;
+    });
+  }
 
   function handleEnter() {
     localStorage.setItem(VISITED_STORAGE_KEY, "true");
@@ -82,6 +124,8 @@ export default function HunnyeoPage() {
   );
 
   const tiles = CATEGORIES.filter(c => c.key !== "all");
+  // 날짜가 씨앗이라 하루 동안은 같은 항목이 나온다.
+  const todayTip = useMemo(() => getTodayTip(), []);
 
   // ── 로딩 화면 ─────────────────────────────────────────────────────────
   if (step === "loading") {
@@ -181,7 +225,9 @@ export default function HunnyeoPage() {
         <PixelFall />
 
       <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
-        <span className="hn-sticker text-[10px]">훈녀생정</span>
+        <button onClick={() => router.push("/search")} className="hn-btn px-3 py-1.5 text-[11px]">
+          <PixelIcon name="eye" size={13} /> 찾아보기
+        </button>
         <button onClick={() => router.push("/mypage")} className="hn-btn px-3 py-1.5 text-[11px]">
 <PixelIcon name="user" size={13} /> 내 정보
         </button>
@@ -195,12 +241,47 @@ export default function HunnyeoPage() {
         </div>
         <h1 className="text-4xl font-black mb-1 hn-title">훈녀생정</h1>
         <p className="hn-cute text-[12px] mb-3" style={{ color: "#ff6fb5" }}>
-오늘은 뭘 해볼까요?
+          {streak > 1 ? `${streak}일째 들르고 있어요!` : "오늘은 뭘 해볼까요?"}
         </p>
         <HunnyeoScoreBar points={totalPoints} />
       </header>
 
-      <div className="flex justify-center gap-1.5 my-4">
+      {/* 오늘의 생정 — 날마다 하나씩 바뀐다 */}
+      <section className="max-w-2xl mx-auto px-4 mt-5">
+        <p className="hn-cute text-[13px] mb-2 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <PixelIcon name="star" size={15} className="hn-twinkle" /> 오늘의 생정
+        </p>
+        <HunnyeoTipCard
+          tip={todayTip}
+          done={!!checked[todayTip.id]}
+          favorite={!!favorite[todayTip.id]}
+          onToggleFavorite={() => toggleFavorite(todayTip.id)}
+          onClick={() => router.push(`/${todayTip.category}/`)}
+        />
+      </section>
+
+      {/* 뽑기 — 뭘 볼지 모르겠을 때 */}
+      <section className="max-w-2xl mx-auto px-4 mt-4">
+        <button onClick={drawRandom} className="hn-btn w-full py-2.5 text-[13px]">
+          <span className="flex items-center justify-center gap-1.5">
+            <PixelIcon name="polish" size={14} className={drawn ? "hn-wiggle" : ""} />
+            {drawn ? "다시 뽑기" : "아무거나 뽑기"}
+          </span>
+        </button>
+        {drawn && (
+          <div className="mt-3 hn-pop">
+            <HunnyeoTipCard
+              tip={drawn}
+              done={!!checked[drawn.id]}
+              favorite={!!favorite[drawn.id]}
+              onToggleFavorite={() => toggleFavorite(drawn.id)}
+              onClick={() => router.push(`/${drawn.category}/`)}
+            />
+          </div>
+        )}
+      </section>
+
+      <div className="flex justify-center gap-1.5 my-5">
         {[0, 1, 2].map(i => (
           <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
         ))}
