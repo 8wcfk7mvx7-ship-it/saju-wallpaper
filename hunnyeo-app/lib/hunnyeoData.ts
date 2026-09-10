@@ -90,25 +90,8 @@ export function getLevelInfo(points: number): LevelInfo {
   return { index, level, next, progress, pointsToNext: Math.max(0, next.min - points) };
 }
 
-// ── 방명록 초기 시드 ──────────────────────────────────────────────────────
-export interface GuestbookEntry {
-  id: string;
-  name: string;
-  message: string;
-  date: string;
-}
-
-export const GUESTBOOK_SEED: GuestbookEntry[] = [
-  { id: "gb1", name: "달빛소녀", message: "봉숭아물 들이던 여름밤이 생각나요. 첫눈까지 남았었는지는 기억이 안 나네요.", date: "2026.09.01" },
-  { id: "gb2", name: "삐삐머리", message: "밀가루팩 하다가 엄마한테 혼났던 기억이 나요. 반가운 목록이에요.", date: "2026.09.02" },
-  { id: "gb3", name: "옆가르마", message: "얼짱 각도 설명 보고 옛날 사진첩을 열어봤어요.", date: "2026.09.03" },
-  { id: "gb4", name: "완소완소", message: "완소라는 말 진짜 오랜만에 봐요. 그때 친구들 생각이 나네요.", date: "2026.09.04" },
-  { id: "gb5", name: "덴마크실패", message: "황제 다이어트 하다가 셋째 날에 밥 한 공기 먹고 울었던 사람 저요.", date: "2026.09.05" },
-];
-
 // ── 로컬 저장 키 ──────────────────────────────────────────────────────────
 export const CHECKED_STORAGE_KEY = "hunnyeo_checked_v2";
-export const GUESTBOOK_STORAGE_KEY = "hunnyeo_guestbook_v1";
 export const VISITED_STORAGE_KEY = "hunnyeo_visited_v1";
 export const NICKNAME_STORAGE_KEY = "hunnyeo_nickname_v1";
 export const AVATAR_STORAGE_KEY = "hunnyeo_avatar_v1";

@@ -4,13 +4,10 @@ import { useRouter } from "next/navigation";
 import {
   CATEGORIES,
   TIPS,
-  GUESTBOOK_SEED,
   FAVORITE_STORAGE_KEY,
   STREAK_STORAGE_KEY,
   CHECKED_STORAGE_KEY,
-  GUESTBOOK_STORAGE_KEY,
   VISITED_STORAGE_KEY,
-  type GuestbookEntry,
 } from "@/lib/hunnyeoData";
 import { loadJSON, saveJSON } from "@/lib/hunnyeoStorage";
 import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
@@ -47,9 +44,6 @@ export default function HunnyeoPage() {
   const [visitTotal, setVisitTotal] = useState(38471);
   const [visitToday, setVisitToday] = useState(48);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [guestbook, setGuestbook] = useState<GuestbookEntry[]>(GUESTBOOK_SEED);
-  const [gbName, setGbName] = useState("");
-  const [gbMsg, setGbMsg] = useState("");
   const [favorite, setFavorite] = useState<Record<string, boolean>>({});
   const [drawn, setDrawn] = useState<HunnyeoTip | null>(null);
   const [streak, setStreak] = useState(1);
@@ -72,7 +66,6 @@ export default function HunnyeoPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
-    setGuestbook(loadJSON(GUESTBOOK_STORAGE_KEY, GUESTBOOK_SEED));
     setFavorite(loadJSON(FAVORITE_STORAGE_KEY, {} as Record<string, boolean>));
     if (loadJSON<boolean>(VISITED_STORAGE_KEY, false)) {
       setVisitTotal(v => v + Math.floor(Math.random() * 30));
@@ -100,22 +93,6 @@ export default function HunnyeoPage() {
     setVisitTotal(v => v + 1);
     setVisitToday(v => v + 1);
     setStep("menu");
-  }
-
-  function submitGuestbook(e: React.FormEvent) {
-    e.preventDefault();
-    if (!gbName.trim() || !gbMsg.trim()) return;
-    const entry: GuestbookEntry = {
-      id: `gb-${Date.now()}`,
-      name: gbName.trim().slice(0, 12),
-      message: gbMsg.trim().slice(0, 200),
-      date: new Date().toISOString().slice(0, 10).replace(/-/g, "."),
-    };
-    const next = [entry, ...guestbook];
-    setGuestbook(next);
-    saveJSON(GUESTBOOK_STORAGE_KEY, next);
-    setGbName("");
-    setGbMsg("");
   }
 
   const totalPoints = useMemo(
@@ -363,56 +340,6 @@ export default function HunnyeoPage() {
         {[0, 1, 2].map(i => (
           <PixelIcon key={i} name="heart" size={12} style={{ opacity: 0.55 }} />
         ))}
-      </div>
-
-      {/* 방명록 */}
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="hn-box hn-box-p p-4">
-          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
-            <PixelIcon name="note" size={15} /> 방명록
-          </h3>
-          <p className="text-[11px] font-bold mb-3" style={{ color: "#9375b8" }}>흔적을 남겨주세요</p>
-
-          <form onSubmit={submitGuestbook} className="space-y-2 mb-4">
-            <input
-              value={gbName}
-              onChange={e => setGbName(e.target.value)}
-              placeholder="이름"
-              maxLength={12}
-              className="w-full rounded-lg px-3 py-2 text-xs font-bold outline-none"
-              style={{ border: "2px solid #ddd0ff", color: "#4b2e63" }}
-            />
-            <textarea
-              value={gbMsg}
-              onChange={e => setGbMsg(e.target.value)}
-              placeholder="한마디 남겨주세요"
-              rows={2}
-              maxLength={200}
-              className="w-full rounded-lg px-3 py-2 text-xs font-bold outline-none resize-none"
-              style={{ border: "2px solid #ddd0ff", color: "#4b2e63" }}
-            />
-            <button
-              type="submit"
-              disabled={!gbName.trim() || !gbMsg.trim()}
-              className="hn-btn w-full py-2 text-xs disabled:opacity-40"
-              style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}
-            >
-남기기
-            </button>
-          </form>
-
-          <div className="space-y-2 max-h-80 overflow-y-auto scrollbar-none">
-            {guestbook.map(g => (
-              <div key={g.id} className="rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-xs font-black" style={{ color: "#7c3aed" }}>{g.name}</span>
-                  <span className="text-[10px] font-bold" style={{ color: "#c4b5fd" }}>{g.date}</span>
-                </div>
-                <p className="text-[13px] font-bold" style={{ color: "#57406b" }}>{g.message}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <p className="text-center text-[10px] mt-6 px-6 font-bold" style={{ color: "#c093ac" }}>
