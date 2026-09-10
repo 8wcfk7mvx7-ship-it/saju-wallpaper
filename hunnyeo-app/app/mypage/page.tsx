@@ -19,6 +19,19 @@ import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
 import { HunnyeoDisclaimerBox } from "@/components/HunnyeoDisclaimer";
 import { exportRecord, importRecord } from "@/lib/hunnyeoBackup";
+import { drawShareCard, shareCard } from "@/lib/hunnyeoShare";
+import { notificationsAvailable, enableDailyReminder, disableDailyReminder } from "@/lib/hunnyeoNotify";
+import { tapFeedback } from "@/lib/hunnyeoHaptics";
+
+const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
+const REMINDER_KEY = "hunnyeo_reminder_v1";
+type TextSize = "normal" | "large" | "xlarge";
+
+// 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다.
+function applyTextSize(size: TextSize) {
+  if (size === "normal") document.documentElement.removeAttribute("data-hn-text");
+  else document.documentElement.setAttribute("data-hn-text", size);
+}
 
 export default function HunnyeoMyPage() {
   const router = useRouter();
@@ -32,12 +45,24 @@ export default function HunnyeoMyPage() {
   const [restoreInput, setRestoreInput] = useState("");
   const [backupMsg, setBackupMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cardUrl, setCardUrl] = useState("");
+  const [cardMsg, setCardMsg] = useState("");
+  const [textSize, setTextSize] = useState<TextSize>("normal");
+  const [canNotify, setCanNotify] = useState(false);
+  const [reminderOn, setReminderOn] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setNickname(loadJSON(NICKNAME_STORAGE_KEY, "완소소녀"));
     setAvatar(loadJSON(AVATAR_STORAGE_KEY, ""));
+
+    const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "normal");
+    setTextSize(size);
+    applyTextSize(size);
+
+    setReminderOn(loadJSON<boolean>(REMINDER_KEY, false));
+    void notificationsAvailable().then(setCanNotify);
   }, []);
 
   const totalPoints = useMemo(
@@ -79,6 +104,50 @@ export default function HunnyeoMyPage() {
     if (!confirm("훈녀력을 정말 초기화할까요? 체크했던 기록이 모두 사라져요.")) return;
     setChecked({});
     saveJSON(CHECKED_STORAGE_KEY, {});
+  }
+
+  // ── 자랑 카드 ───────────────────────────────────────────────────────
+  function makeCard() {
+    tapFeedback();
+    try {
+      setCardUrl(drawShareCard({ nickname, info, points: totalPoints, doneCount: checkedTips.length }));
+      setCardMsg("");
+    } catch {
+      setCardMsg("이미지를 만들지 못했어요.");
+    }
+  }
+
+  async function handleShare() {
+    if (!cardUrl) return;
+    const outcome = await shareCard(cardUrl);
+    setCardMsg(
+      outcome === "shared" ? "공유창을 열었어요."
+      : outcome === "downloaded" ? "이미지를 내려받았어요."
+      : "이미지를 길게 눌러 저장해 주세요."
+    );
+  }
+
+  // ── 글자 크기 ───────────────────────────────────────────────────────
+  function changeTextSize(size: TextSize) {
+    tapFeedback();
+    setTextSize(size);
+    applyTextSize(size);
+    saveJSON(TEXT_SIZE_KEY, size);
+  }
+
+  // ── 하루 한 번 알림 ─────────────────────────────────────────────────
+  async function toggleReminder() {
+    tapFeedback();
+    if (reminderOn) {
+      await disableDailyReminder();
+      setReminderOn(false);
+      saveJSON(REMINDER_KEY, false);
+      return;
+    }
+    const ok = await enableDailyReminder(20, 0);
+    setReminderOn(ok);
+    saveJSON(REMINDER_KEY, ok);
+    if (!ok) setCardMsg("알림 권한이 꺼져 있어요. 설정에서 켜 주세요.");
   }
 
   // ── 백업 / 복원 ─────────────────────────────────────────────────────
@@ -315,6 +384,98 @@ export default function HunnyeoMyPage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* 자랑 카드 */}
+      <div className="max-w-2xl mx-auto px-4 mt-4">
+        <div className="hn-box hn-glitter p-4">
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+            <PixelIcon name="camera" size={15} /> 훈녀력 자랑하기
+          </h3>
+          <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
+            지금 등급을 그림 한 장으로 만들어요. 친구에게 보내거나 사진첩에 남겨 두세요.
+          </p>
+
+          {!cardUrl ? (
+            <button onClick={makeCard} className="hn-btn hn-btn-on w-full py-2.5 text-[13px]">
+              <span className="flex items-center justify-center gap-1.5">
+                <PixelIcon name="sparkle" size={13} /> 카드 만들기
+              </span>
+            </button>
+          ) : (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 캔버스로 만든 데이터 URL 이라 next/image 를 쓸 수 없다 */}
+              <img
+                src={cardUrl}
+                alt="나의 훈녀력 카드"
+                className="w-full rounded-2xl mb-2"
+                style={{ border: "3px solid #ffb3d8" }}
+              />
+              <div className="flex gap-2">
+                <button onClick={handleShare} className="hn-btn hn-btn-on flex-1 py-2.5 text-[12px]">
+                  공유 / 저장
+                </button>
+                <button onClick={makeCard} className="hn-btn px-4 py-2.5 text-[12px]">
+                  다시
+                </button>
+              </div>
+              <p className="text-[10.5px] font-bold mt-2 text-center" style={{ color: "#b08aa0" }}>
+                저장이 안 되면 그림을 길게 눌러 보세요
+              </p>
+            </>
+          )}
+
+          {cardMsg && (
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+              {cardMsg}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* 설정 */}
+      <div className="max-w-2xl mx-auto px-4 mt-4">
+        <div className="hn-box p-4">
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+            <PixelIcon name="comb" size={15} /> 설정
+          </h3>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자 크기</p>
+          <div className="flex gap-2 mb-4">
+            {([
+              ["normal", "보통"],
+              ["large", "크게"],
+              ["xlarge", "더 크게"],
+            ] as const).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => changeTextSize(key)}
+                className={`hn-btn flex-1 py-2 text-[12px] ${textSize === key ? "hn-btn-on" : ""}`}
+                aria-pressed={textSize === key}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>하루 한 번 알림</p>
+          {canNotify ? (
+            <button
+              onClick={toggleReminder}
+              className={`hn-btn w-full py-2.5 text-[12px] ${reminderOn ? "hn-btn-on" : ""}`}
+              aria-pressed={reminderOn}
+            >
+              <span className="flex items-center justify-center gap-1.5">
+                <PixelIcon name={reminderOn ? "check" : "box"} size={13} />
+                {reminderOn ? "저녁 8시에 알려드려요" : "오늘의 생정 알림 받기"}
+              </span>
+            </button>
+          ) : (
+            <p className="text-[11.5px] font-bold" style={{ color: "#b08aa0" }}>
+              알림은 앱으로 열었을 때만 켤 수 있어요.
+            </p>
           )}
         </div>
       </div>

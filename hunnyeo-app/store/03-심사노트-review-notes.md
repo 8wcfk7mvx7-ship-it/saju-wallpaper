@@ -28,9 +28,17 @@ bundled in the app binary. Please feel free to test it in Airplane Mode - every
 screen works. Nothing is sent to any server, and no analytics or ad SDKs are
 included.
 
-NO PURCHASES
-The app is completely free with no in-app purchases, subscriptions, or external
-payment links of any kind.
+NO PURCHASES, NO ADS
+The app is completely free with no in-app purchases, no subscriptions, no
+external payment links, and no advertising SDKs of any kind.
+
+NATIVE FEATURES
+Beyond the archive itself the app provides: full-text search across all 227
+entries, favourites, a daily rotating pick, a random draw, a "remaining only"
+filter, haptic feedback on completion, an opt-in daily local notification
+(scheduled on-device, no server), adjustable text size, a shareable
+achievement card rendered on-device and passed to the system share sheet, and
+an export/import code so records survive a device change.
 
 
 ABOUT THE CONTENT (please read)
@@ -91,7 +99,7 @@ please let us know and we will translate the specific entry.
 
 | 사유 | 대응 |
 |---|---|
-| **4.2 Minimum Functionality** — 콘텐츠 목록 앱이라 단순하다고 볼 경우 | 오프라인 동작, 진행률·등급 시스템, 프로필 사진 지정, 직접 그린 도트 아이콘 30종을 근거로 회신. 그래도 막히면 위젯이나 알림 같은 네이티브 기능을 추가 |
+| **4.2 Minimum Functionality** — 콘텐츠 목록 앱이라 단순하다고 볼 경우 | 오프라인 동작, 검색, 찜, 오늘의 생정, 자랑 카드(시스템 공유 시트), 로컬 알림, 햅틱, 글자 크기, 기록 내보내기/불러오기, 진행률·등급, 직접 그린 도트 아이콘 30종을 근거로 회신 |
 | **1.4.1 Physical Harm** — 다이어트 콘텐츠 | 위 심사 노트의 안전장치 목록을 그대로 회신. 최초 팝업 스크린샷을 첨부하면 효과적 |
 | **2.1 App Completeness** — 앱이 비어 보인다 | 심사자가 표지 화면에서 "들어가기 ▶" 를 못 눌렀을 가능성. 진입 방법을 안내 |
 | **5.1.1 Privacy Policy** | 개인정보처리방침 URL 이 실제로 열리는지 확인. 접속 안 되면 바로 리젝 |
