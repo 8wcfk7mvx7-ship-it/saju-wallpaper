@@ -169,15 +169,6 @@ export default function HunnyeoPage() {
             그 시절 관리법 <b style={{ color: "#ff2b8d" }}>{TIPS.length}가지</b>를 모았어요
           </div>
 
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "#1a1a1a", border: "2px solid #666" }}>
-            <span className="text-[10px] font-black" style={{ color: "#4ade80", fontFamily: "monospace" }}>
-              STREAK {String(streak).padStart(3, "0")}일
-            </span>
-            <span className="text-[10px] font-black" style={{ color: "#facc15", fontFamily: "monospace" }}>
-              POINT {String(totalPoints).padStart(5, "0")}
-            </span>
-          </div>
-
           <button onClick={handleEnter} className="hn-btn hn-btn-on w-full py-3.5 text-base">
 들어가기 ▶
           </button>
