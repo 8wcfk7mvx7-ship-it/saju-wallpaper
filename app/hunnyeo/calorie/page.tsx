@@ -7,8 +7,7 @@ import { pageStyle, RETRO_CSS } from "@/lib/hunnyeoTheme";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
 
-// 그 시절 잡지에 실리던 칼로리표. 다만 종이와 달리 체중과 시간을 바꾸면
-// 값이 바로 다시 계산된다. 계산은 전부 기기에서 하고 서버를 쓰지 않는다.
+// 체중과 시간을 바꾸면 값이 바로 다시 계산된다. 계산은 전부 기기에서 하고 서버를 쓰지 않는다.
 
 const WEIGHT_KEY = "hunnyeo_weight_v1";
 const MINUTES = [10, 30, 60] as const;

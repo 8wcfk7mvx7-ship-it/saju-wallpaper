@@ -4,7 +4,7 @@ import HunnyeoIntroPopup from "@/components/HunnyeoIntroPopup";
 
 // 훈녀생정 전용 큐티 서체
 // - Jua: 동글동글한 제목용 고딕
-// - Gaegu: 손글씨 느낌의 본문용 서체 (그 시절 다이어리 감성)
+// - Gaegu: 손글씨 느낌의 본문용 서체
 const jua = Jua({
   weight: "400",
   subsets: ["latin"],

@@ -258,7 +258,7 @@ export default function HunnyeoPage() {
         )}
       </section>
 
-      {/* 칼로리표 — 그 시절 잡지에 꼭 있던 그 표 */}
+      {/* 칼로리표 입구 */}
       <section className="max-w-2xl mx-auto px-4 mt-3">
         <button
           onClick={() => router.push("/calorie")}

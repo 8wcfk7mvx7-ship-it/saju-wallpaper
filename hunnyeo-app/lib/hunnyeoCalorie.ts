@@ -1,6 +1,4 @@
 // ── 행동별 칼로리 소모표 ──────────────────────────────────────────────────
-// 그 시절 잡지와 카페에 꼭 하나씩 있던 "이것만 해도 몇 칼로리!" 표.
-//
 // 값은 지어내지 않고 MET(대사당량)에서 계산한다.
 //   소모 열량(kcal) = MET × 체중(kg) × 시간(h)
 // MET 는 미국 Compendium of Physical Activities 의 값을 따랐다.
@@ -110,7 +108,6 @@ export function burnedKcal(met: number, weightKg: number, hours: number): number
   return Math.round(raw / 5) * 5;
 }
 
-/** 그 시절 표에 흔히 붙어 있던 비교 기준 */
 export const FOOD_COMPARE: { name: string; kcal: number }[] = [
   { name: "라면 한 봉지", kcal: 500 },
   { name: "떡볶이 1인분", kcal: 450 },
