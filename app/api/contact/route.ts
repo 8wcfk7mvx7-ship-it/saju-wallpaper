@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createNotionInquiry } from "@/lib/notion";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,8 @@ export async function POST(req: NextRequest) {
     if (message.trim().length < 5) {
       return NextResponse.json({ error: "문의 내용이 너무 짧습니다" }, { status: 400 });
     }
+
+    await createNotionInquiry({ name, email, message });
 
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!process.env.RESEND_API_KEY || !adminEmail) {

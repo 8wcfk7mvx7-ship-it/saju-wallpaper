@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { confirmTossPayment } from "@/lib/toss";
 import { sendReceiptEmail, sendAdminNotification } from "@/lib/resend";
+import { createNotionPayment } from "@/lib/notion";
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL;
@@ -49,6 +50,15 @@ export async function POST(req: NextRequest) {
     }
 
     await sendAdminNotification(orderId, Number(amount), productName || "분석");
+
+    await createNotionPayment({
+      orderId,
+      amount: Number(amount),
+      productName: productName || "Summer Palace 분석",
+      customerName: customerName || "고객",
+      customerEmail,
+      method: isStarpiece ? "별조각" : "토스",
+    });
 
     return NextResponse.json({ success: true, payment: result });
   } catch (e: unknown) {
