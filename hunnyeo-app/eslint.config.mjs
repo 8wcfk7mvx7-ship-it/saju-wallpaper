@@ -5,15 +5,13 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
+    "ios/**",
+    "android/**",
     "next-env.d.ts",
-    // 훈녀생정 단독 앱은 자체 eslint 설정으로 따로 검사한다
-    "hunnyeo-app/**",
   ]),
 ]);
 
