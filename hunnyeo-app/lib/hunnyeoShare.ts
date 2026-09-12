@@ -164,6 +164,44 @@ function dataUrlToBlob(dataUrl: string): Blob {
   return new Blob([bytes], { type: mime });
 }
 
+// TODO: 앱스토어 심사 통과 후 실제 앱 링크로 바꿔주세요.
+const APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
+
+/** 앱 자체를 친구에게 추천한다. 카드 공유와 달리 내 기록이 아니라 앱 링크를 보낸다. */
+export async function shareApp(): Promise<ShareOutcome> {
+  const text = "그 시절 추억 뷰티 정보 모음, 훈녀생정 한번 해봐!";
+
+  try {
+    const cap = await import("@capacitor/core");
+    if (cap.Capacitor.isNativePlatform()) {
+      const { Share } = await import("@capacitor/share");
+      await Share.share({ title: "훈녀생정", text, url: APP_STORE_URL });
+      return "shared";
+    }
+  } catch {
+    // 아래 웹 방식으로 넘어간다
+  }
+
+  try {
+    const nav = navigator as Navigator & {
+      share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+    };
+    if (nav.share) {
+      await nav.share({ title: "훈녀생정", text, url: APP_STORE_URL });
+      return "shared";
+    }
+  } catch {
+    // 아래 복사로 넘어간다
+  }
+
+  try {
+    await navigator.clipboard.writeText(`${text} ${APP_STORE_URL}`);
+    return "downloaded";
+  } catch {
+    return "longpress";
+  }
+}
+
 export type ShareOutcome = "shared" | "downloaded" | "longpress";
 
 /**

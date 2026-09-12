@@ -21,20 +21,21 @@ export async function notificationsAvailable(): Promise<boolean> {
 }
 
 /** 매일 정해진 시각에 한 번. 권한이 거절되면 false 를 돌려준다. */
-export async function enableDailyReminder(hour = 20, minute = 0): Promise<boolean> {
+export async function enableDailyReminder(hour = 20, minute = 0, nickname = ""): Promise<boolean> {
   const plugin = await getPlugin();
   if (!plugin) return false;
 
   const permission = await plugin.requestPermissions();
   if (permission.display !== "granted") return false;
 
+  const greeting = nickname ? `${nickname}님, ` : "";
   await plugin.cancel({ notifications: [{ id: NOTIFY_ID }] });
   await plugin.schedule({
     notifications: [
       {
         id: NOTIFY_ID,
         title: "오늘의 생정이 왔어요",
-        body: "오늘은 뭘 해볼까요? 훈녀력을 채워봐요.",
+        body: `${greeting}오늘은 뭘 해볼까요? 훈녀력을 채워봐요.`,
         schedule: { on: { hour, minute }, allowWhileIdle: true },
       },
     ],

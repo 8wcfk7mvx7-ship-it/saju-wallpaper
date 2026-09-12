@@ -11,6 +11,7 @@
     "android": "npm run sync && cap open android"
   },
   "dependencies": {
+    "@capacitor-community/in-app-review": "^7.1.0",
     "@capacitor/android": "^7.4.4",
     "@capacitor/core": "^7.4.4",
     "@capacitor/filesystem": "^7.1.8",

@@ -8,6 +8,7 @@ import HunnyeoScoreBar from "@/components/HunnyeoScoreBar";
 import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
 import { tapFeedback, successFeedback } from "@/lib/hunnyeoHaptics";
+import { maybeRequestReview } from "@/lib/hunnyeoReview";
 
 export default function CategoryView({ category }: { category: HunnyeoCategoryKey }) {
   const router = useRouter();
@@ -46,8 +47,12 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
       if (willCheck) {
         // 이 체크로 장이 다 채워지면 축하 쪽 진동을 준다.
         const allDone = tips.every(t => (t.id === id ? true : next[t.id]));
-        if (allDone) successFeedback();
-        else tapFeedback();
+        if (allDone) {
+          successFeedback();
+          void maybeRequestReview();
+        } else {
+          tapFeedback();
+        }
         setJustChecked(id);
         setTimeout(() => setJustChecked(cur => (cur === id ? null : cur)), 1200);
       }

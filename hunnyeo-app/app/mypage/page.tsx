@@ -19,13 +19,26 @@ import PixelIcon from "@/components/PixelIcon";
 import PixelFall from "@/components/PixelFall";
 import { HunnyeoDisclaimerBox } from "@/components/HunnyeoDisclaimer";
 import { exportRecord, importRecord } from "@/lib/hunnyeoBackup";
-import { drawShareCard, shareCard } from "@/lib/hunnyeoShare";
+import { drawShareCard, shareCard, shareApp } from "@/lib/hunnyeoShare";
 import { notificationsAvailable, enableDailyReminder, disableDailyReminder } from "@/lib/hunnyeoNotify";
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
 const REMINDER_KEY = "hunnyeo_reminder_v1";
+const REMINDER_TIME_KEY = "hunnyeo_reminder_time_v1";
 type TextSize = "normal" | "large" | "xlarge";
+
+interface ReminderTime {
+  hour: number;
+  minute: number;
+}
+
+const REMINDER_PRESETS: { label: string; time: ReminderTime }[] = [
+  { label: "아침 9시", time: { hour: 9, minute: 0 } },
+  { label: "점심 1시", time: { hour: 13, minute: 0 } },
+  { label: "저녁 8시", time: { hour: 20, minute: 0 } },
+  { label: "밤 10시", time: { hour: 22, minute: 0 } },
+];
 
 // 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다.
 function applyTextSize(size: TextSize) {
@@ -50,6 +63,7 @@ export default function HunnyeoMyPage() {
   const [textSize, setTextSize] = useState<TextSize>("normal");
   const [canNotify, setCanNotify] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
+  const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[2].time);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
@@ -62,6 +76,7 @@ export default function HunnyeoMyPage() {
     applyTextSize(size);
 
     setReminderOn(loadJSON<boolean>(REMINDER_KEY, false));
+    setReminderTime(loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[2].time));
     void notificationsAvailable().then(setCanNotify);
   }, []);
 
@@ -127,6 +142,16 @@ export default function HunnyeoMyPage() {
     );
   }
 
+  async function handleShareApp() {
+    tapFeedback();
+    const outcome = await shareApp();
+    setCardMsg(
+      outcome === "shared" ? "공유창을 열었어요."
+      : outcome === "downloaded" ? "추천 문구를 복사했어요."
+      : "공유가 안 되면 화면을 길게 눌러 보세요."
+    );
+  }
+
   // ── 글자 크기 ───────────────────────────────────────────────────────
   function changeTextSize(size: TextSize) {
     tapFeedback();
@@ -144,10 +169,17 @@ export default function HunnyeoMyPage() {
       saveJSON(REMINDER_KEY, false);
       return;
     }
-    const ok = await enableDailyReminder(20, 0);
+    const ok = await enableDailyReminder(reminderTime.hour, reminderTime.minute, nickname);
     setReminderOn(ok);
     saveJSON(REMINDER_KEY, ok);
     if (!ok) setCardMsg("알림 권한이 꺼져 있어요. 설정에서 켜 주세요.");
+  }
+
+  async function changeReminderTime(time: ReminderTime) {
+    tapFeedback();
+    setReminderTime(time);
+    saveJSON(REMINDER_TIME_KEY, time);
+    if (reminderOn) await enableDailyReminder(time.hour, time.minute, nickname);
   }
 
   // ── 백업 / 복원 ─────────────────────────────────────────────────────
@@ -427,6 +459,12 @@ export default function HunnyeoMyPage() {
             </>
           )}
 
+          <button onClick={handleShareApp} className="hn-btn w-full py-2.5 text-[12px] mt-2.5">
+            <span className="flex items-center justify-center gap-1.5">
+              <PixelIcon name="heart" size={13} /> 친구에게 추천하기
+            </span>
+          </button>
+
           {cardMsg && (
             <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
               {cardMsg}
@@ -462,16 +500,35 @@ export default function HunnyeoMyPage() {
 
           <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>하루 한 번 알림</p>
           {canNotify ? (
-            <button
-              onClick={toggleReminder}
-              className={`hn-btn w-full py-2.5 text-[12px] ${reminderOn ? "hn-btn-on" : ""}`}
-              aria-pressed={reminderOn}
-            >
-              <span className="flex items-center justify-center gap-1.5">
-                <PixelIcon name={reminderOn ? "check" : "box"} size={13} />
-                {reminderOn ? "저녁 8시에 알려드려요" : "오늘의 생정 알림 받기"}
-              </span>
-            </button>
+            <>
+              <div className="grid grid-cols-4 gap-1.5 mb-2">
+                {REMINDER_PRESETS.map(({ label, time }) => {
+                  const active = reminderTime.hour === time.hour && reminderTime.minute === time.minute;
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => changeReminderTime(time)}
+                      className={`hn-btn py-2 text-[10.5px] ${active ? "hn-btn-on" : ""}`}
+                      aria-pressed={active}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={toggleReminder}
+                className={`hn-btn w-full py-2.5 text-[12px] ${reminderOn ? "hn-btn-on" : ""}`}
+                aria-pressed={reminderOn}
+              >
+                <span className="flex items-center justify-center gap-1.5">
+                  <PixelIcon name={reminderOn ? "check" : "box"} size={13} />
+                  {reminderOn
+                    ? `${REMINDER_PRESETS.find(p => p.time.hour === reminderTime.hour && p.time.minute === reminderTime.minute)?.label ?? "정해진 시각"}에 알려드려요`
+                    : "오늘의 생정 알림 받기"}
+                </span>
+              </button>
+            </>
           ) : (
             <p className="text-[11.5px] font-bold" style={{ color: "#b08aa0" }}>
               알림은 앱으로 열었을 때만 켤 수 있어요.

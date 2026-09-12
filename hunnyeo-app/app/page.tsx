@@ -16,9 +16,14 @@ import PixelFall from "@/components/PixelFall";
 import HunnyeoTipCard from "@/components/HunnyeoTipCard";
 import { getTodayTip, getRandomTip, todayKey } from "@/lib/hunnyeoPick";
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
+import { maybeRequestReview } from "@/lib/hunnyeoReview";
 import type { HunnyeoTip } from "@/lib/hunnyeoData";
 
 type Step = "loading" | "splash" | "menu";
+
+// 처음 열 때만 접속 연출을 보여준다. 재방문마다 1.8초씩 기다리게 하면
+// 매번 켤 때의 부담만 커지고 재미는 딱 한 번뿐이라 그렇다.
+const OPENED_BEFORE_KEY = "hunnyeo_opened_before_v1";
 
 // 며칠째 이어서 열었는지 센다. 어제 열었으면 +1, 하루라도 걸렀으면 1부터 다시.
 // 컴포넌트 상태를 쓰지 않으므로 바깥에 둔다.
@@ -62,9 +67,13 @@ export default function HunnyeoPage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
+    if (loadJSON(OPENED_BEFORE_KEY, false)) setStep("splash");
+    else saveJSON(OPENED_BEFORE_KEY, true);
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
     setFavorite(loadJSON(FAVORITE_STORAGE_KEY, {} as Record<string, boolean>));
-    setStreak(updateStreak());
+    const days = updateStreak();
+    setStreak(days);
+    if (days === 3 || days === 7) void maybeRequestReview();
   }, []);
 
   function drawRandom() {
