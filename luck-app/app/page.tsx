@@ -534,7 +534,9 @@ export default function HomePage() {
               <Card>
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--clover)" }}>오늘의 개운법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>{luck.ganwoonTip}</p>
-                <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.actionOfDay}</p>
+                {luck.actionOfDay.map((tip, i) => (
+                  <p key={i} className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{tip}</p>
+                ))}
                 <Perforation />
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.aegmagiTip}</p>

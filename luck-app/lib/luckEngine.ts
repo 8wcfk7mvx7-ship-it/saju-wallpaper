@@ -26,7 +26,9 @@ export interface DailyLuck {
   todayColorHex: string;
   todayNumbers: [number, number];
   todayRelationNote?: string; // 용신 정보가 있을 때만 채워짐(생년월일 없으면 undefined)
-  actionOfDay: string; // "하루 한 줄 개운법" — 매일 하나씩 결정적으로 뽑히는 짧은 개운법 (lib/ganwoonOneLiners.ts)
+  // "하루 한 줄 개운법" — 매일 결정적으로 뽑히는 짧은 개운법 (lib/ganwoonOneLiners.ts).
+  // 보통 하루에 1개지만, 아주 간단한 개운법끼리는 같은 날에 2개를 함께 보여주기도 한다.
+  actionOfDay: string[];
   // 애정운·금전운·직장운 S~D 등급 — 생년월일이 있어야 나만의 등급으로 개인화됨
   dailyGrades: DailyGrades;
 }
@@ -110,9 +112,11 @@ export function getDailyLuck(opts: DailyLuckOptions = {}): DailyLuck {
   const month = Number(mStr), day = Number(dStr);
   // 윤년은 항상 4의 배수라 연도를 그대로 나머지 연산하면 짝수만 나와 절대 골고루 안 뽑힘 —
   // 4로 나눈 몫으로 나머지 연산해야 윤년이 돌아올 때마다(4년 간격) 실제로 번갈아 뽑힌다.
-  const actionOfDay = month === 2 && day === 29
+  const rawAction = month === 2 && day === 29
     ? LEAP_DAY_ONE_LINERS[Math.floor(Number(yStr) / 4) % LEAP_DAY_ONE_LINERS.length]
     : GANWOON_ONE_LINERS[fixedDayIndex(month, day) % GANWOON_ONE_LINERS.length];
+  // 슬롯 하나에 짧은 개운법 2개를 묶어둔 날도 있어서(lib/ganwoonOneLiners.ts), 배열로 통일한다.
+  const actionOfDay = Array.isArray(rawAction) ? rawAction : [rawAction];
 
   let personalColor: string | undefined;
   let personalColorHex: string | undefined;
