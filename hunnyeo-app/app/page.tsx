@@ -293,13 +293,15 @@ export default function HunnyeoPage() {
                 background: `linear-gradient(#fff 55%, ${c.accent}1f)`,
               }}
             >
-              {/* 비뚤게 붙인 스티커 */}
-              <span
-                className={`hn-sticker absolute -top-2.5 -left-2 ${complete ? "hn-blink" : ""}`}
-                style={{ borderColor: c.accent, color: complete ? "#c9186d" : "#d4348a" }}
-              >
-                {complete ? "올클리어!" : started ? "하는중" : `제${idx + 1}장`}
-              </span>
+              {/* 비뚤게 붙인 스티커 — 진행 상태가 있을 때만 보여준다 */}
+              {(complete || started) && (
+                <span
+                  className={`hn-sticker absolute -top-2.5 -left-2 ${complete ? "hn-blink" : ""}`}
+                  style={{ borderColor: c.accent, color: complete ? "#c9186d" : "#d4348a" }}
+                >
+                  {complete ? "올클리어!" : "하는중"}
+                </span>
+              )}
 
               <PixelIcon
                 name={c.icon}
