@@ -22,6 +22,8 @@ import { exportRecord, importRecord } from "@/lib/hunnyeoBackup";
 import { drawShareCard, shareCard, shareApp } from "@/lib/hunnyeoShare";
 import { notificationsAvailable, enableDailyReminder, disableDailyReminder } from "@/lib/hunnyeoNotify";
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
+import { authAvailable, signInWithApple, signInWithGoogle, signOutEverywhere, currentUser, type HunnyeoUser } from "@/lib/hunnyeoAuth";
+import { pullAndMergeRecord } from "@/lib/hunnyeoSync";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
 const REMINDER_KEY = "hunnyeo_reminder_v1";
@@ -64,6 +66,10 @@ export default function HunnyeoMyPage() {
   const [canNotify, setCanNotify] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
   const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[2].time);
+  const [canUseAuth, setCanUseAuth] = useState(false);
+  const [authUser, setAuthUser] = useState<HunnyeoUser | null>(null);
+  const [authMsg, setAuthMsg] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
@@ -78,6 +84,10 @@ export default function HunnyeoMyPage() {
     setReminderOn(loadJSON<boolean>(REMINDER_KEY, false));
     setReminderTime(loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[2].time));
     void notificationsAvailable().then(setCanNotify);
+    void authAvailable().then(async available => {
+      setCanUseAuth(available);
+      if (available) setAuthUser(await currentUser());
+    });
   }, []);
 
   const totalPoints = useMemo(
@@ -180,6 +190,65 @@ export default function HunnyeoMyPage() {
     setReminderTime(time);
     saveJSON(REMINDER_TIME_KEY, time);
     if (reminderOn) await enableDailyReminder(time.hour, time.minute, nickname);
+  }
+
+  // ── 로그인 · 기기 동기화 ─────────────────────────────────────────────
+  async function afterLogin(user: HunnyeoUser | null) {
+    if (!user) return;
+    setAuthUser(user);
+    setSyncing(true);
+    try {
+      await pullAndMergeRecord(user.id);
+      setAuthMsg("다른 기기 기록과 합쳤어요. 화면을 새로 열게요.");
+      setTimeout(() => window.location.reload(), 800);
+    } catch {
+      setAuthMsg("동기화에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  async function handleAppleLogin() {
+    tapFeedback();
+    setAuthMsg("");
+    try {
+      await afterLogin(await signInWithApple());
+    } catch {
+      setAuthMsg("애플 로그인에 실패했어요.");
+    }
+  }
+
+  async function handleGoogleLogin() {
+    tapFeedback();
+    setAuthMsg("");
+    try {
+      await afterLogin(await signInWithGoogle());
+    } catch {
+      setAuthMsg("구글 로그인에 실패했어요.");
+    }
+  }
+
+  async function handleLogout() {
+    tapFeedback();
+    await signOutEverywhere();
+    setAuthUser(null);
+    setAuthMsg("로그아웃했어요. 기록은 이 기기에 그대로 남아있어요.");
+  }
+
+  async function handleManualSync() {
+    if (!authUser) return;
+    tapFeedback();
+    setSyncing(true);
+    setAuthMsg("");
+    try {
+      await pullAndMergeRecord(authUser.id);
+      setAuthMsg("동기화됐어요. 화면을 새로 열게요.");
+      setTimeout(() => window.location.reload(), 800);
+    } catch {
+      setAuthMsg("동기화에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setSyncing(false);
+    }
   }
 
   // ── 백업 / 복원 ─────────────────────────────────────────────────────
@@ -536,6 +605,51 @@ export default function HunnyeoMyPage() {
           )}
         </div>
       </div>
+
+      {/* 로그인 · 기기 동기화 */}
+      {canUseAuth && (
+        <div className="max-w-2xl mx-auto px-4 mt-4">
+          <div className="hn-box p-4">
+            <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+              <PixelIcon name="star" size={15} /> 로그인 · 기기 동기화
+            </h3>
+            <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
+              로그인 안 해도 기록은 이 기기에 그대로 저장돼요. 로그인하면 폰을 바꾸거나 다른 기기에서 열어도 기록이 이어져요.
+            </p>
+
+            {authUser ? (
+              <>
+                <p className="text-[12px] font-black mb-2" style={{ color: "#57406b" }}>
+                  {authUser.name ?? authUser.email ?? "로그인됨"}
+                </p>
+                <div className="flex gap-2">
+                  <button onClick={handleManualSync} disabled={syncing} className="hn-btn hn-btn-on flex-1 py-2.5 text-[12px]" style={{ opacity: syncing ? 0.6 : 1 }}>
+                    {syncing ? "동기화 중..." : "지금 동기화"}
+                  </button>
+                  <button onClick={handleLogout} className="hn-btn px-4 py-2.5 text-[12px]">
+                    로그아웃
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <button onClick={handleAppleLogin} disabled={syncing} className="hn-btn flex-1 py-2.5 text-[12px]" style={{ opacity: syncing ? 0.6 : 1 }}>
+                  🍎 Apple로 로그인
+                </button>
+                <button onClick={handleGoogleLogin} disabled={syncing} className="hn-btn flex-1 py-2.5 text-[12px]" style={{ opacity: syncing ? 0.6 : 1 }}>
+                  Google로 로그인
+                </button>
+              </div>
+            )}
+
+            {authMsg && (
+              <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+                {authMsg}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 기록 옮기기 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">

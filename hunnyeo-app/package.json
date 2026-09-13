@@ -11,6 +11,7 @@
     "android": "npm run sync && cap open android"
   },
   "dependencies": {
+    "@capacitor-community/apple-sign-in": "^7.1.0",
     "@capacitor-community/in-app-review": "^7.1.0",
     "@capacitor/android": "^7.4.4",
     "@capacitor/core": "^7.4.4",
@@ -21,6 +22,8 @@
     "@capacitor/share": "^7.0.4",
     "@capacitor/splash-screen": "^7.0.4",
     "@capacitor/status-bar": "^7.0.4",
+    "@southdevs/capacitor-google-auth": "^7.0.0",
+    "@supabase/supabase-js": "^2.116.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
