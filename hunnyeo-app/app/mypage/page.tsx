@@ -439,7 +439,7 @@ export default function HunnyeoMyPage() {
               return (
                 <button
                   key={c.key}
-                  onClick={() => router.push(`/hunnyeo/${c.key}`)}
+                  onClick={() => router.push(`/${c.key}/`)}
                   className="w-full text-left rounded-xl px-3 py-2.5"
                   style={{ background: "#fdfafc", border: `2px dotted ${c.accent}77` }}
                 >

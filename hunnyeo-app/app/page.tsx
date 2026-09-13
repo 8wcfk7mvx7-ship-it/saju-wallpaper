@@ -285,7 +285,7 @@ export default function HunnyeoPage() {
           return (
             <button
               key={c.key}
-              onClick={() => router.push(`/hunnyeo/${c.key}`)}
+              onClick={() => router.push(`/${c.key}/`)}
               className="hn-box hn-glitter p-3 pt-5 text-center relative"
               style={{
                 borderColor: c.accent,
