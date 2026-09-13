@@ -68,7 +68,7 @@ export const WORDS_TIPS: HunnyeoTip[] = [
       "일촌평과 파도타기라는 말도 이때 생겼어요.",
     ],
     effect: "그 시절 인터넷 생활의 풍경이 떠올라요.",
-    tags: ["미니홈피", "도토리", "그시절인터넷"],
+    tags: ["미니홈피", "도토리", "옛날인터넷"],
     points: 5,
     type: "read",
   },

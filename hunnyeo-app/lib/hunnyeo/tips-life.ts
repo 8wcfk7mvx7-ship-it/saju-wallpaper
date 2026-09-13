@@ -232,7 +232,7 @@ export const LIFE_TIPS: HunnyeoTip[] = [
       "스티커는 다 쓴 날에만 붙여요.",
     ],
     effect: "기분이 정리되고 그 시절 다이어리 감성도 되살아나요.",
-    tags: ["다이어리", "한줄", "그시절"],
+    tags: ["다이어리", "한줄", "추억"],
     points: 6,
     type: "action",
   },

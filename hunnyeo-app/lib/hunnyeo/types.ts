@@ -22,7 +22,7 @@ export type HunnyeoCategoryKey =
   | "words"     // 제14장 추억사전
   | "spell"     // 제15장 글자스킬
   | "love"      // 제16장 애정운
-  | "workout";  // 제17장 그시절운동
+  | "workout";  // 제17장 레트로운동
 
 export interface HunnyeoCategory {
   key: HunnyeoCategoryKey;
@@ -52,7 +52,7 @@ export const CATEGORIES: HunnyeoCategory[] = [
   { key: "words",    label: "추억사전",    desc: "그 시절 말과 유행 이야기",    icon: "book",       accent: "#fbbf24" },
   { key: "spell",    label: "글자스킬",    desc: "공책에 적던 주문, 일명 문자스킬",     icon: "note",       accent: "#d17bd8" },
   { key: "love",     label: "애정운",      desc: "그 시절 짝사랑 미신 모음",     icon: "letter",     accent: "#f43f5e" },
-  { key: "workout",  label: "그시절운동",  desc: "빌리·이소라·파워워킹",         icon: "dumbbell",   accent: "#16a34a" },
+  { key: "workout",  label: "레트로운동",  desc: "빌리·이소라·파워워킹",         icon: "dumbbell",   accent: "#16a34a" },
 ];
 
 export type TipType = "action" | "read";

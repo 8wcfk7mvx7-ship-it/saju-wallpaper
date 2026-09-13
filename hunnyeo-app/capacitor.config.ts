@@ -31,7 +31,7 @@ const config: CapacitorConfig = {
       splashImmersive: false,
     },
     StatusBar: {
-      style: "LIGHT", // 밝은 배경 위의 어두운 글씨
+      style: "DARK", // 밝은 분홍 배경 위에 어두운 글씨(시계·배터리)가 보이게
       backgroundColor: "#ffd6e8",
       overlaysWebView: false,
     },

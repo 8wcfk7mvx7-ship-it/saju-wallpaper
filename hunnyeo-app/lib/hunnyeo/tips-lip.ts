@@ -91,7 +91,7 @@ export const LIP_TIPS: HunnyeoTip[] = [
     ],
     effect: "내 입술색에 맞는 촉촉한 립글로스를 만들 수 있어요.",
     caution: "직접 불에 올려 녹이지 마세요. 따뜻한 물에 중탕하는 정도가 안전해요.",
-    tags: ["만들기", "그시절", "립글로스"],
+    tags: ["만들기", "추억", "립글로스"],
     points: 10,
     type: "action",
   },
