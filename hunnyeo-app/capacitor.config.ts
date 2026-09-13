@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 // ── 훈녀생정 네이티브 앱 설정 ────────────────────────────────────────────
 // server.url 을 두지 않는다. `next build` 가 만든 out/ 폴더를 통째로 앱에
-// 담기 때문에 인터넷이 끊겨도 228개 항목이 전부 열린다.
+// 담기 때문에 인터넷이 끊겨도 259개 항목이 전부 열린다.
 // (웹사이트를 불러오기만 하는 앱은 앱스토어 가이드라인 4.2 로 반려되기 쉽다)
 const config: CapacitorConfig = {
   appId: "kr.ai.hunnyeo.app",

@@ -13,7 +13,7 @@ ABOUT THIS APP
 Hunnyeo-Saengjeong ("훈녀생정") is a nostalgia archive for Koreans born in the
 1990s. In the mid-2000s, Korean students shared homemade beauty and lifestyle
 tips on blogs and online cafes under the name "훈훈한 여자 생활정보" (roughly:
-"lovely girl's life info"). This app collects 228 of those tips across 16
+"lovely girl's life info"). This app collects 259 of those tips across 17
 chapters and presents them in the visual style of that era.
 
 The app is a self-contained archive. Users can check off items they have tried,
@@ -23,7 +23,7 @@ NO ACCOUNT NEEDED
 There is no sign-up or login. All features are available immediately on launch.
 
 FULLY OFFLINE
-The app makes zero network requests. All 228 entries, fonts and images are
+The app makes zero network requests. All 259 entries, fonts and images are
 bundled in the app binary. Please feel free to test it in Airplane Mode - every
 screen works. Nothing is sent to any server, and no analytics or ad SDKs are
 included.
