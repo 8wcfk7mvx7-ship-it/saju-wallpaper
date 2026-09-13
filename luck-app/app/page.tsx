@@ -415,10 +415,8 @@ export default function HomePage() {
                     {luck.specialDay.ganwoonTips.map((tip, i) => (
                       <p key={i} className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>· {tip}</p>
                     ))}
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>· {luck.specialDay.aegmagiTip}</p>
                   </div>
-                  <Perforation />
-                  <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.specialDay.aegmagiTip}</p>
                 </div>
               </FadeIn>
             )}
@@ -537,9 +535,7 @@ export default function HomePage() {
                 {luck.actionOfDay.map((tip, i) => (
                   <p key={i} className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{tip}</p>
                 ))}
-                <Perforation />
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--amber)" }}>액운을 막는 방법</p>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>{luck.aegmagiTip}</p>
+                <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.aegmagiTip}</p>
               </Card>
             </FadeIn>
           </div>
