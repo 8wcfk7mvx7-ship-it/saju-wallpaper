@@ -1,13 +1,15 @@
-// lib/specialDays.ts — 24절기에 속하지 않는 "특별한 날" (초복·중복·말복 등)
+// lib/specialDays.ts — 24절기에 속하지 않는 "특별한 날" (초복·중복·말복·단오 등)
 // 절기는 태양 황경 기준이라 고정된 계산법(getCurrentSolarTerm)이 있지만,
 // 복날은 일진(日辰)의 천간이 "경(庚)"인 날을 세는 전통 방식이라 별도로 계산한다.
 // 초복 = 하지 후 3번째 경일, 중복 = 하지 후 4번째 경일, 말복 = 입추 후 1번째 경일.
-import { Solar } from "lunar-typescript";
+// 단오는 음력 5월 5일로 고정이라, 매년 음력→양력 변환만 해주면 된다.
+import { Solar, Lunar } from "lunar-typescript";
 
 export type BokKey = "초복" | "중복" | "말복";
+export type SpecialDayKey = BokKey | "단오";
 
 export interface SpecialDay {
-  name: BokKey;
+  name: SpecialDayKey;
   meaning: string;
   ganwoonTips: string[];
   aegmagiTip: string;
@@ -40,6 +42,19 @@ const BOK_INFO: Record<BokKey, Omit<SpecialDay, "name">> = {
   },
 };
 
+const DANO_INFO: Omit<SpecialDay, "name"> = {
+  meaning: "음력 5월 5일, 우리나라 4대 명절 중 하나로 1년 중 양기가 가장 왕성한 날로 여겨졌어요. 창포물에 머리를 감고 그네뛰기·씨름을 즐기던 풍습이 전해져요.",
+  ganwoonTips: [
+    "창포 삶은 물로 머리를 감으면 나쁜 기운을 씻어낸다는 단오의 전통이 있어요. 향 좋은 샴푸로 대신해도 좋아요.",
+    "수리취떡이나 앵두처럼 제철 음식을 챙겨 먹으며 계절 기운을 받아보세요.",
+    "그네뛰기·씨름처럼 몸을 움직이는 활동으로 왕성한 양기를 받아보세요.",
+    "단오부채를 주고받던 풍습처럼, 가까운 사람에게 작은 선물을 건네보세요.",
+    "육회·냉면처럼 찬 음식과 해산물은 양기가 도는 것을 방해한다고 하니 오늘만큼은 피해보세요.",
+    "장아찌 같은 묵은 음식, 먹다 남긴 음식, 기름진 음식, 오래 냉장해둔 음식도 조심해보세요. 묵은 기운과 탁한 기운, 남의 액운을 불러온다는 말이 있어요.",
+  ],
+  aegmagiTip: "오늘만큼은 갓 만든 담백하고 따뜻한 음식으로 몸의 양기를 지켜보세요.",
+};
+
 // from(포함)부터 하루씩 세어 천간이 "庚"인 날을 n번째로 찾는다
 function findGyeongIl(from: Solar, n: number): Solar {
   let found = 0;
@@ -66,6 +81,11 @@ export function getBokDays(year: number): Record<"초복" | "중복" | "말복",
   };
 }
 
+// 단오(음력 5월 5일)를 그 해의 양력 날짜로 변환
+export function getDanoDay(year: number): Solar {
+  return Lunar.fromYmd(year, 5, 5).getSolar();
+}
+
 export function getSpecialDay(date: Date = new Date()): SpecialDay | null {
   const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   const bokDays = getBokDays(date.getFullYear());
@@ -73,6 +93,9 @@ export function getSpecialDay(date: Date = new Date()): SpecialDay | null {
     if (bokDays[key].toYmd() === dateStr) {
       return { name: key, ...BOK_INFO[key] };
     }
+  }
+  if (getDanoDay(date.getFullYear()).toYmd() === dateStr) {
+    return { name: "단오", ...DANO_INFO };
   }
   return null;
 }

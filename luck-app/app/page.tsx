@@ -90,6 +90,13 @@ function formatDateLabel(dateKey: string): string {
   return `${Number(m)}월 ${Number(d)}일`;
 }
 
+// 특별한 날 이름 뒤에 받침 유무에 맞는 서술격 조사를 붙임 (초복 → 초복이에요, 단오 → 단오예요)
+function withIeyo(name: string): string {
+  const last = name.charCodeAt(name.length - 1) - 0xac00;
+  const hasBatchim = last >= 0 && last <= 11171 && last % 28 !== 0;
+  return `${name}${hasBatchim ? "이에요" : "예요"}`;
+}
+
 async function toSolar(profile: SajuProfile): Promise<{ y: number; m: number; d: number }> {
   if (profile.calendarType === "solar") return { y: profile.birthYear, m: profile.birthMonth, d: profile.birthDay };
   try {
@@ -398,9 +405,27 @@ export default function HomePage() {
         {tab === "today" && (
           <div className="space-y-4 mt-2">
             <FadeIn>
-              <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                지금은 <b style={{ color: "var(--ink)" }}>{luck.term.name}</b>({luck.term.hanja}) 절기({luck.term.dateRange}~)예요 — {luck.term.meaning}
-              </p>
+              {luck.term.isStartDay ? (
+                <div className="retro-card p-5" style={{ background: "rgba(224,122,63,0.14)" }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <SparkleIcon size={16} style={{ color: "var(--amber)" }} />
+                    <p className="font-display text-base" style={{ color: "var(--amber)" }}>
+                      오늘부터 {luck.term.name}({luck.term.hanja}) 절기예요
+                    </p>
+                  </div>
+                  <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.term.meaning}</p>
+                  <div className="space-y-1.5">
+                    {luck.term.ganwoonTips.slice(0, 3).map((tip, i) => (
+                      <p key={i} className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>· {tip}</p>
+                    ))}
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--ink-soft)" }}>· {luck.term.aegmagiTip}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
+                  지금은 <b style={{ color: "var(--ink)" }}>{luck.term.name}</b>({luck.term.hanja}) 절기({luck.term.dateRange}~)예요 — {luck.term.meaning}
+                </p>
+              )}
             </FadeIn>
 
             {luck.specialDay && (
@@ -408,7 +433,7 @@ export default function HomePage() {
                 <div className="retro-card p-5" style={{ background: "rgba(224,122,63,0.14)" }}>
                   <div className="flex items-center gap-2 mb-2">
                     <SparkleIcon size={16} style={{ color: "var(--amber)" }} />
-                    <p className="font-display text-base" style={{ color: "var(--amber)" }}>오늘은 {luck.specialDay.name}이에요</p>
+                    <p className="font-display text-base" style={{ color: "var(--amber)" }}>오늘은 {withIeyo(luck.specialDay.name)}</p>
                   </div>
                   <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.specialDay.meaning}</p>
                   <div className="space-y-1.5">

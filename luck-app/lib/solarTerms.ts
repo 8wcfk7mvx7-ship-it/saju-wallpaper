@@ -17,6 +17,7 @@ export interface SolarTermInfo {
   aegmagiTip: string;     // 액운을 막는 방법
   luckyColor: string;     // 절기 자체의 행운 컬러 (세시풍속·계절 기반)
   luckyItem: string;      // 절기 자체의 행운 아이템
+  isStartDay: boolean;    // 오늘이 이 절기가 "시작되는" 바로 그날인지 — 맞으면 화면에 더 자세히 보여준다
 }
 
 // 오행별 "개인 맞춤" 행운 컬러·아이템 — 사용자의 용신(사주에서 필요한 기운)에 따라 달라짐
@@ -28,7 +29,11 @@ export const ELEMENT_LUCK: Record<Element, { color: string; colorHex: string; it
   수: { color: "네이비·블랙", colorHex: "#3b82f6", item: "짙은 색 다이어리나 텀블러" },
 };
 
-export const SOLAR_TERMS: SolarTermInfo[] = [
+// 정적 데이터에는 isStartDay가 없다 — 그건 "오늘"이 정해져야만 계산할 수 있어서
+// getCurrentSolarTerm() 호출 시점에 덧붙인다.
+type SolarTermStatic = Omit<SolarTermInfo, "isStartDay">;
+
+export const SOLAR_TERMS: SolarTermStatic[] = [
   {
     key: "立春", name: "입춘", hanja: "立春", dateRange: "양력 2월 4일경", season: "봄", element: "목",
     meaning: "봄의 시작을 알리는 절기예요. 예로부터 '입춘대길 건양다경' 같은 입춘첩을 문에 붙이며 한 해의 복을 기원했어요.",
@@ -374,6 +379,7 @@ export function getCurrentSolarTerm(date: Date = new Date()): SolarTermInfo {
   const lunar = solar.getLunar();
   const cur = lunar.getPrevJieQi(true);
   const info = TERM_BY_KEY.get(cur.getName());
+  const isStartDay = cur.getSolar().toYmd() === solar.toYmd();
   // 안전장치: 매핑이 안 되는 극단적 케이스엔 입춘으로 폴백
-  return info ?? SOLAR_TERMS[0];
+  return { ...(info ?? SOLAR_TERMS[0]), isStartDay };
 }
