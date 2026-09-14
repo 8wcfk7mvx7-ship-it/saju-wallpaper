@@ -284,4 +284,20 @@ export const LIP_TIPS: HunnyeoTip[] = [
     points: 6,
     type: "action",
   },
+  {
+    id: "lip-strawberry-teeth",
+    category: "lip",
+    title: "베이킹소다 딸기 치아미백",
+    materials: ["잘 익은 딸기 1개", "베이킹소다 약간"],
+    steps: [
+      "딸기를 으깨고 베이킹소다를 살짝 섞어요.",
+      "칫솔에 묻혀 이를 부드럽게 닦아요.",
+      "1분 정도 지나면 물로 깨끗이 헹구고 평소처럼 양치해요.",
+    ],
+    effect: "표면 착색이 옅어지고 개운한 느낌을 줘요.",
+    caution: "베이킹소다는 연마 성분이라 자주 하면 치아 표면이 상할 수 있어요. 한 달에 한두 번으로 충분해요.",
+    tags: ["치아미백", "베이킹소다", "딸기"],
+    points: 8,
+    type: "action",
+  },
 ];
