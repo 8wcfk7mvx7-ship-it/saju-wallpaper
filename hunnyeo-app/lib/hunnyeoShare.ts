@@ -169,7 +169,7 @@ const APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
 
 /** 앱 자체를 친구에게 추천한다. 카드 공유와 달리 내 기록이 아니라 앱 링크를 보낸다. */
 export async function shareApp(): Promise<ShareOutcome> {
-  const text = "그 시절 추억 뷰티 정보 모음, 훈녀생정 한번 해봐!";
+  const text = "예전 추억 뷰티 정보 모음, 훈녀생정 한번 해봐!";
 
   try {
     const cap = await import("@capacitor/core");

@@ -175,7 +175,7 @@ export default function HunnyeoPage() {
 
           <div className="rounded-xl px-3 py-3 mb-4 text-[13px] leading-relaxed font-bold" style={{ background: "#fff0f7", border: "2px dashed #ff9ecb", color: "#a04a75" }}>
             집에 있는 재료로 하는<br />
-            그 시절 관리법 <b style={{ color: "#ff2b8d" }}>{TIPS.length}가지</b>를 모았어요
+            예전 관리법 <b style={{ color: "#ff2b8d" }}>{TIPS.length}가지</b>를 모았어요
           </div>
 
           <button onClick={handleEnter} className="hn-btn hn-btn-on w-full py-3.5 text-base">
@@ -336,7 +336,7 @@ export default function HunnyeoPage() {
       </div>
 
       <p className="text-center text-[10px] mt-6 px-6 font-bold" style={{ color: "#c093ac" }}>
-        그 시절 민간요법을 모은 추억 콘텐츠예요
+        예전 민간요법을 모은 추억 콘텐츠예요
       </p>
     </main>
   );

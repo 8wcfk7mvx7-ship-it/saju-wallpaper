@@ -239,7 +239,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
       </div>
 
       <p className="text-center text-[10px] mt-6 px-6 font-bold" style={{ color: "#c093ac" }}>
-        그 시절 민간요법을 모은 추억 콘텐츠예요
+        예전 민간요법을 모은 추억 콘텐츠예요
       </p>
     </main>
   );

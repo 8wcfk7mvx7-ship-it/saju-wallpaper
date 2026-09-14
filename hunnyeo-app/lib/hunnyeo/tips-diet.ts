@@ -285,7 +285,7 @@ export const DIET_TIPS: HunnyeoTip[] = [
       "나린진이라는 성분을 넣어 식욕을 줄여 준다고 광고했어요.",
       "그만큼 다이어트에 관심이 뜨거웠던 시기였다는 기록으로 남아 있어요.",
     ],
-    effect: "그 시절 유행이 얼마나 극단적이었는지 돌아볼 수 있어요.",
+    effect: "예전 유행이 얼마나 극단적이었는지 돌아볼 수 있어요.",
     tags: ["한때유행", "읽을거리"],
     points: 5,
     type: "read",
@@ -576,7 +576,7 @@ export const DIET_TIPS: HunnyeoTip[] = [
   {
     id: "diet-motivation-phrases",
     category: "diet",
-    title: "그 시절 다이어트 자극 문구",
+    title: "예전 다이어트 자극 문구",
     steps: [
       "1kg 빼는 데 한 달, 찌는 데 하루",
       "살은 정직하다",

@@ -5,7 +5,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
   {
     id: "item-top10",
     category: "item",
-    title: "그 시절 완소템 열 가지",
+    title: "예전 완소템 열 가지",
     steps: [
       "목에 거는 MP3 플레이어",
       "폴더폰에 붙이던 큐빅 스티커",
@@ -34,7 +34,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
       "향기 나는 지우개",
       "작은 손거울",
     ],
-    effect: "필통만 열어도 기분이 좋아지던 그 시절 감성을 다시 만날 수 있어요.",
+    effect: "필통만 열어도 기분이 좋아지던 예전 감성을 다시 만날 수 있어요.",
     tags: ["학용품", "필통"],
     points: 6,
     type: "read",
@@ -42,7 +42,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
   {
     id: "item-makeup-pouch",
     category: "item",
-    title: "그 시절 화장 파우치 구성",
+    title: "예전 화장 파우치 구성",
     steps: [
       "비비크림 한 통",
       "반짝이가 들어간 아이섀도",
@@ -106,7 +106,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
   {
     id: "item-massage-tools",
     category: "item",
-    title: "그 시절 마사지 도구들",
+    title: "예전 마사지 도구들",
     steps: [
       "지압 슬리퍼 — 신고 걸으면 발바닥이 아파서 눈물이 났어요.",
       "종아리 롤러 — 텔레비전 보면서 다리를 굴렸어요.",
@@ -131,7 +131,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
       "슬리밍 크림 — 바르고 랩을 감으라고 했어요.",
       "'매진 임박' 글자가 화면 아래에서 깜빡였어요.",
     ],
-    effect: "그 시절 거실에서 흔히 보던 물건들을 다시 만나요.",
+    effect: "예전 거실에서 흔히 보던 물건들을 다시 만나요.",
     tags: ["홈쇼핑", "옛날기구", "추억"],
     points: 5,
     type: "read",
@@ -221,7 +221,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
       "타이머로 쓰던 알람시계",
       "필기용 형광펜 세트",
     ],
-    effect: "그 시절 공부 공간을 채우던 물건들이 떠올라요.",
+    effect: "예전 공부 공간을 채우던 물건들이 떠올라요.",
     tags: ["독서실", "학원", "추억"],
     points: 6,
     type: "read",
@@ -236,7 +236,7 @@ export const ITEM_TIPS: HunnyeoTip[] = [
       "다이어리와 필통에 붙이던 사진",
       "친구 이름과 날짜를 적어 두던 습관",
     ],
-    effect: "그 시절 우정을 사진 한 장에 담아 두던 문화를 떠올릴 수 있어요.",
+    effect: "예전 우정을 사진 한 장에 담아 두던 문화를 떠올릴 수 있어요.",
     tags: ["스티커사진", "우정", "추억"],
     points: 6,
     type: "read",
