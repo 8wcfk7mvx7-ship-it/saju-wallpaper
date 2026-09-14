@@ -558,4 +558,19 @@ export const DIET_TIPS: HunnyeoTip[] = [
     points: 6,
     type: "action",
   },
+  {
+    id: "diet-king-beggar",
+    category: "diet",
+    title: "아침은 왕처럼, 저녁은 거지처럼",
+    steps: [
+      "아침은 밥과 반찬을 든든하게 챙겨 먹어요.",
+      "점심도 평소대로 골고루 먹어요.",
+      "저녁은 가볍게, 채소와 단백질 위주로 적게 먹어요.",
+      "'아침은 왕처럼, 점심은 왕자처럼, 저녁은 거지처럼 먹으라'는 말로 전해져요.",
+    ],
+    effect: "활동량이 많은 낮에 에너지를 쓰고 잠들기 전 소화 부담은 줄일 수 있어요.",
+    tags: ["식사습관", "아침저녁", "옛말"],
+    points: 8,
+    type: "action",
+  },
 ];

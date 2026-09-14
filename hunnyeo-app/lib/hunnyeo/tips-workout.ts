@@ -460,4 +460,21 @@ export const WORKOUT_TIPS: HunnyeoTip[] = [
     points: 8,
     type: "action",
   },
+  {
+    id: "workout-parkbom-legs",
+    category: "workout",
+    title: "박봄 다리운동",
+    materials: ["매트나 이불"],
+    steps: [
+      "한 그룹의 아이돌이 방송에서 선보여 크게 유행한 다리 운동이에요.",
+      "바닥에 누워 다리를 천장으로 곧게 뻗어요.",
+      "발끝을 몸쪽으로 당긴 채 다리를 좌우로 작게 벌렸다 모았다 반복해요.",
+      "허벅지 안쪽과 바깥쪽에 번갈아 힘이 들어가게 해요.",
+    ],
+    effect: "일자로 곧게 뻗은 다리 라인을 갖고 싶어 하던 그 시절 로망이 담긴 운동이에요.",
+    caution: "무리하게 각도를 크게 벌리면 허리에 무리가 갈 수 있어요. 허리를 바닥에 붙인 채로 작게 움직이세요.",
+    tags: ["박봄다리운동", "일자다리", "누워서"],
+    points: 10,
+    type: "action",
+  },
 ];
