@@ -477,4 +477,21 @@ export const WORKOUT_TIPS: HunnyeoTip[] = [
     points: 10,
     type: "action",
   },
+  {
+    id: "workout-hiking",
+    category: "workout",
+    title: "등산 다이어트",
+    materials: ["등산화", "물", "배낭"],
+    steps: [
+      "동네 뒷산이나 둘레길부터 시작해요.",
+      "일정한 속도로 오르고, 숨이 너무 차면 잠깐 쉬어요.",
+      "내려올 때는 무릎에 무리가 가지 않게 천천히 걸어요.",
+      "주말마다 정해 놓고 꾸준히 다녀요.",
+    ],
+    effect: "오르내리는 동안 하체 근력과 심폐지구력이 함께 길러지고 땀도 시원하게 나요.",
+    caution: "내리막에서 무릎 통증이 있으면 무리하지 말고 등산 스틱을 활용하세요.",
+    tags: ["등산", "주말운동", "하체"],
+    points: 12,
+    type: "action",
+  },
 ];

@@ -595,4 +595,20 @@ export const DIET_TIPS: HunnyeoTip[] = [
     points: 5,
     type: "read",
   },
+  {
+    id: "diet-figure8-legs",
+    category: "diet",
+    title: "8자다리 교정 스쿼트",
+    materials: ["쿠션이나 작은 공"],
+    steps: [
+      "무릎 사이에 쿠션이나 공을 끼워요.",
+      "발끝은 살짝 바깥으로 벌리고 서요.",
+      "쿠션을 놓치지 않게 힘을 준 채로 앉았다 일어나기를 반복해요.",
+      "허리는 곧게 펴고 천천히 움직여요.",
+    ],
+    effect: "허벅지 안쪽에 힘이 들어가면서 다리 라인을 정리하는 데 도움을 줘요.",
+    tags: ["8자다리", "허벅지안쪽", "스쿼트"],
+    points: 10,
+    type: "action",
+  },
 ];
