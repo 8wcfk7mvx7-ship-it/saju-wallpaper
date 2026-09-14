@@ -1,0 +1,72 @@
+# ── 훈녀생정 배포 자동화 ─────────────────────────────────────────────────
+#
+# 준비 (맥에서 한 번만)
+#   brew install fastlane
+#   npm install && npx cap add ios
+#   Xcode 에서 프로젝트를 한 번 열어 서명 팀을 선택해 둡니다.
+#
+# 쓰는 법
+#   fastlane beta      웹 빌드 → 앱 동기화 → TestFlight 업로드
+#   fastlane release   위와 같고, 심사 제출까지
+#   fastlane bump      빌드 번호만 올리기
+
+default_platform(:ios)
+
+XCODE_PROJECT = "ios/App/App.xcodeproj"
+XCODE_WORKSPACE = "ios/App/App.xcworkspace"
+SCHEME = "App"
+
+platform :ios do
+  desc "웹을 정적 빌드해서 네이티브 프로젝트에 밀어 넣는다"
+  lane :sync do
+    sh("cd .. && npm run build")      # next build → out/
+    sh("cd .. && npx cap sync ios")   # out/ → ios/App/App/public
+  end
+
+  desc "빌드 번호를 올린다 (같은 번호로는 두 번 못 올린다)"
+  lane :bump do
+    increment_build_number(xcodeproj: XCODE_PROJECT)
+  end
+
+  desc "TestFlight 에 올린다"
+  lane :beta do
+    sync
+    bump
+    build_app(
+      workspace: XCODE_WORKSPACE,
+      scheme: SCHEME,
+      export_method: "app-store",
+      output_directory: "build",
+      clean: true
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "그 시절 생활정보를 더 담았습니다."
+    )
+  end
+
+  desc "심사에 제출한다"
+  lane :release do
+    sync
+    bump
+    build_app(
+      workspace: XCODE_WORKSPACE,
+      scheme: SCHEME,
+      export_method: "app-store",
+      output_directory: "build",
+      clean: true
+    )
+    upload_to_app_store(
+      submit_for_review: true,
+      automatic_release: false,       # 승인돼도 수동으로 출시 (원하는 날 공개)
+      force: true,                    # 등재 문구 미리보기 건너뛰기
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        # 아래 세 줄이 "수출 규정 / 광고 식별자" 질문에 대한 답입니다.
+        export_compliance_uses_encryption: false,
+        add_id_info_uses_idfa: false,
+        content_rights_contains_third_party_content: false
+      }
+    )
+  end
+end
