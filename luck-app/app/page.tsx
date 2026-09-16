@@ -9,6 +9,7 @@ import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/Luck
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
+import { getFeedbackEnabled, setFeedbackEnabled, playLuckChime, hapticLight, hapticSuccess } from "@/lib/feedback";
 import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
 import type { User } from "@supabase/supabase-js";
@@ -166,6 +167,7 @@ export default function HomePage() {
   const [calledText, setCalledText] = useState("");
   const [showLuckPopup, setShowLuckPopup] = useState(false);
   const [notifyOn, setNotifyOn] = useState(false);
+  const [feedbackOn, setFeedbackOn] = useState(true);
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
@@ -226,6 +228,7 @@ export default function HomePage() {
       setSplashDone(true); // 첫 방문은 위저드로 바로 들어가므로 스플래시 대기가 필요 없음
     }
     setNotifyOn(getMorningNotifyEnabled());
+    setFeedbackOn(getFeedbackEnabled());
     setReady(true);
   }, []);
 
@@ -280,6 +283,7 @@ export default function HomePage() {
     const entry = { rating: r, tags: nextTags, note: nextNote };
     persistLog(dateKey, entry);
     setHistory((prev) => ({ ...prev, [dateKey]: entry }));
+    hapticLight();
   }
 
   function submitCall() {
@@ -290,6 +294,8 @@ export default function HomePage() {
     setCalledText(text);
     setShowLuckPopup(true);
     setPastCalls(getAllCalls());
+    hapticSuccess();
+    playLuckChime();
     setTimeout(() => setShowLuckPopup(false), 3000);
   }
 
@@ -299,6 +305,13 @@ export default function HomePage() {
     if (!notifyOn && !result) {
       alert("알림을 켜지 못했어요. 기기 알림 권한을 확인해주세요.");
     }
+  }
+
+  function toggleFeedback() {
+    const next = !feedbackOn;
+    setFeedbackEnabled(next);
+    setFeedbackOn(next);
+    if (next) { hapticLight(); playLuckChime(); }
   }
 
   function finishOnboarding(p: SajuProfile, firstMemo: string) {
@@ -748,6 +761,20 @@ export default function HomePage() {
                   className="retro-btn w-full py-3 text-sm font-bold"
                   style={{ background: notifyOn ? "var(--clover)" : "var(--card)", color: notifyOn ? "#fff" : "var(--ink-soft)" }}>
                   {notifyOn ? "알림 켜짐 (끄려면 눌러주세요)" : "알림 켜기"}
+                </button>
+              </Card>
+            </FadeIn>
+            <FadeIn delay={30}>
+              <Card>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>소리·진동</p>
+                <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                  행운을 부를 때 짧은 종소리와 진동으로 알려드려요.
+                </p>
+                <button
+                  onClick={toggleFeedback}
+                  className="retro-btn w-full py-3 text-sm font-bold"
+                  style={{ background: feedbackOn ? "var(--clover)" : "var(--card)", color: feedbackOn ? "#fff" : "var(--ink-soft)" }}>
+                  {feedbackOn ? "소리·진동 켜짐 (끄려면 눌러주세요)" : "소리·진동 켜기"}
                 </button>
               </Card>
             </FadeIn>
