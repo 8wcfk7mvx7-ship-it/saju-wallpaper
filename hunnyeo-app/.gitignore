@@ -1,0 +1,18 @@
+/node_modules
+/.next/
+/out/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.env*
+
+# Capacitor 네이티브 프로젝트 — 맥에서 `npx cap add ios` 로 생성한다.
+# 서명 설정을 팀과 공유하려면 이 두 줄을 지우고 커밋해도 된다.
+/ios/
+/android/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
