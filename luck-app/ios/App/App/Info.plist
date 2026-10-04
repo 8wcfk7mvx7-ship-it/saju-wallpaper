@@ -45,5 +45,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- AdMob — 지금은 구글 공식 테스트 App ID. 실제 AdMob 계정 발급 후 진짜 App ID로 교체할 것
+	     (lib/ads.ts의 USE_TEST_ADS와 함께 바꿔야 함). -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>맞춤 광고를 보여드리기 위해 활동 데이터를 사용할 수 있어요.</string>
 </dict>
 </plist>

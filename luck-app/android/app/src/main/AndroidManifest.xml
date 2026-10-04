@@ -33,6 +33,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- AdMob — 지금은 구글 공식 테스트 App ID. 실제 AdMob 계정 발급 후 진짜 App ID로 교체할 것
+             (lib/ads.ts의 USE_TEST_ADS와 함께 바꿔야 함). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 
     <!-- Permissions -->

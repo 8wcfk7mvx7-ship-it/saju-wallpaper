@@ -11,6 +11,7 @@ import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
+import { initBannerAd } from "@/lib/ads";
 import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
 import type { User } from "@supabase/supabase-js";
@@ -232,6 +233,7 @@ export default function HomePage() {
     }
     setNotifyOn(getMorningNotifyEnabled());
     setReady(true);
+    initBannerAd();
   }, []);
 
   useEffect(() => {
