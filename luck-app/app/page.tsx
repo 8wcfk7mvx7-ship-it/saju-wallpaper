@@ -12,7 +12,7 @@ import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
 import { initBannerAd } from "@/lib/ads";
-import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut } from "@/lib/auth";
+import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut, listenForNativeAuthRedirect } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
 import type { User } from "@supabase/supabase-js";
 import { Capacitor } from "@capacitor/core";
@@ -207,7 +207,10 @@ export default function HomePage() {
         });
       }
     });
-    return () => { cancelled = true; unsubscribe(); };
+    // 네이티브 앱에서 구글/애플 로그인은 시스템 브라우저를 열어 진행되므로, 돌아올 때의
+    // 딥링크를 받아 세션을 완성해준다 — 세션이 생기면 위 onAuthChange가 알아서 반응한다.
+    const stopNativeRedirect = listenForNativeAuthRedirect();
+    return () => { cancelled = true; unsubscribe(); stopNativeRedirect(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

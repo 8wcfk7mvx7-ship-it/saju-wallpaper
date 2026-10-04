@@ -22,6 +22,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- 애플/구글 로그인 — 시스템 브라우저에서 로그인을 마친 뒤
+                 kr.ai.luckyapp.app://login-callback 으로 돌아올 때 이 액티비티가 받는다. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kr.ai.luckyapp.app" />
+            </intent-filter>
+
         </activity>
 
         <provider

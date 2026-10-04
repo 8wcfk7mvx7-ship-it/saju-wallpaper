@@ -51,5 +51,16 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>맞춤 광고를 보여드리기 위해 활동 데이터를 사용할 수 있어요.</string>
+	<!-- 애플/구글 로그인 — 시스템 브라우저에서 로그인을 마친 뒤
+	     kr.ai.luckyapp.app://login-callback 으로 돌아올 때 앱이 이 스킴으로 받는다. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kr.ai.luckyapp.app</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
