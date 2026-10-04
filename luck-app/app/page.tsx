@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import AuthScreen from "@/components/AuthScreen";
@@ -155,7 +155,6 @@ export default function HomePage() {
 
   const [memo, setMemoState] = useState("");
   const [memoSaved, setMemoSaved] = useState(true);
-  const memoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [rating, setRating] = useState<number | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -270,12 +269,12 @@ export default function HomePage() {
   function onMemoChange(v: string) {
     setMemoState(v);
     setMemoSaved(false);
-    if (memoTimer.current) clearTimeout(memoTimer.current);
-    memoTimer.current = setTimeout(() => {
-      persistMemo(dateKey, v);
-      setMemoSaved(true);
-      setPastMemos(getAllMemos());
-    }, 600);
+  }
+
+  function saveMemo() {
+    persistMemo(dateKey, memo);
+    setMemoSaved(true);
+    setPastMemos(getAllMemos());
   }
 
   function submitLog(r: number, nextTags = tags, nextNote = note) {
@@ -586,7 +585,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-bold" style={{ color: "var(--ink-soft)" }}>{todayLabel}의 메모</p>
                   <span className="text-[10px]" style={{ color: memoSaved ? "var(--ink-soft)" : "var(--clover)" }}>
-                    {memoSaved ? "저장됨" : "저장 중…"}
+                    {memoSaved ? "저장됨" : "저장 안 된 내용 있음"}
                   </span>
                 </div>
                 <textarea
@@ -595,6 +594,16 @@ export default function HomePage() {
                   className="w-full text-sm rounded p-3 resize-none focus:outline-none"
                   style={{ background: "var(--bg-soft)", border: "2px solid var(--card-border)", color: "var(--ink)" }}
                 />
+                <button
+                  onClick={saveMemo}
+                  disabled={memoSaved}
+                  className="retro-btn font-display w-full py-3 text-sm mt-3"
+                  style={{
+                    background: memoSaved ? "var(--bg-soft)" : "var(--clover)",
+                    color: memoSaved ? "var(--ink-soft)" : "#fff",
+                  }}>
+                  저장하기
+                </button>
               </Card>
             </FadeIn>
 
