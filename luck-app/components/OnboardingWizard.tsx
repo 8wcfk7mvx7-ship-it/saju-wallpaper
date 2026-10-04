@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { SajuProfile } from "@/lib/storage";
 import { MemoIcon } from "@/components/Icons";
 import { CloverStamp, SunPixel, CloudPixel } from "@/components/LuckArt";
+import { setMorningNotifyEnabled } from "@/lib/notifications";
 
 const HOURS = [
   { v: "unknown", label: "시간 모름" },
@@ -15,7 +16,7 @@ const FEATURES = [
   { text: "오늘의 메모 & 행운 점수 기록" },
 ];
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
 
 function StepShell({
   step, title, subtitle, children, onNext, onBack, nextLabel = "다음", nextDisabled = false, showSkip, onSkipAll,
@@ -78,12 +79,14 @@ export default function OnboardingWizard({
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<SajuProfile>(initial);
   const [memo, setMemo] = useState("");
+  const [wantNotify, setWantNotify] = useState(true);
   const set = (patch: Partial<SajuProfile>) => setForm((prev) => ({ ...prev, ...patch }));
   const dateStr = `${String(form.birthYear).padStart(4, "0")}-${String(form.birthMonth).padStart(2, "0")}-${String(form.birthDay).padStart(2, "0")}`;
   const todayStr = new Date().toISOString().slice(0, 10);
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const back = () => setStep((s) => Math.max(s - 1, 1));
+  const confirmNotify = async () => { await setMorningNotifyEnabled(wantNotify); next(); };
 
   if (step === 1) {
     return (
@@ -205,10 +208,32 @@ export default function OnboardingWizard({
     );
   }
 
-  // step 7 — 오늘의 메모 (선택), 마지막 단계
+  if (step === 7) {
+    return (
+      <StepShell
+        step={7} title="아침마다 행운 알림을 받을까요?" subtitle="매일 아침 6시에 “오늘도 행운을 불러보세요” 알림을 보내드려요."
+        onNext={confirmNotify} onBack={back}
+      >
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={() => setWantNotify(true)}
+            className="retro-btn py-4 text-base font-bold"
+            style={{ background: wantNotify ? "var(--clover)" : "var(--card)", color: wantNotify ? "#fff" : "var(--ink-soft)" }}>
+            알림 받기
+          </button>
+          <button type="button" onClick={() => setWantNotify(false)}
+            className="retro-btn py-4 text-base font-bold"
+            style={{ background: !wantNotify ? "var(--clover)" : "var(--card)", color: !wantNotify ? "#fff" : "var(--ink-soft)" }}>
+            받지 않을게요
+          </button>
+        </div>
+      </StepShell>
+    );
+  }
+
+  // step 8 — 오늘의 메모 (선택), 마지막 단계
   return (
     <StepShell
-      step={7} title="오늘의 메모 (선택)" subtitle="오늘 하루를 시작하며 떠오르는 생각을 적어보세요."
+      step={8} title="오늘의 메모 (선택)" subtitle="오늘 하루를 시작하며 떠오르는 생각을 적어보세요."
       onNext={() => onComplete(form, memo)} onBack={back} nextLabel="시작하기"
     >
       <div className="retro-card p-4">
@@ -229,7 +254,7 @@ export default function OnboardingWizard({
 
 function SparkleBullet() {
   return (
-    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full shrink-0" style={{ background: "rgba(45,106,79,0.12)", color: "var(--clover)" }}>
+    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full shrink-0" style={{ background: "rgba(18,83,60,0.12)", color: "var(--clover)" }}>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
         <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
         <path d="M12 8a4 4 0 0 0 4 4 4 4 0 0 0-4 4 4 4 0 0 0-4-4 4 4 0 0 0 4-4Z" />

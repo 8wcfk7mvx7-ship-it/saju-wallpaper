@@ -59,7 +59,7 @@ function LoadingScreen() {
   );
 }
 
-const TAG_OPTIONS = ["재물", "애정", "건강", "인간관계", "커리어"];
+const TAG_OPTIONS = ["재물", "애정", "건강", "인간관계", "커리어", "직장", "공부"];
 const GRADE_COLOR: Record<string, string> = {
   S: "#d4922a", A: "#4d7c3a", B: "#8a6b4a", C: "#c2673a", D: "#b23a2e",
 };

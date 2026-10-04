@@ -48,7 +48,7 @@ function PillButton({ onClick, disabled, children }: { onClick: () => void; disa
       onClick={onClick}
       disabled={disabled}
       className="retro-btn w-full py-3.5 text-sm font-bold flex items-center justify-center gap-2.5"
-      style={{ background: "var(--card)", color: "var(--ink)", border: "1px solid rgba(107,68,35,0.14)", opacity: disabled ? 0.5 : 1 }}>
+      style={{ background: "var(--card)", color: "var(--ink)", border: "1px solid rgba(45,46,47,0.14)", opacity: disabled ? 0.5 : 1 }}>
       {children}
     </button>
   );
