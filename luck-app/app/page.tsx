@@ -4,6 +4,7 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import AuthScreen from "@/components/AuthScreen";
 import HistoryList from "@/components/HistoryList";
+import { PrivacyContent, TermsContent } from "@/components/LegalContent";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
 import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
@@ -13,14 +14,17 @@ import { hapticLight, hapticSuccess } from "@/lib/feedback";
 import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
 import type { User } from "@supabase/supabase-js";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import {
   getProfile, saveProfile, clearProfile, getSkipOnboarding, setSkipOnboarding,
   getMemo, setMemo as persistMemo, getAllMemos, getLog, setLog as persistLog, getRecentLogs,
-  getCall, setCall as persistCall, getAllCalls, exportAllData,
+  getCall, setCall as persistCall, getAllCalls, exportAllData, importAllData,
   type SajuProfile, type LuckLogEntry,
 } from "@/lib/storage";
 
-type Screen = "onboarding" | "edit" | "auth" | "dashboard";
+type Screen = "onboarding" | "edit" | "auth" | "dashboard" | "privacy" | "terms";
 type Tab = "today" | "memo" | "log" | "settings";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -155,6 +159,7 @@ export default function HomePage() {
 
   const [memo, setMemoState] = useState("");
   const [memoSaved, setMemoSaved] = useState(true);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const [rating, setRating] = useState<number | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -327,15 +332,49 @@ export default function HomePage() {
     setScreen("dashboard");
   }
 
-  function handleExportBackup() {
+  // 네이티브 앱(iOS/Android)의 웹뷰는 <a download> 클릭으로 파일을 저장하지 못한다
+  // (조용히 아무 반응도 없음 — 버튼이 "작동 안 하는" 것처럼 보이는 원인). 그래서
+  // 기기에서는 Filesystem에 임시로 써두고 Share 시트를 열어 "파일에 저장" 등으로
+  // 직접 내보내게 하고, 웹 프리뷰에서는 기존처럼 블롭 다운로드를 그대로 쓴다.
+  async function handleExportBackup() {
     const json = exportAllData();
+    const filename = `luck-app-backup-${dateKey}.json`;
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Filesystem.writeFile({ path: filename, data: json, directory: Directory.Cache, encoding: Encoding.UTF8 });
+        const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
+        await Share.share({ title: filename, url: uri, dialogTitle: "백업 파일 저장" });
+      } catch {
+        setSyncMsg("백업 파일을 내보내지 못했어요.");
+        setTimeout(() => setSyncMsg(null), 2500);
+      }
+      return;
+    }
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `luck-app-backup-${dateKey}.json`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // 같은 파일을 다시 골라도 onChange가 또 발생하도록 초기화
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = importAllData(String(reader.result ?? ""));
+      if (result.ok) {
+        reloadFromLocalStorage();
+        setSyncMsg("백업 파일을 불러왔어요.");
+      } else {
+        setSyncMsg(result.error);
+      }
+      setTimeout(() => setSyncMsg(null), 2500);
+    };
+    reader.readAsText(file);
   }
 
   if (!ready) return <LoadingScreen />;
@@ -369,6 +408,23 @@ export default function HomePage() {
             </button>
           </div>
         </div>
+      </main>
+    );
+  }
+
+  // ── 개인정보처리방침·이용약관 — 설정에서 진입. 실제 페이지 이동(<a href>) 대신
+  //    화면 전환으로 보여준다. 네이티브 앱에서는 정적 내보내기의 /privacy, /terms
+  //    라우트로 진짜 이동하면 웹뷰 로컬 서버가 확장자 없는 경로를 못 찾고
+  //    메인 화면으로 튕기기 때문이다. ───────────────────────────────────────
+  if (screen === "privacy" || screen === "terms") {
+    return (
+      <main className="min-h-screen page-fade-in px-6 py-12" style={{ background: "var(--bg)", color: "var(--ink)" }}>
+        <div className="max-w-lg mx-auto mb-4">
+          <button onClick={() => setScreen("dashboard")} className="text-sm font-bold" style={{ color: "var(--ink-soft)" }}>
+            ← 뒤로
+          </button>
+        </div>
+        {screen === "privacy" ? <PrivacyContent /> : <TermsContent />}
       </main>
     );
   }
@@ -771,17 +827,24 @@ export default function HomePage() {
                 <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
                   메모·행운기록·내 정보는 지금 이 기기 안에만 저장돼요. 기기를 바꾸거나 앱을 지우기 전엔 백업 파일로 내보내두세요.
                 </p>
-                <button onClick={handleExportBackup}
-                  className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--card)", color: "var(--ink)" }}>
-                  백업 파일 내보내기
-                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={handleExportBackup}
+                    className="retro-btn py-3 text-sm font-bold" style={{ background: "var(--clover)", color: "#fff" }}>
+                    내보내기
+                  </button>
+                  <button onClick={() => importInputRef.current?.click()}
+                    className="retro-btn py-3 text-sm font-bold" style={{ background: "var(--card)", color: "var(--ink)" }}>
+                    불러오기
+                  </button>
+                </div>
+                <input ref={importInputRef} type="file" accept="application/json,.json" onChange={handleImportFile} className="hidden" />
               </Card>
             </FadeIn>
             <FadeIn delay={80}>
               <Card>
                 <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>정보</p>
-                <a href="/privacy" className="block text-sm py-2" style={{ color: "var(--ink)" }}>개인정보처리방침</a>
-                <a href="/terms" className="block text-sm py-2" style={{ color: "var(--ink)" }}>이용약관</a>
+                <button onClick={() => setScreen("privacy")} className="block w-full text-left text-sm py-2" style={{ color: "var(--ink)" }}>개인정보처리방침</button>
+                <button onClick={() => setScreen("terms")} className="block w-full text-left text-sm py-2" style={{ color: "var(--ink)" }}>이용약관</button>
               </Card>
             </FadeIn>
           </div>

@@ -146,3 +146,30 @@ export function exportAllData(): string {
   }
   return JSON.stringify({ app: "luck-app", version: 1, exportedAt: new Date().toISOString(), data }, null, 2);
 }
+
+// ── 백업 불러오기 ────────────────────────────────────────────────────────
+// exportAllData로 내보낸 파일만 받는다 — 알려진 키(ALL_KEYS)만 덮어써서
+// 백업 파일에 엉뚱한 내용이 섞여 있어도 다른 localStorage 값을 건드리지 않는다.
+export function importAllData(json: string): { ok: true } | { ok: false; error: string } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return { ok: false, error: "파일을 읽을 수 없어요. 올바른 백업 파일인지 확인해주세요." };
+  }
+  if (
+    typeof parsed !== "object" || parsed === null ||
+    (parsed as { app?: unknown }).app !== "luck-app" ||
+    typeof (parsed as { data?: unknown }).data !== "object" ||
+    (parsed as { data?: unknown }).data === null
+  ) {
+    return { ok: false, error: "행운의 앱 백업 파일이 아니에요." };
+  }
+  const data = (parsed as { data: Record<string, unknown> }).data;
+  if (typeof window !== "undefined") {
+    for (const key of ALL_KEYS) {
+      if (key in data) writeJson(key, data[key]);
+    }
+  }
+  return { ok: true };
+}

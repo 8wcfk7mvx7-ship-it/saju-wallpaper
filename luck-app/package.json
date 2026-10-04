@@ -14,9 +14,11 @@
   "dependencies": {
     "@capacitor/android": "^7.4.4",
     "@capacitor/core": "^7.4.4",
+    "@capacitor/filesystem": "^7.1.9",
     "@capacitor/haptics": "^7.0.5",
     "@capacitor/ios": "^7.4.4",
     "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/share": "^7.0.2",
     "@capacitor/splash-screen": "^7.0.4",
     "@capacitor/status-bar": "^7.0.4",
     "@supabase/supabase-js": "^2.116.0",
