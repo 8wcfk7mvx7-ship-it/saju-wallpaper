@@ -14,16 +14,16 @@
 }
 
 :root {
-  /* 스타듀밸리풍 — 파치먼트(양피지) 배경 + 나무 갈색 패널 + 초원 그린 + 골드 */
-  --bg: #fdf3e0;
-  --bg-soft: #f6e3bf;
-  --ink: #4a3220;
-  --ink-soft: #8a6b4a;
-  --clover: #4d7c3a;
-  --clover-soft: #7fb069;
-  --amber: #d4922a;
-  --card: #fffaee;
-  --card-border: #6b4423;
+  /* African Garden(짙은 그린) · Slate blue(그레이) · Sweet Sugar(연핑크) · Teal Black(먹색) 배색 */
+  --bg: #f8eced;
+  --bg-soft: #f0d9db;
+  --ink: #2d2e2f;
+  --ink-soft: #6a6f72;
+  --clover: #12533c;
+  --clover-soft: #3f7f61;
+  --amber: var(--clover);
+  --card: #fdf6f7;
+  --card-border: #2d2e2f;
 }
 
 * {
@@ -55,7 +55,7 @@ body {
   text-rendering: optimizeSpeed;
   letter-spacing: 0.01em;
   /* 파치먼트 질감 — 아주 은은한 도트 패턴(카드가 깔끔해 보이도록 예전보다 옅게) */
-  background-image: radial-gradient(rgba(107,68,35,0.035) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(45,46,47,0.035) 1px, transparent 1px);
   background-size: 14px 14px;
 }
 
@@ -71,22 +71,22 @@ body {
    폰트·아이콘·팔레트는 그대로 유지해 브랜드 톤은 이어간다. */
 .retro-card {
   background: var(--card);
-  border: 1px solid rgba(107, 68, 35, 0.08);
+  border: 1px solid rgba(45, 46, 47, 0.08);
   border-radius: 20px;
   box-shadow:
-    0 1px 2px rgba(74, 50, 32, 0.04),
-    0 8px 24px -8px rgba(74, 50, 32, 0.12);
+    0 1px 2px rgba(45, 46, 47, 0.04),
+    0 8px 24px -8px rgba(45, 46, 47, 0.12);
 }
 
 .retro-btn {
   border: none;
   border-radius: 14px;
-  box-shadow: 0 4px 14px -4px rgba(74, 50, 32, 0.28);
+  box-shadow: 0 4px 14px -4px rgba(45, 46, 47, 0.28);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .retro-btn:active {
   transform: scale(0.97);
-  box-shadow: 0 2px 6px -2px rgba(74, 50, 32, 0.28);
+  box-shadow: 0 2px 6px -2px rgba(45, 46, 47, 0.28);
 }
 
 /* 도장(스탬프) 느낌의 원형 배지 */

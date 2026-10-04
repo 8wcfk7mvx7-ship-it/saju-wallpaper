@@ -74,10 +74,10 @@ function cloverGrid(): Grid {
   const petal = (cx: number, cy: number) => makeMask(CLOVER_W, CLOVER_H, (x, y) => Math.hypot(x - cx, y - cy) <= 4.3);
   const petals = unionMask(petal(7.5, 8), petal(14.5, 8), petal(7.5, 15), petal(14.5, 15));
   const stem = makeMask(CLOVER_W, CLOVER_H, (x, y) => x >= 10 && x <= 12 && y >= 13 && y <= 22);
-  const petalLayer = outlineify(petals, "#4d7c3a", "#2d4a22");
-  const stemLayer = outlineify(stem, "#4d7c3a", "#2d4a22");
+  const petalLayer = outlineify(petals, "#12533c", "#2d2e2f");
+  const stemLayer = outlineify(stem, "#12533c", "#2d2e2f");
   const dot = makeMask(CLOVER_W, CLOVER_H, (x, y) => Math.hypot(x - 11, y - 11.5) <= 1.8);
-  const dotLayer = outlineify(dot, "#d4922a", "#8a5a18");
+  const dotLayer = outlineify(dot, "#f3e1e2", "#6a6f72");
   return mergeGrids(CLOVER_W, CLOVER_H, stemLayer, petalLayer, dotLayer);
 }
 export function CloverStamp({ size = 88, className, style }: ArtProps) {

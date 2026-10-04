@@ -418,7 +418,7 @@ export default function HomePage() {
           <div className="space-y-4 mt-2">
             <FadeIn>
               {luck.term.isStartDay ? (
-                <div className="retro-card p-5" style={{ background: "rgba(224,122,63,0.14)" }}>
+                <div className="retro-card p-5" style={{ background: "rgba(18,83,60,0.10)" }}>
                   <div className="flex items-center gap-2 mb-2">
                     <SparkleIcon size={16} style={{ color: "var(--amber)" }} />
                     <p className="font-display text-base" style={{ color: "var(--amber)" }}>
@@ -442,7 +442,7 @@ export default function HomePage() {
 
             {luck.specialDay && (
               <FadeIn delay={20}>
-                <div className="retro-card p-5" style={{ background: "rgba(224,122,63,0.14)" }}>
+                <div className="retro-card p-5" style={{ background: "rgba(18,83,60,0.10)" }}>
                   <div className="flex items-center gap-2 mb-2">
                     <SparkleIcon size={16} style={{ color: "var(--amber)" }} />
                     <p className="font-display text-base" style={{ color: "var(--amber)" }}>오늘은 {withIeyo(luck.specialDay.name)}</p>
@@ -654,7 +654,7 @@ export default function HomePage() {
                       }}
                       className="px-3 py-1.5 rounded-full text-xs font-semibold transition"
                       style={{
-                        background: tags.includes(tag) ? "rgba(45,106,79,0.12)" : "var(--bg-soft)",
+                        background: tags.includes(tag) ? "rgba(18,83,60,0.12)" : "var(--bg-soft)",
                         color: tags.includes(tag) ? "var(--clover)" : "var(--ink-soft)",
                         border: `2px solid ${tags.includes(tag) ? "var(--clover)" : "var(--card-border)"}`,
                       }}>
@@ -823,7 +823,7 @@ export default function HomePage() {
     {showLuckPopup && (
       <div
         className="fixed inset-0 z-30 flex items-center justify-center p-6"
-        style={{ background: "rgba(74,50,32,0.45)" }}
+        style={{ background: "rgba(45,46,47,0.45)" }}
         onClick={() => setShowLuckPopup(false)}
       >
         <div
