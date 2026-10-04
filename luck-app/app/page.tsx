@@ -291,7 +291,8 @@ export default function HomePage() {
     if (!callInput.trim()) return;
     const text = callInput.trim();
     persistCall(dateKey, text);
-    setCallSubmitted(true);
+    setCallInput("");
+    setCallSubmitted(false);
     setCalledText(text);
     setShowLuckPopup(true);
     setPastCalls(getAllCalls());
