@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import AuthScreen from "@/components/AuthScreen";
@@ -271,10 +271,14 @@ export default function HomePage() {
     setMemoSaved(false);
   }
 
+  const memoToastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   function saveMemo() {
     persistMemo(dateKey, memo);
     setMemoSaved(true);
     setPastMemos(getAllMemos());
+    setSyncMsg("저장완료되었어요");
+    if (memoToastTimer.current) clearTimeout(memoToastTimer.current);
+    memoToastTimer.current = setTimeout(() => setSyncMsg(null), 1800);
   }
 
   function submitLog(r: number, nextTags = tags, nextNote = note) {
@@ -596,12 +600,8 @@ export default function HomePage() {
                 />
                 <button
                   onClick={saveMemo}
-                  disabled={memoSaved}
                   className="retro-btn font-display w-full py-3 text-sm mt-3"
-                  style={{
-                    background: memoSaved ? "var(--bg-soft)" : "var(--clover)",
-                    color: memoSaved ? "var(--ink-soft)" : "#fff",
-                  }}>
+                  style={{ background: "var(--clover)", color: "#fff" }}>
                   저장하기
                 </button>
               </Card>
