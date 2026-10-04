@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Jua, Gaegu } from "next/font/google";
 import "./globals.css";
 import HunnyeoIntroPopup from "@/components/HunnyeoIntroPopup";
+import AdBanner from "@/components/AdBanner";
 
 // 훈녀생정 전용 큐티 서체 (빌드 때 파일로 내려받아 앱에 함께 담긴다)
 const jua = Jua({
@@ -40,6 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 앱을 처음 열었을 때 한 번만 뜨는 안내 팝업 */}
         <HunnyeoIntroPopup />
         {children}
+        {/* 화면 맨 아래 광고 배너 (네이티브 앱에서만 보임) */}
+        <AdBanner />
       </body>
     </html>
   );

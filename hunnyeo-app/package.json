@@ -11,6 +11,7 @@
     "android": "npm run sync && cap open android"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^7.2.0",
     "@capacitor-community/apple-sign-in": "^7.1.0",
     "@capacitor-community/in-app-review": "^7.1.0",
     "@capacitor/android": "^7.4.4",
