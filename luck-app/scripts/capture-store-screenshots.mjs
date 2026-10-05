@@ -46,11 +46,13 @@ async function run() {
       await page.screenshot({ path: path.join(dir, "02-onboarding-step4.png") });
 
       // 3) 나머지 스텝을 빠르게 통과해 대시보드 진입 (오늘 탭)
-      await page.click("text=다음"); // -> 5
+      await page.click("text=다음"); // -> 5 (태어난 시간)
       await page.waitForTimeout(150);
-      await page.click("text=다음"); // -> 6
+      await page.click("text=다음"); // -> 6 (성별)
       await page.waitForTimeout(150);
-      await page.click("text=다음"); // -> 7
+      await page.click("text=다음"); // -> 7 (아침 알림 받을지)
+      await page.waitForTimeout(150);
+      await page.click("text=다음"); // -> 8 (오늘의 메모, 마지막)
       await page.waitForTimeout(150);
       await page.click("text=시작하기");
       await page.waitForTimeout(800);
