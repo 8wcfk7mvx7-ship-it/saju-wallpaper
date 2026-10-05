@@ -11,7 +11,8 @@ import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
-import { initBannerAd } from "@/lib/ads";
+import { initBannerAd, hideBannerAd } from "@/lib/ads";
+import { getAdsRemovedCached, refreshAdsRemoved, getRemoveAdsPriceString, purchaseRemoveAds, restorePurchases } from "@/lib/purchases";
 import { getFontSize, setFontSize, applyFontSize, type FontSize } from "@/lib/fontSize";
 import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut, listenForNativeAuthRedirect } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
@@ -174,6 +175,9 @@ export default function HomePage() {
   const [showLuckPopup, setShowLuckPopup] = useState(false);
   const [notifyOn, setNotifyOn] = useState(false);
   const [fontSize, setFontSizeState] = useState<FontSize>("medium");
+  const [adsRemoved, setAdsRemoved] = useState(false);
+  const [removeAdsPrice, setRemoveAdsPrice] = useState("₩990");
+  const [purchaseBusy, setPurchaseBusy] = useState(false);
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
@@ -241,8 +245,44 @@ export default function HomePage() {
     setFontSizeState(fs);
     applyFontSize(fs);
     setReady(true);
-    initBannerAd();
+    const cachedAdsRemoved = getAdsRemovedCached();
+    setAdsRemoved(cachedAdsRemoved);
+    if (!cachedAdsRemoved) initBannerAd();
+    getRemoveAdsPriceString().then((p) => { if (p) setRemoveAdsPrice(p); });
+    refreshAdsRemoved().then((removed) => {
+      setAdsRemoved(removed);
+      if (removed) hideBannerAd();
+    });
   }, []);
+
+  async function handlePurchaseRemoveAds() {
+    setPurchaseBusy(true);
+    const result = await purchaseRemoveAds();
+    setPurchaseBusy(false);
+    if (result.ok) {
+      setAdsRemoved(true);
+      hideBannerAd();
+      setSyncMsg("광고가 제거됐어요. 감사합니다!");
+      setTimeout(() => setSyncMsg(null), 2500);
+    } else if (!result.cancelled && result.error) {
+      setSyncMsg(result.error);
+      setTimeout(() => setSyncMsg(null), 2500);
+    }
+  }
+
+  async function handleRestorePurchases() {
+    setPurchaseBusy(true);
+    const result = await restorePurchases();
+    setPurchaseBusy(false);
+    if (result.ok) {
+      setAdsRemoved(result.removed);
+      if (result.removed) { hideBannerAd(); setSyncMsg("이전 구매를 복원했어요."); }
+      else setSyncMsg("복원할 구매 내역이 없어요.");
+    } else {
+      setSyncMsg(result.error);
+    }
+    setTimeout(() => setSyncMsg(null), 2500);
+  }
 
   function changeFontSize(size: FontSize) {
     setFontSize(size);
@@ -854,6 +894,28 @@ export default function HomePage() {
                     </button>
                   ))}
                 </div>
+              </Card>
+            </FadeIn>
+            <FadeIn delay={35}>
+              <Card>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>광고 제거</p>
+                {adsRemoved ? (
+                  <p className="text-sm font-bold" style={{ color: "var(--clover)" }}>✓ 광고가 제거됐어요</p>
+                ) : (
+                  <>
+                    <p className="text-xs mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                      한 번 결제로 평생 광고 없이 쓸 수 있어요.
+                    </p>
+                    <button onClick={handlePurchaseRemoveAds} disabled={purchaseBusy}
+                      className="retro-btn w-full py-3 text-sm font-bold" style={{ background: "var(--clover)", color: "#fff", opacity: purchaseBusy ? 0.6 : 1 }}>
+                      {purchaseBusy ? "처리 중…" : `광고 제거하기 (${removeAdsPrice})`}
+                    </button>
+                    <button onClick={handleRestorePurchases} disabled={purchaseBusy}
+                      className="w-full text-center text-xs py-3 mt-1 underline underline-offset-4" style={{ color: "var(--ink-soft)" }}>
+                      이전 구매 복원하기
+                    </button>
+                  </>
+                )}
               </Card>
             </FadeIn>
             <FadeIn delay={40}>

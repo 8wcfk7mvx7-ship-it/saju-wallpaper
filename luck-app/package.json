@@ -24,6 +24,7 @@
     "@capacitor/share": "^7.0.2",
     "@capacitor/splash-screen": "^7.0.4",
     "@capacitor/status-bar": "^7.0.4",
+    "@revenuecat/purchases-capacitor": "^11.3.2",
     "@supabase/supabase-js": "^2.116.0",
     "korean-lunar-calendar": "^0.3.6",
     "lunar-typescript": "^1.8.6",

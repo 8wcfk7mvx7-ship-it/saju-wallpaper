@@ -10,6 +10,7 @@
 //    AdMob이 발급한 진짜 App ID로 바꿔야 한다.
 import { Capacitor } from "@capacitor/core";
 import { AdMob, BannerAdPosition, BannerAdSize } from "@capacitor-community/admob";
+import { getAdsRemovedCached } from "@/lib/purchases";
 
 // 구글 공식 테스트 광고 단위 ID (https://developers.google.com/admob/android/test-ads)
 const TEST_BANNER_ID = {
@@ -33,8 +34,10 @@ function bannerAdId(): string {
 let initialized = false;
 
 // 하단 탭바(BottomTabs)를 가리지 않도록 그 위에 배너를 띄운다.
+// "광고 제거" 구매자에게는 아예 띄우지 않는다 (lib/purchases.ts의 remove_ads 엔타이틀먼트).
 export async function initBannerAd(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return; // 웹 프리뷰에는 광고를 띄우지 않음
+  if (getAdsRemovedCached()) return;
   const adId = bannerAdId();
   if (!adId) return; // 실광고 전환 후 ID를 아직 안 채운 경우 — 조용히 건너뜀
   try {
@@ -52,4 +55,10 @@ export async function initBannerAd(): Promise<void> {
   } catch {
     // Play 서비스 미탑재, 네트워크 없음 등 — 광고 없이도 앱은 정상 동작해야 하므로 조용히 무시
   }
+}
+
+// 구매 완료 직후, 앱을 재시작하지 않고도 바로 배너를 치워준다.
+export async function hideBannerAd(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try { await AdMob.removeBanner(); } catch { /* 띄운 적 없으면 조용히 무시 */ }
 }
