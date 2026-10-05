@@ -12,8 +12,8 @@ export default function AuthScreen({ onBack, onAuthed }: { onBack: () => void; o
   const configured = isCloudSyncConfigured();
 
   return (
-    <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
-      <div className="max-w-lg mx-auto px-6 pt-10 pb-16">
+    <main className="page-fade-in" style={{ background: "var(--bg)", height: "100dvh", overflow: "hidden" }}>
+      <div className="max-w-lg mx-auto px-6 pt-10 pb-16 h-full overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <button onClick={view === "email" ? () => setView("options") : onBack} className="text-sm font-bold mb-4" style={{ color: "var(--ink-soft)" }}>
           ← 뒤로
         </button>

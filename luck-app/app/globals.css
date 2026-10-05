@@ -40,6 +40,11 @@ html, body {
   background: var(--bg);
   color: var(--ink);
   overscroll-behavior-y: none;
+  /* 문서 자체는 절대 스크롤되지 않게 막는다 — 실제 스크롤은 각 화면의 콘텐츠
+     컨테이너(예: 대시보드의 main > div)가 맡는다. iOS 웹뷰에서 body가 스크롤되면
+     position:fixed인 하단 탭바가 관성 스크롤 중/끝에 떠보이거나 밀리는 버그가 있다. */
+  height: 100%;
+  overflow: hidden;
 }
 
 /* 네이티브 앱처럼 느껴지도록 — 탭할 때 웹 특유의 회색 하이라이트를 없애고

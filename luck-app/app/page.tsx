@@ -402,8 +402,8 @@ export default function HomePage() {
   // ── 내 정보 수정(설정에서 진입) — 한 화면에서 전체 항목 수정 ──────────────
   if (screen === "edit") {
     return (
-      <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
-        <div className="max-w-lg mx-auto px-5 pt-10 pb-16">
+      <main className="page-fade-in" style={{ background: "var(--bg)", height: "100dvh", overflow: "hidden" }}>
+        <div className="max-w-lg mx-auto px-5 pt-10 pb-16 h-full overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
           <button onClick={() => setScreen("dashboard")} className="text-sm font-bold mb-4" style={{ color: "var(--ink-soft)" }}>
             ← 뒤로
           </button>
@@ -433,13 +433,15 @@ export default function HomePage() {
   //    메인 화면으로 튕기기 때문이다. ───────────────────────────────────────
   if (screen === "privacy" || screen === "terms") {
     return (
-      <main className="min-h-screen page-fade-in px-6 py-12" style={{ background: "var(--bg)", color: "var(--ink)" }}>
-        <div className="max-w-lg mx-auto mb-4">
-          <button onClick={() => setScreen("dashboard")} className="text-sm font-bold" style={{ color: "var(--ink-soft)" }}>
-            ← 뒤로
-          </button>
+      <main className="page-fade-in" style={{ background: "var(--bg)", color: "var(--ink)", height: "100dvh", overflow: "hidden" }}>
+        <div className="h-full overflow-y-auto px-6 py-12" style={{ WebkitOverflowScrolling: "touch" }}>
+          <div className="max-w-lg mx-auto mb-4">
+            <button onClick={() => setScreen("dashboard")} className="text-sm font-bold" style={{ color: "var(--ink-soft)" }}>
+              ← 뒤로
+            </button>
+          </div>
+          {screen === "privacy" ? <PrivacyContent /> : <TermsContent />}
         </div>
-        {screen === "privacy" ? <PrivacyContent /> : <TermsContent />}
       </main>
     );
   }
@@ -457,8 +459,12 @@ export default function HomePage() {
   // fixed 포지셔닝의 기준(containing block)을 바꿔버려 화면 중앙에 뜨지 않는 문제를 피하기 위함.
   return (
     <>
-    <main className="min-h-screen page-fade-in" style={{ background: "var(--bg)" }}>
-      <div className="max-w-lg mx-auto px-5 pb-28">
+    <main className="page-fade-in" style={{ background: "var(--bg)", height: "100dvh", overflow: "hidden" }}>
+      {/* 탭 안쪽 내용만 스크롤되는 별도 컨테이너로 분리 — body/main 자체가 스크롤되면
+          iOS 웹뷰에서 position:fixed인 하단 탭바가 스크롤 중/관성 스크롤 끝에 잠깐
+          떠보이거나 밀리는 고질적인 버그가 있어서, 이렇게 하면 탭바는 항상 화면에
+          고정된 채로 안쪽 콘텐츠만 움직인다. */}
+      <div className="max-w-lg mx-auto px-5 pb-28 h-full overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <FadeIn>
           <div className="pt-8 pb-2 flex items-start justify-between">
             <div>

@@ -33,8 +33,8 @@ function StepShell({
   onSkipAll?: () => void;
 }) {
   return (
-    <main className="min-h-screen page-fade-in flex flex-col" style={{ background: "var(--bg)" }}>
-      <div className="max-w-lg mx-auto px-6 pt-8 pb-10 flex-1 flex flex-col w-full">
+    <main className="page-fade-in" style={{ background: "var(--bg)", height: "100dvh", overflow: "hidden" }}>
+      <div className="max-w-lg mx-auto px-6 pt-8 pb-10 h-full overflow-y-auto flex flex-col w-full" style={{ WebkitOverflowScrolling: "touch" }}>
         <div className="flex items-center gap-2 mb-8">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (
             <div key={i} className="flex-1 h-2 rounded-full" style={{ background: i < step ? "var(--clover)" : "var(--card-border)", opacity: i < step ? 1 : 0.2 }} />
@@ -90,8 +90,8 @@ export default function OnboardingWizard({
 
   if (step === 1) {
     return (
-      <main className="min-h-screen page-fade-in flex flex-col" style={{ background: "var(--bg)" }}>
-        <div className="max-w-lg mx-auto px-6 pt-10 pb-10 flex-1 flex flex-col">
+      <main className="page-fade-in" style={{ background: "var(--bg)", height: "100dvh", overflow: "hidden" }}>
+        <div className="max-w-lg mx-auto px-6 pt-10 pb-10 h-full overflow-y-auto flex flex-col" style={{ WebkitOverflowScrolling: "touch" }}>
           <div className="flex-1 flex flex-col justify-center">
             <div className="text-center relative">
               <SunPixel size={30} className="absolute -top-2 right-8" />
