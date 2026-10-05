@@ -26,9 +26,11 @@ import { authAvailable, signInWithApple, signInWithGoogle, signOutEverywhere, cu
 import { pullAndMergeRecord } from "@/lib/hunnyeoSync";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
+const FONT_KEY = "hunnyeo_font_v1";
 const REMINDER_KEY = "hunnyeo_reminder_v1";
 const REMINDER_TIME_KEY = "hunnyeo_reminder_time_v1";
-type TextSize = "normal" | "large" | "xlarge";
+type TextSize = "small" | "medium" | "large";
+type FontKey = "gaegu" | "himelody" | "pen" | "gamja" | "dongle";
 
 interface ReminderTime {
   hour: number;
@@ -42,10 +44,32 @@ const REMINDER_PRESETS: { label: string; time: ReminderTime }[] = [
   { label: "밤 10시", time: { hour: 22, minute: 0 } },
 ];
 
-// 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다.
+// 무료 폰트 중에서 본문에 쓸 손글씨체를 고른다. 전부 구글 폰트(무료, 상업적 이용 가능).
+const FONT_PRESETS: { key: FontKey; label: string; sample: string }[] = [
+  { key: "gaegu", label: "기본체", sample: "가나다라" },
+  { key: "himelody", label: "하이멜로디", sample: "가나다라" },
+  { key: "pen", label: "손글씨펜", sample: "가나다라" },
+  { key: "gamja", label: "감자꽃", sample: "가나다라" },
+  { key: "dongle", label: "동글", sample: "가나다라" },
+];
+const FONT_STACK: Record<FontKey, string> = {
+  gaegu: "var(--font-hn-gaegu)",
+  himelody: "var(--font-hn-himelody)",
+  pen: "var(--font-hn-pen)",
+  gamja: "var(--font-hn-gamja)",
+  dongle: "var(--font-hn-dongle)",
+};
+
+// 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다. (중간이 기본값)
 function applyTextSize(size: TextSize) {
-  if (size === "normal") document.documentElement.removeAttribute("data-hn-text");
+  if (size === "medium") document.documentElement.removeAttribute("data-hn-text");
   else document.documentElement.setAttribute("data-hn-text", size);
+}
+
+// 저장된 폰트를 <html> 에 표시해 둔다. (기본체가 기본값)
+function applyFont(font: FontKey) {
+  if (font === "gaegu") document.documentElement.removeAttribute("data-hn-font");
+  else document.documentElement.setAttribute("data-hn-font", font);
 }
 
 export default function HunnyeoMyPage() {
@@ -62,7 +86,8 @@ export default function HunnyeoMyPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cardUrl, setCardUrl] = useState("");
   const [cardMsg, setCardMsg] = useState("");
-  const [textSize, setTextSize] = useState<TextSize>("normal");
+  const [textSize, setTextSize] = useState<TextSize>("medium");
+  const [font, setFont] = useState<FontKey>("gaegu");
   const [canNotify, setCanNotify] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
   const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[0].time);
@@ -78,9 +103,13 @@ export default function HunnyeoMyPage() {
     setNickname(storedNickname);
     setAvatar(loadJSON(AVATAR_STORAGE_KEY, ""));
 
-    const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "normal");
+    const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "medium");
     setTextSize(size);
     applyTextSize(size);
+
+    const storedFont = loadJSON<FontKey>(FONT_KEY, "gaegu");
+    setFont(storedFont);
+    applyFont(storedFont);
 
     const storedReminderOn = loadJSON<boolean>(REMINDER_KEY, false);
     const storedReminderTime = loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[0].time);
@@ -171,12 +200,19 @@ export default function HunnyeoMyPage() {
     );
   }
 
-  // ── 글자 크기 ───────────────────────────────────────────────────────
+  // ── 글자 크기 · 폰트 ───────────────────────────────────────────────────
   function changeTextSize(size: TextSize) {
     tapFeedback();
     setTextSize(size);
     applyTextSize(size);
     saveJSON(TEXT_SIZE_KEY, size);
+  }
+
+  function changeFont(key: FontKey) {
+    tapFeedback();
+    setFont(key);
+    applyFont(key);
+    saveJSON(FONT_KEY, key);
   }
 
   // ── 하루 한 번 알림 ─────────────────────────────────────────────────
@@ -561,9 +597,9 @@ export default function HunnyeoMyPage() {
           <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자 크기</p>
           <div className="flex gap-2 mb-4">
             {([
-              ["normal", "보통"],
+              ["small", "작게"],
+              ["medium", "중간"],
               ["large", "크게"],
-              ["xlarge", "더 크게"],
             ] as const).map(([key, label]) => (
               <button
                 key={key}
@@ -571,6 +607,22 @@ export default function HunnyeoMyPage() {
                 className={`hn-btn flex-1 py-2 text-[12px] ${textSize === key ? "hn-btn-on" : ""}`}
                 aria-pressed={textSize === key}
               >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자체</p>
+          <div className="grid grid-cols-3 gap-1.5 mb-4">
+            {FONT_PRESETS.map(({ key, label, sample }) => (
+              <button
+                key={key}
+                onClick={() => changeFont(key)}
+                className={`hn-btn py-2 text-[11px] leading-tight ${font === key ? "hn-btn-on" : ""}`}
+                aria-pressed={font === key}
+                style={{ fontFamily: FONT_STACK[key] }}
+              >
+                <span className="block text-[14px]">{sample}</span>
                 {label}
               </button>
             ))}

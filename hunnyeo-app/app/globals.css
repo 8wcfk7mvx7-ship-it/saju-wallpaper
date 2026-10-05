@@ -26,10 +26,30 @@ input[type="search"]::-webkit-search-decoration {
 
 /* 글자 크기 조절 — 내 정보에서 고르면 뿌리에 표시가 붙는다.
    화면이 px 로 짜여 있어 font-size 배율로는 안 커지므로 zoom 을 쓴다.
-   (사파리/WKWebView 에서 동작하고, 안 먹는 환경에서는 원래 크기 그대로다) */
-html[data-hn-text="large"] body {
-  zoom: 1.12;
+   (사파리/WKWebView 에서 동작하고, 안 먹는 환경에서는 원래 크기 그대로다)
+   기본값(표시 없음)이 "중간" 이고, 작게/크게 둘만 표시를 붙인다. */
+html[data-hn-text="small"] body {
+  zoom: 0.88;
 }
-html[data-hn-text="xlarge"] body {
-  zoom: 1.25;
+html[data-hn-text="large"] body {
+  zoom: 1.18;
+}
+
+/* 본문 폰트 선택 — 내 정보에서 고르면 뿌리에 표시가 붙는다.
+   기본값(표시 없음)은 Gaegu. app/layout.tsx 에서 다섯 폰트를 전부
+   미리 불러와 두고, 여기서는 --font-hn-body 가 어느 쪽을 가리킬지만 고른다. */
+:root {
+  --font-hn-body: var(--font-hn-gaegu);
+}
+html[data-hn-font="himelody"] body {
+  --font-hn-body: var(--font-hn-himelody);
+}
+html[data-hn-font="pen"] body {
+  --font-hn-body: var(--font-hn-pen);
+}
+html[data-hn-font="gamja"] body {
+  --font-hn-body: var(--font-hn-gamja);
+}
+html[data-hn-font="dongle"] body {
+  --font-hn-body: var(--font-hn-dongle);
 }

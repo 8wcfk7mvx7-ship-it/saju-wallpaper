@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Jua, Gaegu } from "next/font/google";
+import { Jua, Gaegu, Hi_Melody, Nanum_Pen_Script, Gamja_Flower, Dongle } from "next/font/google";
 import "./globals.css";
 import HunnyeoIntroPopup from "@/components/HunnyeoIntroPopup";
 import AdBanner from "@/components/AdBanner";
@@ -12,10 +12,37 @@ const jua = Jua({
   display: "swap",
 });
 
+// 본문 서체 — 내 정보 화면에서 무료 폰트 중 하나로 바꿔 쓸 수 있다.
+// 실제로 적용되는 건 --font-hn-body 하나뿐이고, 어떤 폰트를 가리킬지는
+// globals.css 의 html[data-hn-font="..."] 규칙이 고른다.
 const gaegu = Gaegu({
   weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--font-hn-body",
+  variable: "--font-hn-gaegu",
+  display: "swap",
+});
+const himelody = Hi_Melody({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-hn-himelody",
+  display: "swap",
+});
+const pen = Nanum_Pen_Script({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-hn-pen",
+  display: "swap",
+});
+const gamja = Gamja_Flower({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-hn-gamja",
+  display: "swap",
+});
+const dongle = Dongle({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-hn-dongle",
   display: "swap",
 });
 
@@ -36,7 +63,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${jua.variable} ${gaegu.variable}`}>
+    <html
+      lang="ko"
+      className={`${jua.variable} ${gaegu.variable} ${himelody.variable} ${pen.variable} ${gamja.variable} ${dongle.variable}`}
+    >
       <body>
         {/* 앱을 처음 열었을 때 한 번만 뜨는 안내 팝업 */}
         <HunnyeoIntroPopup />
