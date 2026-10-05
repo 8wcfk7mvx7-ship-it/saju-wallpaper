@@ -2,19 +2,22 @@
 // 네이티브 앱(iOS·안드로이드)에서만 동작한다. 웹 미리보기(브라우저)에서는
 // import 자체를 하지 않으므로 아무 일도 일어나지 않는다.
 //
-// ⚠️ 아래 ID 네 개는 전부 구글이 공식으로 제공하는 "테스트" ID다.
+// iOS 는 실제 AdMob 콘솔에서 발급받은 값으로 채워져 있다.
+// 안드로이드는 아직 AdMob에 앱을 안 만들어서 구글 공식 "테스트" ID 그대로 둔다
+// (나중에 안드로이드용 앱을 만들면 여기만 바꾸면 된다).
 // https://developers.google.com/admob/ios/test-ads
-// AdMob 콘솔에서 본인 앱과 배너 광고 단위를 만든 뒤, 이 값들과
-// isTesting 플래그를 실제 값으로 바꿔야 광고 수익이 발생한다.
-// 바꾸기 전까지는 "Test Ad" 라고 적힌 가짜 광고만 나온다 (정상 동작).
+//
+// ⚠️ isTesting 은 아직 true 로 켜 둔다 — 이게 true 인 동안은 실제 ID를 넣어도
+// 항상 "Test Ad"만 뜨고 진짜 광고는 안 나간다. 앱스토어 제출 직전에
+// showBannerAd() 안의 isTesting 을 false 로 바꿔야 그때부터 진짜 광고가 뜬다.
 const ADMOB_APP_ID = {
-  ios: "ca-app-pub-3940256099942544~1458002511",
-  android: "ca-app-pub-3940256099942544~3347511713",
+  ios: "ca-app-pub-3174617933560150~7714124390",
+  android: "ca-app-pub-3940256099942544~3347511713", // 테스트 ID (안드로이드 앱 만들면 교체)
 } as const;
 
 const BANNER_AD_UNIT_ID = {
-  ios: "ca-app-pub-3940256099942544/2934735716",
-  android: "ca-app-pub-3940256099942544/6300978111",
+  ios: "ca-app-pub-3174617933560150/9765572660",
+  android: "ca-app-pub-3940256099942544/6300978111", // 테스트 ID (안드로이드 앱 만들면 교체)
 } as const;
 
 type NativePlatform = "ios" | "android";

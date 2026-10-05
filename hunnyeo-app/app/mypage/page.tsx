@@ -24,6 +24,7 @@ import { notificationsAvailable, enableDailyReminder, disableDailyReminder } fro
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
 import { authAvailable, signInWithApple, signInWithGoogle, signOutEverywhere, currentUser, type HunnyeoUser } from "@/lib/hunnyeoAuth";
 import { pullAndMergeRecord } from "@/lib/hunnyeoSync";
+import { purchasesAvailable, isAdsRemoved, purchaseRemoveAds, restorePurchases } from "@/lib/hunnyeoPurchase";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
 const FONT_KEY = "hunnyeo_font_v1";
@@ -95,6 +96,10 @@ export default function HunnyeoMyPage() {
   const [authUser, setAuthUser] = useState<HunnyeoUser | null>(null);
   const [authMsg, setAuthMsg] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [canPurchase, setCanPurchase] = useState(false);
+  const [adsRemoved, setAdsRemoved] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [purchaseMsg, setPurchaseMsg] = useState("");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
@@ -125,6 +130,10 @@ export default function HunnyeoMyPage() {
     void authAvailable().then(async available => {
       setCanUseAuth(available);
       if (available) setAuthUser(await currentUser());
+    });
+    void purchasesAvailable().then(async available => {
+      setCanPurchase(available);
+      if (available) setAdsRemoved(await isAdsRemoved());
     });
   }, []);
 
@@ -213,6 +222,31 @@ export default function HunnyeoMyPage() {
     setFont(key);
     applyFont(key);
     saveJSON(FONT_KEY, key);
+  }
+
+  // ── 광고 제거 ───────────────────────────────────────────────────────
+  async function buyRemoveAds() {
+    tapFeedback();
+    setPurchasing(true);
+    setPurchaseMsg("");
+    const result = await purchaseRemoveAds();
+    setPurchasing(false);
+    if (result === "owned") {
+      setAdsRemoved(true);
+      setPurchaseMsg("광고가 제거됐어요. 고마워요!");
+    } else if (result === "failed") {
+      setPurchaseMsg("구매가 안 됐어요. 취소했거나 잠시 문제가 있었을 수 있어요.");
+    }
+  }
+
+  async function restoreRemoveAds() {
+    tapFeedback();
+    setPurchasing(true);
+    setPurchaseMsg("");
+    const owned = await restorePurchases();
+    setPurchasing(false);
+    setAdsRemoved(owned);
+    setPurchaseMsg(owned ? "이전에 구매한 내역을 찾아서 복원했어요." : "복원할 구매 내역이 없어요.");
   }
 
   // ── 하루 한 번 알림 ─────────────────────────────────────────────────
@@ -627,6 +661,42 @@ export default function HunnyeoMyPage() {
               </button>
             ))}
           </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>광고 제거</p>
+          {canPurchase ? (
+            adsRemoved ? (
+              <p className="hn-btn hn-btn-on w-full py-2.5 text-[12px] text-center mb-4" style={{ cursor: "default" }}>
+                <span className="flex items-center justify-center gap-1.5">
+                  <PixelIcon name="check" size={13} /> 광고 제거됨
+                </span>
+              </p>
+            ) : (
+              <div className="mb-4">
+                <button
+                  onClick={buyRemoveAds}
+                  disabled={purchasing}
+                  className="hn-btn w-full py-2.5 text-[12px] mb-1.5"
+                >
+                  {purchasing ? "처리 중..." : "배너 광고 없애기 — 990원"}
+                </button>
+                <button
+                  onClick={restoreRemoveAds}
+                  disabled={purchasing}
+                  className="text-[11px] font-bold underline"
+                  style={{ color: "#b08aa0" }}
+                >
+                  이전에 구매했어요 (복원하기)
+                </button>
+                {purchaseMsg && (
+                  <p className="text-[11px] font-bold mt-1.5" style={{ color: "#b06a94" }}>{purchaseMsg}</p>
+                )}
+              </div>
+            )
+          ) : (
+            <p className="text-[11.5px] font-bold mb-4" style={{ color: "#b08aa0" }}>
+              구매는 앱으로 열었을 때만 할 수 있어요.
+            </p>
+          )}
 
           <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>하루 한 번 알림</p>
           {canNotify ? (

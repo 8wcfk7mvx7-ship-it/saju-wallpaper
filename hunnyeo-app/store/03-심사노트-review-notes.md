@@ -37,12 +37,14 @@ content works fully in Airplane Mode. The only network activity is (a) the
 optional sign-in/sync described above, and (b) loading the banner ad
 described below. No analytics SDK is included.
 
-FREE, NO IN-APP PURCHASES, ONE SMALL BANNER AD
-The app is completely free with no in-app purchases, subscriptions, or
-external payment links. It shows one small banner ad (Google AdMob) at the
-bottom of the screen; there are no interstitial or rewarded ads. Users who
-decline the App Tracking Transparency prompt still see ads (non-personalized)
-and lose no functionality.
+FREE, ONE OPTIONAL IN-APP PURCHASE, ONE SMALL BANNER AD
+The app is completely free to use. It shows one small banner ad (Google
+AdMob) at the bottom of the screen; there are no interstitial or rewarded
+ads. Users who decline the App Tracking Transparency prompt still see ads
+(non-personalized) and lose no functionality. A single optional, non-
+consumable in-app purchase ("Remove Ads") permanently hides the banner for
+that user - it unlocks no additional content, it is purely cosmetic. A
+"Restore Purchases" button is available on the My Info screen.
 
 NATIVE FEATURES
 Beyond the archive itself the app provides: full-text search across all 387
@@ -117,3 +119,5 @@ please let us know and we will translate the specific entry.
 | **5.1.1 Privacy Policy** | 개인정보처리방침 URL 이 실제로 열리는지 확인. 접속 안 되면 바로 리젝 |
 | **2.3.1 / App Tracking Transparency 안내 문구 누락** | Xcode `Info.plist` 에 `NSUserTrackingUsageDescription` 문구가 들어있는지 확인 (lib/hunnyeoAds.ts 상단 주석 참고) |
 | **광고가 "테스트 광고"로 보인다는 지적** | `lib/hunnyeoAds.ts` 의 `isTesting: true` 를 실제 AdMob 콘솔 승인 후 `false` 로 바꾸고 테스트 ID 네 개를 전부 본인 것으로 교체했는지 확인 |
+| **3.1.1 In-App Purchase — 구매가 안 되거나 복원이 안 됨** | App Store Connect의 인앱 구입 상품 상태가 "제출 준비 완료"인지 확인 (상품이 "미완료" 상태면 심사 중 구매 자체가 막힘). 제품 ID가 `remove_ads` 로 코드와 정확히 일치하는지도 확인 |
+| **3.1.1 Restore Purchases 버튼을 못 찾겠다는 지적** | 내 정보 → 설정 → "광고 제거" 바로 아래 "이전에 구매했어요(복원하기)" 링크 위치를 노트에 적어 안내 |
