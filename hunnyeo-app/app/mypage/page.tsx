@@ -36,7 +36,7 @@ interface ReminderTime {
 }
 
 const REMINDER_PRESETS: { label: string; time: ReminderTime }[] = [
-  { label: "아침 9시", time: { hour: 9, minute: 0 } },
+  { label: "아침 8시", time: { hour: 8, minute: 0 } },
   { label: "점심 1시", time: { hour: 13, minute: 0 } },
   { label: "저녁 8시", time: { hour: 20, minute: 0 } },
   { label: "밤 10시", time: { hour: 22, minute: 0 } },
@@ -65,7 +65,7 @@ export default function HunnyeoMyPage() {
   const [textSize, setTextSize] = useState<TextSize>("normal");
   const [canNotify, setCanNotify] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
-  const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[2].time);
+  const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[0].time);
   const [canUseAuth, setCanUseAuth] = useState(false);
   const [authUser, setAuthUser] = useState<HunnyeoUser | null>(null);
   const [authMsg, setAuthMsg] = useState("");
@@ -74,16 +74,25 @@ export default function HunnyeoMyPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
-    setNickname(loadJSON(NICKNAME_STORAGE_KEY, "완소소녀"));
+    const storedNickname = loadJSON(NICKNAME_STORAGE_KEY, "완소소녀");
+    setNickname(storedNickname);
     setAvatar(loadJSON(AVATAR_STORAGE_KEY, ""));
 
     const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "normal");
     setTextSize(size);
     applyTextSize(size);
 
-    setReminderOn(loadJSON<boolean>(REMINDER_KEY, false));
-    setReminderTime(loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[2].time));
-    void notificationsAvailable().then(setCanNotify);
+    const storedReminderOn = loadJSON<boolean>(REMINDER_KEY, false);
+    const storedReminderTime = loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[0].time);
+    setReminderOn(storedReminderOn);
+    setReminderTime(storedReminderTime);
+    void notificationsAvailable().then(async available => {
+      setCanNotify(available);
+      // 켜져 있었다면 앱을 열 때마다 60일치 예약을 다시 채워 끊기지 않게 한다
+      if (available && storedReminderOn) {
+        await enableDailyReminder(storedReminderTime.hour, storedReminderTime.minute, storedNickname);
+      }
+    });
     void authAvailable().then(async available => {
       setCanUseAuth(available);
       if (available) setAuthUser(await currentUser());
