@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Jua, Gaegu, Hi_Melody, Nanum_Pen_Script, Gamja_Flower, Dongle } from "next/font/google";
+import { Jua, Gaegu, Hi_Melody, Nanum_Pen_Script, Gamja_Flower, Dongle, Noto_Sans_KR, Nanum_Gothic, Gowun_Dodum } from "next/font/google";
 import "./globals.css";
 import HunnyeoIntroPopup from "@/components/HunnyeoIntroPopup";
 import AdBanner from "@/components/AdBanner";
@@ -45,6 +45,25 @@ const dongle = Dongle({
   variable: "--font-hn-dongle",
   display: "swap",
 });
+// 손글씨 느낌 대신 또박또박 읽기 편한 "평범한" 서체 세 가지
+const notosans = Noto_Sans_KR({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-hn-notosans",
+  display: "swap",
+});
+const nanumgothic = Nanum_Gothic({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-hn-nanumgothic",
+  display: "swap",
+});
+const gowun = Gowun_Dodum({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-hn-gowun",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "훈녀생정 — 90년대생 추억 뷰티 노트",
@@ -65,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ko"
-      className={`${jua.variable} ${gaegu.variable} ${himelody.variable} ${pen.variable} ${gamja.variable} ${dongle.variable}`}
+      className={`${jua.variable} ${gaegu.variable} ${himelody.variable} ${pen.variable} ${gamja.variable} ${dongle.variable} ${notosans.variable} ${nanumgothic.variable} ${gowun.variable}`}
     >
       <body>
         {/* 앱을 처음 열었을 때 한 번만 뜨는 안내 팝업 */}

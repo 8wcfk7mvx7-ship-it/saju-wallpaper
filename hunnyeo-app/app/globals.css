@@ -36,7 +36,7 @@ html[data-hn-text="large"] body {
 }
 
 /* 본문 폰트 선택 — 내 정보에서 고르면 뿌리에 표시가 붙는다.
-   기본값(표시 없음)은 Gaegu. app/layout.tsx 에서 다섯 폰트를 전부
+   기본값(표시 없음)은 Gaegu. app/layout.tsx 에서 여덟 폰트를 전부
    미리 불러와 두고, 여기서는 --font-hn-body 가 어느 쪽을 가리킬지만 고른다. */
 :root {
   --font-hn-body: var(--font-hn-gaegu);
@@ -52,4 +52,13 @@ html[data-hn-font="gamja"] body {
 }
 html[data-hn-font="dongle"] body {
   --font-hn-body: var(--font-hn-dongle);
+}
+html[data-hn-font="notosans"] body {
+  --font-hn-body: var(--font-hn-notosans);
+}
+html[data-hn-font="nanumgothic"] body {
+  --font-hn-body: var(--font-hn-nanumgothic);
+}
+html[data-hn-font="gowun"] body {
+  --font-hn-body: var(--font-hn-gowun);
 }

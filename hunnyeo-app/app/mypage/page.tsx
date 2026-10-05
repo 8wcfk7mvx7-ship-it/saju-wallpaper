@@ -31,7 +31,7 @@ const FONT_KEY = "hunnyeo_font_v1";
 const REMINDER_KEY = "hunnyeo_reminder_v1";
 const REMINDER_TIME_KEY = "hunnyeo_reminder_time_v1";
 type TextSize = "small" | "medium" | "large";
-type FontKey = "gaegu" | "himelody" | "pen" | "gamja" | "dongle";
+type FontKey = "gaegu" | "himelody" | "pen" | "gamja" | "dongle" | "notosans" | "nanumgothic" | "gowun";
 
 interface ReminderTime {
   hour: number;
@@ -45,13 +45,19 @@ const REMINDER_PRESETS: { label: string; time: ReminderTime }[] = [
   { label: "밤 10시", time: { hour: 22, minute: 0 } },
 ];
 
-// 무료 폰트 중에서 본문에 쓸 손글씨체를 고른다. 전부 구글 폰트(무료, 상업적 이용 가능).
-const FONT_PRESETS: { key: FontKey; label: string; sample: string }[] = [
+// 무료 폰트 중에서 본문에 쓸 서체를 고른다. 전부 구글 폰트(무료, 상업적 이용 가능).
+const HANDWRITING_FONTS: { key: FontKey; label: string; sample: string }[] = [
   { key: "gaegu", label: "기본체", sample: "가나다라" },
   { key: "himelody", label: "하이멜로디", sample: "가나다라" },
   { key: "pen", label: "손글씨펜", sample: "가나다라" },
   { key: "gamja", label: "감자꽃", sample: "가나다라" },
   { key: "dongle", label: "동글", sample: "가나다라" },
+];
+// 손글씨 느낌 대신 또박또박 읽기 편한 평범한 서체
+const READABLE_FONTS: { key: FontKey; label: string; sample: string }[] = [
+  { key: "notosans", label: "노토산스", sample: "가나다라" },
+  { key: "nanumgothic", label: "나눔고딕", sample: "가나다라" },
+  { key: "gowun", label: "고운돋움", sample: "가나다라" },
 ];
 const FONT_STACK: Record<FontKey, string> = {
   gaegu: "var(--font-hn-gaegu)",
@@ -59,6 +65,9 @@ const FONT_STACK: Record<FontKey, string> = {
   pen: "var(--font-hn-pen)",
   gamja: "var(--font-hn-gamja)",
   dongle: "var(--font-hn-dongle)",
+  notosans: "var(--font-hn-notosans)",
+  nanumgothic: "var(--font-hn-nanumgothic)",
+  gowun: "var(--font-hn-gowun)",
 };
 
 // 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다. (중간이 기본값)
@@ -646,9 +655,25 @@ export default function HunnyeoMyPage() {
             ))}
           </div>
 
-          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자체</p>
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자체 — 손글씨 느낌</p>
+          <div className="grid grid-cols-3 gap-1.5 mb-3">
+            {HANDWRITING_FONTS.map(({ key, label, sample }) => (
+              <button
+                key={key}
+                onClick={() => changeFont(key)}
+                className={`hn-btn py-2 text-[11px] leading-tight ${font === key ? "hn-btn-on" : ""}`}
+                aria-pressed={font === key}
+                style={{ fontFamily: FONT_STACK[key] }}
+              >
+                <span className="block text-[14px]">{sample}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자체 — 또박또박 읽기 편한</p>
           <div className="grid grid-cols-3 gap-1.5 mb-4">
-            {FONT_PRESETS.map(({ key, label, sample }) => (
+            {READABLE_FONTS.map(({ key, label, sample }) => (
               <button
                 key={key}
                 onClick={() => changeFont(key)}
