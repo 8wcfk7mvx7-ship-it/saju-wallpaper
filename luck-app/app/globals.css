@@ -30,6 +30,12 @@
   box-sizing: border-box;
 }
 
+/* 글자 크기 설정(설정 탭 > 글자 크기) — Tailwind의 text-xs~2xl이 전부 rem 단위라
+   html의 font-size만 바꾸면 앱 전체 글자가 비율대로 같이 커지고 작아진다. */
+html { font-size: 16px; }
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="large"] { font-size: 19px; }
+
 html, body {
   background: var(--bg);
   color: var(--ink);

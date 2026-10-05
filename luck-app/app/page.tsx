@@ -12,6 +12,7 @@ import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
 import { initBannerAd } from "@/lib/ads";
+import { getFontSize, setFontSize, applyFontSize, type FontSize } from "@/lib/fontSize";
 import { isCloudSyncConfigured, getCurrentUser, onAuthChange, signOut, listenForNativeAuthRedirect } from "@/lib/auth";
 import { syncOnLogin } from "@/lib/cloudSync";
 import type { User } from "@supabase/supabase-js";
@@ -133,7 +134,7 @@ function BottomTabs({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void })
             style={{ color: active ? "var(--clover)" : "var(--ink-soft)" }}
           >
             <Icon size={20} />
-            <span className="text-[11px]" style={{ fontWeight: active ? 800 : 600 }}>{label}</span>
+            <span className="text-[0.6875rem]" style={{ fontWeight: active ? 800 : 600 }}>{label}</span>
           </button>
         );
       })}
@@ -172,6 +173,7 @@ export default function HomePage() {
   const [calledText, setCalledText] = useState("");
   const [showLuckPopup, setShowLuckPopup] = useState(false);
   const [notifyOn, setNotifyOn] = useState(false);
+  const [fontSize, setFontSizeState] = useState<FontSize>("medium");
 
   const [pastMemos, setPastMemos] = useState<{ date: string; content: string }[]>([]);
   const [pastCalls, setPastCalls] = useState<{ date: string; text: string }[]>([]);
@@ -235,9 +237,17 @@ export default function HomePage() {
       setSplashDone(true); // 첫 방문은 위저드로 바로 들어가므로 스플래시 대기가 필요 없음
     }
     setNotifyOn(getMorningNotifyEnabled());
+    const fs = getFontSize();
+    setFontSizeState(fs);
+    applyFontSize(fs);
     setReady(true);
     initBannerAd();
   }, []);
+
+  function changeFontSize(size: FontSize) {
+    setFontSize(size);
+    setFontSizeState(size);
+  }
 
   useEffect(() => {
     if (!ready) return;
@@ -554,12 +564,12 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
-                    <p className="text-[11px] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>행운의 컬러</p>
+                    <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>행운의 컬러</p>
                     <p className="font-display text-xl" style={{ color: "var(--ink)" }}>{luck.todayColor}</p>
                   </div>
                   <div className="w-px self-stretch" style={{ background: "var(--card-border)", opacity: 0.3 }} />
                   <div className="flex-1">
-                    <p className="text-[11px] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>행운의 숫자</p>
+                    <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>행운의 숫자</p>
                     <p className="font-display text-xl" style={{ color: "var(--ink)" }}>{luck.todayNumbers.join(" · ")}</p>
                   </div>
                 </div>
@@ -579,14 +589,14 @@ export default function HomePage() {
                     const g = luck.dailyGrades[key];
                     return (
                       <div key={key} className="flex flex-col items-center gap-1.5 py-1">
-                        <span className="text-[11px] font-bold" style={{ color: "var(--ink-soft)" }}>{label}</span>
+                        <span className="text-[0.6875rem] font-bold" style={{ color: "var(--ink-soft)" }}>{label}</span>
                         <span
                           className="w-10 h-10 rounded-full flex items-center justify-center font-display text-lg"
                           style={{ background: GRADE_COLOR[g.grade], color: "#fff" }}
                         >
                           {g.grade}
                         </span>
-                        <span className="text-[10px]" style={{ color: "var(--ink-soft)" }}>{g.label}</span>
+                        <span className="text-[0.625rem]" style={{ color: "var(--ink-soft)" }}>{g.label}</span>
                       </div>
                     );
                   })}
@@ -602,12 +612,12 @@ export default function HomePage() {
             <FadeIn delay={110}>
               <div className="grid grid-cols-2 gap-3">
                 <Card>
-                  <p className="text-[11px] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>이 절기의 행운색</p>
+                  <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>이 절기의 행운색</p>
                   <p className="font-display text-lg" style={{ color: "var(--ink)" }}>{luck.seasonColor}</p>
                   <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>{luck.seasonItem}</p>
                 </Card>
                 <Card>
-                  <p className="text-[11px] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>
+                  <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>
                     {profile ? "내 기본 행운" : "기본 행운(생년월일 필요)"}
                   </p>
                   <p className="font-display text-lg" style={{ color: "var(--ink)" }}>{luck.personalColor ?? "—"}</p>
@@ -641,7 +651,7 @@ export default function HomePage() {
               <Card>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-bold" style={{ color: "var(--ink-soft)" }}>{todayLabel}의 메모</p>
-                  <span className="text-[10px]" style={{ color: memoSaved ? "var(--ink-soft)" : "var(--clover)" }}>
+                  <span className="text-[0.625rem]" style={{ color: memoSaved ? "var(--ink-soft)" : "var(--clover)" }}>
                     {memoSaved ? "저장됨" : "저장 안 된 내용 있음"}
                   </span>
                 </div>
@@ -669,7 +679,7 @@ export default function HomePage() {
                   emptyText="아직 지난 메모가 없어요."
                   renderItem={(m) => (
                     <>
-                      <p className="text-[11px] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
+                      <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--ink)" }}>{m.content}</p>
                     </>
                   )}
@@ -687,7 +697,7 @@ export default function HomePage() {
                 <div className="grid grid-cols-5 gap-1.5 mb-3">
                   {[1, 2, 3, 4, 5].map((r) => (
                     <button key={r} onClick={() => submitLog(r)}
-                      className="retro-btn py-2.5 text-[11px] font-bold"
+                      className="retro-btn py-2.5 text-[0.6875rem] font-bold"
                       style={{
                         background: rating === r ? "var(--clover)" : "var(--bg-soft)",
                         color: rating === r ? "#fff" : "var(--ink-soft)",
@@ -724,14 +734,14 @@ export default function HomePage() {
                 />
 
                 <Perforation />
-                <p className="text-[11px] font-bold mb-2" style={{ color: "var(--ink-soft)" }}>최근 7일</p>
+                <p className="text-[0.6875rem] font-bold mb-2" style={{ color: "var(--ink-soft)" }}>최근 7일</p>
                 <div className="flex items-end gap-1.5 h-12">
                   {last7Dates().map((d) => {
                     const r = history[d]?.rating ?? 0;
                     return (
                       <div key={d} className="flex-1 flex flex-col items-center justify-end h-full gap-1">
                         <div className="w-full" style={{ height: r ? `${r * 20}%` : "4%", background: r ? "var(--clover)" : "var(--card-border)", minHeight: 4, opacity: r ? 1 : 0.25, border: "1px solid var(--card-border)" }} />
-                        <span className="text-[9px]" style={{ color: "var(--ink-soft)" }}>{d.slice(8)}</span>
+                        <span className="text-[0.5625rem]" style={{ color: "var(--ink-soft)" }}>{d.slice(8)}</span>
                       </div>
                     );
                   })}
@@ -748,7 +758,7 @@ export default function HomePage() {
                   emptyText="아직 행운을 부른 기록이 없어요."
                   renderItem={(c) => (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-[11px] font-bold shrink-0" style={{ color: "var(--ink-soft)" }}>{formatDateLabel(c.date)}</span>
+                      <span className="text-[0.6875rem] font-bold shrink-0" style={{ color: "var(--ink-soft)" }}>{formatDateLabel(c.date)}</span>
                       <span className="text-sm" style={{ color: "var(--ink)" }}>&ldquo;{c.text}&rdquo;</span>
                     </div>
                   )}
@@ -824,6 +834,20 @@ export default function HomePage() {
                   style={{ background: notifyOn ? "var(--clover)" : "var(--card)", color: notifyOn ? "#fff" : "var(--ink-soft)" }}>
                   {notifyOn ? "알림 켜짐 (끄려면 눌러주세요)" : "알림 켜기"}
                 </button>
+              </Card>
+            </FadeIn>
+            <FadeIn delay={30}>
+              <Card>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--ink-soft)" }}>글자 크기</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([["small", "작게"], ["medium", "중간"], ["large", "크게"]] as [FontSize, string][]).map(([size, label]) => (
+                    <button key={size} onClick={() => changeFontSize(size)}
+                      className="retro-btn py-3 text-sm font-bold"
+                      style={{ background: fontSize === size ? "var(--clover)" : "var(--card)", color: fontSize === size ? "#fff" : "var(--ink-soft)" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </Card>
             </FadeIn>
             <FadeIn delay={40}>

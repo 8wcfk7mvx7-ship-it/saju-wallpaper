@@ -75,7 +75,7 @@ export default function HistoryList<T>({
         {rows.map((row, i) => (
           <div key={row.date}>
             {row.showMonthHeader && (
-              <p className="text-[10px] font-bold mb-2" style={{ color: "var(--ink-soft)", opacity: 0.65 }}>{row.month}</p>
+              <p className="text-[0.625rem] font-bold mb-2" style={{ color: "var(--ink-soft)", opacity: 0.65 }}>{row.month}</p>
             )}
             {renderItem(row.item)}
             {i < rows.length - 1 && <div className="mt-3" style={{ borderTop: "2px dashed var(--card-border)", opacity: 0.35 }} />}
