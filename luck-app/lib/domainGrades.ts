@@ -41,18 +41,36 @@ const GROUP_DOMAIN_MOD: Record<SipseongGroup, Record<DomainKey, number>> = {
   인성: { money: +1, love: +1, career: -1 },
 };
 
-const GRADE_LABEL: Record<Grade, string> = {
-  S: "최고의 하루",
-  A: "술술 풀리는 하루",
-  B: "무난한 하루",
-  C: "조심스러운 하루",
-  D: "신중해야 하는 하루",
+// 애정운·금전운·직장운은 같은 등급이라도 각자 다른 의미를 가지므로, 등급 하나당
+// 문구 하나를 세 도메인이 나눠 쓰지 않고 도메인×등급(3×5=15)마다 전용 문구를 둔다.
+const DOMAIN_GRADE_LABEL: Record<DomainKey, Record<Grade, string>> = {
+  love: {
+    S: "설레는 인연이 다가오는 하루",
+    A: "마음이 잘 통하는 하루",
+    B: "무난하게 흘러가는 하루",
+    C: "작은 오해를 조심할 하루",
+    D: "말을 아끼는 게 좋은 하루",
+  },
+  money: {
+    S: "뜻밖의 수입운이 따르는 하루",
+    A: "돈 흐름이 술술 풀리는 하루",
+    B: "수입과 지출이 평범한 하루",
+    C: "지갑 단속이 필요한 하루",
+    D: "충동구매를 조심할 하루",
+  },
+  career: {
+    S: "성과가 확실히 드러나는 하루",
+    A: "일이 손에 잘 붙는 하루",
+    B: "꾸준히 해나가면 되는 하루",
+    C: "실수를 조심해야 하는 하루",
+    D: "무리한 추진은 피할 하루",
+  },
 };
 
-function scoreToGrade(score: number): DomainGrade {
+function scoreToGrade(score: number, domain: DomainKey): DomainGrade {
   const s = Math.max(1, Math.min(9, score));
   const grade: Grade = s <= 1 ? "S" : s <= 3 ? "A" : s <= 5 ? "B" : s <= 7 ? "C" : "D";
-  return { grade, label: GRADE_LABEL[grade] };
+  return { grade, label: DOMAIN_GRADE_LABEL[domain][grade] };
 }
 
 export function getDailyGrades(date: Date, ilgan?: string): DailyGrades {
@@ -66,9 +84,9 @@ export function getDailyGrades(date: Date, ilgan?: string): DailyGrades {
       const base = UUNSEONG_BASE_SCORE[uunseong] ?? 5;
       const mod = GROUP_DOMAIN_MOD[group];
       return {
-        money: scoreToGrade(base + mod.money),
-        love: scoreToGrade(base + mod.love),
-        career: scoreToGrade(base + mod.career),
+        money: scoreToGrade(base + mod.money, "money"),
+        love: scoreToGrade(base + mod.love, "love"),
+        career: scoreToGrade(base + mod.career, "career"),
         personalized: true,
       };
     }
@@ -77,11 +95,12 @@ export function getDailyGrades(date: Date, ilgan?: string): DailyGrades {
   // 생년월일이 없으면 개인화할 수 없으므로, 오늘 일진 자체의 오행 기운만으로
   // 모두에게 동일한 대략적인 등급을 매긴다 (극단적인 S/D는 피해 B~A 중심으로).
   const seed = (cg.charCodeAt(0) * 31 + jj.charCodeAt(0)) >>> 0;
-  const fallback = (offset: number): DomainGrade => scoreToGrade(3 + ((seed + offset) % 5));
+  const fallback = (offset: number, domain: DomainKey): DomainGrade =>
+    scoreToGrade(3 + ((seed + offset) % 5), domain);
   return {
-    money: fallback(0),
-    love: fallback(3),
-    career: fallback(7),
+    money: fallback(0, "money"),
+    love: fallback(3, "love"),
+    career: fallback(7, "career"),
     personalized: false,
   };
 }
