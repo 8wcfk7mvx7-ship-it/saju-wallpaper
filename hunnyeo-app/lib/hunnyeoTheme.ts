@@ -45,12 +45,12 @@ export const RETRO_CSS = `
   .hn-marquee > div { display: flex; width: max-content; animation: hnMarquee 16s linear infinite; }
   .hn-marquee > div > span { white-space: nowrap; padding-right: 2rem; }
 
-  /* 각진 그림자 박스 */
+  /* 각진 그림자 박스 — 아이콘과 같은 느낌으로 테두리를 짙게, 위쪽에 살짝 윤기 */
   .hn-box {
     background: #fff;
-    border: 3px solid #ff3d9a;
+    border: 3px solid #c9186d;
     border-radius: 14px;
-    box-shadow: 4px 4px 0 #ffc6e2;
+    box-shadow: 4px 4px 0 #ffc6e2, inset 0 2px 0 rgba(255,255,255,0.6);
   }
 
   /* 동글동글 제목 서체 (손글씨 본문과 대비) */
@@ -66,8 +66,8 @@ export const RETRO_CSS = `
     font-weight: 900;
     background: #fff45e;
     color: #d4348a;
-    border: 2px solid #ff3d9a;
-    box-shadow: 1.5px 1.5px 0 rgba(255,61,154,0.4);
+    border: 2px solid #c9186d;
+    box-shadow: 1.5px 1.5px 0 rgba(255,61,154,0.4), inset 0 1px 0 rgba(255,255,255,0.7);
     transform: rotate(-8deg);
   }
   .hn-sticker-pink { background: #ffd9ec; color: #c9186d; }
@@ -117,8 +117,8 @@ export const RETRO_CSS = `
     letter-spacing: 4px;
     color: #ff9ecb;
   }
-  .hn-box-y { border-color: #f5b400; box-shadow: 4px 4px 0 #ffe9a8; }
-  .hn-box-p { border-color: #9b6bf5; box-shadow: 4px 4px 0 #ddd0ff; }
+  .hn-box-y { border-color: #a86a00; box-shadow: 4px 4px 0 #ffe9a8, inset 0 2px 0 rgba(255,255,255,0.6); }
+  .hn-box-p { border-color: #6d3fd1; box-shadow: 4px 4px 0 #ddd0ff, inset 0 2px 0 rgba(255,255,255,0.6); }
 
   /* 무지개 제목 */
   .hn-title {
@@ -135,22 +135,22 @@ export const RETRO_CSS = `
       saturate(1.35);
   }
 
-  /* 입체 버튼 */
+  /* 입체 버튼 — 아이콘과 같은 짙은 테두리 + 위쪽 윤기로 보석 느낌 */
   .hn-btn {
     font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
-    border: 3px solid #ff3d9a;
+    border: 3px solid #c9186d;
     border-radius: 999px;
     background: linear-gradient(#fff, #ffe3f2);
     color: #ff2b8d;
     font-weight: 900;
-    box-shadow: 3px 3px 0 #ffb3d8;
+    box-shadow: 3px 3px 0 #ffb3d8, inset 0 2px 0 rgba(255,255,255,0.8);
     transition: transform .08s ease, box-shadow .08s ease;
   }
   .hn-btn:active { transform: translate(3px,3px); box-shadow: 0 0 0 #ffb3d8; }
   .hn-btn-on {
     background: linear-gradient(#ff6fb5, #ff2b8d);
     color: #fff;
-    box-shadow: 3px 3px 0 #c9186d;
+    box-shadow: 3px 3px 0 #8a0f4a, inset 0 2px 0 rgba(255,255,255,0.45);
   }
 
   /* 별 구분선 */

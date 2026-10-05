@@ -460,32 +460,56 @@ const ART: Record<string, PixelArt> = {
 
 export type PixelIconName = keyof typeof ART;
 
+// 아이콘 전체를 감싸는 진한 윤곽선 색 — 앱 아이콘(resources/icon.png)과 통일.
+// 스티커처럼 또렷해 보이도록, 각 아이콘의 실루엣 바깥 1칸을 이 색으로 자동으로 두른다.
+const OUTLINE = "#3a1030";
+
 export default function PixelIcon({
   name,
   size = 24,
   className = "",
   style,
+  outlined = true,
 }: {
   name: PixelIconName;
   size?: number;
   className?: string;
   style?: React.CSSProperties;
+  outlined?: boolean;
 }) {
   const art = ART[name];
   if (!art) return null;
   const h = art.rows.length;
   const w = Math.max(...art.rows.map(r => r.length));
 
+  const occupied = (x: number, y: number) => art.rows[y]?.[x] !== undefined && art.rows[y]?.[x] !== ".";
+
+  const outlineCells: { x: number; y: number }[] = [];
+  if (outlined) {
+    for (let y = -1; y <= h; y++) {
+      for (let x = -1; x <= w; x++) {
+        if (occupied(x, y)) continue;
+        if (occupied(x - 1, y) || occupied(x + 1, y) || occupied(x, y - 1) || occupied(x, y + 1)) {
+          outlineCells.push({ x, y });
+        }
+      }
+    }
+  }
+  const pad = outlined ? 1 : 0;
+
   return (
     <svg
-      viewBox={`0 0 ${w} ${h}`}
+      viewBox={`${-pad} ${-pad} ${w + pad * 2} ${h + pad * 2}`}
       width={size}
-      height={(size * h) / w}
+      height={(size * (h + pad * 2)) / (w + pad * 2)}
       className={className}
       style={{ shapeRendering: "crispEdges", display: "inline-block", verticalAlign: "middle", ...style }}
       aria-hidden="true"
       focusable="false"
     >
+      {outlineCells.map(({ x, y }) => (
+        <rect key={`o-${x}-${y}`} x={x} y={y} width={1} height={1} fill={OUTLINE} />
+      ))}
       {art.rows.flatMap((row, y) =>
         row.split("").map((ch, x) => {
           if (ch === ".") return null;
