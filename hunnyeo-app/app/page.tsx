@@ -310,7 +310,7 @@ export default function HunnyeoPage() {
                 style={{ display: "block", margin: "0 auto 6px", animationDelay: `${idx * 0.13}s` }}
               />
               <p className="hn-cute text-[16px] mb-0.5" style={{ color: c.accent }}>{c.label}</p>
-              <p className="text-[11px] font-bold mb-2 leading-tight" style={{ color: "#a8798f" }}>{c.desc}</p>
+              <p className="text-[12.5px] font-bold mb-2 leading-snug" style={{ color: "#8a6378" }}>{c.desc}</p>
 
               <div className="h-3.5 rounded-full overflow-hidden mb-1.5" style={{ background: "#fff", border: `2px solid ${c.accent}88` }}>
                 <div

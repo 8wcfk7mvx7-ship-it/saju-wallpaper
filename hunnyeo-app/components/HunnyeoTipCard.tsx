@@ -47,7 +47,7 @@ export default function HunnyeoTipCard({
         <h3 className="hn-cute text-[16px] leading-snug mb-1.5" style={{ color: "#c9186d" }}>
           {tip.title}
         </h3>
-        <p className="text-[12.5px] font-bold leading-relaxed" style={{ color: "#7a6070" }}>
+        <p className="text-[13.5px] font-bold leading-relaxed" style={{ color: "#6b5565" }}>
           {tip.effect}
         </p>
       </button>
