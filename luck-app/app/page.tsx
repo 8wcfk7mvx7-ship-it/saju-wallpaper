@@ -9,6 +9,7 @@ import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/compon
 import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
+import { getHeavenReply } from "@/lib/heavenReply";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
 import { initBannerAd, hideBannerAd } from "@/lib/ads";
@@ -98,6 +99,12 @@ function formatDateLabel(dateKey: string): string {
   return `${Number(m)}월 ${Number(d)}일`;
 }
 
+// "2026-09-06" → "2025-09-06" — "1년 전 오늘" 소원을 찾아볼 때 씀
+function lastYearDateKey(dateKey: string): string {
+  const [y, m, d] = dateKey.split("-");
+  return `${Number(y) - 1}-${m}-${d}`;
+}
+
 // 특별한 날 이름 뒤에 받침 유무에 맞는 서술격 조사를 붙임 (초복 → 초복이에요, 단오 → 단오예요)
 function withIeyo(name: string): string {
   const last = name.charCodeAt(name.length - 1) - 0xac00;
@@ -173,6 +180,8 @@ export default function HomePage() {
   const [callSubmitted, setCallSubmitted] = useState(false);
   const [calledText, setCalledText] = useState("");
   const [showLuckPopup, setShowLuckPopup] = useState(false);
+  const [lastYearCall, setLastYearCall] = useState("");
+  const [heavenReply, setHeavenReply] = useState("");
   const [notifyOn, setNotifyOn] = useState(false);
   const [fontSize, setFontSizeState] = useState<FontSize>("medium");
   const [adsRemoved, setAdsRemoved] = useState(false);
@@ -196,6 +205,7 @@ export default function HomePage() {
     setCallSubmitted(!!getCall(dateKey));
     setPastMemos(getAllMemos());
     setPastCalls(getAllCalls());
+    setLastYearCall(getCall(lastYearDateKey(dateKey)));
   }
 
   useEffect(() => {
@@ -302,6 +312,8 @@ export default function HomePage() {
     setCallSubmitted(!!savedCall);
     setPastMemos(getAllMemos());
     setPastCalls(getAllCalls());
+    setLastYearCall(getCall(lastYearDateKey(dateKey)));
+    setHeavenReply(getHeavenReply(dateKey));
   }, [ready, dateKey]);
 
   useEffect(() => {
@@ -580,6 +592,12 @@ export default function HomePage() {
                 <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
                   행운은 가만히 기다리는 사람이 아니라, 부르는 사람에게 온다고 해요. 오늘, 한마디로 행운을 불러보세요.
                 </p>
+                {lastYearCall && (
+                  <div className="mb-3 p-3 rounded" style={{ background: "var(--bg-soft)", border: "1px dashed var(--card-border)" }}>
+                    <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--ink-soft)" }}>1년 전 오늘, 이렇게 빌었어요</p>
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>&ldquo;{lastYearCall}&rdquo;</p>
+                  </div>
+                )}
                 <input
                   value={callInput}
                   onChange={(e) => { setCallInput(e.target.value); setCallSubmitted(false); }}
@@ -977,9 +995,14 @@ export default function HomePage() {
           <p className="font-display text-lg mb-2" style={{ color: "var(--amber)" }}>
             행운이 오늘 당신을 찾아갈 거예요
           </p>
-          <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+          <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--ink-soft)" }}>
             &ldquo;{calledText}&rdquo;
           </p>
+          {heavenReply && (
+            <p className="text-xs mb-4 leading-relaxed" style={{ color: "var(--amber)" }}>
+              {heavenReply}
+            </p>
+          )}
           <button
             onClick={() => setShowLuckPopup(false)}
             className="retro-btn font-display w-full py-2.5 text-sm"
