@@ -452,7 +452,7 @@ export default function HunnyeoMyPage() {
             </button>
           )}
 
-          <p className="text-xs font-black mb-4" style={{ color: "#9b6bf5" }}>{info.level.name}</p>
+          <p className="text-xs font-black mb-4" style={{ color: "#333df2" }}>{info.level.name}</p>
 
           <div className="text-left">
             <HunnyeoScoreBar points={totalPoints} />
@@ -486,7 +486,7 @@ export default function HunnyeoMyPage() {
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2"
                   style={{
                     background: current ? "#fff6da" : "#fdfbf5",
-                    border: current ? "2.5px solid #f5b400" : "2px dotted #eadfc0",
+                    border: current ? "2.5px solid #ffd219" : "2px dotted #eadfc0",
                     opacity: reached ? 1 : 0.5,
                   }}
                 >
@@ -495,7 +495,7 @@ export default function HunnyeoMyPage() {
                     <p className="hn-cute text-[13px]" style={{ color: reached ? "#7a5b00" : "#b5a98a" }}>{lv.name}</p>
                     <p className="text-[10px] font-bold" style={{ color: "#b5a98a" }}>{lv.min}점부터</p>
                   </div>
-                  {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white hn-blink" style={{ background: "#f5b400" }}>지금 여기!</span>}
+                  {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full hn-blink" style={{ background: "#ffd219", color: "#7a5b00" }}>지금 여기!</span>}
                   {reached && !current && <PixelIcon name="check" size={15} />}
                 </div>
               );
@@ -554,7 +554,7 @@ export default function HunnyeoMyPage() {
       {/* 완료 목록 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-p p-4">
-          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#333df2" }}>
             <PixelIcon name="heart" size={15} /> 내가 해본 것 ({checkedTips.length})
           </h3>
           {checkedTips.length === 0 ? (
@@ -564,9 +564,9 @@ export default function HunnyeoMyPage() {
           ) : (
             <div className="space-y-1.5">
               {checkedTips.map(t => (
-                <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
+                <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #bdc0f7" }}>
                   <span className="text-[13px] font-bold truncate pr-2" style={{ color: "#57406b" }}>{t.title}</span>
-                  <span className="text-[10px] font-black shrink-0" style={{ color: "#7c3aed" }}>+{t.points}점</span>
+                  <span className="text-[10px] font-black shrink-0" style={{ color: "#333df2" }}>+{t.points}점</span>
                 </div>
               ))}
             </div>
@@ -577,7 +577,7 @@ export default function HunnyeoMyPage() {
       {/* 자랑 카드 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box hn-glitter p-4">
-          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="camera" size={15} /> 훈녀력 자랑하기
           </h3>
           <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -620,7 +620,7 @@ export default function HunnyeoMyPage() {
           </button>
 
           {cardMsg && (
-            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
               {cardMsg}
             </p>
           )}
@@ -630,7 +630,7 @@ export default function HunnyeoMyPage() {
       {/* 설정 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box p-4">
-          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="comb" size={15} /> 설정
           </h3>
 
@@ -747,7 +747,7 @@ export default function HunnyeoMyPage() {
       {canUseAuth && (
         <div className="max-w-2xl mx-auto px-4 mt-4">
           <div className="hn-box p-4">
-            <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+            <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#333df2" }}>
               <PixelIcon name="star" size={15} /> 로그인 · 기기 동기화
             </h3>
             <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -780,7 +780,7 @@ export default function HunnyeoMyPage() {
             )}
 
             {authMsg && (
-              <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+              <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
                 {authMsg}
               </p>
             )}
@@ -791,7 +791,7 @@ export default function HunnyeoMyPage() {
       {/* 기록 옮기기 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box p-4">
-          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="floppy" size={15} /> 기록 옮기기
           </h3>
           <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -822,7 +822,7 @@ export default function HunnyeoMyPage() {
           )}
 
           <details>
-            <summary className="text-[12px] font-black cursor-pointer py-1" style={{ color: "#c9186d" }}>
+            <summary className="text-[12px] font-black cursor-pointer py-1" style={{ color: "#d50062" }}>
               코드로 되살리기
             </summary>
             <div className="mt-2">
@@ -850,7 +850,7 @@ export default function HunnyeoMyPage() {
           </details>
 
           {backupMsg && (
-            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
               {backupMsg}
             </p>
           )}

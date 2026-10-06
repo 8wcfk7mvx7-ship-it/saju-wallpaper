@@ -63,7 +63,7 @@ export default function CaloriePage() {
             <label htmlFor="hn-weight" className="text-[12px] font-black" style={{ color: "#b06a94" }}>
               내 몸무게
             </label>
-            <span className="hn-cute text-[18px]" style={{ color: "#c9186d" }}>{weight}kg</span>
+            <span className="hn-cute text-[18px]" style={{ color: "#d50062" }}>{weight}kg</span>
           </div>
           <input
             id="hn-weight"
@@ -74,7 +74,7 @@ export default function CaloriePage() {
             value={weight}
             onChange={e => changeWeight(Number(e.target.value))}
             className="w-full"
-            style={{ accentColor: "#ff3d9a" }}
+            style={{ accentColor: "#f90072" }}
           />
 
           <p className="text-[12px] font-black mt-3 mb-1.5" style={{ color: "#b06a94" }}>얼마나 하면</p>
@@ -110,7 +110,7 @@ export default function CaloriePage() {
                       <span className="text-[13.5px] font-bold" style={{ color: "#5c4653" }}>
                         {item.name}
                       </span>
-                      <span className="hn-cute text-[15px] shrink-0" style={{ color: "#c9186d" }}>
+                      <span className="hn-cute text-[15px] shrink-0" style={{ color: "#d50062" }}>
                         {kcal}<span className="text-[11px]">kcal</span>
                       </span>
                     </div>
@@ -146,7 +146,7 @@ export default function CaloriePage() {
               <li
                 key={f.name}
                 className="flex items-center justify-between rounded-xl px-3 py-2 text-[13px] font-bold"
-                style={{ background: "#fffbe8", border: "2px dotted #f5b400", color: "#7a6a3a" }}
+                style={{ background: "#fffbe8", border: "2px dotted #ffd219", color: "#7a6a3a" }}
               >
                 <span>{f.name}</span>
                 <span style={{ color: "#c98a00" }}>{f.kcal}kcal</span>

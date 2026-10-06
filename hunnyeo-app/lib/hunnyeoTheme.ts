@@ -1,6 +1,13 @@
 // ── 훈녀생정 공용 레트로 테마 ─────────────────────────────────────────────
 // 2000년대 초중반 개인 홈페이지 감성: 사탕색 배경, 물방울무늬, 각진 그림자,
 // 반짝이는 별, 흐르는 글씨, 무지개 제목.
+//
+// "Sugar Rush" 팔레트(진한 톤 / 옅은 배경 톤) — 테두리·버튼은 진한 쪽,
+// 배경·그림자는 옅은 쪽을 쓴다. 장(챕터)별 고유색은 구분이 목적이라 그대로 둔다.
+//   핑크   : #f90072 (진) / #fec3df (연)
+//   노랑   : #ffd219 (진) / #ffeea8 (연)
+//   민트   : #0ac9c3 (진) / #a0f3ed (연)
+//   라벤더 : #333df2 (진) / #bdc0f7 (연)
 
 // app/hunnyeo/layout.tsx 에서 next/font 로 불러온 큐티 서체
 // (Gaegu = 손글씨 본문, Jua = 동글동글 제목). 변수를 못 읽는 경우를 대비해 대체 서체를 둔다.
@@ -9,11 +16,11 @@ export const RETRO_FONT =
 export const TITLE_FONT =
   "var(--font-hn-title), 'Jua', 'Comic Sans MS', 'Gulim', '굴림', sans-serif";
 
-// 분홍이 주인공인 사탕색 배경: 하얀 물방울 + 분홍 사선 줄무늬 + 연분홍 바탕
+// 하얀 물방울 + 핑크·노랑·민트·라벤더 네 가지 연한 사선 줄무늬 ("Sugar Rush" 배경)
 export const PAGE_BG = [
   "radial-gradient(circle at 12px 12px, rgba(255,255,255,0.9) 3px, transparent 3.5px)",
   "radial-gradient(circle at 30px 30px, rgba(255,255,255,0.55) 2px, transparent 2.5px)",
-  "repeating-linear-gradient(45deg, #ffd9ec 0px, #ffd9ec 26px, #ffe9f4 26px, #ffe9f4 52px, #fff3d9 52px, #fff3d9 66px, #ffe1f0 66px, #ffe1f0 92px)",
+  "repeating-linear-gradient(45deg, #ffdcec 0px, #ffdcec 23px, #fffae5 23px, #fffae5 46px, #e2fbfa 46px, #e2fbfa 69px, #ebecfd 69px, #ebecfd 92px)",
 ].join(",");
 
 export const PAGE_BG_SIZE = "24px 24px, 40px 40px, auto";
@@ -48,9 +55,9 @@ export const RETRO_CSS = `
   /* 각진 그림자 박스 — 아이콘과 같은 느낌으로 테두리를 짙게, 위쪽에 살짝 윤기 */
   .hn-box {
     background: #fff;
-    border: 3px solid #c9186d;
+    border: 3px solid #f90072;
     border-radius: 14px;
-    box-shadow: 4px 4px 0 #ffc6e2, inset 0 2px 0 rgba(255,255,255,0.6);
+    box-shadow: 4px 4px 0 #fec3df, inset 0 2px 0 rgba(255,255,255,0.6);
   }
 
   /* 동글동글 제목 서체 (손글씨 본문과 대비) */
@@ -64,13 +71,13 @@ export const RETRO_CSS = `
     border-radius: 999px;
     font-size: 10px;
     font-weight: 900;
-    background: #fff45e;
-    color: #d4348a;
-    border: 2px solid #c9186d;
-    box-shadow: 1.5px 1.5px 0 rgba(255,61,154,0.4), inset 0 1px 0 rgba(255,255,255,0.7);
+    background: #ffeea8;
+    color: #f90072;
+    border: 2px solid #f90072;
+    box-shadow: 1.5px 1.5px 0 rgba(249,0,114,0.4), inset 0 1px 0 rgba(255,255,255,0.7);
     transform: rotate(-8deg);
   }
-  .hn-sticker-pink { background: #ffd9ec; color: #c9186d; }
+  .hn-sticker-pink { background: #fec3df; color: #f90072; }
 
   /* 반짝이 뿌린 카드 */
   .hn-glitter { position: relative; overflow: hidden; }
@@ -117,40 +124,40 @@ export const RETRO_CSS = `
     letter-spacing: 4px;
     color: #ff9ecb;
   }
-  .hn-box-y { border-color: #a86a00; box-shadow: 4px 4px 0 #ffe9a8, inset 0 2px 0 rgba(255,255,255,0.6); }
-  .hn-box-p { border-color: #6d3fd1; box-shadow: 4px 4px 0 #ddd0ff, inset 0 2px 0 rgba(255,255,255,0.6); }
+  .hn-box-y { border-color: #ffd219; box-shadow: 4px 4px 0 #ffeea8, inset 0 2px 0 rgba(255,255,255,0.6); }
+  .hn-box-p { border-color: #333df2; box-shadow: 4px 4px 0 #bdc0f7, inset 0 2px 0 rgba(255,255,255,0.6); }
 
-  /* 무지개 제목 */
+  /* Sugar Rush 제목 */
   .hn-title {
     font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
     letter-spacing: 0.02em;
-    background: linear-gradient(90deg, #ff3d9a, #ff8a3d, #f5d400, #4ecb71, #3db6ff, #a259ff);
+    background: linear-gradient(90deg, #ff89bf, #ffd219, #0ac9c3, #333df2, #9fa3e3);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     filter:
       drop-shadow(1px 1px 0 #fff)
       drop-shadow(-1px -1px 0 #fff)
-      drop-shadow(3px 3px 0 rgba(255,61,154,0.5))
+      drop-shadow(3px 3px 0 rgba(255,137,191,0.5))
       saturate(1.35);
   }
 
   /* 입체 버튼 — 아이콘과 같은 짙은 테두리 + 위쪽 윤기로 보석 느낌 */
   .hn-btn {
     font-family: var(--font-hn-title), 'Jua', 'Comic Sans MS', sans-serif;
-    border: 3px solid #c9186d;
+    border: 3px solid #f90072;
     border-radius: 999px;
-    background: linear-gradient(#fff, #ffe3f2);
-    color: #ff2b8d;
+    background: linear-gradient(#fff, #ffdcec);
+    color: #f90072;
     font-weight: 900;
-    box-shadow: 3px 3px 0 #ffb3d8, inset 0 2px 0 rgba(255,255,255,0.8);
+    box-shadow: 3px 3px 0 #fec3df, inset 0 2px 0 rgba(255,255,255,0.8);
     transition: transform .08s ease, box-shadow .08s ease;
   }
-  .hn-btn:active { transform: translate(3px,3px); box-shadow: 0 0 0 #ffb3d8; }
+  .hn-btn:active { transform: translate(3px,3px); box-shadow: 0 0 0 #fec3df; }
   .hn-btn-on {
-    background: linear-gradient(#ff6fb5, #ff2b8d);
+    background: linear-gradient(#ff89bf, #f90072);
     color: #fff;
-    box-shadow: 3px 3px 0 #8a0f4a, inset 0 2px 0 rgba(255,255,255,0.45);
+    box-shadow: 3px 3px 0 #804460, inset 0 2px 0 rgba(255,255,255,0.45);
   }
 
   /* 별 구분선 */

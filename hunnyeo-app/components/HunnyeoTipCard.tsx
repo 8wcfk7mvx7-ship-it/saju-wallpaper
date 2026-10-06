@@ -44,7 +44,7 @@ export default function HunnyeoTipCard({
             {cat?.label}
           </span>
         </div>
-        <h3 className="hn-cute text-[16px] leading-snug mb-1.5" style={{ color: "#c9186d" }}>
+        <h3 className="hn-cute text-[16px] leading-snug mb-1.5" style={{ color: "#d50062" }}>
           {tip.title}
         </h3>
         <p className="text-[13.5px] font-bold leading-relaxed" style={{ color: "#6b5565" }}>
