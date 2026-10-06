@@ -633,16 +633,19 @@ export default function HomePage() {
                 <div className="grid grid-cols-3 gap-2">
                   {GRADE_DOMAINS.map(({ key, label }) => {
                     const g = luck.dailyGrades[key];
+                    const personalized = luck.dailyGrades.personalized;
                     return (
                       <div key={key} className="flex flex-col items-center gap-1.5 py-1">
                         <span className="text-[0.6875rem] font-bold" style={{ color: "var(--ink-soft)" }}>{label}</span>
                         <span
                           className="w-10 h-10 rounded-full flex items-center justify-center font-display text-lg"
-                          style={{ background: GRADE_COLOR[g.grade], color: "#fff" }}
+                          style={{ background: personalized ? GRADE_COLOR[g.grade] : "var(--ink-soft)", color: "#fff" }}
                         >
-                          {g.grade}
+                          {personalized ? g.grade : "?"}
                         </span>
-                        <span className="text-[0.625rem]" style={{ color: "var(--ink-soft)" }}>{g.label}</span>
+                        <span className="text-[0.625rem]" style={{ color: "var(--ink-soft)" }}>
+                          {personalized ? g.label : "입력하면 확인"}
+                        </span>
                       </div>
                     );
                   })}
