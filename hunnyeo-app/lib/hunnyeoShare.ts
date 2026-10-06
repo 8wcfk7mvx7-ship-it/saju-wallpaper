@@ -84,7 +84,7 @@ export function drawShareCard({ nickname, info, points, doneCount }: ShareCardIn
   ctx.fillStyle = "#fff";
   roundRect(ctx, pad, pad, W - pad * 2, H - pad * 2, 48);
   ctx.fill();
-  ctx.strokeStyle = "#ff3d9a";
+  ctx.strokeStyle = "#f90072";
   ctx.lineWidth = 10;
   ctx.setLineDash([26, 18]);
   roundRect(ctx, pad, pad, W - pad * 2, H - pad * 2, 48);
@@ -105,17 +105,17 @@ export function drawShareCard({ nickname, info, points, doneCount }: ShareCardIn
   drawPixelArt(ctx, RIBBON, RIBBON_COLORS, cx - (11 * 26) / 2, 250, 26);
 
   // 닉네임
-  ctx.fillStyle = "#c9186d";
+  ctx.fillStyle = "#d50062";
   ctx.font = font(76);
   ctx.fillText(nickname || "완소소녀", cx, 560);
 
   // 등급
-  ctx.fillStyle = "#7c3aed";
+  ctx.fillStyle = "#333df2";
   ctx.font = font(56);
   ctx.fillText(info.level.name, cx, 650);
 
   // 점수
-  ctx.fillStyle = "#ff3d9a";
+  ctx.fillStyle = "#d50062";
   ctx.font = font(130);
   ctx.fillText(`${points}점`, cx, 800);
 
@@ -127,7 +127,7 @@ export function drawShareCard({ nickname, info, points, doneCount }: ShareCardIn
   roundRect(ctx, barX, barY, barW, 44, 22);
   ctx.fill();
   const ratio = Math.max(0.02, Math.min(1, info.progress ?? points / 100));
-  ctx.fillStyle = "#ff3d9a";
+  ctx.fillStyle = "#f90072";
   roundRect(ctx, barX, barY, barW * ratio, 44, 22);
   ctx.fill();
 
@@ -142,14 +142,14 @@ export function drawShareCard({ nickname, info, points, doneCount }: ShareCardIn
   ctx.font = font(30, "700");
   LEVELS.forEach((lv, i) => {
     const isNow = lv.name === info.level.name;
-    ctx.fillStyle = isNow ? "#c9186d" : "#e3b9cd";
+    ctx.fillStyle = isNow ? "#d50062" : "#e3b9cd";
     ctx.fillText(isNow ? `▶ ${lv.name}` : lv.name, cx, listTop + i * lineGap);
   });
 
   // 꼬리말
   ctx.fillStyle = "#ff6fb5";
   ctx.font = font(32);
-  ctx.fillText("훈녀생정 · 90년대생 추억 뷰티 노트", cx, listTop + LEVELS.length * lineGap + 42);
+  ctx.fillText("훈녀생정 · Y2K 감성 뷰티 노트", cx, listTop + LEVELS.length * lineGap + 42);
 
   return canvas.toDataURL("image/png");
 }

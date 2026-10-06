@@ -1,7 +1,13 @@
 # 심사 노트 (App Review Information → Notes)
 
+> ⚠️ 2026-10 업데이트: 애플/구글 로그인(선택, 동기화용)과 AdMob 배너 광고가
+> 추가됐습니다. 아래 영문 노트를 이 버전 기준으로 다시 썼습니다 — 예전에
+> "로그인 없음 / 네트워크 0건"이라고 적었던 문구를 그대로 내면 애플 심사에서
+> 거짓 정보 제출로 리젝되거나 계정이 정지될 수 있으니 반드시 아래 새 버전을 쓰세요.
+
 심사자는 한국어를 모를 가능성이 높습니다. 아래 영문을 그대로 붙여 넣으세요.
-이 앱은 로그인이 없으므로 **데모 계정은 "필요 없음"으로 두면 됩니다.**
+로그인은 선택사항이므로 **데모 계정은 "필요 없음"으로 두면 됩니다** — 다만 심사자가
+로그인을 눌러볼 수도 있으니, 로그인 없이도 전 기능을 쓸 수 있다는 점을 노트에 적어둡니다.
 
 ---
 
@@ -19,18 +25,26 @@ chapters and presents them in the visual style of that era.
 The app is a self-contained archive. Users can check off items they have tried,
 which accumulates points and unlocks nostalgic rank titles.
 
-NO ACCOUNT NEEDED
-There is no sign-up or login. All features are available immediately on launch.
+NO ACCOUNT REQUIRED
+Sign-up and sign-in are optional. All 387 entries and every feature are usable
+immediately on launch without creating an account. Signing in with Apple or
+Google only adds cross-device sync of the user's own checklist/progress data
+(via Supabase) - it unlocks no additional content and is never required.
 
-FULLY OFFLINE
-The app makes zero network requests. All 387 entries, fonts and images are
-bundled in the app binary. Please feel free to test it in Airplane Mode - every
-screen works. Nothing is sent to any server, and no analytics or ad SDKs are
-included.
+OFFLINE-FIRST
+All 387 entries, fonts and images are bundled in the app binary, so the
+content works fully in Airplane Mode. The only network activity is (a) the
+optional sign-in/sync described above, and (b) loading the banner ad
+described below. No analytics SDK is included.
 
-NO PURCHASES, NO ADS
-The app is completely free with no in-app purchases, no subscriptions, no
-external payment links, and no advertising SDKs of any kind.
+FREE, ONE OPTIONAL IN-APP PURCHASE, ONE SMALL BANNER AD
+The app is completely free to use. It shows one small banner ad (Google
+AdMob) at the bottom of the screen; there are no interstitial or rewarded
+ads. Users who decline the App Tracking Transparency prompt still see ads
+(non-personalized) and lose no functionality. A single optional, non-
+consumable in-app purchase ("Remove Ads") permanently hides the banner for
+that user - it unlocks no additional content, it is purely cosmetic. A
+"Restore Purchases" button is available on the My Info screen.
 
 NATIVE FEATURES
 Beyond the archive itself the app provides: full-text search across all 387
@@ -89,7 +103,7 @@ please let us know and we will translate the specific entry.
 
 | 칸 | 입력 |
 |---|---|
-| 로그인 필요 (Sign-in required) | **체크 해제** — 로그인이 없습니다 |
+| 로그인 필요 (Sign-in required) | **체크 해제** — 로그인은 선택사항이고 전 기능을 로그인 없이 쓸 수 있습니다 |
 | 연락처 이름/성 | 본인 이름 |
 | 전화번호 | 심사자가 연락할 수 있는 번호 |
 | 이메일 | 실제로 확인하는 주소 (리젝 통보가 여기로 옵니다) |
@@ -103,3 +117,7 @@ please let us know and we will translate the specific entry.
 | **1.4.1 Physical Harm** — 다이어트 콘텐츠 | 위 심사 노트의 안전장치 목록을 그대로 회신. 최초 팝업 스크린샷을 첨부하면 효과적 |
 | **2.1 App Completeness** — 앱이 비어 보인다 | 심사자가 표지 화면에서 "들어가기 ▶" 를 못 눌렀을 가능성. 진입 방법을 안내 |
 | **5.1.1 Privacy Policy** | 개인정보처리방침 URL 이 실제로 열리는지 확인. 접속 안 되면 바로 리젝 |
+| **2.3.1 / App Tracking Transparency 안내 문구 누락** | Xcode `Info.plist` 에 `NSUserTrackingUsageDescription` 문구가 들어있는지 확인 (lib/hunnyeoAds.ts 상단 주석 참고) |
+| **광고가 "테스트 광고"로 보인다는 지적** | `lib/hunnyeoAds.ts` 의 `isTesting: true` 를 실제 AdMob 콘솔 승인 후 `false` 로 바꾸고 테스트 ID 네 개를 전부 본인 것으로 교체했는지 확인 |
+| **3.1.1 In-App Purchase — 구매가 안 되거나 복원이 안 됨** | App Store Connect의 인앱 구입 상품 상태가 "제출 준비 완료"인지 확인 (상품이 "미완료" 상태면 심사 중 구매 자체가 막힘). 제품 ID가 `remove_ads` 로 코드와 정확히 일치하는지도 확인 |
+| **3.1.1 Restore Purchases 버튼을 못 찾겠다는 지적** | 내 정보 → 설정 → "광고 제거" 바로 아래 "이전에 구매했어요(복원하기)" 링크 위치를 노트에 적어 안내 |

@@ -40,6 +40,10 @@ const config: CapacitorConfig = {
       serverClientId: "752770746287-u34u96u5dcfk1e16clgn3s1bt1bpo67d.apps.googleusercontent.com",
       scopes: ["email", "profile"],
     },
+    // AdMob 은 여기서 설정하지 않는다 — 앱 ID는 네이티브 프로젝트의
+    // Info.plist / AndroidManifest.xml·strings.xml 에 직접 넣어야 한다.
+    // 값과 붙여넣을 위치는 lib/hunnyeoAds.ts 상단 주석과
+    // store/04-안드로이드-구글플레이.md 참고.
   },
 };
 

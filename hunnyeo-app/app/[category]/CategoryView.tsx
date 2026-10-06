@@ -81,7 +81,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
         <button onClick={() => router.push("/")} className="hn-btn px-3 py-1.5 text-[11px]">
           ◀ 메뉴판
         </button>
-        <button onClick={() => router.push("/mypage")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#9b6bf5", color: "#7c3aed", boxShadow: "3px 3px 0 #ddd0ff" }}>
+        <button onClick={() => router.push("/mypage")} className="hn-btn hn-box-p px-3 py-1.5 text-[11px]" style={{ borderColor: "#333df2", color: "#333df2", boxShadow: "3px 3px 0 #bdc0f7" }}>
           <PixelIcon name="user" size={13} /> 내 정보
         </button>
       </div>
@@ -119,7 +119,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
         {visibleTips.length === 0 && (
           <div className="hn-box p-6 text-center">
             <PixelIcon name="crown" size={30} className="hn-float" />
-            <p className="hn-cute text-[16px] mt-2" style={{ color: "#c9186d" }}>
+            <p className="hn-cute text-[16px] mt-2" style={{ color: "#d50062" }}>
               이 장은 다 했어요!
             </p>
             <p className="text-[12px] font-bold mt-1" style={{ color: "#b08aa0" }}>
@@ -155,7 +155,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
                 >
                   {idx + 1}
                 </span>
-                <h2 className="hn-cute text-[17px] leading-snug flex-1" style={{ color: "#c9186d" }}>
+                <h2 className="hn-cute text-[17px] leading-snug flex-1" style={{ color: "#d50062" }}>
                   {tip.title}
                 </h2>
                 <button
@@ -176,11 +176,11 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
 
               {/* 준비물 */}
               {tip.materials && (
-                <div className="rounded-2xl px-3 py-2 mb-3" style={{ background: "#fffbe8", border: "2px dotted #f5b400" }}>
+                <div className="rounded-2xl px-3 py-2 mb-3" style={{ background: "#fffbe8", border: "2px dotted #ffd219" }}>
                   <p className="text-[11px] font-black mb-1 flex items-center gap-1" style={{ color: "#c98a00" }}>
                     <PixelIcon name="basket" size={13} /> 준비물
                   </p>
-                  <p className="text-[13px] font-bold leading-relaxed" style={{ color: "#7a6a3a" }}>
+                  <p className="text-[14.5px] font-bold leading-relaxed" style={{ color: "#7a6a3a" }}>
                     {tip.materials.join(" · ")}
                   </p>
                 </div>
@@ -193,7 +193,7 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
               </p>
               <ol className="space-y-1.5 mb-3">
                 {tip.steps.map((s, i) => (
-                  <li key={i} className="flex gap-2 text-[14px] leading-relaxed font-bold" style={{ color: "#5c4653" }}>
+                  <li key={i} className="flex gap-2 text-[15.5px] leading-7 font-bold" style={{ color: "#4a3843" }}>
                     <span className="shrink-0" style={{ color: cat.accent }}>{tip.type === "read" ? "·" : `${i + 1}.`}</span>
                     <span>{s}</span>
                   </li>
@@ -202,14 +202,14 @@ export default function CategoryView({ category }: { category: HunnyeoCategoryKe
 
               {/* 효과 */}
               <div className="rounded-xl px-3 py-2 mb-3" style={{ background: "#fff0f7", border: "2px solid #ffb3d8" }}>
-                <p className="text-[13px] font-black leading-relaxed flex gap-1.5" style={{ color: "#c9186d" }}>
+                <p className="text-[14.5px] font-black leading-relaxed flex gap-1.5" style={{ color: "#d50062" }}>
                   <PixelIcon name="sparkle" size={13} style={{ flexShrink: 0, marginTop: 1 }} />
                   <span>{tip.effect}</span>
                 </p>
               </div>
 
               {tip.caution && (
-                <div className="rounded-xl px-3 py-2 mb-3 text-[12px] leading-relaxed font-bold flex gap-1.5" style={{ background: "#fff5f5", border: "2px dotted #f7a8a8", color: "#c0392b" }}>
+                <div className="rounded-xl px-3 py-2 mb-3 text-[13.5px] leading-relaxed font-bold flex gap-1.5" style={{ background: "#fff5f5", border: "2px dotted #f7a8a8", color: "#c0392b" }}>
                   <PixelIcon name="warning" size={13} style={{ flexShrink: 0, marginTop: 1 }} />
                   <span>{tip.caution}</span>
                 </div>

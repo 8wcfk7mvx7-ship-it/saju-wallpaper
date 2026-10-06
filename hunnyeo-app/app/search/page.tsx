@@ -83,13 +83,13 @@ export default function SearchPage() {
               inputMode="search"
               placeholder="밀가루, 붓기, 봉숭아…"
               className="flex-1 min-w-0 bg-transparent outline-none text-[15px] font-bold"
-              style={{ color: "#c9186d" }}
+              style={{ color: "#d50062" }}
             />
             {query && (
               <button
                 onClick={() => setQuery("")}
                 className="text-[11px] font-black px-2 py-1 rounded-full"
-                style={{ background: "#ffe3f0", color: "#c9186d" }}
+                style={{ background: "#ffe3f0", color: "#d50062" }}
                 aria-label="검색어 지우기"
               >
                 지우기
@@ -122,7 +122,7 @@ export default function SearchPage() {
         {showEmptyHint ? (
           <div className="hn-box p-5 text-center">
             <PixelIcon name="basket" size={30} className="hn-float" />
-            <p className="hn-cute text-[15px] mt-2" style={{ color: "#c9186d" }}>
+            <p className="hn-cute text-[15px] mt-2" style={{ color: "#d50062" }}>
               무엇을 찾아볼까요?
             </p>
             <p className="text-[12px] font-bold mt-1 mb-3" style={{ color: "#b08aa0" }}>
@@ -134,7 +134,7 @@ export default function SearchPage() {
                   key={w}
                   onClick={() => setQuery(w)}
                   className="text-[11px] font-black px-2.5 py-1 rounded-full"
-                  style={{ background: "#fff", color: "#c9186d", border: "2px solid #ffb3d8" }}
+                  style={{ background: "#fff", color: "#d50062", border: "2px solid #ffb3d8" }}
                 >
                   {w}
                 </button>
@@ -144,7 +144,7 @@ export default function SearchPage() {
         ) : results.length === 0 ? (
           <div className="hn-box p-6 text-center">
             <PixelIcon name="droplet" size={28} style={{ opacity: 0.6 }} />
-            <p className="hn-cute text-[15px] mt-2" style={{ color: "#c9186d" }}>
+            <p className="hn-cute text-[15px] mt-2" style={{ color: "#d50062" }}>
               {mode === "favorite" ? "아직 찜한 게 없어요" : "찾는 게 없어요"}
             </p>
             <p className="text-[12px] font-bold mt-1" style={{ color: "#b08aa0" }}>
@@ -155,7 +155,7 @@ export default function SearchPage() {
           </div>
         ) : (
           <>
-            <p className="text-[12px] font-black px-1" style={{ color: "#c9186d" }}>
+            <p className="text-[12px] font-black px-1" style={{ color: "#d50062" }}>
               {results.length}개를 찾았어요
             </p>
             {results.map(tip => (

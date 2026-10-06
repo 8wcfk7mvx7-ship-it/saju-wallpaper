@@ -24,11 +24,14 @@ import { notificationsAvailable, enableDailyReminder, disableDailyReminder } fro
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
 import { authAvailable, signInWithApple, signInWithGoogle, signOutEverywhere, currentUser, type HunnyeoUser } from "@/lib/hunnyeoAuth";
 import { pullAndMergeRecord } from "@/lib/hunnyeoSync";
+import { purchasesAvailable, isAdsRemoved, purchaseRemoveAds, restorePurchases, getRemoveAdsPrice } from "@/lib/hunnyeoPurchase";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
+const FONT_KEY = "hunnyeo_font_v1";
 const REMINDER_KEY = "hunnyeo_reminder_v1";
 const REMINDER_TIME_KEY = "hunnyeo_reminder_time_v1";
-type TextSize = "normal" | "large" | "xlarge";
+type TextSize = "small" | "medium" | "large";
+type FontKey = "gaegu" | "himelody" | "pen" | "gamja" | "dongle" | "notosans" | "nanumgothic" | "gowun";
 
 interface ReminderTime {
   hour: number;
@@ -36,16 +39,44 @@ interface ReminderTime {
 }
 
 const REMINDER_PRESETS: { label: string; time: ReminderTime }[] = [
-  { label: "아침 9시", time: { hour: 9, minute: 0 } },
+  { label: "아침 8시", time: { hour: 8, minute: 0 } },
   { label: "점심 1시", time: { hour: 13, minute: 0 } },
   { label: "저녁 8시", time: { hour: 20, minute: 0 } },
   { label: "밤 10시", time: { hour: 22, minute: 0 } },
 ];
 
-// 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다.
+// 무료 폰트 중에서 본문에 쓸 서체를 고른다. 전부 구글 폰트(무료, 상업적 이용 가능).
+const ALL_FONTS: { key: FontKey; label: string; sample: string }[] = [
+  { key: "gaegu", label: "기본체", sample: "가나다라" },
+  { key: "himelody", label: "하이멜로디", sample: "가나다라" },
+  { key: "pen", label: "손글씨펜", sample: "가나다라" },
+  { key: "gamja", label: "감자꽃", sample: "가나다라" },
+  { key: "dongle", label: "동글", sample: "가나다라" },
+  { key: "notosans", label: "노토산스", sample: "가나다라" },
+  { key: "nanumgothic", label: "나눔고딕", sample: "가나다라" },
+  { key: "gowun", label: "고운돋움", sample: "가나다라" },
+];
+const FONT_STACK: Record<FontKey, string> = {
+  gaegu: "var(--font-hn-gaegu)",
+  himelody: "var(--font-hn-himelody)",
+  pen: "var(--font-hn-pen)",
+  gamja: "var(--font-hn-gamja)",
+  dongle: "var(--font-hn-dongle)",
+  notosans: "var(--font-hn-notosans)",
+  nanumgothic: "var(--font-hn-nanumgothic)",
+  gowun: "var(--font-hn-gowun)",
+};
+
+// 저장된 글자 크기를 <html> 에 표시해 둔다. CSS 가 이걸 보고 배율을 준다. (중간이 기본값)
 function applyTextSize(size: TextSize) {
-  if (size === "normal") document.documentElement.removeAttribute("data-hn-text");
+  if (size === "medium") document.documentElement.removeAttribute("data-hn-text");
   else document.documentElement.setAttribute("data-hn-text", size);
+}
+
+// 저장된 폰트를 <html> 에 표시해 둔다. (기본체가 기본값)
+function applyFont(font: FontKey) {
+  if (font === "gaegu") document.documentElement.removeAttribute("data-hn-font");
+  else document.documentElement.setAttribute("data-hn-font", font);
 }
 
 export default function HunnyeoMyPage() {
@@ -62,31 +93,57 @@ export default function HunnyeoMyPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cardUrl, setCardUrl] = useState("");
   const [cardMsg, setCardMsg] = useState("");
-  const [textSize, setTextSize] = useState<TextSize>("normal");
+  const [textSize, setTextSize] = useState<TextSize>("medium");
+  const [font, setFont] = useState<FontKey>("gaegu");
   const [canNotify, setCanNotify] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
-  const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[2].time);
+  const [reminderTime, setReminderTime] = useState<ReminderTime>(REMINDER_PRESETS[0].time);
   const [canUseAuth, setCanUseAuth] = useState(false);
   const [authUser, setAuthUser] = useState<HunnyeoUser | null>(null);
   const [authMsg, setAuthMsg] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [canPurchase, setCanPurchase] = useState(false);
+  const [adsRemoved, setAdsRemoved] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [removeAdsPrice, setRemoveAdsPrice] = useState<string | null>(null);
+  const [purchaseMsg, setPurchaseMsg] = useState("");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 최초 마운트 시 localStorage에서 1회 하이드레이션
     setChecked(loadJSON(CHECKED_STORAGE_KEY, {} as Record<string, boolean>));
-    setNickname(loadJSON(NICKNAME_STORAGE_KEY, "완소소녀"));
+    const storedNickname = loadJSON(NICKNAME_STORAGE_KEY, "완소소녀");
+    setNickname(storedNickname);
     setAvatar(loadJSON(AVATAR_STORAGE_KEY, ""));
 
-    const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "normal");
+    const size = loadJSON<TextSize>(TEXT_SIZE_KEY, "medium");
     setTextSize(size);
     applyTextSize(size);
 
-    setReminderOn(loadJSON<boolean>(REMINDER_KEY, false));
-    setReminderTime(loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[2].time));
-    void notificationsAvailable().then(setCanNotify);
+    const storedFont = loadJSON<FontKey>(FONT_KEY, "gaegu");
+    setFont(storedFont);
+    applyFont(storedFont);
+
+    const storedReminderOn = loadJSON<boolean>(REMINDER_KEY, false);
+    const storedReminderTime = loadJSON<ReminderTime>(REMINDER_TIME_KEY, REMINDER_PRESETS[0].time);
+    setReminderOn(storedReminderOn);
+    setReminderTime(storedReminderTime);
+    void notificationsAvailable().then(async available => {
+      setCanNotify(available);
+      // 켜져 있었다면 앱을 열 때마다 60일치 예약을 다시 채워 끊기지 않게 한다
+      if (available && storedReminderOn) {
+        await enableDailyReminder(storedReminderTime.hour, storedReminderTime.minute, storedNickname);
+      }
+    });
     void authAvailable().then(async available => {
       setCanUseAuth(available);
       if (available) setAuthUser(await currentUser());
+    });
+    void purchasesAvailable().then(async available => {
+      setCanPurchase(available);
+      if (available) {
+        setAdsRemoved(await isAdsRemoved());
+        setRemoveAdsPrice(await getRemoveAdsPrice());
+      }
     });
   }, []);
 
@@ -162,12 +219,44 @@ export default function HunnyeoMyPage() {
     );
   }
 
-  // ── 글자 크기 ───────────────────────────────────────────────────────
+  // ── 글자 크기 · 폰트 ───────────────────────────────────────────────────
   function changeTextSize(size: TextSize) {
     tapFeedback();
     setTextSize(size);
     applyTextSize(size);
     saveJSON(TEXT_SIZE_KEY, size);
+  }
+
+  function changeFont(key: FontKey) {
+    tapFeedback();
+    setFont(key);
+    applyFont(key);
+    saveJSON(FONT_KEY, key);
+  }
+
+  // ── 광고 제거 ───────────────────────────────────────────────────────
+  async function buyRemoveAds() {
+    tapFeedback();
+    setPurchasing(true);
+    setPurchaseMsg("");
+    const result = await purchaseRemoveAds();
+    setPurchasing(false);
+    if (result === "owned") {
+      setAdsRemoved(true);
+      setPurchaseMsg("광고가 제거됐어요. 고마워요!");
+    } else if (result === "failed") {
+      setPurchaseMsg("구매가 안 됐어요. 취소했거나 잠시 문제가 있었을 수 있어요.");
+    }
+  }
+
+  async function restoreRemoveAds() {
+    tapFeedback();
+    setPurchasing(true);
+    setPurchaseMsg("");
+    const owned = await restorePurchases();
+    setPurchasing(false);
+    setAdsRemoved(owned);
+    setPurchaseMsg(owned ? "이전에 구매한 내역을 찾아서 복원했어요." : "복원할 구매 내역이 없어요.");
   }
 
   // ── 하루 한 번 알림 ─────────────────────────────────────────────────
@@ -367,7 +456,7 @@ export default function HunnyeoMyPage() {
             </button>
           )}
 
-          <p className="text-xs font-black mb-4" style={{ color: "#9b6bf5" }}>{info.level.name}</p>
+          <p className="text-xs font-black mb-4" style={{ color: "#333df2" }}>{info.level.name}</p>
 
           <div className="text-left">
             <HunnyeoScoreBar points={totalPoints} />
@@ -401,7 +490,7 @@ export default function HunnyeoMyPage() {
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2"
                   style={{
                     background: current ? "#fff6da" : "#fdfbf5",
-                    border: current ? "2.5px solid #f5b400" : "2px dotted #eadfc0",
+                    border: current ? "2.5px solid #ffd219" : "2px dotted #eadfc0",
                     opacity: reached ? 1 : 0.5,
                   }}
                 >
@@ -410,7 +499,7 @@ export default function HunnyeoMyPage() {
                     <p className="hn-cute text-[13px]" style={{ color: reached ? "#7a5b00" : "#b5a98a" }}>{lv.name}</p>
                     <p className="text-[10px] font-bold" style={{ color: "#b5a98a" }}>{lv.min}점부터</p>
                   </div>
-                  {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white hn-blink" style={{ background: "#f5b400" }}>지금 여기!</span>}
+                  {current && <span className="text-[10px] font-black px-2 py-0.5 rounded-full hn-blink" style={{ background: "#ffd219", color: "#7a5b00" }}>지금 여기!</span>}
                   {reached && !current && <PixelIcon name="check" size={15} />}
                 </div>
               );
@@ -469,7 +558,7 @@ export default function HunnyeoMyPage() {
       {/* 완료 목록 */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="hn-box hn-box-p p-4">
-          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#333df2" }}>
             <PixelIcon name="heart" size={15} /> 내가 해본 것 ({checkedTips.length})
           </h3>
           {checkedTips.length === 0 ? (
@@ -479,9 +568,9 @@ export default function HunnyeoMyPage() {
           ) : (
             <div className="space-y-1.5">
               {checkedTips.map(t => (
-                <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #ddd0ff" }}>
+                <div key={t.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: "#faf5ff", border: "2px dotted #bdc0f7" }}>
                   <span className="text-[13px] font-bold truncate pr-2" style={{ color: "#57406b" }}>{t.title}</span>
-                  <span className="text-[10px] font-black shrink-0" style={{ color: "#7c3aed" }}>+{t.points}점</span>
+                  <span className="text-[10px] font-black shrink-0" style={{ color: "#333df2" }}>+{t.points}점</span>
                 </div>
               ))}
             </div>
@@ -492,7 +581,7 @@ export default function HunnyeoMyPage() {
       {/* 자랑 카드 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box hn-glitter p-4">
-          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="camera" size={15} /> 훈녀력 자랑하기
           </h3>
           <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -535,7 +624,7 @@ export default function HunnyeoMyPage() {
           </button>
 
           {cardMsg && (
-            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
               {cardMsg}
             </p>
           )}
@@ -545,16 +634,16 @@ export default function HunnyeoMyPage() {
       {/* 설정 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box p-4">
-          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-3 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="comb" size={15} /> 설정
           </h3>
 
           <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자 크기</p>
           <div className="flex gap-2 mb-4">
             {([
-              ["normal", "보통"],
+              ["small", "작게"],
+              ["medium", "중간"],
               ["large", "크게"],
-              ["xlarge", "더 크게"],
             ] as const).map(([key, label]) => (
               <button
                 key={key}
@@ -566,6 +655,58 @@ export default function HunnyeoMyPage() {
               </button>
             ))}
           </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>글자체</p>
+          <div className="grid grid-cols-3 gap-1.5 mb-4">
+            {ALL_FONTS.map(({ key, label, sample }) => (
+              <button
+                key={key}
+                onClick={() => changeFont(key)}
+                className={`hn-btn py-2 text-[11px] leading-tight ${font === key ? "hn-btn-on" : ""}`}
+                aria-pressed={font === key}
+                style={{ fontFamily: FONT_STACK[key] }}
+              >
+                <span className="block text-[14px]">{sample}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>광고 제거</p>
+          {canPurchase ? (
+            adsRemoved ? (
+              <p className="hn-btn hn-btn-on w-full py-2.5 text-[12px] text-center mb-4" style={{ cursor: "default" }}>
+                <span className="flex items-center justify-center gap-1.5">
+                  <PixelIcon name="check" size={13} /> 광고 제거됨
+                </span>
+              </p>
+            ) : (
+              <div className="mb-4">
+                <button
+                  onClick={buyRemoveAds}
+                  disabled={purchasing}
+                  className="hn-btn w-full py-2.5 text-[12px] mb-1.5"
+                >
+                  {purchasing ? "처리 중..." : `배너 광고 없애기 — ${removeAdsPrice ?? "약 990원"}`}
+                </button>
+                <button
+                  onClick={restoreRemoveAds}
+                  disabled={purchasing}
+                  className="text-[11px] font-bold underline"
+                  style={{ color: "#b08aa0" }}
+                >
+                  이전에 구매했어요 (복원하기)
+                </button>
+                {purchaseMsg && (
+                  <p className="text-[11px] font-bold mt-1.5" style={{ color: "#b06a94" }}>{purchaseMsg}</p>
+                )}
+              </div>
+            )
+          ) : (
+            <p className="text-[11.5px] font-bold mb-4" style={{ color: "#b08aa0" }}>
+              구매는 앱으로 열었을 때만 할 수 있어요.
+            </p>
+          )}
 
           <p className="text-[12px] font-black mb-1.5" style={{ color: "#b06a94" }}>하루 한 번 알림</p>
           {canNotify ? (
@@ -610,7 +751,7 @@ export default function HunnyeoMyPage() {
       {canUseAuth && (
         <div className="max-w-2xl mx-auto px-4 mt-4">
           <div className="hn-box p-4">
-            <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#7c3aed" }}>
+            <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#333df2" }}>
               <PixelIcon name="star" size={15} /> 로그인 · 기기 동기화
             </h3>
             <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -643,7 +784,7 @@ export default function HunnyeoMyPage() {
             )}
 
             {authMsg && (
-              <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+              <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
                 {authMsg}
               </p>
             )}
@@ -654,7 +795,7 @@ export default function HunnyeoMyPage() {
       {/* 기록 옮기기 */}
       <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="hn-box p-4">
-          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+          <h3 className="hn-cute text-[15px] mb-1 flex items-center gap-1.5" style={{ color: "#d50062" }}>
             <PixelIcon name="floppy" size={15} /> 기록 옮기기
           </h3>
           <p className="text-[11.5px] font-bold leading-relaxed mb-3" style={{ color: "#a8869a" }}>
@@ -685,7 +826,7 @@ export default function HunnyeoMyPage() {
           )}
 
           <details>
-            <summary className="text-[12px] font-black cursor-pointer py-1" style={{ color: "#c9186d" }}>
+            <summary className="text-[12px] font-black cursor-pointer py-1" style={{ color: "#d50062" }}>
               코드로 되살리기
             </summary>
             <div className="mt-2">
@@ -713,7 +854,7 @@ export default function HunnyeoMyPage() {
           </details>
 
           {backupMsg && (
-            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#c9186d" }}>
+            <p className="text-[12px] font-black mt-2.5 text-center" style={{ color: "#d50062" }}>
               {backupMsg}
             </p>
           )}

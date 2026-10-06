@@ -12,7 +12,7 @@ export default function HunnyeoScoreBar({ points, compact = false }: { points: n
           <PixelIcon name={info.level.icon} size={18} className="hn-wiggle" />
           {info.level.name}
         </span>
-        <span className="hn-cute text-[13px] px-2 py-0.5 rounded-full" style={{ background: "#fff0f7", color: "#ff2b8d", border: "2px solid #ffb3d8" }}>
+        <span className="hn-cute text-[13px] px-2 py-0.5 rounded-full" style={{ background: "#fff0f7", color: "#d50062", border: "2px solid #ffb3d8" }}>
           훈녀력 {points}점
         </span>
       </div>

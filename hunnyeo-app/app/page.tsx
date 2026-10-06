@@ -126,7 +126,7 @@ export default function HunnyeoPage() {
               className="h-full"
               style={{
                 width: `${progress}%`,
-                background: "repeating-linear-gradient(45deg,#ff3d9a 0 8px,#ffd93d 8px 16px)",
+                background: "repeating-linear-gradient(45deg,#f90072 0 8px,#ffd93d 8px 16px)",
                 transition: "width 60ms linear",
               }}
             />
@@ -155,15 +155,15 @@ export default function HunnyeoPage() {
           <PixelIcon name="heart" size={26} className="absolute -top-3 -right-3 hn-float" style={{ animationDelay: ".7s" }} />
 
           <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>
-─── 90년대생 전용 미니홈피 ───
+─── Y2K 감성 미니홈피 ───
           </p>
 
           <h1 className="text-5xl font-black mb-1 hn-title">훈녀생정</h1>
-          <p className="text-xs font-black mb-4" style={{ color: "#9b6bf5" }}>
+          <p className="text-xs font-black mb-4" style={{ color: "#333df2" }}>
             훈훈한 여자 생활정보 <span className="hn-blink">★</span>
           </p>
 
-          <div className="hn-marquee mb-4 py-1.5 rounded-full" style={{ background: "#fff6da", border: "2px solid #f5b400" }}>
+          <div className="hn-marquee mb-4 py-1.5 rounded-full" style={{ background: "#fff6da", border: "2px solid #ffd219" }}>
             <div>
               {[0, 1].map(i => (
                 <span key={i} className="text-[11px] font-black" style={{ color: "#c98a00" }}>
@@ -175,7 +175,7 @@ export default function HunnyeoPage() {
 
           <div className="rounded-xl px-3 py-3 mb-4 text-[13px] leading-relaxed font-bold" style={{ background: "#fff0f7", border: "2px dashed #ff9ecb", color: "#a04a75" }}>
             집에 있는 재료로 하는<br />
-            예전 관리법 <b style={{ color: "#ff2b8d" }}>{TIPS.length}가지</b>를 모았어요
+            예전 관리법 <b style={{ color: "#d50062" }}>{TIPS.length}가지</b>를 모았어요
           </div>
 
           <button onClick={handleEnter} className="hn-btn hn-btn-on w-full py-3.5 text-base">
@@ -216,7 +216,7 @@ export default function HunnyeoPage() {
 
       {/* 오늘의 생정 — 날마다 하나씩 바뀐다 */}
       <section className="max-w-2xl mx-auto px-4 mt-5">
-        <p className="hn-cute text-[13px] mb-2 flex items-center gap-1.5" style={{ color: "#c9186d" }}>
+        <p className="hn-cute text-[13px] mb-2 flex items-center gap-1.5" style={{ color: "#d50062" }}>
           <PixelIcon name="star" size={15} className="hn-twinkle" /> 오늘의 생정
         </p>
         <HunnyeoTipCard
@@ -297,7 +297,7 @@ export default function HunnyeoPage() {
               {(complete || started) && (
                 <span
                   className={`hn-sticker absolute -top-2.5 -left-2 ${complete ? "hn-blink" : ""}`}
-                  style={{ borderColor: c.accent, color: complete ? "#c9186d" : "#d4348a" }}
+                  style={{ borderColor: c.accent, color: complete ? "#d50062" : "#d4348a" }}
                 >
                   {complete ? "올클리어!" : "하는중"}
                 </span>
@@ -310,7 +310,7 @@ export default function HunnyeoPage() {
                 style={{ display: "block", margin: "0 auto 6px", animationDelay: `${idx * 0.13}s` }}
               />
               <p className="hn-cute text-[16px] mb-0.5" style={{ color: c.accent }}>{c.label}</p>
-              <p className="text-[11px] font-bold mb-2 leading-tight" style={{ color: "#a8798f" }}>{c.desc}</p>
+              <p className="text-[12.5px] font-bold mb-2 leading-snug" style={{ color: "#8a6378" }}>{c.desc}</p>
 
               <div className="h-3.5 rounded-full overflow-hidden mb-1.5" style={{ background: "#fff", border: `2px solid ${c.accent}88` }}>
                 <div
