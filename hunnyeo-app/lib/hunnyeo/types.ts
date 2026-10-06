@@ -18,11 +18,11 @@ export type HunnyeoCategoryKey =
   | "eye"       // 제10장 눈·눈썹
   | "body"      // 제11장 몸매·자세
   | "life"      // 제12장 생활습관
-  | "item"      // 제13장 완소템
-  | "words"     // 제14장 추억사전
-  | "spell"     // 제15장 글자스킬
-  | "love"      // 제16장 애정운
-  | "workout";  // 제17장 그시절 훈녀운동
+  | "workout"   // 제13장 그시절 훈녀운동
+  | "item"      // 제14장 완소템
+  | "words"     // 제15장 추억사전
+  | "spell"     // 제16장 글자스킬
+  | "love";     // 제17장 애정운
 
 export interface HunnyeoCategory {
   key: HunnyeoCategoryKey;
@@ -48,11 +48,11 @@ export const CATEGORIES: HunnyeoCategory[] = [
   { key: "eye",      label: "눈·눈썹",     desc: "눈썹 정리와 눈가 관리",       icon: "eye",        accent: "#b794f6" },
   { key: "body",     label: "몸매·자세",   desc: "자세 교정과 맵시 관리",       icon: "dress",      accent: "#ff7eb9" },
   { key: "life",     label: "생활습관",    desc: "잠·물·향기 같은 기본기",      icon: "moon",       accent: "#93c5fd" },
+  { key: "workout",  label: "그시절 훈녀운동", desc: "그 시절 유행한 홈트레이닝 모음",  icon: "dumbbell",   accent: "#16a34a" },
   { key: "item",     label: "완소템",      desc: "예전 필수 아이템",         icon: "heart",      accent: "#ff5ca8" },
   { key: "words",    label: "추억사전",    desc: "예전 말과 유행 이야기",    icon: "book",       accent: "#fbbf24" },
   { key: "spell",    label: "글자스킬",    desc: "공책에 적던 주문, 일명 문자스킬",     icon: "note",       accent: "#d17bd8" },
   { key: "love",     label: "애정운",      desc: "예전 짝사랑 미신 모음",     icon: "letter",     accent: "#f43f5e" },
-  { key: "workout",  label: "그시절 훈녀운동", desc: "그 시절 유행한 홈트레이닝 모음",  icon: "dumbbell",   accent: "#16a34a" },
 ];
 
 export type TipType = "action" | "read";
