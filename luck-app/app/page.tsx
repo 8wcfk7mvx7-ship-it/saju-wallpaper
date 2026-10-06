@@ -4,6 +4,7 @@ import BirthInputForm, { defaultProfile } from "@/components/BirthInputForm";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import AuthScreen from "@/components/AuthScreen";
 import HistoryList from "@/components/HistoryList";
+import MemoCalendar from "@/components/MemoCalendar";
 import { PrivacyContent, TermsContent } from "@/components/LegalContent";
 import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
 import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
@@ -740,17 +741,7 @@ export default function HomePage() {
             <FadeIn delay={40}>
               <Card>
                 <p className="text-xs font-bold mb-3" style={{ color: "var(--ink-soft)" }}>지난 메모</p>
-                <HistoryList
-                  items={pastMemos.filter((m) => m.date !== dateKey)}
-                  getDate={(m) => m.date}
-                  emptyText="아직 지난 메모가 없어요."
-                  renderItem={(m) => (
-                    <>
-                      <p className="text-[0.6875rem] font-bold mb-1" style={{ color: "var(--clover)" }}>{formatDateLabel(m.date)}</p>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "var(--ink)" }}>{m.content}</p>
-                    </>
-                  )}
-                />
+                <MemoCalendar memos={pastMemos} todayKey={dateKey} />
               </Card>
             </FadeIn>
           </div>
