@@ -24,7 +24,7 @@ import { notificationsAvailable, enableDailyReminder, disableDailyReminder } fro
 import { tapFeedback } from "@/lib/hunnyeoHaptics";
 import { authAvailable, signInWithApple, signInWithGoogle, signOutEverywhere, currentUser, type HunnyeoUser } from "@/lib/hunnyeoAuth";
 import { pullAndMergeRecord } from "@/lib/hunnyeoSync";
-import { purchasesAvailable, isAdsRemoved, purchaseRemoveAds, restorePurchases } from "@/lib/hunnyeoPurchase";
+import { purchasesAvailable, isAdsRemoved, purchaseRemoveAds, restorePurchases, getRemoveAdsPrice } from "@/lib/hunnyeoPurchase";
 
 const TEXT_SIZE_KEY = "hunnyeo_textsize_v1";
 const FONT_KEY = "hunnyeo_font_v1";
@@ -105,6 +105,7 @@ export default function HunnyeoMyPage() {
   const [canPurchase, setCanPurchase] = useState(false);
   const [adsRemoved, setAdsRemoved] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  const [removeAdsPrice, setRemoveAdsPrice] = useState<string | null>(null);
   const [purchaseMsg, setPurchaseMsg] = useState("");
 
   useEffect(() => {
@@ -139,7 +140,10 @@ export default function HunnyeoMyPage() {
     });
     void purchasesAvailable().then(async available => {
       setCanPurchase(available);
-      if (available) setAdsRemoved(await isAdsRemoved());
+      if (available) {
+        setAdsRemoved(await isAdsRemoved());
+        setRemoveAdsPrice(await getRemoveAdsPrice());
+      }
     });
   }, []);
 
@@ -683,7 +687,7 @@ export default function HunnyeoMyPage() {
                   disabled={purchasing}
                   className="hn-btn w-full py-2.5 text-[12px] mb-1.5"
                 >
-                  {purchasing ? "처리 중..." : "배너 광고 없애기 — 990원"}
+                  {purchasing ? "처리 중..." : `배너 광고 없애기 — ${removeAdsPrice ?? "약 990원"}`}
                 </button>
                 <button
                   onClick={restoreRemoveAds}

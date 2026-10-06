@@ -52,7 +52,7 @@ export const CATEGORIES: HunnyeoCategory[] = [
   { key: "words",    label: "추억사전",    desc: "예전 말과 유행 이야기",    icon: "book",       accent: "#fbbf24" },
   { key: "spell",    label: "글자스킬",    desc: "공책에 적던 주문, 일명 문자스킬",     icon: "note",       accent: "#d17bd8" },
   { key: "love",     label: "애정운",      desc: "예전 짝사랑 미신 모음",     icon: "letter",     accent: "#f43f5e" },
-  { key: "workout",  label: "그시절 훈녀운동", desc: "빌리·이소라·파워워킹",       icon: "dumbbell",   accent: "#16a34a" },
+  { key: "workout",  label: "그시절 훈녀운동", desc: "그 시절 유행한 홈트레이닝 모음",  icon: "dumbbell",   accent: "#16a34a" },
 ];
 
 export type TipType = "action" | "read";

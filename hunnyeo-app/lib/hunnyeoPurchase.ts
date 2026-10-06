@@ -78,6 +78,16 @@ export async function isAdsRemoved(): Promise<boolean> {
   return owned;
 }
 
+/** 스토어가 알려주는 실제 현지화 가격. 아직 못 불러왔거나 웹이면 null. */
+export async function getRemoveAdsPrice(): Promise<string | null> {
+  const platform = await nativePlatform();
+  if (!platform) return null;
+  await ensureStore();
+  const { store } = await import("capacitor-plugin-cdv-purchase");
+  const offer = store.get(PRODUCT_ID)?.getOffer();
+  return offer?.pricingPhases?.[0]?.price ?? null;
+}
+
 export async function purchaseRemoveAds(): Promise<"owned" | "failed" | "unavailable"> {
   const platform = await nativePlatform();
   if (!platform) return "unavailable";
