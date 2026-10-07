@@ -55,16 +55,46 @@ async function run() {
       await page.click("text=다음"); // -> 8 (오늘의 메모, 마지막)
       await page.waitForTimeout(150);
       await page.click("text=시작하기");
-      await page.waitForTimeout(800);
+      await page.waitForTimeout(2200);
+      // 이 앱은 iOS WKWebView의 position:fixed 버그를 피하려고 body 자체는 절대
+      // 스크롤되지 않게 잠가두고(overflow:hidden), 실제 스크롤은 안쪽 div가 맡는다
+      // (app/page.tsx의 "h-full overflow-y-auto" 컨테이너). 그래서 Playwright의
+      // fullPage 스크린샷이 문서 높이를 뷰포트 높이로만 재서 아래쪽이 잘린다 —
+      // 캡처 직전에만 일시적으로 스크롤 잠금을 풀어 전체 높이가 제대로 측정되게 한다.
+      await page.evaluate(() => {
+        document.documentElement.style.overflow = "visible";
+        document.documentElement.style.height = "auto";
+        document.body.style.overflow = "visible";
+        document.body.style.height = "auto";
+        document.querySelectorAll("main").forEach((el) => {
+          el.style.height = "auto";
+          el.style.overflow = "visible";
+        });
+        document.querySelectorAll(".overflow-y-auto").forEach((el) => {
+          el.style.height = "auto";
+          el.style.overflow = "visible";
+        });
+      });
+      await page.waitForTimeout(200);
       await page.screenshot({ path: path.join(dir, "03-dashboard-today.png"), fullPage: true });
+
+      // 위에서 풀어둔 overflow:hidden/100dvh를 코드로 "되돌리면" 될 것 같지만, 실제로는
+      // 안 된다: Playwright의 fullPage 캡처가 캡처 중에만 뷰포트를 전체 콘텐츠 높이로
+      // 키웠다가 되돌리는데, 그 과정에서 100dvh(동적 뷰포트 단위) 계산값이 꼬여서
+      // main/스크롤 컨테이너가 실제 뷰포트보다 큰 상태로 남는다(스크롤 위치는 0인데도
+      // 컨테이너 자체가 위로 밀려 보임). CSS를 일일이 복구하는 대신 그냥 새로고침해서
+      // 완전히 깨끗한 상태로 메모/기록 탭을 다시 찍는다 — 생년월일은 이미 저장돼 있어서
+      // 새로고침해도 온보딩을 다시 거치지 않고 바로 대시보드로 돌아온다.
+      await page.reload({ waitUntil: "networkidle" });
+      await page.waitForTimeout(1800);
 
       // 4) 메모 / 기록 탭 (하단 탭바)
       await page.click("text=메모");
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(800);
       await page.screenshot({ path: path.join(dir, "04-dashboard-memo.png") });
 
       await page.click("text=기록");
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(800);
       await page.screenshot({ path: path.join(dir, "05-dashboard-log.png") });
     } catch (err) {
       console.error(`${device.name}: 캡처 실패`, err.message);
