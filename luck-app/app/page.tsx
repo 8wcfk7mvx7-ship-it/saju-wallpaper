@@ -6,11 +6,12 @@ import AuthScreen from "@/components/AuthScreen";
 import HistoryList from "@/components/HistoryList";
 import MemoCalendar from "@/components/MemoCalendar";
 import { PrivacyContent, TermsContent } from "@/components/LegalContent";
-import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon } from "@/components/Icons";
+import { CloverIcon, MemoIcon, ChartIcon, GearIcon, SparkleIcon, ShareIcon } from "@/components/Icons";
 import { SunPixel, CloudPixel, PouchPixel, CloverStamp } from "@/components/LuckArt";
 import { analyzeSaju } from "@/lib/saju";
 import { getDailyLuck, getKstDateKey, type DailyLuck } from "@/lib/luckEngine";
 import { getHeavenReply } from "@/lib/heavenReply";
+import { renderShareCardDataUrl, type ShareGrade } from "@/lib/shareCard";
 import { getMorningNotifyEnabled, setMorningNotifyEnabled } from "@/lib/notifications";
 import { hapticLight, hapticSuccess } from "@/lib/feedback";
 import { initBannerAd, hideBannerAd } from "@/lib/ads";
@@ -183,6 +184,7 @@ export default function HomePage() {
   const [showLuckPopup, setShowLuckPopup] = useState(false);
   const [lastYearCall, setLastYearCall] = useState("");
   const [heavenReply, setHeavenReply] = useState("");
+  const [sharing, setSharing] = useState(false);
   const [notifyOn, setNotifyOn] = useState(false);
   const [fontSize, setFontSizeState] = useState<FontSize>("medium");
   const [adsRemoved, setAdsRemoved] = useState(false);
@@ -425,6 +427,44 @@ export default function HomePage() {
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  // "오늘의 운세" 카드를 이미지로 그려서 공유 시트(또는 웹에서는 다운로드)로 내보낸다.
+  // 파일 내보내기와 같은 이유로 네이티브/웹 경로를 나눈다 — 위 handleExportBackup 참고.
+  async function handleShareToday() {
+    if (!luck || sharing) return;
+    setSharing(true);
+    try {
+      const grades: ShareGrade[] = GRADE_DOMAINS.map(({ key, label }) => ({
+        label,
+        grade: luck.dailyGrades.personalized ? luck.dailyGrades[key].grade : "?",
+      }));
+      const dataUrl = await renderShareCardDataUrl({
+        dateLabel: todayLabel,
+        seasonLabel: luck.term.name,
+        ganwoonTip: luck.actionOfDay[0],
+        todayColor: luck.todayColor,
+        todayNumbers: luck.todayNumbers,
+        grades,
+      });
+      const filename = `luck-app-share-${dateKey}.png`;
+      if (Capacitor.isNativePlatform()) {
+        const base64 = dataUrl.split(",")[1] ?? "";
+        await Filesystem.writeFile({ path: filename, data: base64, directory: Directory.Cache });
+        const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
+        await Share.share({ title: "오늘의 운세", text: "오늘의 운세를 확인해보세요", url: uri, dialogTitle: "오늘의 운세 공유하기" });
+      } else {
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = filename;
+        a.click();
+      }
+    } catch {
+      setSyncMsg("공유 이미지를 만들지 못했어요.");
+      setTimeout(() => setSyncMsg(null), 2500);
+    } finally {
+      setSharing(false);
+    }
   }
 
   function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -709,6 +749,17 @@ export default function HomePage() {
                 ))}
                 <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--ink)" }}>{luck.aegmagiTip}</p>
               </Card>
+            </FadeIn>
+
+            <FadeIn delay={180}>
+              <button
+                onClick={handleShareToday}
+                disabled={sharing}
+                className="retro-btn font-display w-full py-3 text-sm flex items-center justify-center gap-2"
+                style={{ background: "var(--card)", color: "var(--clover)" }}>
+                <ShareIcon size={16} />
+                {sharing ? "이미지 만드는 중…" : "오늘의 운세 공유하기"}
+              </button>
             </FadeIn>
           </div>
         )}

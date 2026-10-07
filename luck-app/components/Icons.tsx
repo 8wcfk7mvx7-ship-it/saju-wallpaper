@@ -61,6 +61,17 @@ export function SparkleIcon({ size = 20, className, style }: IconProps) {
   );
 }
 
+export function ShareIcon({ size = 20, className, style }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" {...base} className={className} style={style}>
+      <circle cx="18" cy="5" r="2.6" />
+      <circle cx="6" cy="12" r="2.6" />
+      <circle cx="18" cy="19" r="2.6" />
+      <path d="M8.3 10.6 15.7 6.4M8.3 13.4l7.4 4.2" />
+    </svg>
+  );
+}
+
 export function PaletteIcon({ size = 20, className, style }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" stroke="currentColor" {...base} className={className} style={style}>

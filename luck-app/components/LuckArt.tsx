@@ -70,7 +70,8 @@ export function PouchPixel({ size = 48, className, style }: ArtProps) {
 //    하나의 로고로 통일한다(기존 "幸" 도장은 다른 아이콘들과 스타일이
 //    겉돌아서 이 클로버로 교체했다).
 const CLOVER_W = 22, CLOVER_H = 24;
-function cloverGrid(): Grid {
+// 공유 카드(lib/shareCard.ts)에서 캔버스에 같은 로고를 그릴 때도 재사용하므로 export.
+export function cloverGrid(): Grid {
   const petal = (cx: number, cy: number) => makeMask(CLOVER_W, CLOVER_H, (x, y) => Math.hypot(x - cx, y - cy) <= 4.3);
   const petals = unionMask(petal(7.5, 8), petal(14.5, 8), petal(7.5, 15), petal(14.5, 15));
   const stem = makeMask(CLOVER_W, CLOVER_H, (x, y) => x >= 10 && x <= 12 && y >= 13 && y <= 22);
