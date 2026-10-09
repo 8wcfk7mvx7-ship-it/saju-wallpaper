@@ -149,7 +149,7 @@ export function drawShareCard({ nickname, info, points, doneCount }: ShareCardIn
   // 꼬리말
   ctx.fillStyle = "#ff6fb5";
   ctx.font = font(32);
-  ctx.fillText("훈녀생정 · Y2K 감성 뷰티 노트", cx, listTop + LEVELS.length * lineGap + 42);
+  ctx.fillText("훈녀생정 · 90년대생 추억 뷰티 노트", cx, listTop + LEVELS.length * lineGap + 42);
 
   return canvas.toDataURL("image/png");
 }

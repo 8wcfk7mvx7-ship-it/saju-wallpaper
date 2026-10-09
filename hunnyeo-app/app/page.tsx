@@ -155,7 +155,7 @@ export default function HunnyeoPage() {
           <PixelIcon name="heart" size={26} className="absolute -top-3 -right-3 hn-float" style={{ animationDelay: ".7s" }} />
 
           <p className="text-[11px] font-black mb-2" style={{ color: "#ff6fb5" }}>
-─── Y2K 감성 미니홈피 ───
+─── 90년대생 미니홈피 ───
           </p>
 
           <h1 className="text-5xl font-black mb-1 hn-title">훈녀생정</h1>

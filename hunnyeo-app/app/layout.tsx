@@ -66,9 +66,9 @@ const gowun = Gowun_Dodum({
 });
 
 export const metadata: Metadata = {
-  title: "훈녀생정 — Y2K 감성 뷰티 노트",
+  title: "훈녀생정 — 90년대생 추억 뷰티 노트",
   description:
-    "밀가루팩, 봉숭아물 들이기, 빌리의 부트캠프까지. 그 시절 레전드 '훈훈한 여자 생활정보'를 지금 감성으로 모았어요.",
+    "밀가루팩, 봉숭아물 들이기, 빌리의 부트캠프까지. 2000년대 '훈훈한 여자 생활정보'를 모은 추억 콘텐츠예요.",
 };
 
 export const viewport: Viewport = {
